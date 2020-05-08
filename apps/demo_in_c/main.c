@@ -1,5 +1,5 @@
-#include <electionguard/encrypt.h>
 #include <assert.h>
+#include <electionguard/encrypt.h>
 
 int main()
 {

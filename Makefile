@@ -1,7 +1,10 @@
-.PHONY: build clean demo-c demo-cpp
+.PHONY: build clean demo-c demo-cpp test
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_DIR="$(realpath .)/build/ElectionGuard"
+
+environment:
+	wget -O cmake/CPM.cmake https://github.com/TheLartians/CPM.cmake/releases/latest/download/CPM.cmake
 
 build: clean
 	if [ ! -d "build" ]; then mkdir build; fi
@@ -25,3 +28,10 @@ demo-cpp: build
 	ElectionGuard_DIR=$(ELECTIONGUARD_DIR) cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp
 	cmake --build build/apps/demo_in_cpp --target DemoInCPP
 	./build/apps/demo_in_cpp/DemoInCPP
+
+test: clean
+	ElectionGuard_DIR=$(ELECTIONGUARD_DIR) cmake -Htest -Bbuild/test
+	cmake --build build/test
+	CTEST_OUTPUT_ON_FAILURE=1 cmake --build build/test --target ElectionGuardTests
+	./build/test/ElectionGuardTests
+	

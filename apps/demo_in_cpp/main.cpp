@@ -1,6 +1,8 @@
+#include <assert.h>
 #include <electionguard/encrypt.h>
 #include <electionguard/encrypt.hpp>
-#include <assert.h>
+
+using namespace electionguard;
 
 int main()
 {

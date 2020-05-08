@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 
+# ---- Project ----
+
 project("ElectionGuard Demo in CPP" 
     VERSION 0.0.1 
     LANGUAGES CXX
