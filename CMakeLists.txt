@@ -30,17 +30,10 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# ---- Dependencies ----
-
-
 # ---- OPTIONS ----
 
-#option(BUILD_SHARED_LIBS        "Build shared instead of static libraries."                 ON)
 option(CMAKE_BUILD_TYPE         "Build with or withoutdebug symbols"                        Release)
-option(OPTION_BUILD_DOCS        "Build documentation."                                      OFF)
-option(OPTION_BUILD_EXAMPLES    "Build examples."                                           OFF)
 option(OPTION_ENABLE_TESTS      "Enable support for testing private headers"                OFF)
-option(OPTION_ENABLE_COVERAGE   "Enable coverage"                                           OFF)
 
 # --- PROPERTIES ---
 
@@ -57,6 +50,3 @@ endif()
 # ---- Library Sources ----
 
 add_subdirectory(src)
-
-# ---- Executable ----
-
