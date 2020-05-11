@@ -47,7 +47,11 @@ if(MSVC)
     target_compile_definitions(ElectionGuardTests PUBLIC DOCTEST_CONFIG_USE_STD_HEADERS)
 endif()
 
-target_link_libraries(ElectionGuardTests doctest ${META_PROJECT_TARGET})
+# ---- Link Libraries ----
+
+find_package(GMP REQUIRED)
+
+target_link_libraries(ElectionGuardTests doctest ${META_PROJECT_TARGET} ${GMPXX_LIBRARY})
 
 # ---- Add Tests ----
 

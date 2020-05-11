@@ -11,7 +11,8 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.hpp
 )
 
-add_library(${META_PROJECT_TARGET} SHARED STATIC ${PROJECT_SOURCE_FILES})
+# TODO: STATIC
+add_library(${META_PROJECT_TARGET} SHARED ${PROJECT_SOURCE_FILES})
 
 # ---- Compile ----
 
@@ -29,6 +30,11 @@ target_include_directories(${META_PROJECT_TARGET}
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/${META_PROJECT_TARGET}
 )
+
+# ---- Dependencies ----
+
+find_package(GMP REQUIRED)
+target_link_libraries(${META_PROJECT_TARGET} ${GMP_LIBRARY})
 
 # ---- Install ----
 
