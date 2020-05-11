@@ -15,7 +15,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
 # ---- Options ----
 
-set(OPTION_ENABLE_TESTS ON)
+set(CMAKE_BUILD_TYPE        Debug)
+set(OPTION_ENABLE_TESTS     ON)
 
 # ---- Dependencies ----
 

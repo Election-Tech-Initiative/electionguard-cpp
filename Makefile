@@ -1,15 +1,31 @@
 .PHONY: build clean demo-c demo-cpp test
 
+BUILD_DEBUG?=false
+
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_DIR="$(realpath .)/build/ElectionGuard"
+
+all: environment build install
 
 environment:
 	wget -O cmake/CPM.cmake https://github.com/TheLartians/CPM.cmake/releases/latest/download/CPM.cmake
 
-build: clean
+ifeq ($(BUILD_DEBUG),true)
+build: build-debug
+else
+build: build-release
+endif
+
+build-debug: clean
 	if [ ! -d "build" ]; then mkdir build; fi
 	if [ ! -d "build/ElectionGuard" ]; then mkdir build/ElectionGuard; fi
-	cmake -S . -B build/ElectionGuard
+	cmake -S . -B build/ElectionGuard -DCMAKE_BUILD_TYPE=Debug
+	cmake --build build/ElectionGuard
+
+build-release: clean
+	if [ ! -d "build" ]; then mkdir build; fi
+	if [ ! -d "build/ElectionGuard" ]; then mkdir build/ElectionGuard; fi
+	cmake -S . -B build/ElectionGuard -DCMAKE_BUILD_TYPE=Release
 	cmake --build build/ElectionGuard
 
 clean:
