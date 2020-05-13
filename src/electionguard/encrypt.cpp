@@ -1,5 +1,7 @@
 #include "electionguard/encrypt.hpp"
 
+#include "hash.hpp"
+
 #include <iostream>
 
 namespace electionguard
@@ -18,6 +20,9 @@ namespace electionguard
     int EncryptionCompositor::encrypt()
     {
         std::cout << __func__ << " : encrypting by instance " << std::endl;
+        auto result = hash_elems("some string");
+        if (result == 5) {
+        }
         return 9;
     }
 

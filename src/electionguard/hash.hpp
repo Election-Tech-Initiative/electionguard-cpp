@@ -1,12 +1,13 @@
-#ifndef __ELECTIONGUARD_ENCRYPTION_COMPOSITOR_H_INCLUDED__
-#define __ELECTIONGUARD_ENCRYPTION_COMPOSITOR_H_INCLUDED__
+#ifndef __ELECTIONGUARD__CORE_HASH_HPP_INCLUDED__
+#define __ELECTIONGUARD__CORE_HASH_HPP_INCLUDED__
+#include <electionguard/export.h>
 #include <string>
 
 using namespace std;
 
 namespace electionguard
 {
-    int hash_elems(string const &a);
+    EG_INTERNAL_API int hash_elems(string const &a);
 } // namespace electionguard
 
-#endif /* __ELECTIONGUARD_ENCRYPTION_COMPOSITOR_H_INCLUDED__ */
+#endif /* __ELECTIONGUARD__CORE_HASH_HPP_INCLUDED__ */

@@ -1,25 +1,7 @@
 #ifndef __ELECTIONGUARD_CORE_H_INCLUDED__
 #define __ELECTIONGUARD_CORE_H_INCLUDED__
 
-/* Use the windows pattern to export suymbols */
-
-#ifndef EG_API
-#    ifdef _WIN32
-#        if defined(ELECTIONGUARD_BUILD_SHARED) /* build dll */
-#            define EG_API __declspec(dllexport)
-#        elif !defined(ELECTIONGUARD_BUILD_STATIC) /* use dll */
-#            define EG_API __declspec(dllimport)
-#        else /* static library */
-#            define EG_API
-#        endif
-#    else
-#        if __GNUC__ >= 4
-#            define EG_API __attribute__((visibility("default")))
-#        else
-#            define EG_API
-#        endif
-#    endif
-#endif
+#include "export.h"
 
 #ifdef __cplusplus
 extern "C" {

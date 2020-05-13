@@ -1,7 +1,7 @@
 #include "electionguard/encrypt.hpp"
 
 extern "C" {
-    #include "electionguard/encrypt.h"
+#include "electionguard/encrypt.h"
 }
 
 #define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
@@ -9,7 +9,8 @@ extern "C" {
 
 eg_encryption_compositor_t *eg_encryption_compositor_new()
 {
-    return AS_TYPE(eg_encryption_compositor_t, new electionguard::EncryptionCompositor());
+    return AS_TYPE(eg_encryption_compositor_t,
+                   new electionguard::EncryptionCompositor());
 }
 
 void eg_encryption_compositor_free(eg_encryption_compositor_t *composer)
@@ -24,7 +25,4 @@ int eg_encryption_compositor_encrypt(eg_encryption_compositor_t *composer)
     return AS_TYPE(electionguard::EncryptionCompositor, composer)->encrypt();
 }
 
-int eg_encrypt_ballot()
-{
-    return electionguard::encrypt_ballot();
-}
+int eg_encrypt_ballot() { return electionguard::encrypt_ballot(); }

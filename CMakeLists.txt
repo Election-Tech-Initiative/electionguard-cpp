@@ -30,22 +30,17 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# ---- OPTIONS ----
+# ---- Options ----
 
 option(CMAKE_BUILD_TYPE         "Build with or withoutdebug symbols"                        Release)
+option(BUILD_SHARED_LIBS         "Build SHARED libraries"                                   ON)
 option(OPTION_ENABLE_TESTS      "Enable support for testing private headers"                OFF)
 
-# --- PROPERTIES ---
+# --- Properties ---
 
 # IDE's usually prefer folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(IDE_FOLDER "")
-
-# Set a DEBUG definition
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-    message("setting DEBUG during compile")
-    add_compile_definitions(DEBUG)
-endif()
 
 # ---- Library Sources ----
 

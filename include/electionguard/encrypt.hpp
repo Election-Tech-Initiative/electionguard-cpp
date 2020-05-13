@@ -1,9 +1,11 @@
-#ifndef __ELECTIONGUARD_ENCRYPTION_COMPOSITOR_H_INCLUDED__
-#define __ELECTIONGUARD_ENCRYPTION_COMPOSITOR_H_INCLUDED__
+#ifndef __ELECTIONGUARD_CORE_ENCRYPT_HPP_INCLUDED__
+#define __ELECTIONGUARD_CORE_ENCRYPT_HPP_INCLUDED__
+
+#include "export.h"
 
 namespace electionguard
 {
-    class EncryptionCompositor
+    class EG_API EncryptionCompositor
     {
       public:
         EncryptionCompositor();
@@ -12,7 +14,7 @@ namespace electionguard
         int encrypt();
     };
 
-    int encrypt_ballot();
+    EG_API int encrypt_ballot();
 } // namespace electionguard
 
-#endif /* __ELECTIONGUARD_ENCRYPTION_COMPOSITOR_H_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CORE_ENCRYPT_HPP_INCLUDED__ */
