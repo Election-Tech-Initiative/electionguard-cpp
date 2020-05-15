@@ -26,22 +26,82 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
     message(FATAL_ERROR "In-source builds not allowed. Please make a new /build/ directory and run CMake from there.")
 endif()
 
+# ---- Options ----
+
+option(CMAKE_BUILD_TYPE         "Build with or without debug symbols"                       Release)
+option(BUILD_SHARED_LIBS         "Build SHARED libraries"                                   OFF)
+option(OPTION_ENABLE_TESTS      "Enable support for testing private headers"                OFF)
+option(CODE_COVERAGE            "Enable code coverage"                                      OFF)
+option(OPTION_GENERATE_DOCS     "Generate documentation"                                    OFF)
+option(USE_STATIC_ANALYSIS      "use static analysis tools"                                 OFF)
+option(USE_DYNAMIC_ANALYSIS      "use dynamic analysis tools"                               OFF)
+option(USE_FORMATTING           "use formatting tools"                                      ON)
+
 # ---- Modules ----
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# ---- Options ----
+# ---- Dependencies ----
 
-option(CMAKE_BUILD_TYPE         "Build with or withoutdebug symbols"                        Release)
-option(BUILD_SHARED_LIBS         "Build SHARED libraries"                                   ON)
-option(OPTION_ENABLE_TESTS      "Enable support for testing private headers"                OFF)
+include(cmake/CPM.cmake)
+
+CPMAddPackage(
+    NAME StableCoder-cmake-scripts
+    GITHUB_REPOSITORY StableCoder/cmake-scripts
+    GIT_TAG 3a469d8251660a97dbf9e0afff0a242965d40277
+)
+
+# ---- Enable Tools ----
+
+# available values are: Address, Memory, MemoryWithOrigins, Undefined, Thread, Leak, 'Address;Undefined'
+if (USE_SANITIZER)
+    message("++ Using Sanitizer: ${USE_SANITIZER}")
+    include(${StableCoder-cmake-scripts_SOURCE_DIR}/sanitizers.cmake)
+endif()
+
+if (CODE_COVERAGE)
+    message("++ Running with coverage")
+    include(${StableCoder-cmake-scripts_SOURCE_DIR}/code-coverage.cmake)
+    add_code_coverage()
+endif()
+
+if (USE_STATIC_ANALYSIS)
+    message("++ Running with static analysis")
+    set(CLANG_TIDY ON)
+    set(CPPCHECK ON)
+    include(${StableCoder-cmake-scripts_SOURCE_DIR}/tools.cmake)
+    clang_tidy()
+    cppcheck()
+endif()
+
+if (USE_FORMATTING)
+    message("++ Running with formatting")
+    include(${StableCoder-cmake-scripts_SOURCE_DIR}/formatting.cmake)
+endif()
 
 # --- Properties ---
+
+set(CMAKE_CXX_STANDARD_REQUIRED     ON)
+set(CMAKE_CXX_EXTENSIONS            OFF)
 
 # IDE's usually prefer folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(IDE_FOLDER "")
 
-# ---- Library Sources ----
+# Set a DEBUG definition
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    message("++ Setting DEBUG during compile")
+    add_compile_definitions(DEBUG)
+endif()
+
+# ---- Sources ----
 
 add_subdirectory(src)
+
+if (OPTION_ENABLE_TESTS)
+    add_subdirectory(test)
+endif()
+
+if (OPTION_GENERATE_DOCS)
+    add_subdirectory(docs)
+endif()

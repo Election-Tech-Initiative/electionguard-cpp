@@ -1,11 +1,15 @@
-BasedOnStyle: LLVM
-IndentWidth: 4
 ---
 Language: Cpp
+BasedOnStyle: LLVM
+IndentWidth: 4
+ColumnLimit: 80
 ReflowComments: false
+
+# Braces
 BreakBeforeBraces: Linux
 ContinuationIndentWidth: 2
 Cpp11BracedListStyle: true
+
 FixNamespaceComments: true
 IncludeBlocks: Regroup
 IndentCaseLabels: true

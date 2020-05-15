@@ -1,3 +1,5 @@
 /build*
 
 cmake/CPM.cmake
+
+.DS_Store

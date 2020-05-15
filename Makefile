@@ -1,9 +1,9 @@
 .PHONY: build clean demo-c demo-cpp test
 
-BUILD_DEBUG?=false
+BUILD_DEBUG?=true
 
 .EXPORT_ALL_VARIABLES:
-ELECTIONGUARD_DIR="$(realpath .)/build/electionguard-core"
+ELECTIONGUARD_BUILD_DIR="$(realpath .)/build/electionguard-core"
 
 # Detect operating system
 ifeq ($(OS),Windows_NT)
@@ -33,64 +33,83 @@ build: build-release
 endif
 
 build-debug: clean
-	if [ ! -d "build" ]; then mkdir build; fi
-	if [ ! -d "build/electionguard-core" ]; then mkdir build/electionguard-core; fi
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B build/electionguard-core -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug
+	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON
 else
-	cmake -S . -B build/electionguard-core -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON
+	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON
 endif
-	cmake --build build/electionguard-core
+	cmake --build $(ELECTIONGUARD_BUILD_DIR)
 
 build-release: clean
-	if [ ! -d "build" ]; then mkdir build; fi
-	if [ ! -d "build/electionguard-core" ]; then mkdir build/electionguard-core; fi
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B build/electionguard-core -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
+	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DUSE_STATIC_ANALYSIS=ON
 else
-	cmake -S . -B build/electionguard-core -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
+	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DUSE_STATIC_ANALYSIS=ON
 endif
-	cmake --build build/electionguard-core
+	cmake --build $(ELECTIONGUARD_BUILD_DIR)
 
 clean:
 	if [ -d "build" ]; then rm -rf ./build/*; fi
-	
-demo-c: build
+	if [ ! -d "build" ]; then mkdir build; fi
+	if [ ! -d "$($(ELECTIONGUARD_BUILD_DIR))" ]; then mkdir $(ELECTIONGUARD_BUILD_DIR); fi
 	if [ ! -d "build/apps" ]; then mkdir build/apps; fi
 	if [ ! -d "build/apps/demo_in_c" ]; then mkdir build/apps/demo_in_c; fi
+	if [ ! -d "build/apps/demo_in_cpp" ]; then mkdir build/apps/demo_in_cpp; fi
+	
+demo-c: build
 ifeq ($(OPERATING_SYSTEM),Windows)
-	CMAKE_PREFIX_PATH="./build/electionguard-core" cmake -S apps/demo_in_c -B build/apps/demo_in_c -G "MSYS Makefiles"
+	CMAKE_PREFIX_PATH="$(ELECTIONGUARD_BUILD_DIR)" cmake -S apps/demo_in_c -B build/apps/demo_in_c -G "MSYS Makefiles"
 	cmake --build build/apps/demo_in_c --target DemoInC
-	PATH=$(PWD)/build/electionguard-core/src:$$PATH; ./build/apps/demo_in_c/DemoInC
+	PATH=$(ELECTIONGUARD_BUILD_DIR)/src:$$PATH; ./build/apps/demo_in_c/DemoInC
 else
-	ElectionGuard_DIR=$(ELECTIONGUARD_DIR) cmake -S apps/demo_in_c -B build/apps/demo_in_c
+	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_c -B build/apps/demo_in_c
 	cmake --build build/apps/demo_in_c --target DemoInC
 	./build/apps/demo_in_c/DemoInC
 endif
 
 demo-cpp: build
-	if [ ! -d "build/apps" ]; then mkdir build/apps; fi
-	if [ ! -d "build/apps/demo_in_cpp" ]; then mkdir build/apps/demo_in_cpp; fi
 ifeq ($(OPERATING_SYSTEM),Windows)
 	CMAKE_PREFIX_PATH="./build/electionguard-core" cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp -G "MSYS Makefiles"
 	cmake --build build/apps/demo_in_cpp --target DemoInCPP
-	PATH=$(PWD)/build/electionguard-core/src:$$PATH; ./build/apps/demo_in_cpp/DemoInCPP
+	PATH=$(ELECTIONGUARD_BUILD_DIR)/src:$$PATH; ./build/apps/demo_in_cpp/DemoInCPP
 else
-	ElectionGuard_DIR=$(ELECTIONGUARD_DIR) cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp
+	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp
 	cmake --build build/apps/demo_in_cpp --target DemoInCPP
 	./build/apps/demo_in_cpp/DemoInCPP
 endif
 
+format: build
+	cd ./build/electionguard-core && $(MAKE) format
+
+sanitize: sanitize-asan sanitize-tsan
+
+sanitize-asan: clean
+	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DUSE_SANITIZER="address;undefined"
+	cmake --build $(ELECTIONGUARD_BUILD_DIR)
+	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp
+	cmake --build build/apps/demo_in_cpp --target DemoInCPP
+	./build/apps/demo_in_cpp/DemoInCPP
+	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_c -B build/apps/demo_in_c
+	cmake --build build/apps/demo_in_c --target DemoInC
+	./build/apps/demo_in_c/DemoInC
+
+sanitize-tsan: clean
+	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DUSE_SANITIZER="thread"
+	cmake --build $(ELECTIONGUARD_BUILD_DIR)
+	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp
+	cmake --build build/apps/demo_in_cpp --target DemoInCPP
+	./build/apps/demo_in_cpp/DemoInCPP
+	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_c -B build/apps/demo_in_c
+	cmake --build build/apps/demo_in_c --target DemoInC
+	./build/apps/demo_in_c/DemoInC
+
 test: clean
 ifeq ($(OPERATING_SYSTEM),Windows)
-	CMAKE_PREFIX_PATH="./build/test" cmake -Htest -Bbuild/test -G "MSYS Makefiles"
-	cmake --build build/test
-	CTEST_OUTPUT_ON_FAILURE=1 cmake --build build/test --target ElectionGuardTests
-	PATH=$(PWD)/build/test/_deps/electionguard-build/src:$(PWD)/src/electionguard:$$PATH; ./build/test/ElectionGuardTests
+	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DOPTION_ENABLE_TESTS=ON -DCODE_COVERAGE=ON -DUSE_STATIC_ANALYSIS=ON
+	cmake --build $(ELECTIONGUARD_BUILD_DIR)
+	PATH=$(ELECTIONGUARD_BUILD_DIR)/src:$$PATH; $(ELECTIONGUARD_BUILD_DIR)/test/ElectionGuardTests
 else
-	ElectionGuard_DIR=$(ELECTIONGUARD_DIR) cmake -Htest -Bbuild/test
-	cmake --build build/test
-	CTEST_OUTPUT_ON_FAILURE=1 cmake --build build/test --target ElectionGuardTests
-	./build/test/ElectionGuardTests
+	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DOPTION_ENABLE_TESTS=ON -DCODE_COVERAGE=ON -DUSE_STATIC_ANALYSIS=ON
+	cmake --build $(ELECTIONGUARD_BUILD_DIR)
+	$(ELECTIONGUARD_BUILD_DIR)/test/ElectionGuardTests
 endif
-	

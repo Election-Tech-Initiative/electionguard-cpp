@@ -7,8 +7,6 @@ project("ElectionGuardTests"
     LANGUAGES CXX
 )
 
-set(META_PROJECT_TARGET      "electionguard")
-
 # --- Import tools ----
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
@@ -16,7 +14,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 # ---- Options ----
 
 set(CMAKE_BUILD_TYPE        Debug)
-set(OPTION_ENABLE_TESTS     ON)
 
 # ---- Dependencies ----
 
@@ -26,11 +23,6 @@ CPMAddPackage(
     NAME doctest
     GITHUB_REPOSITORY onqtam/doctest
     GIT_TAG 2.3.7
-)
-
-CPMAddPackage(
-    NAME electionguard
-    SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..
 )
 
 # ---- Sources ----
@@ -59,3 +51,7 @@ ENABLE_TESTING()
 
 include(${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake)
 doctest_discover_tests(ElectionGuardTests)
+
+if (CODE_COVERAGE)
+    target_code_coverage(ElectionGuardTests AUTO)
+endif()

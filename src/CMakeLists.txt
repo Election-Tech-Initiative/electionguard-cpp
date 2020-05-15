@@ -1,13 +1,5 @@
 cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 
-# --- Properties ---
-
-# Set a DEBUG definition
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-    message("++ Setting DEBUG during compile")
-    add_compile_definitions(DEBUG)
-endif()
-
 # ---- Library Sources ----
 
 set(PROJECT_SOURCE_FILES
@@ -20,8 +12,8 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/include/electionguard/export.h
 )
 
-# TODO: STATIC
-add_library(${META_PROJECT_TARGET} SHARED ${PROJECT_SOURCE_FILES})
+add_library(${META_PROJECT_TARGET} ${PROJECT_SOURCE_FILES})
+add_library(${META_PROJECT_TARGET}::${META_PROJECT_TARGET} ALIAS ${META_PROJECT_TARGET})
 
 # ---- Compile ----
 
@@ -93,6 +85,7 @@ if(OPTION_ENABLE_TESTS)
     # Expose the internal headers to tests
     target_include_directories(${META_PROJECT_TARGET}
         SYSTEM PUBLIC
+            #$<INSTALL_INTERFACE:${PROJECT_SOURCE_DIR}/src>
             $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
     )
 
@@ -103,4 +96,14 @@ if(OPTION_ENABLE_TESTS)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC /W4 /WX)
     endif()
 
+endif()
+
+if (CODE_COVERAGE)
+    message("++ Building with coverage")
+    target_code_coverage(${META_PROJECT_TARGET} AUTO)
+endif()
+
+if (USE_FORMATTING)
+    message("++ Building with formatting")
+    clang_format(format ${PROJECT_SOURCE_FILES})
 endif()
