@@ -1,0 +1,13 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+---
+Language: Cpp
+ReflowComments: false
+BreakBeforeBraces: Linux
+ContinuationIndentWidth: 2
+Cpp11BracedListStyle: true
+FixNamespaceComments: true
+IncludeBlocks: Regroup
+IndentCaseLabels: true
+IndentPPDirectives: AfterHash
+NamespaceIndentation: All
