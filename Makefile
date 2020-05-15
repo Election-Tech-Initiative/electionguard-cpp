@@ -17,7 +17,11 @@ all: environment build
 environment:
 	wget -O cmake/CPM.cmake https://github.com/TheLartians/CPM.cmake/releases/latest/download/CPM.cmake
 ifeq ($(OPERATING_SYSTEM),Darwin)
-    
+	brew install cmake
+	brew install gmp
+	brew install cppcheck
+	brew install llvm
+	ln -s "$(brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
     
