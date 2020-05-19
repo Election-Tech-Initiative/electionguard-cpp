@@ -49,8 +49,13 @@ target_link_libraries(ElectionGuardTests PRIVATE doctest ${META_PROJECT_TARGET} 
 
 ENABLE_TESTING()
 
-include(${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake)
-doctest_discover_tests(ElectionGuardTests)
+if (WIN32)
+    include(${doctest_SOURCE_DIR}/scripts/cmake/common.cmake)
+    doctest_add_test(NAME ElectionGuardTests COMMAND $<TARGET_FILE:ElectionGuardTests> --no-version)
+else()
+    include(${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake)
+    doctest_discover_tests(ElectionGuardTests)
+endif()
 
 if (USE_DYNAMIC_ANALYSIS AND VALGRIND_PROGRAM)
         message("++ Building with dynamic analysis")

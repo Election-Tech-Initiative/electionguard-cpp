@@ -89,11 +89,18 @@ format: build
 	cd ./build/electionguard-core && $(MAKE) format
 
 memcheck:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	echo "Static analysis is only supported on Linux"
+else
 	cd ./build/electionguard-core && $(MAKE) memcheck-ElectionGuardTests
+endif
 
 sanitize: sanitize-asan sanitize-tsan
 
 sanitize-asan: clean
+ifeq ($(OPERATING_SYSTEM),Windows)
+	echo "Address sanitizer is only supported on Linux & Mac"
+else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DUSE_SANITIZER="address;undefined"
 	cmake --build $(ELECTIONGUARD_BUILD_DIR)
 	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp
@@ -102,8 +109,12 @@ sanitize-asan: clean
 	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_c -B build/apps/demo_in_c
 	cmake --build build/apps/demo_in_c --target DemoInC
 	./build/apps/demo_in_c/DemoInC
+endif
 
 sanitize-tsan: clean
+ifeq ($(OPERATING_SYSTEM),Windows)
+	echo "Thread sanitizer is only supported on Linux & Mac"
+else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DUSE_SANITIZER="thread"
 	cmake --build $(ELECTIONGUARD_BUILD_DIR)
 	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp
@@ -112,14 +123,15 @@ sanitize-tsan: clean
 	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_c -B build/apps/demo_in_c
 	cmake --build build/apps/demo_in_c --target DemoInC
 	./build/apps/demo_in_c/DemoInC
+endif
 
 test: clean
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DOPTION_ENABLE_TESTS=ON -DCODE_COVERAGE=ON -DUSE_STATIC_ANALYSIS=ON
+	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DOPTION_ENABLE_TESTS=ON
 	cmake --build $(ELECTIONGUARD_BUILD_DIR)
 	PATH=$(ELECTIONGUARD_BUILD_DIR)/src:$$PATH; $(ELECTIONGUARD_BUILD_DIR)/test/ElectionGuardTests
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DOPTION_ENABLE_TESTS=ON -DCODE_COVERAGE=ON -DUSE_STATIC_ANALYSIS=ON
+	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DOPTION_ENABLE_TESTS=ON -DCODE_COVERAGE=ON -DUSE_STATIC_ANALYSIS=ON -DUSE_DYNAMIC_ANALYSIS=ON
 	cmake --build $(ELECTIONGUARD_BUILD_DIR)
 	$(ELECTIONGUARD_BUILD_DIR)/test/ElectionGuardTests
 endif

@@ -1,9 +1,9 @@
 # ---- Options ----
 
-option(CODE_COVERAGE            "Enable code coverage"  OFF)
-option(USE_STATIC_ANALYSIS      "use static analysis tools" OFF)
-option(USE_DYNAMIC_ANALYSIS      "use dynamic analysis tools"   ON)
-option(USE_FORMATTING           "use formatting tools"  ON)
+option(CODE_COVERAGE            "Enable code coverage"          OFF)
+option(USE_STATIC_ANALYSIS      "use static analysis tools"     OFF)
+option(USE_DYNAMIC_ANALYSIS      "use dynamic analysis tools"   OFF)
+option(USE_FORMATTING           "use formatting tools"          ON)
 
 function(use_valgrind TARGET_NAME)
     
