@@ -24,7 +24,10 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 	ln -s "$(brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
-    
+	sudo apt-get install lcov
+	sudo apt-get install cppcheck
+	sudo apt-get install clang-tidy
+	sudo apt-get install valgrind
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
     
@@ -84,6 +87,9 @@ endif
 
 format: build
 	cd ./build/electionguard-core && $(MAKE) format
+
+memcheck:
+	cd ./build/electionguard-core && $(MAKE) memcheck-ElectionGuardTests
 
 sanitize: sanitize-asan sanitize-tsan
 

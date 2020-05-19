@@ -9,4 +9,6 @@ TEST_CASE("Encrypt")
 
     CHECK(cpp_encrypter->encrypt() == 9);
     CHECK(encrypt_ballot() == 8);
+
+    delete cpp_encrypter;
 }

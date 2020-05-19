@@ -43,7 +43,7 @@ endif()
 
 find_package(GMP REQUIRED)
 
-target_link_libraries(ElectionGuardTests doctest ${META_PROJECT_TARGET} ${GMPXX_LIBRARY})
+target_link_libraries(ElectionGuardTests PRIVATE doctest ${META_PROJECT_TARGET} ${GMPXX_LIBRARY})
 
 # ---- Add Tests ----
 
@@ -51,6 +51,11 @@ ENABLE_TESTING()
 
 include(${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake)
 doctest_discover_tests(ElectionGuardTests)
+
+if (USE_DYNAMIC_ANALYSIS AND VALGRIND_PROGRAM)
+        message("++ Building with dynamic analysis")
+        USE_VALGRIND(ElectionGuardTests --trace-children=yes --leak-check=full --sim-hints=no-nptl-pthread-stackcache --track-fds=yes)
+endif()
 
 if (CODE_COVERAGE)
     target_code_coverage(ElectionGuardTests AUTO)

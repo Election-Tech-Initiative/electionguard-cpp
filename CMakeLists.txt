@@ -31,11 +31,7 @@ endif()
 option(CMAKE_BUILD_TYPE         "Build with or without debug symbols"                       Release)
 option(BUILD_SHARED_LIBS         "Build SHARED libraries"                                   OFF)
 option(OPTION_ENABLE_TESTS      "Enable support for testing private headers"                OFF)
-option(CODE_COVERAGE            "Enable code coverage"                                      OFF)
 option(OPTION_GENERATE_DOCS     "Generate documentation"                                    OFF)
-option(USE_STATIC_ANALYSIS      "use static analysis tools"                                 OFF)
-option(USE_DYNAMIC_ANALYSIS      "use dynamic analysis tools"                               OFF)
-option(USE_FORMATTING           "use formatting tools"                                      ON)
 
 # ---- Modules ----
 
@@ -43,41 +39,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # ---- Dependencies ----
 
-include(cmake/CPM.cmake)
+# ---- Tools ----
 
-CPMAddPackage(
-    NAME StableCoder-cmake-scripts
-    GITHUB_REPOSITORY StableCoder/cmake-scripts
-    GIT_TAG 3a469d8251660a97dbf9e0afff0a242965d40277
-)
-
-# ---- Enable Tools ----
-
-# available values are: Address, Memory, MemoryWithOrigins, Undefined, Thread, Leak, 'Address;Undefined'
-if (USE_SANITIZER)
-    message("++ Using Sanitizer: ${USE_SANITIZER}")
-    include(${StableCoder-cmake-scripts_SOURCE_DIR}/sanitizers.cmake)
-endif()
-
-if (CODE_COVERAGE)
-    message("++ Running with coverage")
-    include(${StableCoder-cmake-scripts_SOURCE_DIR}/code-coverage.cmake)
-    add_code_coverage()
-endif()
-
-if (USE_STATIC_ANALYSIS)
-    message("++ Running with static analysis")
-    set(CLANG_TIDY ON)
-    set(CPPCHECK ON)
-    include(${StableCoder-cmake-scripts_SOURCE_DIR}/tools.cmake)
-    clang_tidy()
-    cppcheck()
-endif()
-
-if (USE_FORMATTING)
-    message("++ Running with formatting")
-    include(${StableCoder-cmake-scripts_SOURCE_DIR}/formatting.cmake)
-endif()
+include(cmake/tools.cmake)
 
 # --- Properties ---
 

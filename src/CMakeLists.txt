@@ -44,7 +44,7 @@ target_include_directories(${META_PROJECT_TARGET}
 # ---- Dependencies ----
 
 find_package(GMP REQUIRED)
-target_link_libraries(${META_PROJECT_TARGET} ${GMP_LIBRARY})
+target_link_libraries(${META_PROJECT_TARGET} PRIVATE ${GMP_LIBRARY})
 
 # ---- Install ----
 
