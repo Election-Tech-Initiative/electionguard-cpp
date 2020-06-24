@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 
+
 # ---- Library Sources ----
 
 set(PROJECT_SOURCE_FILES
@@ -7,6 +8,8 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.hpp
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.c
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/export.h
@@ -39,6 +42,7 @@ target_include_directories(${META_PROJECT_TARGET}
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/${META_PROJECT_TARGET}
+        ${PROJECT_SOURCE_DIR}/src/kremlin
 )
 
 # ---- Dependencies ----
