@@ -58,6 +58,13 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
     add_compile_definitions(DEBUG)
 endif()
 
+# HACK: Disable x86 intrinsics
+# TODO: load the appropriate intrinsics for the processor architecture
+# this is currently only being set when the platform is explicitly set (such as on ios)
+if(DEFINED PLATFORM)
+    add_compile_definitions(BROKEN_INTRINSICS)
+endif()
+
 # ---- Sources ----
 
 add_subdirectory(src)

@@ -16,6 +16,7 @@ all: environment build
 
 environment:
 	wget -O cmake/CPM.cmake https://github.com/TheLartians/CPM.cmake/releases/latest/download/CPM.cmake
+	wget -O cmake/ios.toolchain.cmake https://raw.githubusercontent.com/leetal/ios-cmake/e4a930c911002c048472e0400c1ab041ef930b10/ios.toolchain.cmake
 ifeq ($(OPERATING_SYSTEM),Darwin)
 	brew install cmake
 	brew install gmp
@@ -54,6 +55,10 @@ else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DUSE_STATIC_ANALYSIS=ON
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_DIR)
+
+build-ios: clean
+	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G Xcode -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=cmake/ios.toolchain.cmake -DPLATFORM=OS64COMBINED
+	cmake --build $(ELECTIONGUARD_BUILD_DIR) --config Release --target install
 
 clean:
 	if [ -d "build" ]; then rm -rf ./build/*; fi
