@@ -13,18 +13,16 @@ extern "C" {
 
 namespace electionguard
 {
-    EncryptionCompositor::EncryptionCompositor()
+    EncryptionMediator::EncryptionMediator()
     {
-        std::cout << __func__ << " : Creating EncryptionCompositor[" << this
-                  << "]" << std::endl;
+        std::cout << __func__ << " : Creating EncryptionCompositor[" << this << "]" << std::endl;
     }
-    EncryptionCompositor::~EncryptionCompositor()
+    EncryptionMediator::~EncryptionMediator()
     {
-        std::cout << __func__ << " : Destroying EncryptionCompositor[" << this
-                  << "]" << std::endl;
+        std::cout << __func__ << " : Destroying EncryptionCompositor[" << this << "]" << std::endl;
     }
 
-    int EncryptionCompositor::encrypt()
+    int EncryptionMediator::encrypt()
     {
         std::cout << __func__ << " : encrypting by instance " << std::endl;
         auto result = hash_elems("some string");
@@ -42,10 +40,10 @@ namespace electionguard
         return 9;
     }
 
-    int encrypt_ballot()
+    int encrypt_selection(PlaintextBallotSelection *selection)
     {
         std::cout << __func__ << " : encrypting by function " << std::endl;
-        return 8;
+        return selection->toInt();
     }
 
 } // namespace electionguard

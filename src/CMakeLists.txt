@@ -4,12 +4,17 @@ cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 # ---- Library Sources ----
 
 set(PROJECT_SOURCE_FILES
+    ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.hpp
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.c
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/export.h
@@ -47,8 +52,8 @@ target_include_directories(${META_PROJECT_TARGET}
 
 # ---- Dependencies ----
 
-find_package(GMP REQUIRED)
-target_link_libraries(${META_PROJECT_TARGET} PRIVATE ${GMP_LIBRARY})
+# find_package(GMP REQUIRED)
+# target_link_libraries(${META_PROJECT_TARGET} PRIVATE ${GMP_LIBRARY})
 
 # ---- Install ----
 

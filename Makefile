@@ -19,7 +19,6 @@ environment:
 	wget -O cmake/ios.toolchain.cmake https://raw.githubusercontent.com/leetal/ios-cmake/e4a930c911002c048472e0400c1ab041ef930b10/ios.toolchain.cmake
 ifeq ($(OPERATING_SYSTEM),Darwin)
 	brew install cmake
-	brew install gmp
 	brew install cppcheck
 	brew install llvm
 	ln -s "$(brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
