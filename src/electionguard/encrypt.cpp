@@ -1,11 +1,10 @@
 #include "electionguard/encrypt.hpp"
 
+#include "electionguard/elgamal.hpp"
 #include "hash.hpp"
 
 #include <assert.h>
 #include <iostream>
-
-uint64_t one[64] = {1};
 
 extern "C" {
 #include "../kremlin/Hacl_Bignum4096.h"
@@ -24,6 +23,7 @@ namespace electionguard
 
     int EncryptionMediator::encrypt()
     {
+        uint64_t one[64] = {1};
         std::cout << __func__ << " : encrypting by instance " << std::endl;
         auto result = hash_elems("some string");
         if (result == 5) {
@@ -40,10 +40,20 @@ namespace electionguard
         return 9;
     }
 
-    int encrypt_selection(PlaintextBallotSelection *selection)
+    CiphertextBallotSelection *encrypt_selection(PlaintextBallotSelection *selection)
     {
         std::cout << __func__ << " : encrypting by function " << std::endl;
-        return selection->toInt();
+        // TESTING: just putting the plaintext value in the hash for now
+        uint64_t selection_as_int = selection->toInt();
+        uint64_t hash_rep[4] = {};
+        hash_rep[0] = selection_as_int;
+        auto descriptionHash = new ElementModQ(hash_rep);
+        auto fakePublicKey = new ElementModP(hash_rep);
+        auto ciphertext = elgamalEncrypt(selection_as_int, descriptionHash, fakePublicKey);
+        if (ciphertext->getPad()->get() != nullptr) {
+            // just bypass compiler error
+        }
+        return new CiphertextBallotSelection(selection->getObjectId(), descriptionHash);
     }
 
 } // namespace electionguard

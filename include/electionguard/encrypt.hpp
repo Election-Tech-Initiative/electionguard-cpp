@@ -15,7 +15,7 @@ namespace electionguard
         int encrypt();
     };
 
-    EG_API int encrypt_selection(PlaintextBallotSelection *selection);
+    EG_API CiphertextBallotSelection *encrypt_selection(PlaintextBallotSelection *selection);
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD_CORE_ENCRYPT_HPP_INCLUDED__ */

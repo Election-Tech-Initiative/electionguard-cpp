@@ -10,9 +10,13 @@ TEST_CASE("Encrypt")
 
     CHECK(cpp_encrypter->encrypt() == 9);
 
-    auto selection = new PlaintextBallotSelection("some-unique-id", "1");
-    CHECK(encrypt_selection(selection) == 1);
+    auto *plaintext = new PlaintextBallotSelection("some-unique-id", "1");
+    auto *ciphertext = encrypt_selection(plaintext);
+
+    uint64_t *result = ciphertext->getDescriptionHash()->get();
+
+    CHECK(result[0] == 1);
 
     delete cpp_encrypter;
-    delete selection;
+    delete plaintext;
 }

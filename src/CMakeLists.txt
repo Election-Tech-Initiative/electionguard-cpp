@@ -6,8 +6,11 @@ cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_facade.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt_facade.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/elgamal.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt_facade.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/group.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/group_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.hpp
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.c
@@ -15,9 +18,12 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/export.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/group.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/group.h
 )
 
 add_library(${META_PROJECT_TARGET} ${PROJECT_SOURCE_FILES})
