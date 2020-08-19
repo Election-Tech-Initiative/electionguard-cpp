@@ -15,6 +15,10 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.hpp
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.c
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.h
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Hash.c
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Hash.h
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Streaming_SHA2_256.c
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Streaming_SHA2_256.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.h
