@@ -28,6 +28,22 @@ bool hashes_are_eq(ElementModQ *a, ElementModQ *b)
     return are_equal;
 }
 
+// TODO: Tests for Vectors, CryptoHashable/CryptoHashableCheckable, and "null"-scenarios
+
+TEST_CASE("ElementModP and ElementModQ with same Zero data")
+{
+    uint64_t p[1] = {0};
+    uint64_t q[1] = {0};
+    auto elemP = new ElementModP(p);
+    auto elemQ = new ElementModQ(q);
+    auto zero_hash_p = hash_elems(elemP);
+    auto zero_hash_q = hash_elems(elemQ);
+
+    CHECK(hashes_are_eq(zero_hash_p, zero_hash_q));
+    // but different addresses
+    CHECK(&zero_hash_p != &zero_hash_q);
+}
+
 TEST_CASE("Same Zero Value Hash with signed numbers")
 {
     int z1 = 0;
@@ -54,7 +70,7 @@ TEST_CASE("Same Zero Value Hash with unsigned numbers")
 
 TEST_CASE("Same Zero Value Hash for string and number")
 {
-    auto zero_hash1 = hash_elems(0);
+    auto zero_hash1 = hash_elems((uint64_t)0);
     auto zero_hash2 = hash_elems("0");
 
     CHECK(hashes_are_eq(zero_hash1, zero_hash2));

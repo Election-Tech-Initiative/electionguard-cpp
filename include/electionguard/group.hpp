@@ -17,6 +17,7 @@ namespace electionguard
         ~ElementModP();
 
         uint64_t *get();
+        uint64_t to_int();
 
       private:
         ElementModPData data;
@@ -36,6 +37,7 @@ namespace electionguard
         ~ElementModQ();
 
         uint64_t *get();
+        uint64_t to_int();
 
       private:
         ElementModQData data;

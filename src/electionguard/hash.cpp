@@ -8,22 +8,91 @@ extern "C" {
 #include "../kremlin/Hacl_Streaming_SHA2_256.h"
 }
 
+// helper to output the hex value of the resulting SHA-256 hash
+string hex_str(uint8_t *data, int len)
+{
+    stringstream ss;
+    ss << hex;
+    for (int i(0); i < len; ++i)
+        ss << setw(2) << setfill('0') << (int)data[i];
+    return ss.str();
+}
+
 namespace electionguard
 {
-    string hex_str(uint8_t *data, int len)
+    ElementModQ *hash_elems() { return hash_elems("null"); }
+    ElementModQ *hash_elems(nullptr_t p) { return hash_elems("null"); }
+
+    ElementModQ *hash_elems(vector<CryptoHashable> v)
     {
+        if (v.empty()) {
+            return hash_elems("null");
+        }
+
         stringstream ss;
-        ss << hex;
-        for (int i(0); i < len; ++i)
-            ss << setw(2) << setfill('0') << (int)data[i];
-        return ss.str();
+        for (auto a = v.begin(); a != v.end(); ++a) {
+            // TODO: not sure if this is correct
+            ss << to_string(hash_elems(&(*a))->to_int());
+        }
+        return hash_elems(ss.str());
     }
+
+    ElementModQ *hash_elems(vector<ElementModP> v)
+    {
+        if (v.empty()) {
+            return hash_elems("null");
+        }
+
+        stringstream ss;
+        for (auto a = v.begin(); a != v.end(); ++a) {
+            // TODO: not sure if this is correct
+            ss << to_string(hash_elems(&(*a))->to_int());
+        }
+        return hash_elems(ss.str());
+    }
+
+    ElementModQ *hash_elems(vector<ElementModQ> v)
+    {
+        if (v.empty()) {
+            return hash_elems("null");
+        }
+
+        stringstream ss;
+        for (auto a = v.begin(); a != v.end(); ++a) {
+            // TODO: not sure if this is correct
+            ss << to_string(hash_elems(&(*a))->to_int());
+        }
+        return hash_elems(ss.str());
+    }
+
+    ElementModQ *hash_elems(vector<uint64_t> v)
+    {
+        if (v.empty()) {
+            return hash_elems("null");
+        }
+
+        stringstream ss;
+        for (auto a = v.begin(); a != v.end(); ++a) {
+            // TODO: not sure if this is correct
+            ss << to_string(hash_elems(*a)->to_int());
+        }
+        return hash_elems(ss.str());
+    }
+
+    ElementModQ *hash_elems(CryptoHashable *a) { return hash_elems(a->crypto_hash()); }
+
+    ElementModQ *hash_elems(ElementModP *a) { return hash_elems(a->to_int()); }
+
+    ElementModQ *hash_elems(ElementModQ *a) { return hash_elems(a->to_int()); }
 
     ElementModQ *hash_elems(uint64_t const &a) { return hash_elems(to_string(a)); }
 
     ElementModQ *hash_elems(string const &a)
     {
-        // TODO: support other params to hash
+        if (a.empty()) {
+            return hash_elems("null");
+        }
+
         auto *input = reinterpret_cast<const uint8_t *>(a.c_str());
         uint8_t output[32] = {};
         uint8_t pipe[1] = {'|'};
