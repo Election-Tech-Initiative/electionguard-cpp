@@ -19,6 +19,8 @@ namespace electionguard
         return ss.str();
     }
 
+    ElementModQ *hash_elems(uint64_t const &a) { return hash_elems(to_string(a)); }
+
     ElementModQ *hash_elems(string const &a)
     {
         // TODO: support other params to hash

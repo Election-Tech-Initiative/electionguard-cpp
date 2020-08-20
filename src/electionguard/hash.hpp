@@ -12,6 +12,8 @@ extern "C" {
 
 namespace electionguard
 {
+    EG_INTERNAL_API ElementModQ *hash_elems(uint64_t const &a);
+
     EG_INTERNAL_API ElementModQ *hash_elems(string const &a);
 } // namespace electionguard
 

@@ -28,9 +28,33 @@ bool hashes_are_eq(ElementModQ *a, ElementModQ *b)
     return are_equal;
 }
 
-TEST_CASE("Same Zero Value Hash")
+TEST_CASE("Same Zero Value Hash with signed numbers")
 {
-    auto zero_hash1 = hash_elems("0");
+    int z1 = 0;
+    long z2 = 0;
+    auto zero_hash1 = hash_elems(z1);
+    auto zero_hash2 = hash_elems(z2);
+
+    CHECK(hashes_are_eq(zero_hash1, zero_hash2));
+    // but different addresses
+    CHECK(&zero_hash1 != &zero_hash2);
+}
+
+TEST_CASE("Same Zero Value Hash with unsigned numbers")
+{
+    unsigned short z1 = 0;
+    unsigned long z2 = 0;
+    auto zero_hash1 = hash_elems(z1);
+    auto zero_hash2 = hash_elems(z2);
+
+    CHECK(hashes_are_eq(zero_hash1, zero_hash2));
+    // but different addresses
+    CHECK(&zero_hash1 != &zero_hash2);
+}
+
+TEST_CASE("Same Zero Value Hash for string and number")
+{
+    auto zero_hash1 = hash_elems(0);
     auto zero_hash2 = hash_elems("0");
 
     CHECK(hashes_are_eq(zero_hash1, zero_hash2));
