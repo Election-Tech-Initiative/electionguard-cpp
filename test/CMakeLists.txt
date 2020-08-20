@@ -41,9 +41,7 @@ endif()
 
 # ---- Link Libraries ----
 
-find_package(GMP REQUIRED)
-
-target_link_libraries(ElectionGuardTests PRIVATE doctest ${META_PROJECT_TARGET} ${GMPXX_LIBRARY})
+target_link_libraries(ElectionGuardTests PRIVATE doctest ${META_PROJECT_TARGET})
 
 # ---- Add Tests ----
 
