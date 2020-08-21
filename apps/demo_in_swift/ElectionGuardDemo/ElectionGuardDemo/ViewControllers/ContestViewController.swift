@@ -13,6 +13,12 @@ class ContestViewController: UIViewController {
     // TODO: Remove hardcoded demo value
     var contestId: String? = "referendum-pineapple"
     
+    var selectedSelection: BallotSelection? {
+        didSet {
+            submitButton.isEnabled = self.selectedSelection != nil
+        }
+    }
+
     let nameLabel: UILabel = {
         let label = UILabel()
         
@@ -63,6 +69,7 @@ class ContestViewController: UIViewController {
         
         button.setTitle("Submit", for: .normal)
         button.addTarget(self, action: #selector(submit), for: .touchUpInside)
+        button.isEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
         
         return button
@@ -174,10 +181,21 @@ extension ContestViewController: UICollectionViewDelegateFlowLayout, UICollectio
         cell?.backgroundColor = .tertiarySystemBackground
     }
 
+    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        let shouldSelect = selectedSelection?.id != selections[indexPath.row].id
+
+        if !shouldSelect {
+            selectedSelection = nil
+        }
+
+        return shouldSelect
+    }
+
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath)
         
         cell?.backgroundColor = UIColor(named: "eg_lightGreen")
+        selectedSelection = selections[indexPath.row]
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
