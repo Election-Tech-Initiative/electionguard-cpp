@@ -15,8 +15,9 @@ EG_API eg_encryption_mediator_t *eg_encryption_mediator_new();
 EG_API void eg_encryption_mediator_free(eg_encryption_mediator_t *mediator);
 EG_API int eg_encryption_mediator_encrypt(eg_encryption_mediator_t *mediator);
 
+/// returns a stubbed success code and places the result in the ciphertext field
 EG_API int eg_encrypt_selection(eg_plaintext_ballot_selection_t *plaintext,
-                                eg_ciphertext_ballot_selection_t *ciphertext);
+                                eg_ciphertext_ballot_selection_t **ciphertext);
 
 #ifdef __cplusplus
 }
