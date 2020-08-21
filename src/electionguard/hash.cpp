@@ -63,13 +63,13 @@ namespace electionguard
              << " : input_string : " << input_string << endl;
     }
 
-    ElementModQ *hash_elems(vector<CryptoHashableType> a)
+    ElementModQ *hash_elems(initializer_list<CryptoHashableType> a)
     {
         uint8_t output[32] = {};
         Hacl_Streaming_Functor_state_s___uint32_t____ *p = Hacl_Streaming_SHA2_256_create_in();
         Hacl_Streaming_SHA2_256_update(p, delimiter, sizeof(delimiter));
 
-        if (a.empty()) {
+        if (a.size() == 0) {
             push_hash_update(p, null_string);
         } else {
             for (auto it = a.begin(); it != a.end(); ++it) {
@@ -91,6 +91,6 @@ namespace electionguard
 
     ElementModQ *hash_elems(CryptoHashableType a)
     {
-        return hash_elems(vector<CryptoHashableType>{a});
+        return hash_elems(initializer_list<CryptoHashableType>{a});
     }
 } // namespace electionguard

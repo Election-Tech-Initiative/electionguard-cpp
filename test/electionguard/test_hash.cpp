@@ -103,14 +103,12 @@ TEST_CASE("Hash for nullptr same as null string")
 
 TEST_CASE("Hash for vector of multiple zeros is different has than hash for single zero")
 {
-    CHECK(false ==
-          hashes_are_eq(hash_elems("0"), hash_elems(vector<CryptoHashableType>{"0", "0"})));
+    CHECK(false == hashes_are_eq(hash_elems("0"), hash_elems({"0", "0"})));
 }
 
 TEST_CASE("Hash vector of same amount of multiple zeros are the same hash")
 {
-    CHECK(hashes_are_eq(hash_elems(vector<CryptoHashableType>{0, 0}),
-                        hash_elems(vector<CryptoHashableType>{"0", "0"})));
+    CHECK(hashes_are_eq(hash_elems({0, 0}), hash_elems({"0", "0"})));
 }
 
 // TODO: equivalent of hashing a Sequence in Python?
