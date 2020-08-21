@@ -10,6 +10,9 @@ import UIKit
 
 class ContestViewController: UIViewController {
     
+    // TODO: Remove hardcoded demo value
+    var contestId: String? = "referendum-pineapple"
+    
     let nameLabel: UILabel = {
         let label = UILabel()
         
@@ -23,6 +26,8 @@ class ContestViewController: UIViewController {
         let label = UILabel()
         
         label.text = "Ballot title"
+        label.lineBreakMode = .byWordWrapping
+        label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false
         
         return label
@@ -32,6 +37,8 @@ class ContestViewController: UIViewController {
         let label = UILabel()
         
         label.text = "Ballot subtitle"
+        label.lineBreakMode = .byWordWrapping
+        label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false
         
         return label
@@ -61,7 +68,7 @@ class ContestViewController: UIViewController {
         return button
     }()
     
-    private var selections = [String]()
+    private var selections = [BallotSelection]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -88,12 +95,15 @@ class ContestViewController: UIViewController {
         let constraints = [
             nameLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             nameLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            nameLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             
             ballotTitleLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 12),
             ballotTitleLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
+            ballotTitleLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
             
             ballotSubtitleLabel.topAnchor.constraint(equalTo: ballotTitleLabel.bottomAnchor, constant: 12),
             ballotSubtitleLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
+            ballotSubtitleLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
             
             submitButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             submitButton.widthAnchor.constraint(equalToConstant: 300),
@@ -110,7 +120,17 @@ class ContestViewController: UIViewController {
     }
     
     private func loadSelections() {
-        selections = ["Selection 1", "Selection 2"]
+        let election = EGDataService.shared.getElectionManifest()
+        let language = "en"
+        
+        guard let contest = election?.contests?.first(where: { $0.id == contestId }) else {
+            return
+        }
+        
+        nameLabel.text = contest.name
+        ballotTitleLabel.text = contest.ballotTitle?.text?.first(where: { $0.language == language })?.value
+        ballotSubtitleLabel.text = contest.ballotSubtitle?.text?.first(where: { $0.language == language })?.value
+        selections = contest.ballotSelections ?? [BallotSelection]()
         selectionsCollectionView.reloadData()
     }
     

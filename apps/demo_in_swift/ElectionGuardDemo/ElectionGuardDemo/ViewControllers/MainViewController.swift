@@ -34,6 +34,8 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
         
         title = "Election Guard Demo"
+        
+        loadData()
     }
     
     override func loadView() {
@@ -57,6 +59,12 @@ class MainViewController: UIViewController {
         ]
         
         NSLayoutConstraint.activate(constraints)
+    }
+    
+    private func loadData() {
+        let election = EGDataService.shared.getElectionManifest()
+        
+        electionNameLabel.text = election?.name?.text?.first?.value
     }
     
     @objc private func showContest() {

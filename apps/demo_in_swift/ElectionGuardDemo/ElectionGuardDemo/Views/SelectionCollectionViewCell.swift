@@ -10,9 +10,9 @@ import UIKit
 
 class SelectionCollectionViewCell: UICollectionViewCell {
     
-    var selection: String? {
+    var selection: BallotSelection? {
         didSet {
-            nameLabel.text = self.selection
+            setName()
         }
     }
     
@@ -40,11 +40,22 @@ class SelectionCollectionViewCell: UICollectionViewCell {
         addSubviews([nameLabel])
         
         let constraints = [
-            nameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
-            nameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 12),
+            nameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 14),
+            nameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -14),
             nameLabel.centerYAnchor.constraint(equalTo: centerYAnchor)
         ]
         
         NSLayoutConstraint.activate(constraints)
+    }
+    
+    private func setName() {
+        guard let candidateId = selection?.candidateId else {
+            return
+        }
+        
+        let candidateName = EGDataService.shared.getCandidateName(forId: candidateId)?
+                                .text?.first(where: { $0.language == "en" })?.value
+        
+        nameLabel.text = candidateName ?? ""
     }
 }
