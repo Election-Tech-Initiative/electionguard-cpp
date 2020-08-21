@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 using namespace electionguard;
 
@@ -27,8 +28,6 @@ bool hashes_are_eq(ElementModQ *a, ElementModQ *b)
     }
     return are_equal;
 }
-
-// TODO: Tests for Vectors, CryptoHashable/CryptoHashableCheckable, and "null"-scenarios
 
 TEST_CASE("ElementModP and ElementModQ with same Zero data")
 {
@@ -91,3 +90,28 @@ TEST_CASE("Different strings casing not the same Hash")
 {
     CHECK(false == hashes_are_eq(hash_elems("Pam Was Here"), hash_elems("pam was here")));
 }
+
+TEST_CASE("Hash for empty string same as null string")
+{
+    CHECK(hashes_are_eq(hash_elems("null"), hash_elems("")));
+}
+
+TEST_CASE("Hash for nullptr same as null string")
+{
+    CHECK(hashes_are_eq(hash_elems("null"), hash_elems(nullptr)));
+}
+
+TEST_CASE("Hash for vector of multiple zeros is different has than hash for single zero")
+{
+    CHECK(false ==
+          hashes_are_eq(hash_elems("0"), hash_elems(vector<CryptoHashableType>{"0", "0"})));
+}
+
+TEST_CASE("Hash vector of same amount of multiple zeros are the same hash")
+{
+    CHECK(hashes_are_eq(hash_elems(vector<CryptoHashableType>{0, 0}),
+                        hash_elems(vector<CryptoHashableType>{"0", "0"})));
+}
+
+// TODO: equivalent of hashing a Sequence in Python?
+// Need `ElementModQ.to_int` implementation to validate crunching the recursive Q output works

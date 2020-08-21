@@ -3,6 +3,7 @@
 #include <electionguard/export.h>
 #include <electionguard/group.hpp>
 #include <string>
+#include <variant>
 #include <vector>
 
 using namespace std;
@@ -16,36 +17,22 @@ namespace electionguard
     class CryptoHashable
     {
       public:
-        ElementModQ *crypto_hash();
+        virtual ElementModQ *crypto_hash() { return nullptr; };
     };
 
     class CryptoHashCheckable
     {
       public:
-        ElementModQ *crypto_hash_with(ElementModQ *seed_hash);
+        virtual ElementModQ *crypto_hash_with(ElementModQ *seed_hash) { return nullptr; };
     };
 
-    EG_INTERNAL_API ElementModQ *hash_elems();
+    using CryptoHashableType =
+      variant<nullptr_t, CryptoHashable *, ElementModP *, ElementModQ *, uint64_t, string>;
 
-    EG_INTERNAL_API ElementModQ *hash_elems(nullptr_t p);
-
-    EG_INTERNAL_API ElementModQ *hash_elems(vector<CryptoHashable> v);
-
-    EG_INTERNAL_API ElementModQ *hash_elems(vector<ElementModP> v);
-
-    EG_INTERNAL_API ElementModQ *hash_elems(vector<ElementModQ> v);
-
-    EG_INTERNAL_API ElementModQ *hash_elems(vector<uint64_t> v);
-
-    EG_INTERNAL_API ElementModQ *hash_elems(CryptoHashable *a);
-
-    EG_INTERNAL_API ElementModQ *hash_elems(ElementModP *a);
-
-    EG_INTERNAL_API ElementModQ *hash_elems(ElementModQ *a);
-
-    EG_INTERNAL_API ElementModQ *hash_elems(uint64_t const &a);
-
-    EG_INTERNAL_API ElementModQ *hash_elems(string const &a);
+    // TODO: figure out Fold Expressions for Variadic Templates  (iterating with vectors for now)
+    // template <typename... Args> ElementModQ *hash_elems(CryptoHashableType a, Args... args);
+    EG_INTERNAL_API ElementModQ *hash_elems(vector<CryptoHashableType> a);
+    EG_INTERNAL_API ElementModQ *hash_elems(CryptoHashableType a);
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD__CORE_HASH_HPP_INCLUDED__ */

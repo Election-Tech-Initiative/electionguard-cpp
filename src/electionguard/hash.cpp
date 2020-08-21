@@ -20,96 +20,77 @@ string hex_str(uint8_t *data, int len)
 
 namespace electionguard
 {
-    ElementModQ *hash_elems() { return hash_elems("null"); }
-    ElementModQ *hash_elems(nullptr_t p) { return hash_elems("null"); }
+    const char delimiter_char = '|';
+    const string null_string = "null";
 
-    ElementModQ *hash_elems(vector<CryptoHashable> v)
+    uint8_t delimiter[1] = {delimiter_char};
+
+    void push_hash_update(Hacl_Streaming_Functor_state_s___uint32_t____ *p, CryptoHashableType a)
     {
-        if (v.empty()) {
-            return hash_elems("null");
+        string input_string;
+        switch (a.index()) {
+            case 0: // nullptr_t
+                input_string = null_string;
+                break;
+            case 1: // CryptoHashable
+                input_string = to_string(get<CryptoHashable *>(a)->crypto_hash()->to_int());
+                break;
+            case 2: // ElementModP
+                input_string = to_string(get<ElementModP *>(a)->to_int());
+                break;
+            case 3: // ElementModQ
+                input_string = to_string(get<ElementModQ *>(a)->to_int());
+                break;
+            case 4: // uint64_t
+                input_string = to_string(get<uint64_t>(a));
+                break;
+            default: // string
+                input_string = get<string>(a);
+                break;
+                // TODO: equivalent of hashing a Sequence in Python?
+                // Need `ElementModQ.to_int` implementation to validate crunching the recursive Q output works
         }
 
-        stringstream ss;
-        for (auto a = v.begin(); a != v.end(); ++a) {
-            // TODO: not sure if this is correct
-            ss << to_string(hash_elems(&(*a))->to_int());
+        if (input_string.empty()) {
+            input_string = null_string;
         }
-        return hash_elems(ss.str());
+
+        const uint8_t *input = reinterpret_cast<const uint8_t *>(input_string.c_str());
+        Hacl_Streaming_SHA2_256_update(p, (uint8_t *)input, input_string.size());
+        Hacl_Streaming_SHA2_256_update(p, delimiter, sizeof(delimiter));
+
+        cout << __func__ << " : input variant index : " << a.index()
+             << " : input_string : " << input_string << endl;
     }
 
-    ElementModQ *hash_elems(vector<ElementModP> v)
+    ElementModQ *hash_elems(vector<CryptoHashableType> a)
     {
-        if (v.empty()) {
-            return hash_elems("null");
-        }
-
-        stringstream ss;
-        for (auto a = v.begin(); a != v.end(); ++a) {
-            // TODO: not sure if this is correct
-            ss << to_string(hash_elems(&(*a))->to_int());
-        }
-        return hash_elems(ss.str());
-    }
-
-    ElementModQ *hash_elems(vector<ElementModQ> v)
-    {
-        if (v.empty()) {
-            return hash_elems("null");
-        }
-
-        stringstream ss;
-        for (auto a = v.begin(); a != v.end(); ++a) {
-            // TODO: not sure if this is correct
-            ss << to_string(hash_elems(&(*a))->to_int());
-        }
-        return hash_elems(ss.str());
-    }
-
-    ElementModQ *hash_elems(vector<uint64_t> v)
-    {
-        if (v.empty()) {
-            return hash_elems("null");
-        }
-
-        stringstream ss;
-        for (auto a = v.begin(); a != v.end(); ++a) {
-            // TODO: not sure if this is correct
-            ss << to_string(hash_elems(*a)->to_int());
-        }
-        return hash_elems(ss.str());
-    }
-
-    ElementModQ *hash_elems(CryptoHashable *a) { return hash_elems(a->crypto_hash()); }
-
-    ElementModQ *hash_elems(ElementModP *a) { return hash_elems(a->to_int()); }
-
-    ElementModQ *hash_elems(ElementModQ *a) { return hash_elems(a->to_int()); }
-
-    ElementModQ *hash_elems(uint64_t const &a) { return hash_elems(to_string(a)); }
-
-    ElementModQ *hash_elems(string const &a)
-    {
-        if (a.empty()) {
-            return hash_elems("null");
-        }
-
-        auto *input = reinterpret_cast<const uint8_t *>(a.c_str());
         uint8_t output[32] = {};
-        uint8_t pipe[1] = {'|'};
-
         Hacl_Streaming_Functor_state_s___uint32_t____ *p = Hacl_Streaming_SHA2_256_create_in();
-        Hacl_Streaming_SHA2_256_update(p, pipe, sizeof(pipe));
-        Hacl_Streaming_SHA2_256_update(p, (uint8_t *)input, a.size());
-        Hacl_Streaming_SHA2_256_update(p, pipe, sizeof(pipe));
+        Hacl_Streaming_SHA2_256_update(p, delimiter, sizeof(delimiter));
+
+        if (a.empty()) {
+            push_hash_update(p, null_string);
+        } else {
+            for (auto it = a.begin(); it != a.end(); ++it) {
+                push_hash_update(p, *it);
+            }
+        }
+
         Hacl_Streaming_SHA2_256_finish(p, output);
 
-        // auto hex_output = hex_str(output, sizeof(output));
-        // cout << __func__ << " : hashed output as hex : " << hex_output << endl;
+        auto hex_output = hex_str(output, sizeof(output));
+        cout << __func__ << " : output as hex : " << hex_output << endl;
 
         auto *bn = Hacl_Bignum4096_new_bn_from_bytes_be(sizeof(output), output);
 
         Hacl_Streaming_SHA2_256_free(p);
 
         return new ElementModQ(bn);
+    }
+
+    ElementModQ *hash_elems(CryptoHashableType a)
+    {
+        return hash_elems(vector<CryptoHashableType>{a});
     }
 } // namespace electionguard
