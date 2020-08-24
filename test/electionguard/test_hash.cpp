@@ -86,7 +86,7 @@ TEST_CASE("Hash of multiple zeros is different has than hash for single zero")
 
 TEST_CASE("Hash of same amount of multiple zeros are the same hash")
 {
-    //TODO: CHECK((*hash_elems({0, 0}) == *hash_elems({"0", "0"})));
+    CHECK((*hash_elems({0UL, 0UL}) == *hash_elems({"0", "0"})));
 }
 
 // TODO: equivalent of hashing a Sequence in Python?
