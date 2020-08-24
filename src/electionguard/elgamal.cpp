@@ -22,6 +22,7 @@ namespace electionguard
         if (nonce->get() != nullptr) {
             // just bypass compiler error
         }
+        // TODO:Safety
         return new ElGamalCiphertext(publicKey, publicKey);
     }
 } // namespace electionguard

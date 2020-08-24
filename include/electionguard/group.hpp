@@ -13,7 +13,10 @@ namespace electionguard
         uint64_t elem[64];
     };
 
-    class ElementModP
+    /// <summary>
+    /// An element of the larger `mod p` space, i.e., in [0, P), where P is a 4096-bit prime.
+    /// </summary>
+    class EG_API ElementModP
     {
       public:
         ElementModP(uint64_t *elem);
@@ -26,14 +29,24 @@ namespace electionguard
         ElementModPData data;
     };
 
-    ElementModP add_mod_p(ElementModP *lhs, ElementModP *rhs);
-    ElementModP add_mod_p(uint64_t *lhs, uint64_t *rhs);
+    /// <summary>
+    /// Adds together the left hand side and right hand side and returns the sum mod P
+    /// </summary>
+    EG_API ElementModP add_mod_p(ElementModP *lhs, ElementModP *rhs);
+
+    /// <summary>
+    /// Adds together the left hand side and right hand side and returns the sum mod P
+    /// </summary>
+    EG_API ElementModP add_mod_p(uint64_t *lhs, uint64_t *rhs);
 
     struct ElementModQData {
         uint64_t elem[4];
     };
 
-    class ElementModQ
+    /// <summary>
+    /// An element of the smaller `mod q` space, i.e., in [0, Q), where Q is a 256-bit prime.
+    /// </summary>
+    class EG_API ElementModQ
     {
       public:
         ElementModQ(uint64_t *elem);
@@ -49,8 +62,15 @@ namespace electionguard
         ElementModQData data;
     };
 
-    ElementModQ add_mod_q(ElementModQ *lhs, ElementModQ *rhs);
-    ElementModQ add_mod_q(uint64_t *lhs, uint64_t *rhs);
+    /// <summary>
+    /// Adds together the left hand side and right hand side and returns the sum mod Q
+    /// </summary>
+    EG_API ElementModQ add_mod_q(ElementModQ *lhs, ElementModQ *rhs);
+
+    /// <summary>
+    /// Adds together the left hand side and right hand side and returns the sum mod Q
+    /// </summary>
+    EG_API ElementModQ add_mod_q(uint64_t *lhs, uint64_t *rhs);
 
 } // namespace electionguard
 

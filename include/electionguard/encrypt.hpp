@@ -15,6 +15,12 @@ namespace electionguard
         int encrypt();
     };
 
+    /// <summary>
+    /// Encrypt a specific `BallotSelection` in the context of a specific `BallotContest`
+    ///
+    /// <param name="selection">the selection in the valid input form</param>
+    /// <returns>A `CiphertextBallotSelection`</returns>
+    /// </summary>
     EG_API CiphertextBallotSelection *encrypt_selection(PlaintextBallotSelection *selection);
 } // namespace electionguard
 
