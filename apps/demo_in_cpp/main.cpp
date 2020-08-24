@@ -16,20 +16,23 @@ int main()
     eg_plaintext_ballot_selection_t *selection =
       eg_plaintext_ballot_selection_new("some-object-id", "1");
 
-    int function_encrypt = eg_encrypt_selection(selection);
+    eg_ciphertext_ballot_selection_t *ciphertext;
+    int function_encrypt = eg_encrypt_selection(selection, &ciphertext);
     assert(function_encrypt == 1);
 
     eg_encryption_mediator_free(encrypter);
     eg_plaintext_ballot_selection_free(selection);
 
     // Test the C++ API
-    auto cpp_encrypter = new electionguard::EncryptionMediator();
+    auto *cpp_encrypter = new EncryptionMediator();
     auto cpp_instance_encrypt = cpp_encrypter->encrypt();
     assert(cpp_instance_encrypt == 9);
 
-    auto cpp_selection = new PlaintextBallotSelection("some-unique-id", "1");
-    auto cpp_function_encrypt = electionguard::encrypt_selection(cpp_selection);
-    assert(cpp_function_encrypt == 1);
+    auto *cpp_plaintext = new PlaintextBallotSelection("some-unique-id", "1");
+    auto *cpp_ciphertext = encrypt_selection(cpp_plaintext);
+
+    auto *cpp_result = cpp_ciphertext->getDescriptionHash()->get();
+    assert(cpp_result[0] == 1);
 
     delete cpp_encrypter;
     delete selection;

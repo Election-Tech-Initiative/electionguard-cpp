@@ -7,7 +7,6 @@ TEST_CASE("Encrypt")
     using namespace electionguard;
 
     auto *cpp_encrypter = new EncryptionMediator();
-
     CHECK(cpp_encrypter->encrypt() == 9);
 
     auto *plaintext = new PlaintextBallotSelection("some-unique-id", "1");

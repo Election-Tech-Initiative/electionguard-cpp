@@ -7,3 +7,5 @@
 cmake/CPM.cmake
 
 cmake/ios.toolchain.cmake
+
+*.a

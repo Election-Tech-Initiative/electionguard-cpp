@@ -15,10 +15,10 @@ namespace electionguard
 
     PlaintextBallotSelection::PlaintextBallotSelection(const char *object_id, char *vote) : data()
     {
-        size_t _osize = strlen(object_id);
+        size_t _osize = strlen(object_id) + 1;
         strlcpy(data.object_id, object_id, _osize);
 
-        size_t _vsize = strlen(vote);
+        size_t _vsize = strlen(vote) + 1;
         strlcpy(data.vote, vote, _vsize);
     }
 
@@ -41,7 +41,7 @@ namespace electionguard
                                                          ElementModQ *descriptionHash)
         : data()
     {
-        size_t _osize = strlen(object_id);
+        size_t _osize = strlen(object_id) + 1;
         strlcpy(data.object_id, object_id, _osize);
         data.descriptionHash = descriptionHash;
     }
