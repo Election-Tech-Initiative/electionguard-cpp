@@ -1,24 +1,17 @@
 #include "electionguard/nonces.hpp"
 
 #include "hash.hpp"
+#include "variant_cast.hpp"
 
 namespace electionguard
 {
-    Nonces::Nonces(ElementModQ *seed, ElementModP *headers) : data()
+    Nonces::Nonces(ElementModQ *seed, NoncesHeaderType headers) : data()
     {
-        this->data.seed = hash_elems({seed, headers});
+        CryptoHashableType h = variant_cast(headers);
+        this->data.seed = hash_elems({seed, h});
         this->data.nextItem = 0;
     }
-    Nonces::Nonces(ElementModQ *seed, ElementModQ *headers) : data()
-    {
-        this->data.seed = hash_elems({seed, headers});
-        this->data.nextItem = 0;
-    }
-    Nonces::Nonces(ElementModQ *seed, string headers) : data()
-    {
-        this->data.seed = hash_elems({seed, headers});
-        this->data.nextItem = 0;
-    }
+
     Nonces::Nonces(ElementModQ *seed) : data()
     {
         this->data.seed = seed;

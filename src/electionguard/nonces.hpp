@@ -1,12 +1,16 @@
-#ifndef __ELECTIONGUARD__CORE_NONCE_HPP_INCLUDED__
-#define __ELECTIONGUARD__CORE_NONCE_HPP_INCLUDED__
+#ifndef __ELECTIONGUARD__CORE_NONCES_HPP_INCLUDED__
+#define __ELECTIONGUARD__CORE_NONCES_HPP_INCLUDED__
+
 #include <electionguard/export.h>
 #include <electionguard/group.hpp>
+#include <variant>
 #include <vector>
 using namespace std;
 
 namespace electionguard
 {
+    using NoncesHeaderType = variant<ElementModP *, ElementModQ *, string>;
+
     struct NoncesData {
         ElementModQ *seed;
         int nextItem;
@@ -15,9 +19,7 @@ namespace electionguard
     class Nonces
     {
       public:
-        Nonces(ElementModQ *seed, ElementModP *headers);
-        Nonces(ElementModQ *seed, ElementModQ *headers);
-        Nonces(ElementModQ *seed, string headers);
+        Nonces(ElementModQ *seed, NoncesHeaderType headers);
         Nonces(ElementModQ *seed);
         ~Nonces();
 
@@ -31,4 +33,4 @@ namespace electionguard
     };
 } // namespace electionguard
 
-#endif /* __ELECTIONGUARD__CORE_NONCE_HPP_INCLUDED__ */
+#endif /* __ELECTIONGUARD__CORE_NONCES_HPP_INCLUDED__ */

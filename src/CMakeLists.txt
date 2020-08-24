@@ -15,6 +15,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/variant_cast.hpp
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.c
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.h
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Hash.c
