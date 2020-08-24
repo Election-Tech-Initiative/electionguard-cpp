@@ -13,6 +13,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/group_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/log.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/variant_cast.hpp
@@ -113,7 +114,7 @@ if(OPTION_ENABLE_TESTS)
 
     # When running tests, we set some specific compiler flags
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Werror -Wall -Wextra -pedantic -pedantic-errors -Wunreachable-code -Wmissing-field-initializers)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Werror -Wall -Wextra -pedantic -pedantic-errors -Wunreachable-code -Wmissing-field-initializers -Wno-unused-parameter -Wno-unused-variable)
     elseif(MSVC)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC /W4 /WX)
     endif()

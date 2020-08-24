@@ -13,8 +13,9 @@ string hex_str(uint8_t *data, int len)
 {
     stringstream ss;
     ss << hex;
-    for (int i(0); i < len; ++i)
+    for (int i(0); i < len; ++i) {
         ss << setw(2) << setfill('0') << (int)data[i];
+    }
     return ss.str();
 }
 
@@ -32,16 +33,25 @@ namespace electionguard
             case 0: // nullptr_t
                 input_string = null_string;
                 break;
-            case 1: // CryptoHashable
+            case 1: // CryptoHashable *
                 input_string = get<CryptoHashable *>(a)->crypto_hash()->toBigIntString();
                 break;
-            case 2: // ElementModP
+            case 2: // ElementModP *
                 input_string = get<ElementModP *>(a)->toBigIntString();
                 break;
-            case 3: // ElementModQ
+            case 3: // ElementModQ *
                 input_string = get<ElementModQ *>(a)->toBigIntString();
                 break;
-            case 4: // uint64_t
+            case 4: // vector<uint64_t>
+                for (uint64_t x : get<vector<uint64_t>>(a)) {
+                    push_hash_update(p, x);
+                }
+                // TODO: compatibility with the python standard
+                // which consumes the current state of the streaming hash
+                // and inputs it again
+                input_string = "TESTING: UPDATE ME";
+                break;
+            case 5: // uint64_t
                 input_string = to_string(get<uint64_t>(a));
                 break;
             default: // string
