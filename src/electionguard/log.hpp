@@ -1,8 +1,6 @@
 #ifndef __ELECTIONGUARD_CORE_LOG_HPP_INCLUDED__
 #define __ELECTIONGUARD_CORE_LOG_HPP_INCLUDED__
 
-#include "singleton.hpp"
-
 #include <iostream>
 
 using namespace std;
