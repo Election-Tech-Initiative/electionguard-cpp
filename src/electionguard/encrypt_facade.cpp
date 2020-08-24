@@ -1,8 +1,6 @@
 #include "electionguard/ballot.hpp"
 #include "electionguard/encrypt.hpp"
 
-#include <iostream>
-
 extern "C" {
 #include "electionguard/encrypt.h"
 }
@@ -17,8 +15,10 @@ eg_encryption_mediator_t *eg_encryption_mediator_new()
 
 void eg_encryption_mediator_free(eg_encryption_mediator_t *mediator)
 {
-    if (!mediator)
+    if (mediator == nullptr) {
         return;
+    }
+    // TODO: safety
     delete AS_TYPE(electionguard::EncryptionMediator, mediator);
 }
 
@@ -30,10 +30,10 @@ int eg_encryption_mediator_encrypt(eg_encryption_mediator_t *mediator)
 int eg_encrypt_selection(eg_plaintext_ballot_selection_t *plaintext,
                          eg_ciphertext_ballot_selection_t **ciphertext)
 {
-    auto ciphertext_ =
+    auto *ciphertext_ =
       electionguard::encrypt_selection(AS_TYPE(electionguard::PlaintextBallotSelection, plaintext));
 
     *ciphertext = AS_TYPE(eg_ciphertext_ballot_selection_t, ciphertext_);
 
-    return 1;
+    return 1; // TODO: real return codes
 }
