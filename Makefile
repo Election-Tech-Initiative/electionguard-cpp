@@ -1,4 +1,4 @@
-.PHONY: build clean demo-c demo-cpp test
+.PHONY: build build-debug build-release build-ios clean demo-c demo-cpp format memcheck sanitize sanitize-asan sanitize-tsan test
 
 BUILD_DEBUG?=true
 
@@ -39,7 +39,7 @@ else
 build: build-release
 endif
 
-build-debug: clean
+build-debug:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON
 else
@@ -55,7 +55,7 @@ else
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_DIR)
 
-build-ios: clean
+build-ios:
 	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G Xcode -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=cmake/ios.toolchain.cmake -DPLATFORM=OS64COMBINED
 	cmake --build $(ELECTIONGUARD_BUILD_DIR) --config Release --target install
 
@@ -99,6 +99,8 @@ else
 	cd ./build/electionguard-core && $(MAKE) memcheck-ElectionGuardTests
 endif
 
+rebuild: clean build
+
 sanitize: sanitize-asan sanitize-tsan
 
 sanitize-asan: clean
@@ -129,7 +131,7 @@ else
 	./build/apps/demo_in_c/DemoInC
 endif
 
-test: clean
+test:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DOPTION_ENABLE_TESTS=ON
 	cmake --build $(ELECTIONGUARD_BUILD_DIR)
