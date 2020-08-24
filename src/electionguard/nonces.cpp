@@ -20,19 +20,19 @@ namespace electionguard
 
     Nonces::~Nonces() {}
 
-    ElementModQ *Nonces::get(int item)
+    ElementModQ *Nonces::get(uint64_t item)
     {
         this->data.nextItem = item + 1;
         return hash_elems({this->data.seed, item});
     }
 
-    ElementModQ *Nonces::get(int item, string headers)
+    ElementModQ *Nonces::get(uint64_t item, string headers)
     {
         this->data.nextItem = item + 1;
         return hash_elems({this->data.seed, item, headers});
     }
 
-    vector<ElementModQ *> Nonces::get(int startItem, int count)
+    vector<ElementModQ *> Nonces::get(uint64_t startItem, uint64_t count)
     {
         vector<ElementModQ *> result;
         int endItem = startItem + count;

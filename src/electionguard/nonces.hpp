@@ -13,7 +13,7 @@ namespace electionguard
 
     struct NoncesData {
         ElementModQ *seed;
-        int nextItem;
+        uint64_t nextItem;
     };
 
     class Nonces
@@ -23,9 +23,9 @@ namespace electionguard
         Nonces(ElementModQ *seed);
         ~Nonces();
 
-        ElementModQ *get(int item);
-        ElementModQ *get(int item, string headers);
-        vector<ElementModQ *> get(int startItem, int count);
+        ElementModQ *get(uint64_t item);
+        ElementModQ *get(uint64_t item, string headers);
+        vector<ElementModQ *> get(uint64_t startItem, uint64_t count);
         ElementModQ *next();
 
       private:
