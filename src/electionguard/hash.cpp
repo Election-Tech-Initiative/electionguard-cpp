@@ -33,13 +33,13 @@ namespace electionguard
                 input_string = null_string;
                 break;
             case 1: // CryptoHashable
-                input_string = to_string(get<CryptoHashable *>(a)->crypto_hash()->to_int());
+                input_string = get<CryptoHashable *>(a)->crypto_hash()->toBigIntString();
                 break;
             case 2: // ElementModP
-                input_string = to_string(get<ElementModP *>(a)->to_int());
+                input_string = get<ElementModP *>(a)->toBigIntString();
                 break;
             case 3: // ElementModQ
-                input_string = to_string(get<ElementModQ *>(a)->to_int());
+                input_string = get<ElementModQ *>(a)->toBigIntString();
                 break;
             case 4: // uint64_t
                 input_string = to_string(get<uint64_t>(a));
@@ -48,7 +48,7 @@ namespace electionguard
                 input_string = get<string>(a);
                 break;
                 // TODO: equivalent of hashing a Sequence in Python?
-                // Need `ElementModQ.to_int` implementation to validate crunching the recursive Q output works
+                // Need `ElementModQ.toBigIntString` implementation to validate crunching the recursive Q output works
         }
 
         if (input_string.empty()) {

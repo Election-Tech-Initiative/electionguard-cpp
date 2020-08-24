@@ -3,6 +3,9 @@
 #include "export.h"
 
 #include <cstdint>
+#include <string>
+
+using namespace std;
 
 namespace electionguard
 {
@@ -17,7 +20,7 @@ namespace electionguard
         ~ElementModP();
 
         uint64_t *get();
-        uint64_t to_int();
+        string toBigIntString();
 
       private:
         ElementModPData data;
@@ -37,7 +40,7 @@ namespace electionguard
         ~ElementModQ();
 
         uint64_t *get();
-        uint64_t to_int();
+        string toBigIntString();
 
       private:
         ElementModQData data;

@@ -43,10 +43,10 @@ namespace electionguard
 
     uint64_t *ElementModP::get() { return data.elem; }
 
-    uint64_t ElementModP::to_int()
+    string ElementModP::toBigIntString()
     {
-        // TODO: convert bignum pointer to uint64_t
-        return data.elem[0]; // temp work around
+        // TODO: convert uint64_t pointer to big int string
+        return to_string(data.elem[0]); // temp work around
     }
 
     ElementModP add_mod_p(ElementModP *lhs, ElementModP *rhs)
@@ -82,10 +82,10 @@ namespace electionguard
 
     uint64_t *ElementModQ::get() { return data.elem; }
 
-    uint64_t ElementModQ::to_int()
+    string ElementModQ::toBigIntString()
     {
-        // TODO: convert uint64_t pointer to uint64_t
-        return data.elem[0]; // temp work around
+        // TODO: convert uint64_t pointer to big int string
+        return to_string(data.elem[0]); // temp work around
     }
 
     ElementModQ add_mod_q(ElementModQ *lhs, ElementModQ *rhs)

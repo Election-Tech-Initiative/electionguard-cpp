@@ -101,15 +101,15 @@ TEST_CASE("Hash for nullptr same as null string")
     CHECK(hashes_are_eq(hash_elems("null"), hash_elems(nullptr)));
 }
 
-TEST_CASE("Hash for vector of multiple zeros is different has than hash for single zero")
+TEST_CASE("Hash of multiple zeros is different has than hash for single zero")
 {
     CHECK(false == hashes_are_eq(hash_elems("0"), hash_elems({"0", "0"})));
 }
 
-TEST_CASE("Hash vector of same amount of multiple zeros are the same hash")
+TEST_CASE("Hash of same amount of multiple zeros are the same hash")
 {
     CHECK(hashes_are_eq(hash_elems({0, 0}), hash_elems({"0", "0"})));
 }
 
 // TODO: equivalent of hashing a Sequence in Python?
-// Need `ElementModQ.to_int` implementation to validate crunching the recursive Q output works
+// Need `ElementModQ.toBigIntString` implementation to validate crunching the recursive Q output works
