@@ -100,6 +100,20 @@ make demo-c
 make demo-cpp
 ```
 
+### Execute the Demo in Swift
+
+```sh
+make build-ios
+```
+Depending if you are building for the simulator or the phone you need to copy the resulting binary to the swift demo folder.
+For instance, for the simulator:
+
+```sh
+cp ./build/electionguard-core/src/Release-iphonesimulator/libelectionguard.a ./apps/demo_in_swift/ElectionGuardDemo/libelectionguard.a
+```
+
+Then, open `./apps/demo_in_swift/ElectionGuardDemo.xcodeproj` in xcode and run.
+
 ## Key concepts
 
 🚧Under Construction
