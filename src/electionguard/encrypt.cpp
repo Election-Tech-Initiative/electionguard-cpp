@@ -2,6 +2,7 @@
 
 #include "electionguard/elgamal.hpp"
 #include "hash.hpp"
+#include "log.hpp"
 
 #include <iostream>
 
@@ -11,18 +12,15 @@ extern "C" {
 
 namespace electionguard
 {
-    EncryptionMediator::EncryptionMediator()
-    {
-        std::cout << __func__ << " : Creating EncryptionCompositor[" << this << "]" << std::endl;
-    }
+    EncryptionMediator::EncryptionMediator() { Log::debug(" : Creating EncryptionCompositor[]"); }
     EncryptionMediator::~EncryptionMediator()
     {
-        std::cout << __func__ << " : Destroying EncryptionCompositor[" << this << "]" << std::endl;
+        Log::debug(" : Destroying EncryptionCompositor[]");
     }
 
     int EncryptionMediator::encrypt()
     {
-        std::cout << __func__ << " : encrypting by instance " << std::endl;
+        Log::debug(" : encrypting by instance");
         return 9;
     }
 
