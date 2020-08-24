@@ -42,6 +42,9 @@ namespace electionguard
         uint64_t *get();
         string toBigIntString();
 
+        bool operator==(const ElementModQ &other);
+        bool operator!=(const ElementModQ &other);
+
       private:
         ElementModQData data;
     };
