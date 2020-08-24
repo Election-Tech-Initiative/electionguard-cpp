@@ -3,7 +3,6 @@
 #include "electionguard/elgamal.hpp"
 #include "hash.hpp"
 
-#include <assert.h>
 #include <iostream>
 
 extern "C" {
@@ -33,8 +32,9 @@ namespace electionguard
         uint64_t selection_as_int = selection->toInt();
         uint64_t hash_rep[4] = {};
         hash_rep[0] = selection_as_int;
-        auto descriptionHash = new ElementModQ(hash_rep);
-        auto fakePublicKey = new ElementModP(hash_rep);
+        // TODO: Safety
+        auto *descriptionHash = new ElementModQ(hash_rep);
+        auto *fakePublicKey = new ElementModP(hash_rep);
         auto ciphertext = elgamalEncrypt(selection_as_int, descriptionHash, fakePublicKey);
         if (ciphertext->getPad()->get() != nullptr) {
             // just bypass compiler error
