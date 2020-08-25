@@ -56,7 +56,7 @@ endif
 	cmake --build $(ELECTIONGUARD_BUILD_DIR)
 
 build-ios:
-	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G Xcode -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=cmake/ios.toolchain.cmake -DPLATFORM=OS64COMBINED
+	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G Xcode -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=cmake/ios.toolchain.cmake -DPLATFORM=OS64COMBINED -DDEPLOYMENT_TARGET=12.0
 	cmake --build $(ELECTIONGUARD_BUILD_DIR) --config Release --target install
 
 clean:

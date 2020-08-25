@@ -1,4 +1,4 @@
-#include "electionguard/nonces.hpp"
+#include "nonces.hpp"
 
 #include "hash.hpp"
 #include "variant_cast.hpp"

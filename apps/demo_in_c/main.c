@@ -12,10 +12,12 @@ static bool strings_are_equal(char *expected, char *actual);
 
 int main()
 {
+    // insantiate the stateful mediator
     eg_encryption_mediator_t *encrypter = eg_encryption_mediator_new();
     int instance_encrypt = eg_encryption_mediator_encrypt(encrypter);
     assert(instance_encrypt == 9);
 
+    // instantiate a selection on a ballot
     eg_plaintext_ballot_selection_t *plaintext =
       eg_plaintext_ballot_selection_new("some-object-id", "1");
 
