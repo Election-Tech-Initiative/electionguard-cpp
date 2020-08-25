@@ -1,11 +1,10 @@
 #include "electionguard/encrypt.hpp"
 
+#include "electionguard/elgamal.hpp"
 #include "hash.hpp"
+#include "log.hpp"
 
-#include <assert.h>
 #include <iostream>
-
-uint64_t one[64] = {1};
 
 extern "C" {
 #include "../kremlin/Hacl_Bignum4096.h"
@@ -13,39 +12,33 @@ extern "C" {
 
 namespace electionguard
 {
-    EncryptionCompositor::EncryptionCompositor()
+    EncryptionMediator::EncryptionMediator() { Log::debug(" : Creating EncryptionCompositor[]"); }
+    EncryptionMediator::~EncryptionMediator()
     {
-        std::cout << __func__ << " : Creating EncryptionCompositor[" << this
-                  << "]" << std::endl;
-    }
-    EncryptionCompositor::~EncryptionCompositor()
-    {
-        std::cout << __func__ << " : Destroying EncryptionCompositor[" << this
-                  << "]" << std::endl;
+        Log::debug(" : Destroying EncryptionCompositor[]");
     }
 
-    int EncryptionCompositor::encrypt()
+    int EncryptionMediator::encrypt()
     {
-        std::cout << __func__ << " : encrypting by instance " << std::endl;
-        auto result = hash_elems("some string");
-        if (result == 5) {
-        }
-
-        uint64_t res[64] = {};
-
-        uint64_t carry = Hacl_Bignum4096_add(one, one, res);
-        if (carry > 0) {
-        }
-
-        assert(res[0] == 2);
-
+        Log::debug(" : encrypting by instance");
         return 9;
     }
 
-    int encrypt_ballot()
+    CiphertextBallotSelection *encrypt_selection(PlaintextBallotSelection *selection)
     {
-        std::cout << __func__ << " : encrypting by function " << std::endl;
-        return 8;
+        // TESTING: just putting the plaintext value in the hash for now
+        uint64_t selection_as_int = selection->toInt();
+        uint64_t hash_rep[4] = {};
+        hash_rep[0] = selection_as_int;
+        // TODO: Safety
+        auto *descriptionHash = new ElementModQ(hash_rep);
+        auto *fakePublicKey = new ElementModP(hash_rep);
+        auto ciphertext = elgamalEncrypt(selection_as_int, descriptionHash, fakePublicKey);
+        if (ciphertext->getPad()->get() != nullptr) {
+            // just bypass compiler error
+        }
+
+        return new CiphertextBallotSelection(selection->getObjectId(), descriptionHash);
     }
 
 } // namespace electionguard

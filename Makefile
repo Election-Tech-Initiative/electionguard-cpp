@@ -1,4 +1,4 @@
-.PHONY: build clean demo-c demo-cpp test
+.PHONY: build build-debug build-release build-ios clean demo-c demo-cpp format memcheck sanitize sanitize-asan sanitize-tsan test
 
 BUILD_DEBUG?=true
 
@@ -19,7 +19,6 @@ environment:
 	wget -O cmake/ios.toolchain.cmake https://raw.githubusercontent.com/leetal/ios-cmake/e4a930c911002c048472e0400c1ab041ef930b10/ios.toolchain.cmake
 ifeq ($(OPERATING_SYSTEM),Darwin)
 	brew install cmake
-	brew install gmp
 	brew install cppcheck
 	brew install llvm
 	ln -s "$(brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
@@ -40,7 +39,7 @@ else
 build: build-release
 endif
 
-build-debug: clean
+build-debug:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON
 else
@@ -56,8 +55,8 @@ else
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_DIR)
 
-build-ios: clean
-	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G Xcode -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=cmake/ios.toolchain.cmake -DPLATFORM=OS64COMBINED
+build-ios:
+	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G Xcode -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=cmake/ios.toolchain.cmake -DPLATFORM=OS64COMBINED -DDEPLOYMENT_TARGET=12.0
 	cmake --build $(ELECTIONGUARD_BUILD_DIR) --config Release --target install
 
 clean:
@@ -100,6 +99,8 @@ else
 	cd ./build/electionguard-core && $(MAKE) memcheck-ElectionGuardTests
 endif
 
+rebuild: clean build
+
 sanitize: sanitize-asan sanitize-tsan
 
 sanitize-asan: clean
@@ -130,7 +131,7 @@ else
 	./build/apps/demo_in_c/DemoInC
 endif
 
-test: clean
+test:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DOPTION_ENABLE_TESTS=ON
 	cmake --build $(ELECTIONGUARD_BUILD_DIR)

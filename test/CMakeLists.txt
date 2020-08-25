@@ -31,6 +31,7 @@ add_executable(ElectionGuardTests
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_nonces.cpp
 )
 
 target_compile_features(ElectionGuardTests PRIVATE cxx_std_17)
@@ -41,9 +42,7 @@ endif()
 
 # ---- Link Libraries ----
 
-find_package(GMP REQUIRED)
-
-target_link_libraries(ElectionGuardTests PRIVATE doctest ${META_PROJECT_TARGET} ${GMPXX_LIBRARY})
+target_link_libraries(ElectionGuardTests PRIVATE doctest ${META_PROJECT_TARGET})
 
 # ---- Add Tests ----
 

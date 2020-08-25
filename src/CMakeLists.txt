@@ -4,15 +4,34 @@ cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 # ---- Library Sources ----
 
 set(PROJECT_SOURCE_FILES
-    ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt_facade.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_facade.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/elgamal.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt_facade.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/group.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/group_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/log.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/variant_cast.hpp
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.c
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.h
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Hash.c
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Hash.h
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Streaming_SHA2_256.c
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Streaming_SHA2_256.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/export.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/group.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/group.h
 )
 
 add_library(${META_PROJECT_TARGET} ${PROJECT_SOURCE_FILES})
@@ -47,8 +66,8 @@ target_include_directories(${META_PROJECT_TARGET}
 
 # ---- Dependencies ----
 
-find_package(GMP REQUIRED)
-target_link_libraries(${META_PROJECT_TARGET} PRIVATE ${GMP_LIBRARY})
+# find_package(GMP REQUIRED)
+# target_link_libraries(${META_PROJECT_TARGET} PRIVATE ${GMP_LIBRARY})
 
 # ---- Install ----
 
@@ -95,7 +114,7 @@ if(OPTION_ENABLE_TESTS)
 
     # When running tests, we set some specific compiler flags
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Werror -Wall -Wextra -pedantic -pedantic-errors -Wunreachable-code -Wmissing-field-initializers)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Werror -Wall -Wextra -pedantic -pedantic-errors -Wunreachable-code -Wmissing-field-initializers -Wno-unused-parameter -Wno-unused-variable)
     elseif(MSVC)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC /W4 /WX)
     endif()
