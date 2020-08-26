@@ -11,7 +11,7 @@ import UIKit
 class ContestViewController: UIViewController {
     
     // TODO: Remove hardcoded demo value
-    var contestId: String? = "referendum-pineapple"
+    var contestId: String? = "justice-supreme-court"
     
     var selectedSelection: BallotSelection? {
         didSet {

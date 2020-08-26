@@ -276,7 +276,7 @@ class EGDataService {
             "ballot_subtitle": {
                 "text": [
                     {
-                        "value": "Please choose up to two candidates",
+                        "value": "Please choose one candidate",
                         "language": "en"
                     },
                     {
@@ -285,15 +285,15 @@ class EGDataService {
                     }
                 ]
             },
-            "vote_variation": "n_of_m",
+            "vote_variation": "one_of_m",
             "electoral_district_id": "jefferson-county",
             "name": "Justice of the Supreme Court",
             "primary_party_ids": [
                 "whig",
                 "federalist"
             ],
-            "number_elected": 2,
-            "votes_allowed": 2
+            "number_elected": 1,
+            "votes_allowed": 1
         },
         {
             "@type": "ReferendumContest",
