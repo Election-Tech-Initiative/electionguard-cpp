@@ -440,4 +440,18 @@ class EGDataService {
         
         return candidate?.name
     }
+    
+    func castBallot(completion: @escaping (String?) -> Void) {
+        // TODO: Replace hardcoded delay with actual API call
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
+            completion("checker ACND2 sorry K2JJD connect 9ANDK four 8C372 unreal G338F blizzard FGG1J super 4RR81 tornado J7BCA")
+        })
+    }
+    
+    func spoilBallot(completion: @escaping (String?) -> Void) {
+        // TODO: Replace hardcoded delay with actual API call
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
+            completion("chess ACND2 sorry K2JJD connect 9ANDK four 8C372 unreal G338F blizzard FGG1J super 4RR81 tornado J7BCA")
+        })
+    }
 }

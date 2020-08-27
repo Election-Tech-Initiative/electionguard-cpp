@@ -79,6 +79,13 @@ class ContestViewController: UIViewController {
         loadSelections()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        selectedSelection = nil
+        selectionsCollectionView.reloadData()
+    }
+    
     override func loadView() {
         super.loadView()
         

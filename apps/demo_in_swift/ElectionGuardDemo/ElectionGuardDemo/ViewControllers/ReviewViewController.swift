@@ -107,8 +107,9 @@ class ReviewViewController: UIViewController {
                    noText: "No",
                    handler: { yes in
             if yes {
-                // TODO: Cast ballot
-                self.navigationController?.popToRootViewController(animated: true)
+                self.castBallot { code in
+                    self.showVerification(code: code, isSpoiled: false)
+                }
             }
         })
     }
@@ -124,9 +125,34 @@ class ReviewViewController: UIViewController {
                    noText: "No",
                    handler: { yes in
             if yes {
-                // TODO: Spoil ballot
-                self.navigationController?.popViewController(animated: true)
+                self.spoilBallot { code in
+                    self.showVerification(code: code, isSpoiled: true)
+                }
             }
         })
+    }
+    
+    private func castBallot(completion: @escaping (String?) -> Void) {
+        ProgressHUD.show("Casting ballot...", interaction: false)
+        EGDataService.shared.castBallot(completion: { code in
+            ProgressHUD.dismiss()
+            completion(code)
+        })
+    }
+    
+    private func spoilBallot(completion: @escaping (String?) -> Void) {
+        ProgressHUD.show("Spoiling ballot...", interaction: false)
+        EGDataService.shared.spoilBallot(completion: { code in
+            ProgressHUD.dismiss()
+            completion(code)
+        })
+    }
+    
+    private func showVerification(code: String?, isSpoiled: Bool) {
+        let verification = VerificationViewController()
+        
+        verification.code = code
+        verification.isSpoiled = isSpoiled
+        self.navigationController?.pushViewController(verification, animated: true)
     }
 }
