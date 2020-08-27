@@ -196,6 +196,17 @@ class EGDataService {
             "party_id": "democratic-republican"
         },
         {
+            "object_id": "present",
+            "ballot_name": {
+                "text": [
+                    {
+                        "value": "Present",
+                        "language": "en"
+                    }
+                ]
+            }
+        },
+        {
             "object_id": "write-in",
             "ballot_name": {
                 "text": [
@@ -256,9 +267,9 @@ class EGDataService {
                     "candidate_id": "john-hancock"
                 },
                 {
-                    "object_id": "write-in-selection",
+                    "object_id": "present-selection",
                     "sequence_order": 3,
-                    "candidate_id": "write-in"
+                    "candidate_id": "present"
                 }
             ],
             "ballot_title": {
