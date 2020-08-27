@@ -15,7 +15,7 @@ class ContestViewController: UIViewController {
     
     var selectedSelection: BallotSelection? {
         didSet {
-            submitButton.isEnabled = self.selectedSelection != nil
+            reviewButton.isEnabled = self.selectedSelection != nil
         }
     }
 
@@ -64,11 +64,11 @@ class ContestViewController: UIViewController {
         return collectionView
     }()
     
-    let submitButton: EGButton = {
+    let reviewButton: EGButton = {
         let button = EGButton()
         
-        button.setTitle("Submit", for: .normal)
-        button.addTarget(self, action: #selector(submit), for: .touchUpInside)
+        button.setTitle("Review", for: .normal)
+        button.addTarget(self, action: #selector(review), for: .touchUpInside)
         button.isEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
         
@@ -80,6 +80,8 @@ class ContestViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        title = "Vote"
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "Back", style: .plain, target: nil, action: nil)
         selectionsCollectionView.delegate = self
         selectionsCollectionView.dataSource = self
         
@@ -96,7 +98,7 @@ class ContestViewController: UIViewController {
             ballotTitleLabel,
             ballotSubtitleLabel,
             selectionsCollectionView,
-            submitButton
+            reviewButton
         ])
         
         let constraints = [
@@ -112,15 +114,15 @@ class ContestViewController: UIViewController {
             ballotSubtitleLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
             ballotSubtitleLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
             
-            submitButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            submitButton.widthAnchor.constraint(equalToConstant: 300),
-            submitButton.heightAnchor.constraint(equalToConstant: 60),
-            submitButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12),
+            reviewButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            reviewButton.widthAnchor.constraint(equalToConstant: 300),
+            reviewButton.heightAnchor.constraint(equalToConstant: 60),
+            reviewButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12),
             
             selectionsCollectionView.topAnchor.constraint(equalTo: ballotSubtitleLabel.bottomAnchor, constant: 12),
             selectionsCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             selectionsCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            selectionsCollectionView.bottomAnchor.constraint(equalTo: submitButton.topAnchor, constant: -20)
+            selectionsCollectionView.bottomAnchor.constraint(equalTo: reviewButton.topAnchor, constant: -20)
         ]
         
         NSLayoutConstraint.activate(constraints)
@@ -131,6 +133,7 @@ class ContestViewController: UIViewController {
         let language = "en"
         
         guard let contest = election?.contests?.first(where: { $0.id == contestId }) else {
+            showDialog(title: "Contest Not Found", body: "The contest could not be found. Please go back and try again.", okText: "OK")
             return
         }
         
@@ -141,8 +144,15 @@ class ContestViewController: UIViewController {
         selectionsCollectionView.reloadData()
     }
     
-    @objc private func submit() {
+    @objc private func review() {
+        guard let selection = selectedSelection else {
+            return
+        }
         
+        let review = ReviewViewController()
+        
+        review.selection = selection
+        navigationController?.pushViewController(review, animated: true)
     }
 }
 
