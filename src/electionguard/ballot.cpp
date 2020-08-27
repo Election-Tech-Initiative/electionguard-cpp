@@ -1,9 +1,15 @@
 #include "electionguard/ballot.hpp"
 
+#include "hash.hpp"
+
 #include <cstdlib>
 using std::string;
 namespace electionguard
 {
+#pragma region PlaintextBallotSelection
+
+    // Public Members
+
     PlaintextBallotSelection::PlaintextBallotSelection(string object_id, const string vote) : data()
     {
         auto _osize = object_id.size() + 1;
@@ -28,6 +34,12 @@ namespace electionguard
 
     char *PlaintextBallotSelection::getObjectId() { return data.object_id; }
 
+#pragma endregion
+
+#pragma region CiphertextBallotSelection
+
+    // Public Members
+
     CiphertextBallotSelection::CiphertextBallotSelection(const std::string object_id,
                                                          ElementModQ *descriptionHash)
         : data()
@@ -51,5 +63,33 @@ namespace electionguard
     char *CiphertextBallotSelection::getObjectId() { return data.object_id; }
 
     ElementModQ *CiphertextBallotSelection::getDescriptionHash() { return data.descriptionHash; }
+
+    ElementModQ *CiphertextBallotSelection::crypto_hash_with(ElementModQ *seed_hash)
+    {
+        return makeCryptoHash(string(data.object_id), seed_hash, data.ciphertext);
+    }
+
+    // Protected Members
+
+    ElementModQ *CiphertextBallotSelection::makeCryptoHash(string object_id, ElementModQ *seed_hash,
+                                                           ElGamalCiphertext *ciphertext)
+    {
+        return hash_elems({object_id, seed_hash, ciphertext->crypto_hash()});
+    }
+
+#pragma endregion
+
+#pragma region CiphertextBallotContest
+
+    // Protected Members
+
+    ElementModQ *CiphertextBallotContest::makeCryptoHash(
+      string object_id, vector<CiphertextBallotSelection> selections, ElementModQ *seed_hash)
+    {
+        // TODO: implement ballot.py::_ciphertext_ballot_context_crypto_hash
+        return nullptr;
+    }
+
+#pragma endregion
 
 } // namespace electionguard

@@ -5,6 +5,7 @@
 #include <sstream>
 
 extern "C" {
+#include "../kremlin/Hacl_Bignum4096.h"
 #include "../kremlin/Hacl_Streaming_SHA2_256.h"
 }
 

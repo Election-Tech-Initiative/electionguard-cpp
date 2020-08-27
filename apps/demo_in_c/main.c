@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <electionguard/ballot.h>
+#include <electionguard/election.h>
 #include <electionguard/encrypt.h>
-#include <electionguard/group.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -17,14 +17,28 @@ int main()
     int instance_encrypt = eg_encryption_mediator_encrypt(encrypter);
     assert(instance_encrypt == 9);
 
-    // instantiate a selection on a ballot
+    // instantiate a selection description
+    eg_selection_description_t *description =
+      eg_selection_description_new("some-description-object-id", "some-candidate-id", (uint64_t)1);
+
+    // instantiate a fake public key, hash, and nonce
+    uint64_t pub[64] = {10};
+    eg_element_mod_p_t *public_key = eg_element_mod_p_new(pub);
+
+    uint64_t hash[4] = {9};
+    eg_element_mod_q_t *extended_base_hash = eg_element_mod_q_new(hash);
+
+    uint64_t seed[4] = {4};
+    eg_element_mod_q_t *nonce_seed = eg_element_mod_q_new(seed);
+
+    // instantiate a fake selection on a ballot
     eg_plaintext_ballot_selection_t *plaintext =
       eg_plaintext_ballot_selection_new("some-object-id", "1");
 
-    eg_ciphertext_ballot_selection_t *ciphertext;
-
-    int function_encrypt = eg_encrypt_selection(plaintext, &ciphertext);
-    assert(function_encrypt == 1); // arbitrarily returns one for success
+    // execute the encryption
+    eg_ciphertext_ballot_selection_t *ciphertext = eg_encrypt_selection(
+      plaintext, description, public_key, extended_base_hash, nonce_seed, false, false);
+    assert(ciphertext != NULL);
 
     // check the object id by accessing the property getter
     char *plaintext_object_id = eg_plaintext_ballot_selection_get_object_id(plaintext);

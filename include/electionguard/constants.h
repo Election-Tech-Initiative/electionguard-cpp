@@ -1,0 +1,13 @@
+#ifndef __ELECTIONGUARD_CORE_CONSTANTS_H_INCLUDED__
+#define __ELECTIONGUARD_CORE_CONSTANTS_H_INCLUDED__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+enum MAX_IDENIFIER_LENGTH { MAX_IDENIFIER_LENGTH = 256 };
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* __ELECTIONGUARD_CORE_CONSTANTS_H_INCLUDED__ */

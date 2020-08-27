@@ -24,7 +24,10 @@ namespace electionguard
         return 9;
     }
 
-    CiphertextBallotSelection *encrypt_selection(PlaintextBallotSelection *selection)
+    CiphertextBallotSelection *
+    encrypt_selection(PlaintextBallotSelection *selection, SelectionDescription *description,
+                      ElementModP *elgamal_public_key, ElementModQ *crypto_extended_base_hash,
+                      ElementModQ *nonce_seed, bool is_placeholder, bool should_verify_proofs)
     {
         // TESTING: just putting the plaintext value in the hash for now
         uint64_t selection_as_int = selection->toInt();
