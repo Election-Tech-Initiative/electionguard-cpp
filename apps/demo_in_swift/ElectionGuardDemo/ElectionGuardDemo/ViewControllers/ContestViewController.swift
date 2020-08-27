@@ -19,15 +19,6 @@ class ContestViewController: UIViewController {
         }
     }
 
-    let nameLabel: UILabel = {
-        let label = UILabel()
-        
-        label.text = "Contest name"
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        return label
-    }()
-    
     let ballotTitleLabel: UILabel = {
         let label = UILabel()
         
@@ -94,7 +85,6 @@ class ContestViewController: UIViewController {
         view.backgroundColor = .secondarySystemBackground
         
         view.addSubviews([
-            nameLabel,
             ballotTitleLabel,
             ballotSubtitleLabel,
             selectionsCollectionView,
@@ -102,17 +92,13 @@ class ContestViewController: UIViewController {
         ])
         
         let constraints = [
-            nameLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            nameLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            nameLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            
-            ballotTitleLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 12),
-            ballotTitleLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
-            ballotTitleLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
-            
+            ballotTitleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            ballotTitleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            ballotTitleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+
             ballotSubtitleLabel.topAnchor.constraint(equalTo: ballotTitleLabel.bottomAnchor, constant: 12),
-            ballotSubtitleLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
-            ballotSubtitleLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
+            ballotSubtitleLabel.leadingAnchor.constraint(equalTo: ballotTitleLabel.leadingAnchor),
+            ballotSubtitleLabel.trailingAnchor.constraint(equalTo: ballotTitleLabel.trailingAnchor),
             
             reviewButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             reviewButton.widthAnchor.constraint(equalToConstant: 300),
@@ -137,7 +123,6 @@ class ContestViewController: UIViewController {
             return
         }
         
-        nameLabel.text = contest.name
         ballotTitleLabel.text = contest.ballotTitle?.text?.first(where: { $0.language == language })?.value
         ballotSubtitleLabel.text = contest.ballotSubtitle?.text?.first(where: { $0.language == language })?.value
         selections = contest.ballotSelections ?? [BallotSelection]()
