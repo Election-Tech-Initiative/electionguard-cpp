@@ -1,3 +1,5 @@
+#include "../../src/electionguard/log.hpp"
+
 #include <doctest/doctest.h>
 #include <electionguard/hash.hpp>
 #include <iomanip>
@@ -7,52 +9,47 @@
 
 using namespace electionguard;
 
-TEST_CASE("ElementModP and ElementModQ with same Zero data")
+TEST_CASE("Same ElementModQs with same Zero data produce same Hash")
 {
-    uint64_t p[1] = {0};
-    uint64_t q[1] = {0};
-    auto elemP = new ElementModP(p);
-    auto elemQ = new ElementModQ(q);
-    auto zero_hash_p = hash_elems(elemP);
-    auto zero_hash_q = hash_elems(elemQ);
+    uint64_t z1[4] = {};
+    uint64_t z2[4] = {};
 
-    CHECK((*zero_hash_p == *zero_hash_q));
+    auto zero_hash_q1 = hash_elems(new ElementModQ(z1));
+    auto zero_hash_q2 = hash_elems(new ElementModQ(z2));
+
+    CHECK((*zero_hash_q1 == *zero_hash_q2));
     // but different addresses
-    CHECK(&zero_hash_p != &zero_hash_q);
+    CHECK(&zero_hash_q1 != &zero_hash_q2);
 }
 
-TEST_CASE("Same Zero Value Hash with vectors")
+TEST_CASE("Hash Value for Zero string different from Zero number")
 {
-    vector<uint64_t> z1 = {0};
-    vector<uint64_t> z2 = {0};
-    auto zero_hash1 = hash_elems(z1);
-    auto zero_hash2 = hash_elems(z2);
-
-    CHECK((*zero_hash1 == *zero_hash2));
-    // but different addresses
-    CHECK(&zero_hash1 != &zero_hash2);
-}
-
-TEST_CASE("Same Zero Value Hash with explicit number")
-{
-    uint64_t z1[1] = {0};
-    uint64_t z2[1] = {0};
-    auto zero_hash1 = hash_elems(z1[0]);
-    auto zero_hash2 = hash_elems(z2[0]);
-
-    CHECK((*zero_hash1 == *zero_hash2));
-    // but different addresses
-    CHECK(&zero_hash1 != &zero_hash2);
-}
-
-TEST_CASE("Same Zero Value Hash for string and number")
-{
-    auto zero_hash1 = hash_elems((uint64_t)0);
+    auto zero_hash1 = hash_elems(0UL);
     auto zero_hash2 = hash_elems("0");
 
-    CHECK((*zero_hash1 == *zero_hash2));
+    CHECK((*zero_hash1 != *zero_hash2));
     // but different addresses
     CHECK(&zero_hash1 != &zero_hash2);
+}
+
+TEST_CASE("Hash Value for non-zero number string same as explicit number")
+{
+    auto one_hash1 = hash_elems(1UL);
+    auto one_hash2 = hash_elems("1");
+
+    CHECK((*one_hash1 == *one_hash2));
+    // but different addresses
+    CHECK(&one_hash1 != &one_hash2);
+}
+
+TEST_CASE("Same Number Value Hash with explicit number")
+{
+    auto one_hash1 = hash_elems(1UL);
+    auto one_hash2 = hash_elems(1UL);
+
+    CHECK((*one_hash1 == *one_hash2));
+    // but different addresses
+    CHECK(&one_hash1 != &one_hash2);
 }
 
 TEST_CASE("Same strings are the same Hash") { CHECK((*hash_elems("0") == *hash_elems("0"))); }
@@ -74,20 +71,34 @@ TEST_CASE("Hash for empty string same as null string")
     CHECK((*hash_elems("null") == *hash_elems("")));
 }
 
+TEST_CASE("Hash for nullptr same as explicit zero number")
+{
+    CHECK((*hash_elems(0UL) == *hash_elems(nullptr)));
+}
+
 TEST_CASE("Hash for nullptr same as null string")
 {
     CHECK((*hash_elems("null") == *hash_elems(nullptr)));
 }
 
-TEST_CASE("Hash of multiple zeros is different has than hash for single zero")
+TEST_CASE("Hash of multiple zeros in list is different has than hash for single zero")
 {
     CHECK((*hash_elems("0") != *hash_elems({"0", "0"})));
 }
 
-TEST_CASE("Hash of same amount of multiple zeros are the same hash")
+TEST_CASE("Hash of same values in list are the same hash")
 {
-    CHECK((*hash_elems({0UL, 0UL}) == *hash_elems({"0", "0"})));
+    CHECK((*hash_elems({"0", "0"}) == *hash_elems({"0", "0"})));
 }
 
-// TODO: equivalent of hashing a Sequence in Python?
-// Need `ElementModQ.toBigIntString` implementation to validate crunching the recursive Q output works
+TEST_CASE("Same Hash Value from nested-list and taking result of hashed list and hashing it's hex")
+{
+    auto nestedHash = hash_elems({vector<string>{"0", "1"}, "3"});
+    auto nonNestedHash1 = hash_elems({"0", "1"});
+    auto nonNestedHash2 = hash_elems({nonNestedHash1->toHex(), "3"});
+
+    CHECK((*nestedHash != *nonNestedHash1));
+    CHECK((*nestedHash == *nonNestedHash2));
+    // but different addresses
+    CHECK(&nestedHash != &nonNestedHash2);
+}
