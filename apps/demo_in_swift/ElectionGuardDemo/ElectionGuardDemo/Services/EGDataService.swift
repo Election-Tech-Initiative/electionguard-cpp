@@ -305,52 +305,6 @@ class EGDataService {
             ],
             "number_elected": 1,
             "votes_allowed": 1
-        },
-        {
-            "@type": "ReferendumContest",
-            "object_id": "referendum-pineapple",
-            "sequence_order": 1,
-            "ballot_selections": [
-                {
-                    "object_id": "referendum-pineapple-affirmative-selection",
-                    "sequence_order": 0,
-                    "candidate_id": "referendum-pineapple-affirmative"
-                },
-                {
-                    "object_id": "referendum-pineapple-negative-selection",
-                    "sequence_order": 1,
-                    "candidate_id": "referendum-pineapple-negative"
-                }
-            ],
-            "ballot_title": {
-                "text": [
-                    {
-                        "value": "Should pineapple be banned on pizza?",
-                        "language": "en"
-                    },
-                    {
-                        "value": "¿Debería prohibirse la piña en la pizza?",
-                        "language": "es"
-                    }
-                ]
-            },
-            "ballot_subtitle": {
-                "text": [
-                    {
-                        "value": "The township considers this issue to be very important",
-                        "language": "en"
-                    },
-                    {
-                        "value": "El municipio considera que esta cuestión es muy importante",
-                        "language": "es"
-                    }
-                ]
-            },
-            "vote_variation": "one_of_m",
-            "electoral_district_id": "harrison-township",
-            "name": "The Pineapple Question",
-            "number_elected": 1,
-            "votes_allowed": 1
         }
     ],
     "ballot_styles": [
