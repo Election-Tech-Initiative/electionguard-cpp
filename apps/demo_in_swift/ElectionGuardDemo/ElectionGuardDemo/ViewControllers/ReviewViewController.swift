@@ -11,6 +11,7 @@ import UIKit
 class ReviewViewController: UIViewController {
     
     var selection: BallotSelection?
+    var contestId: String?
     
     let instructionsLabel: UILabel = {
         let label = UILabel()
@@ -134,7 +135,7 @@ class ReviewViewController: UIViewController {
     
     private func castBallot(completion: @escaping (String?) -> Void) {
         ProgressHUD.show("Casting ballot...", interaction: false)
-        EGDataService.shared.castBallot(completion: { code in
+        EGDataService.shared.castBallot(contestId: contestId!, completion: { code in
             ProgressHUD.dismiss()
             completion(code)
         })
@@ -142,7 +143,7 @@ class ReviewViewController: UIViewController {
     
     private func spoilBallot(completion: @escaping (String?) -> Void) {
         ProgressHUD.show("Spoiling ballot...", interaction: false)
-        EGDataService.shared.spoilBallot(completion: { code in
+        EGDataService.shared.spoilBallot(contestId: contestId!, completion: { code in
             ProgressHUD.dismiss()
             completion(code)
         })

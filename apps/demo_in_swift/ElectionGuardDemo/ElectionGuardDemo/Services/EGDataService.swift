@@ -11,6 +11,9 @@ import Foundation
 class EGDataService {
     static let shared = EGDataService()
 
+    // Dictionary for keeping track of cast ballots in memory (demo purposes only)
+    var votes = [String: Bool]() // Key: contestId; Value: True (if cast), False (if spoiled)
+
     private init() { }
     
     func getElectionManifest() -> ElectionManifest? {
@@ -395,15 +398,17 @@ class EGDataService {
         return candidate?.name
     }
     
-    func castBallot(completion: @escaping (String?) -> Void) {
+    func castBallot(contestId: String, completion: @escaping (String?) -> Void) {
         // TODO: Replace hardcoded delay with actual API call
+        votes[contestId] = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
             completion("checker ACND2 sorry K2JJD connect 9ANDK four 8C372 unreal G338F blizzard FGG1J super 4RR81 tornado J7BCA")
         })
     }
     
-    func spoilBallot(completion: @escaping (String?) -> Void) {
+    func spoilBallot(contestId: String, completion: @escaping (String?) -> Void) {
         // TODO: Replace hardcoded delay with actual API call
+        votes[contestId] = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
             completion("chess ACND2 sorry K2JJD connect 9ANDK four 8C372 unreal G338F blizzard FGG1J super 4RR81 tornado J7BCA")
         })

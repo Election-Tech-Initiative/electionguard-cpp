@@ -10,8 +10,7 @@ import UIKit
 
 class ContestViewController: UIViewController {
     
-    // TODO: Remove hardcoded demo value
-    var contestId: String? = "justice-supreme-court"
+    var contestId: String?
     
     var selectedSelection: BallotSelection? {
         didSet {
@@ -144,6 +143,7 @@ class ContestViewController: UIViewController {
         let review = ReviewViewController()
         
         review.selection = selection
+        review.contestId = contestId
         navigationController?.pushViewController(review, animated: true)
     }
 }
