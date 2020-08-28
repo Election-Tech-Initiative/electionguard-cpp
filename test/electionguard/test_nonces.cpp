@@ -1,23 +1,39 @@
+#include "../../src/electionguard/log.hpp"
+
 #include <doctest/doctest.h>
 #include <electionguard/nonces.hpp>
 
 using namespace electionguard;
 
-// // TODO: add more tests once `toHex` is implemented in `groups.cpp`
-
 TEST_CASE("Nonces with same seed generated same output")
 {
-    uint64_t a1[4] = {};
-    uint64_t a2[4] = {};
-    auto n1 = new Nonces(new ElementModQ(a1));
-    auto n2 = new Nonces(new ElementModQ(a2));
+    uint64_t a[4] = {};
+    auto n1 = new Nonces(new ElementModQ(a));
+    auto n2 = new Nonces(new ElementModQ(a));
     CHECK(n1->get(0)->toHex() == n2->get(0)->toHex());
 }
 
 TEST_CASE("Nonce seeded with header is different from Nonce seeded without header")
 {
-    uint64_t q[4] = {};
-    auto n1 = new Nonces(new ElementModQ(q));
-    auto n2 = new Nonces(new ElementModQ(q), "0");
+    uint64_t a[4] = {};
+    auto n1 = new Nonces(new ElementModQ(a));
+    auto n2 = new Nonces(new ElementModQ(a), "0");
     CHECK(n1->get(0)->toHex() != n2->get(0)->toHex());
+}
+
+TEST_CASE("Nonces slices produce same output as iterating for each index")
+{
+    uint64_t a[4] = {};
+    auto n = new Nonces(new ElementModQ(a));
+    vector<ElementModQ *> l1;
+    for (int i(0); i < 10; ++i) {
+        l1.push_back(n->get(i));
+    }
+    auto l2 = (new Nonces(new ElementModQ(a)))->get(0UL, 10UL);
+
+    CHECK(l1.size() == l2.size());
+
+    for (int i(0); i < 10; ++i) {
+        CHECK(l1[i]->toHex() == l2[i]->toHex());
+    }
 }
