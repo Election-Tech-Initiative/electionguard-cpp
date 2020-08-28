@@ -13,7 +13,6 @@ class MainViewController: UIViewController {
     let electionNameLabel: UILabel = {
         let label = UILabel()
         
-        label.text = "Election name"
         label.textAlignment = .center
         label.font = .boldSystemFont(ofSize: 16)
         label.lineBreakMode = .byWordWrapping
@@ -45,7 +44,6 @@ class MainViewController: UIViewController {
     let contestNameLabel: UILabel = {
         let label = UILabel()
         
-        label.text = "Contest name"
         label.font = .boldSystemFont(ofSize: 24)
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 3

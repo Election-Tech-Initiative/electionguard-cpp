@@ -21,7 +21,6 @@ class ContestViewController: UIViewController {
     let ballotTitleLabel: UILabel = {
         let label = UILabel()
         
-        label.text = "Ballot title"
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -32,7 +31,6 @@ class ContestViewController: UIViewController {
     let ballotSubtitleLabel: UILabel = {
         let label = UILabel()
         
-        label.text = "Ballot subtitle"
         label.lineBreakMode = .byWordWrapping
         label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false
