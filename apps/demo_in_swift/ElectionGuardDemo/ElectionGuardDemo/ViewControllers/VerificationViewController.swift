@@ -56,6 +56,16 @@ class VerificationViewController: UIViewController {
         return label
     }()
     
+    let copyButton: UIButton = {
+        let button = UIButton(type: .system)
+
+        button.setTitle("Copy", for: .normal)
+        button.addTarget(self, action: #selector(copyCode), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+
+        return button
+    }()
+
     let revoteButton: EGButton = {
         let button = EGButton()
         
@@ -92,6 +102,7 @@ class VerificationViewController: UIViewController {
             messageLabel,
             instructionsLabel,
             codeLabel,
+            copyButton,
             revoteButton,
             closeButton
         ])
@@ -109,6 +120,9 @@ class VerificationViewController: UIViewController {
             codeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             codeLabel.widthAnchor.constraint(equalToConstant: 250),
             
+            copyButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            copyButton.topAnchor.constraint(equalTo: codeLabel.bottomAnchor, constant: 12),
+
             revoteButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             revoteButton.widthAnchor.constraint(equalToConstant: 300),
             revoteButton.heightAnchor.constraint(equalToConstant: 60),
@@ -123,6 +137,11 @@ class VerificationViewController: UIViewController {
         NSLayoutConstraint.activate(constraints)
     }
     
+    @objc private func copyCode() {
+        UIPasteboard.general.string = code
+        ProgressHUD.showSucceed("Copied to clipboard", interaction: false)
+    }
+
     @objc private func revote() {
         guard isSpoiled == true else {
             return
