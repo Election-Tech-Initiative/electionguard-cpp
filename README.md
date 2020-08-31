@@ -109,7 +109,7 @@ Depending if you are building for the simulator or the phone you need to copy th
 For instance, for the simulator:
 
 ```sh
-cp ./build/electionguard-core/src/Release-iphonesimulator/libelectionguard.a ./apps/demo_in_swift/ElectionGuardDemo/libelectionguard.a
+cp ./build/electionguard-core/src/Release-iphonesimulator/libelectionguard.a ./apps/demo_in_swift/ElectionGuardDemo/ElectionGuardDemo/libelectionguard.a
 ```
 
 Then, open `./apps/demo_in_swift/ElectionGuardDemo.xcodeproj` in xcode and run.
