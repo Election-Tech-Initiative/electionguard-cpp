@@ -17,9 +17,11 @@ int main()
     int instance_encrypt = eg_encryption_mediator_encrypt(encrypter);
     assert(instance_encrypt == 9);
 
+    char *candidate_id = "some-candidate-id";
+
     // instantiate a selection description
     eg_selection_description_t *description =
-      eg_selection_description_new("some-description-object-id", "some-candidate-id", (uint64_t)1);
+      eg_selection_description_new("some-description-object-id", candidate_id, (uint64_t)1);
 
     // instantiate a fake public key, hash, and nonce
     uint64_t pub[64] = {10};
@@ -33,7 +35,7 @@ int main()
 
     // instantiate a fake selection on a ballot
     eg_plaintext_ballot_selection_t *plaintext =
-      eg_plaintext_ballot_selection_new("some-object-id", "1");
+      eg_plaintext_ballot_selection_new(candidate_id, "1");
 
     // execute the encryption
     eg_ciphertext_ballot_selection_t *ciphertext = eg_encrypt_selection(
@@ -44,6 +46,7 @@ int main()
     char *plaintext_object_id = eg_plaintext_ballot_selection_get_object_id(plaintext);
     char *ciphertext_object_id = eg_ciphertext_ballot_selection_get_object_id(ciphertext);
     assert(strings_are_equal(plaintext_object_id, ciphertext_object_id) == true);
+    assert(strings_are_equal(ciphertext_object_id, candidate_id) == true);
 
     // get out one of the ElementModQ hashes
     eg_element_mod_q_t *description_hash =

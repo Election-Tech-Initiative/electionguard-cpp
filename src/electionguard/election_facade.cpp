@@ -8,8 +8,9 @@ extern "C" {
 #define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
 #define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
 
-EG_API eg_selection_description_t *
-eg_selection_description_new(const char *object_id, char *candidate_id, uint64_t sequence_order)
+EG_API eg_selection_description_t *eg_selection_description_new(const char *object_id,
+                                                                const char *candidate_id,
+                                                                uint64_t sequence_order)
 {
     return AS_TYPE(eg_selection_description_t, new electionguard::SelectionDescription(
                                                  object_id, candidate_id, sequence_order));
