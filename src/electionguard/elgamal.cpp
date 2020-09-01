@@ -1,5 +1,7 @@
 #include "electionguard/elgamal.hpp"
 
+#include "hash.hpp"
+
 namespace electionguard
 {
 
@@ -14,6 +16,8 @@ namespace electionguard
     ElementModP *ElGamalCiphertext::getPad() { return data.pad; }
     ElementModP *ElGamalCiphertext::getData() { return data.data; }
 
+    ElementModQ *ElGamalCiphertext::crypto_hash() { return hash_elems({data.pad, data.data}); }
+
     ElGamalCiphertext *elgamalEncrypt(uint64_t m, ElementModQ *nonce, ElementModP *publicKey)
     {
         if (m > 0) {
@@ -25,4 +29,5 @@ namespace electionguard
         // TODO:Safety
         return new ElGamalCiphertext(publicKey, publicKey);
     }
+
 } // namespace electionguard
