@@ -39,4 +39,5 @@ struct ElectionManifest: Codable {
 enum ElectionType: String, Codable {
     case unknown
     case primary
+    case general
 }
