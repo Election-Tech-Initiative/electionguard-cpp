@@ -7,23 +7,43 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A513869D24F809E500DD6A74 /* VerificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A513869C24F809E500DD6A74 /* VerificationViewController.swift */; };
+		A52A8FDE24F01A2B0017244F /* ContestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52A8FDD24F01A2B0017244F /* ContestViewController.swift */; };
+		A54A05F724F8312300B9CFE2 /* ProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54A05F624F8312300B9CFE2 /* ProgressHUD.swift */; };
+		A54A05F924FE98C300B9CFE2 /* CiphertextElectionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54A05F824FE98C300B9CFE2 /* CiphertextElectionContext.swift */; };
 		A56C8C5A24EF14B80044EA70 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A56C8C5924EF14B80044EA70 /* AppDelegate.swift */; };
 		A56C8C5C24EF14B80044EA70 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A56C8C5B24EF14B80044EA70 /* SceneDelegate.swift */; };
-		A56C8C5E24EF14B80044EA70 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A56C8C5D24EF14B80044EA70 /* ViewController.swift */; };
-		A56C8C6124EF14B80044EA70 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A56C8C5F24EF14B80044EA70 /* Main.storyboard */; };
+		A56C8C5E24EF14B80044EA70 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A56C8C5D24EF14B80044EA70 /* MainViewController.swift */; };
 		A56C8C6324EF14B90044EA70 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A56C8C6224EF14B90044EA70 /* Assets.xcassets */; };
 		A56C8C6624EF14B90044EA70 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A56C8C6424EF14B90044EA70 /* LaunchScreen.storyboard */; };
 		A56C8C7524EF1C070044EA70 /* libelectionguard.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A56C8C7424EF1C070044EA70 /* libelectionguard.a */; };
 		A56C8C7C24EF1C620044EA70 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A56C8C7B24EF1C620044EA70 /* libc++.tbd */; };
 		A56C8C7E24EF1CA70044EA70 /* ElectionGuard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A56C8C7D24EF1CA70044EA70 /* ElectionGuard.swift */; };
+		A5A8009A24F01F0C0068FE96 /* UIView+addSubviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A8009924F01F0C0068FE96 /* UIView+addSubviews.swift */; };
+		A5A8009D24F027410068FE96 /* SelectionCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A8009C24F027410068FE96 /* SelectionCollectionViewCell.swift */; };
+		A5A8009F24F032DE0068FE96 /* EGButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A8009E24F032DE0068FE96 /* EGButton.swift */; };
+		A5A800A224F044940068FE96 /* EGDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A800A124F044940068FE96 /* EGDataService.swift */; };
+		A5A800AC24F045220068FE96 /* JsonHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A800A424F045220068FE96 /* JsonHelper.swift */; };
+		A5A800AD24F045220068FE96 /* ElectionManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A800A524F045220068FE96 /* ElectionManifest.swift */; };
+		A5A800AE24F045220068FE96 /* GeopoliticalUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A800A624F045220068FE96 /* GeopoliticalUnit.swift */; };
+		A5A800AF24F045220068FE96 /* Contest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A800A724F045220068FE96 /* Contest.swift */; };
+		A5A800B024F045220068FE96 /* Party.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A800A824F045220068FE96 /* Party.swift */; };
+		A5A800B124F045220068FE96 /* Candidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A800A924F045220068FE96 /* Candidate.swift */; };
+		A5A800B224F045220068FE96 /* CommonModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A800AA24F045220068FE96 /* CommonModels.swift */; };
+		A5A800B324F045220068FE96 /* BallotStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A800AB24F045220068FE96 /* BallotStyle.swift */; };
+		A5DD4B3224F6D69400B9B176 /* ReviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5DD4B3124F6D69400B9B176 /* ReviewViewController.swift */; };
+		A5DD4B3424F7EE1000B9B176 /* UIViewController+alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5DD4B3324F7EE1000B9B176 /* UIViewController+alert.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A513869C24F809E500DD6A74 /* VerificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerificationViewController.swift; sourceTree = "<group>"; };
+		A52A8FDD24F01A2B0017244F /* ContestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContestViewController.swift; sourceTree = "<group>"; };
+		A54A05F624F8312300B9CFE2 /* ProgressHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressHUD.swift; sourceTree = "<group>"; };
+		A54A05F824FE98C300B9CFE2 /* CiphertextElectionContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CiphertextElectionContext.swift; sourceTree = "<group>"; };
 		A56C8C5624EF14B80044EA70 /* ElectionGuard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ElectionGuard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A56C8C5924EF14B80044EA70 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A56C8C5B24EF14B80044EA70 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		A56C8C5D24EF14B80044EA70 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		A56C8C6024EF14B80044EA70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		A56C8C5D24EF14B80044EA70 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		A56C8C6224EF14B90044EA70 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A56C8C6524EF14B90044EA70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A56C8C6724EF14B90044EA70 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -38,6 +58,20 @@
 		A56C8C7D24EF1CA70044EA70 /* ElectionGuard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectionGuard.swift; sourceTree = "<group>"; };
 		B160683B24F7F4B400EA2A14 /* constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constants.h; path = ../../../../../include/electionguard/constants.h; sourceTree = "<group>"; };
 		B160683C24F7F4B400EA2A14 /* election.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = election.h; path = ../../../../../include/electionguard/election.h; sourceTree = "<group>"; };
+		A5A8009924F01F0C0068FE96 /* UIView+addSubviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+addSubviews.swift"; sourceTree = "<group>"; };
+		A5A8009C24F027410068FE96 /* SelectionCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionCollectionViewCell.swift; sourceTree = "<group>"; };
+		A5A8009E24F032DE0068FE96 /* EGButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EGButton.swift; sourceTree = "<group>"; };
+		A5A800A124F044940068FE96 /* EGDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EGDataService.swift; sourceTree = "<group>"; };
+		A5A800A424F045220068FE96 /* JsonHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JsonHelper.swift; sourceTree = "<group>"; };
+		A5A800A524F045220068FE96 /* ElectionManifest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectionManifest.swift; sourceTree = "<group>"; };
+		A5A800A624F045220068FE96 /* GeopoliticalUnit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeopoliticalUnit.swift; sourceTree = "<group>"; };
+		A5A800A724F045220068FE96 /* Contest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Contest.swift; sourceTree = "<group>"; };
+		A5A800A824F045220068FE96 /* Party.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Party.swift; sourceTree = "<group>"; };
+		A5A800A924F045220068FE96 /* Candidate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Candidate.swift; sourceTree = "<group>"; };
+		A5A800AA24F045220068FE96 /* CommonModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommonModels.swift; sourceTree = "<group>"; };
+		A5A800AB24F045220068FE96 /* BallotStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BallotStyle.swift; sourceTree = "<group>"; };
+		A5DD4B3124F6D69400B9B176 /* ReviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewViewController.swift; sourceTree = "<group>"; };
+		A5DD4B3324F7EE1000B9B176 /* UIViewController+alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+alert.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +87,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A52A8FDC24F019C60017244F /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				A56C8C5D24EF14B80044EA70 /* MainViewController.swift */,
+				A52A8FDD24F01A2B0017244F /* ContestViewController.swift */,
+				A5DD4B3124F6D69400B9B176 /* ReviewViewController.swift */,
+				A513869C24F809E500DD6A74 /* VerificationViewController.swift */,
+			);
+			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		A54A05F524F8310500B9CFE2 /* ExternalLibraries */ = {
+			isa = PBXGroup;
+			children = (
+				A54A05F624F8312300B9CFE2 /* ProgressHUD.swift */,
+			);
+			path = ExternalLibraries;
+			sourceTree = "<group>";
+		};
 		A56C8C4D24EF14B80044EA70 = {
 			isa = PBXGroup;
 			children = (
@@ -73,17 +126,22 @@
 		A56C8C5824EF14B80044EA70 /* ElectionGuardDemo */ = {
 			isa = PBXGroup;
 			children = (
+				A54A05F524F8310500B9CFE2 /* ExternalLibraries */,
 				A56C8C7424EF1C070044EA70 /* libelectionguard.a */,
 				A56C8C6D24EF15A20044EA70 /* electionguard-core */,
 				A56C8C5924EF14B80044EA70 /* AppDelegate.swift */,
 				A56C8C5B24EF14B80044EA70 /* SceneDelegate.swift */,
-				A56C8C5D24EF14B80044EA70 /* ViewController.swift */,
-				A56C8C5F24EF14B80044EA70 /* Main.storyboard */,
 				A56C8C6224EF14B90044EA70 /* Assets.xcassets */,
 				A56C8C6424EF14B90044EA70 /* LaunchScreen.storyboard */,
 				A56C8C6724EF14B90044EA70 /* Info.plist */,
 				A56C8C7624EF1C1F0044EA70 /* ElectionGuardDemo-Bridging-Header.h */,
 				A56C8C7D24EF1CA70044EA70 /* ElectionGuard.swift */,
+				A5A800A024F0447F0068FE96 /* Services */,
+				A5A8009824F01EEC0068FE96 /* Extensions */,
+				A5A800B424F05E550068FE96 /* Helpers */,
+				A5A800A324F044EA0068FE96 /* Models */,
+				A5A8009B24F027290068FE96 /* Views */,
+				A52A8FDC24F019C60017244F /* ViewControllers */,
 			);
 			path = ElectionGuardDemo;
 			sourceTree = "<group>";
@@ -108,6 +166,55 @@
 				A56C8C7B24EF1C620044EA70 /* libc++.tbd */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A5A8009824F01EEC0068FE96 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				A5A8009924F01F0C0068FE96 /* UIView+addSubviews.swift */,
+				A5DD4B3324F7EE1000B9B176 /* UIViewController+alert.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		A5A8009B24F027290068FE96 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A5A8009C24F027410068FE96 /* SelectionCollectionViewCell.swift */,
+				A5A8009E24F032DE0068FE96 /* EGButton.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A5A800A024F0447F0068FE96 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A5A800A124F044940068FE96 /* EGDataService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A5A800A324F044EA0068FE96 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A5A800AB24F045220068FE96 /* BallotStyle.swift */,
+				A5A800A924F045220068FE96 /* Candidate.swift */,
+				A5A800AA24F045220068FE96 /* CommonModels.swift */,
+				A5A800A724F045220068FE96 /* Contest.swift */,
+				A5A800A524F045220068FE96 /* ElectionManifest.swift */,
+				A5A800A624F045220068FE96 /* GeopoliticalUnit.swift */,
+				A5A800A824F045220068FE96 /* Party.swift */,
+				A54A05F824FE98C300B9CFE2 /* CiphertextElectionContext.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A5A800B424F05E550068FE96 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				A5A800A424F045220068FE96 /* JsonHelper.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -171,7 +278,6 @@
 			files = (
 				A56C8C6624EF14B90044EA70 /* LaunchScreen.storyboard in Resources */,
 				A56C8C6324EF14B90044EA70 /* Assets.xcassets in Resources */,
-				A56C8C6124EF14B80044EA70 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -182,24 +288,34 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5DD4B3424F7EE1000B9B176 /* UIViewController+alert.swift in Sources */,
+				A5A8009A24F01F0C0068FE96 /* UIView+addSubviews.swift in Sources */,
+				A5A8009F24F032DE0068FE96 /* EGButton.swift in Sources */,
+				A5A8009D24F027410068FE96 /* SelectionCollectionViewCell.swift in Sources */,
+				A5A800B124F045220068FE96 /* Candidate.swift in Sources */,
 				A56C8C7E24EF1CA70044EA70 /* ElectionGuard.swift in Sources */,
-				A56C8C5E24EF14B80044EA70 /* ViewController.swift in Sources */,
+				A52A8FDE24F01A2B0017244F /* ContestViewController.swift in Sources */,
+				A5A800B324F045220068FE96 /* BallotStyle.swift in Sources */,
+				A56C8C5E24EF14B80044EA70 /* MainViewController.swift in Sources */,
+				A5DD4B3224F6D69400B9B176 /* ReviewViewController.swift in Sources */,
 				A56C8C5A24EF14B80044EA70 /* AppDelegate.swift in Sources */,
+				A5A800A224F044940068FE96 /* EGDataService.swift in Sources */,
+				A5A800AD24F045220068FE96 /* ElectionManifest.swift in Sources */,
+				A513869D24F809E500DD6A74 /* VerificationViewController.swift in Sources */,
+				A54A05F924FE98C300B9CFE2 /* CiphertextElectionContext.swift in Sources */,
+				A5A800B224F045220068FE96 /* CommonModels.swift in Sources */,
+				A5A800AE24F045220068FE96 /* GeopoliticalUnit.swift in Sources */,
+				A5A800B024F045220068FE96 /* Party.swift in Sources */,
+				A5A800AF24F045220068FE96 /* Contest.swift in Sources */,
 				A56C8C5C24EF14B80044EA70 /* SceneDelegate.swift in Sources */,
+				A5A800AC24F045220068FE96 /* JsonHelper.swift in Sources */,
+				A54A05F724F8312300B9CFE2 /* ProgressHUD.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		A56C8C5F24EF14B80044EA70 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				A56C8C6024EF14B80044EA70 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		A56C8C6424EF14B90044EA70 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
