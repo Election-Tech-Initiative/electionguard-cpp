@@ -4,6 +4,7 @@
 #include "log.hpp"
 
 #include <cstdlib>
+#include <cstring>
 using std::string;
 
 namespace electionguard
