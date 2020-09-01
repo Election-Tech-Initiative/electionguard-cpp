@@ -19,6 +19,10 @@ TEST_CASE("Get rotating tracker hash rotates")
     CHECK(deviceHash != nullptr);
     CHECK(rotatingHash1 != nullptr);
     CHECK(rotatingHash2 != nullptr);
+
+    CHECK(rotatingHash1 != deviceHash);
+    CHECK(rotatingHash2 != deviceHash);
+    CHECK(rotatingHash1 != rotatingHash2);
 }
 
 // todo: TEST_CASE("Hash to words converts to words")
