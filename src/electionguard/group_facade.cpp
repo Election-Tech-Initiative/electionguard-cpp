@@ -7,9 +7,9 @@ extern "C" {
 #define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
 #define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
 
-eg_element_mod_p_t *eg_element_mod_p_new(uint64_t *elem)
+eg_element_mod_p_t *eg_element_mod_p_new(uint64_t *elem, bool unchecked)
 {
-    return AS_TYPE(eg_element_mod_p_t, new electionguard::ElementModP(elem));
+    return AS_TYPE(eg_element_mod_p_t, new electionguard::ElementModP(elem, unchecked));
 }
 
 void eg_element_mod_p_free(eg_element_mod_p_t *element)
@@ -27,9 +27,9 @@ uint8_t eg_element_mod_p_get(eg_element_mod_p_t *element, uint64_t **data)
     return (uint8_t)64; //TODO: return the real size
 }
 
-eg_element_mod_q_t *eg_element_mod_q_new(uint64_t *elem)
+eg_element_mod_q_t *eg_element_mod_q_new(uint64_t *elem, bool unchecked)
 {
-    return AS_TYPE(eg_element_mod_q_t, new electionguard::ElementModQ(elem));
+    return AS_TYPE(eg_element_mod_q_t, new electionguard::ElementModQ(elem, unchecked));
 }
 
 void eg_element_mod_q_free(eg_element_mod_q_t *element)

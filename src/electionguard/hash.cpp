@@ -35,7 +35,7 @@ namespace electionguard
 
         Hacl_Streaming_SHA2_256_finish(p, output);
 
-        auto *bn = Hacl_Bignum4096_new_bn_from_bytes_be(sizeof(output), output);
+        auto bn = Hacl_Bignum4096_new_bn_from_bytes_be(sizeof(output), output);
 
         Hacl_Streaming_SHA2_256_free(p);
 

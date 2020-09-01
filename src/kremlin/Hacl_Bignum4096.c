@@ -365,8 +365,7 @@ Serialize a bignum into big-endian memory.
 */
 void Hacl_Bignum4096_bn_to_bytes_be(uint64_t *b, uint8_t *res)
 {
-    uint32_t bnLen =
-      ((uint32_t)64U - (uint32_t)1U) / (uint32_t)8U + (uint32_t)1U;
+    uint32_t bnLen = ((uint32_t)4096U - (uint32_t)1U) / (uint32_t)64U + (uint32_t)1U;
     uint32_t tmpLen = (uint32_t)8U * bnLen;
     KRML_CHECK_SIZE(sizeof(uint8_t), tmpLen);
     uint8_t *tmp = alloca(tmpLen * sizeof(uint8_t));
@@ -374,8 +373,7 @@ void Hacl_Bignum4096_bn_to_bytes_be(uint64_t *b, uint8_t *res)
     for (uint32_t i = (uint32_t)0U; i < bnLen; i++) {
         store64_be(tmp + i * (uint32_t)8U, b[bnLen - i - (uint32_t)1U]);
     }
-    memcpy(res, tmp + tmpLen - (uint32_t)64U,
-           (uint32_t)64U * sizeof((tmp + tmpLen - (uint32_t)64U)[0U]));
+    memcpy(res, tmp, tmpLen);
 }
 
 /***************/
