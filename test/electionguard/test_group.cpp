@@ -89,3 +89,19 @@ TEST_CASE("Hex string converted to Q matches original hex when converted back to
     CHECK(q->toHex() == expectedHex);
     Log::debug(": q->toHex() = " + q->toHex() + " and expectedHex = " + expectedHex);
 }
+
+TEST_CASE("mul_mod_p 3 * 3 should equal 9")
+{
+    auto p = mul_mod_p(uint64_to_p(3), uint64_to_p(3));
+    CHECK(p->toHex() == "09");
+    Log::debug(": p->toHex() = " + p->toHex());
+}
+
+TEST_CASE(
+  "mul_mod_p for max uint64 * max uint64 should equal hex value fffffffffffffffe0000000000000001)")
+{
+    auto uint64Max = numeric_limits<uint64_t>::max();
+    auto p = mul_mod_p(uint64_to_p(uint64Max), uint64_to_p(uint64Max));
+    CHECK(p->toHex() == "fffffffffffffffe0000000000000001");
+    Log::debug(": p->toHex() = " + p->toHex());
+}

@@ -52,6 +52,21 @@ namespace electionguard
     /// </summary>
     EG_API ElementModP *add_mod_p(ElementModP *lhs, ElementModP *rhs);
 
+    /// <summary>
+    /// Adds together the left hand side and right hand side and returns the sum mod P
+    /// </summary>
+    EG_API ElementModP *add_mod_p(uint64_t *lhs, uint64_t *rhs);
+
+    /// <summary>
+    /// Multplies together the left hand side and right hand side and returns the product mod P
+    /// </summary>
+    EG_API ElementModP *mul_mod_p(ElementModP *lhs, ElementModP *rhs);
+
+    /// <summary>
+    /// Computes b^e mod p.
+    /// </summary>
+    EG_API ElementModP *pow_mod_p(ElementModP *b, ElementModP *e);
+
     struct ElementModQData {
         uint64_t elem[4];
     };
@@ -99,7 +114,12 @@ namespace electionguard
     /// </summary>
     EG_API ElementModQ *add_mod_q(ElementModQ *lhs, ElementModQ *rhs);
 
-    // mul_mod_p, pow_mod_p, g_pow_p, rand_q, a_minus_b_mod_q, a_plus_bc_mod_q, negate_mod_q
+    /// <summary>
+    /// Adds together the left hand side and right hand side and returns the sum mod Q
+    /// </summary>
+    EG_API ElementModQ *add_mod_q(uint64_t *lhs, uint64_t *rhs);
+
+    // g_pow_p, rand_q, a_minus_b_mod_q, a_plus_bc_mod_q, negate_mod_q
 
 } // namespace electionguard
 

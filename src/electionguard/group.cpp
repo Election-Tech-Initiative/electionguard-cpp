@@ -54,6 +54,8 @@ uint64_t q_array[MAX_P_LEN] = {
   0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
   0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000};
 
+uint64_t one[MAX_P_LEN] = {1};
+
 void hex_to_bytes(string hex, uint8_t *bytesOut)
 {
     for (size_t i(0); i < (hex.length() - 1); i += 2) {
@@ -129,18 +131,45 @@ namespace electionguard
     ElementModP *uint64_to_p(uint64_t i)
     {
         uint64_t bigEndian = htobe64(i);
-        return bytes_to_p((uint8_t *)&bigEndian, 8);
+        return bytes_to_p((uint8_t *)&bigEndian, 8U);
     }
 
     ElementModP *add_mod_p(ElementModP *lhs, ElementModP *rhs)
     {
+        return add_mod_p(lhs->get(), rhs->get());
+    }
+
+    ElementModP *add_mod_p(uint64_t *lhs, uint64_t *rhs)
+    {
         uint64_t res[MAX_P_LEN] = {};
-        uint64_t carry = Hacl_Bignum4096_add(lhs->get(), rhs->get(), res);
+        uint64_t carry = Hacl_Bignum4096_add(lhs, rhs, res);
         if (carry > 0) {
             // just bypass compiler error
         }
-        // TODO: % P?
-        return new ElementModP(res);
+        // TODO: % P
+        return new ElementModP(res, true);
+    }
+
+    ElementModP *mul_mod_p(ElementModP *lhs, ElementModP *rhs)
+    {
+        uint64_t res[128] = {};
+        Hacl_Bignum4096_mul(lhs->get(), rhs->get(), res);
+        // TODO: % P
+        return new ElementModP(res, true);
+    }
+
+    ElementModP *pow_mod_p(ElementModP *b, ElementModP *e)
+    {
+        // Log::debug(b, MAX_P_LEN, " : b = ");
+        // Log::debug(e, MAX_P_LEN, " : e = ");
+        // Log::debug(one, MAX_P_LEN, " : one = ");
+
+        uint64_t resultModP[MAX_P_LEN] = {};
+        Hacl_Bignum4096_mod_exp(e->get(), b->get(), MAX_P_LEN, one, resultModP);
+
+        // Log::debug(resultModP, MAX_P_LEN, " : resultModP = ");
+
+        return new ElementModP(resultModP, true);
     }
 
     // param elem is expected to be allocated to uint64_t[MAX_Q_LEN]
@@ -213,7 +242,7 @@ namespace electionguard
     ElementModQ *uint64_to_q(uint64_t i)
     {
         uint64_t bigEndian = htobe64(i);
-        return bytes_to_q((uint8_t *)&bigEndian, 8);
+        return bytes_to_q((uint8_t *)&bigEndian, 8U);
     }
 
     ElementModQ *add_mod_q(ElementModQ *lhs, ElementModQ *rhs)
@@ -221,9 +250,28 @@ namespace electionguard
         // Hacl expects the bignum uint64_t array to be exactly 4096-bits
         // so convert q to p
         auto pL = lhs->toElementModP();
+        // Log::debug(pL->get(), MAX_P_LEN,
+        //            " : rhs->toHex = " + lhs->toHex() + " : lhs->toElementModP->get() = ");
         auto pR = rhs->toElementModP();
+        // Log::debug(pR->get(), MAX_P_LEN,
+        //            " : rhs->toHex = " + rhs->toHex() + " : rhs->toElementModP->get() = ");
         auto sumP = add_mod_p(pL, pR);
-        // TODO: % P
-        return new ElementModQ(sumP->get());
+        // Log::debug(sumP->get(), MAX_P_LEN,
+        //            " : sumP->toHex = " + sumP->toHex() + " : sumP->get() = ");
+
+        // TODO: % Q isn't working
+        // uint64_t resModQ[MAX_P_LEN] = {};
+        // Hacl_Bignum4096_mod_exp(q_array, sumP->get(), MAX_P_LEN, one, resModQ);
+        // Log::debug(resModQ, MAX_P_LEN, " : resModQ = ");
+        // Log::debug(q_array, MAX_P_LEN, " : q_array = ");
+        // Log::debug(one, MAX_P_LEN, " : one = ");
+
+        // return new ElementModQ(resModQ, true);
+        return new ElementModQ(sumP->get(), true);
+    }
+
+    ElementModQ *add_mod_q(uint64_t *lhs, uint64_t *rhs)
+    {
+        return add_mod_q(new ElementModQ(lhs, true), new ElementModQ(rhs, true));
     }
 } // namespace electionguard
