@@ -43,7 +43,7 @@ namespace electionguard
     {
       public:
         PlaintextBallotSelection(const string object_id, string vote);
-        PlaintextBallotSelection(const char *object_id, char *vote);
+        PlaintextBallotSelection(const char *object_id, const char *vote);
         ~PlaintextBallotSelection();
 
         int toInt();

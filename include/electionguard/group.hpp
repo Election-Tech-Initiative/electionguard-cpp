@@ -23,7 +23,7 @@ namespace electionguard
         ~ElementModP();
 
         uint64_t *get();
-        string toBigIntString();
+        string toHex();
 
       private:
         ElementModPData data;
@@ -53,7 +53,7 @@ namespace electionguard
         ~ElementModQ();
 
         uint64_t *get();
-        string toBigIntString();
+        string toHex();
 
         bool operator==(const ElementModQ &other);
         bool operator!=(const ElementModQ &other);

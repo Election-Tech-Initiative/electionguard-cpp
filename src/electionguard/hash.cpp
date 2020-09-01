@@ -1,80 +1,26 @@
 #include "hash.hpp"
 
+#include "log.hpp"
+
 #include <iomanip>
 #include <iostream>
-#include <sstream>
 
 extern "C" {
 #include "../kremlin/Hacl_Bignum4096.h"
 #include "../kremlin/Hacl_Streaming_SHA2_256.h"
 }
 
-// helper to output the hex value of the resulting SHA-256 hash
-string hex_str(uint8_t *data, int len)
-{
-    stringstream ss;
-    ss << hex;
-    for (int i(0); i < len; ++i) {
-        ss << setw(2) << setfill('0') << (int)data[i];
-    }
-    return ss.str();
-}
-
 namespace electionguard
 {
+    template <typename T> string hash_inner_vector(vector<T> inner_vector);
+    void push_hash_update(Hacl_Streaming_Functor_state_s___uint32_t____ *p, CryptoHashableType a);
+
     const char delimiter_char = '|';
     const string null_string = "null";
 
     uint8_t delimiter[1] = {delimiter_char};
 
-    void push_hash_update(Hacl_Streaming_Functor_state_s___uint32_t____ *p, CryptoHashableType a)
-    {
-        string input_string;
-        switch (a.index()) {
-            case 0: // nullptr_t
-                input_string = null_string;
-                break;
-            case 1: // CryptoHashable *
-                input_string = get<CryptoHashable *>(a)->crypto_hash()->toBigIntString();
-                break;
-            case 2: // ElementModP *
-                input_string = get<ElementModP *>(a)->toBigIntString();
-                break;
-            case 3: // ElementModQ *
-                input_string = get<ElementModQ *>(a)->toBigIntString();
-                break;
-            case 4: // vector<uint64_t>
-                for (uint64_t x : get<vector<uint64_t>>(a)) {
-                    push_hash_update(p, x);
-                }
-                // TODO: compatibility with the python standard
-                // which consumes the current state of the streaming hash
-                // and inputs it again
-                input_string = "TESTING: UPDATE ME";
-                break;
-            case 5: // uint64_t
-                input_string = to_string(get<uint64_t>(a));
-                break;
-            default: // string
-                input_string = get<string>(a);
-                break;
-                // TODO: equivalent of hashing a Sequence in Python?
-                // Need `ElementModQ.toBigIntString` implementation to validate crunching the recursive Q output works
-        }
-
-        if (input_string.empty()) {
-            input_string = null_string;
-        }
-
-        const uint8_t *input = reinterpret_cast<const uint8_t *>(input_string.c_str());
-        Hacl_Streaming_SHA2_256_update(p, (uint8_t *)input, input_string.size());
-        Hacl_Streaming_SHA2_256_update(p, delimiter, sizeof(delimiter));
-
-        cout << __func__ << " : input variant index : " << a.index()
-             << " : input_string : " << input_string << endl;
-    }
-
-    ElementModQ *hash_elems(initializer_list<CryptoHashableType> a)
+    ElementModQ *hash_elems(vector<CryptoHashableType> a)
     {
         uint8_t output[32] = {};
         Hacl_Streaming_Functor_state_s___uint32_t____ *p = Hacl_Streaming_SHA2_256_create_in();
@@ -83,15 +29,12 @@ namespace electionguard
         if (a.size() == 0) {
             push_hash_update(p, null_string);
         } else {
-            for (auto it = a.begin(); it != a.end(); ++it) {
-                push_hash_update(p, *it);
+            for (CryptoHashableType item : a) {
+                push_hash_update(p, item);
             }
         }
 
         Hacl_Streaming_SHA2_256_finish(p, output);
-
-        auto hex_output = hex_str(output, sizeof(output));
-        cout << __func__ << " : output as hex : " << hex_output << endl;
 
         auto *bn = Hacl_Bignum4096_new_bn_from_bytes_be(sizeof(output), output);
 
@@ -102,6 +45,86 @@ namespace electionguard
 
     ElementModQ *hash_elems(CryptoHashableType a)
     {
-        return hash_elems(initializer_list<CryptoHashableType>{a});
+        return hash_elems(vector<CryptoHashableType>{a});
+    }
+
+    template <typename T> string hash_inner_vector(vector<T> inner_vector)
+    {
+        vector<CryptoHashableType> hashable_vector(inner_vector.begin(), inner_vector.end());
+        return hash_elems(hashable_vector)->toHex();
+    }
+
+    void push_hash_update(Hacl_Streaming_Functor_state_s___uint32_t____ *p, CryptoHashableType a)
+    {
+        string input_string;
+        switch (a.index()) {
+            case 0: // nullptr_t
+            {
+                input_string = null_string;
+                break;
+            }
+            case 1: // CryptoHashable *
+            {
+                input_string = get<CryptoHashable *>(a)->crypto_hash()->toHex();
+                break;
+            }
+            case 2: // ElementModP *
+            {
+                input_string = get<ElementModP *>(a)->toHex();
+                break;
+            }
+            case 3: // ElementModQ *
+            {
+                input_string = get<ElementModQ *>(a)->toHex();
+                break;
+            }
+            case 4: // uint64_t
+            {
+                uint64_t i = get<uint64_t>(a);
+                if (i != 0) {
+                    input_string = to_string(i);
+                }
+                break;
+            }
+            case 5: // string
+            {
+                input_string = get<string>(a);
+                break;
+            }
+            case 6: // vector<CryptoHashable *>
+            {
+                input_string =
+                  hash_inner_vector<CryptoHashable *>(get<vector<CryptoHashable *>>(a));
+                break;
+            }
+            case 7: // vector<ElementModP *>
+            {
+                input_string = hash_inner_vector<ElementModP *>(get<vector<ElementModP *>>(a));
+                break;
+            }
+            case 8: // vector<ElementModQ *>
+            {
+                input_string = hash_inner_vector<ElementModQ *>(get<vector<ElementModQ *>>(a));
+                break;
+            }
+            case 9: // vector<uint64_t>
+            {
+                input_string = hash_inner_vector<uint64_t>(get<vector<uint64_t>>(a));
+                break;
+            }
+            case 10: // vector<string>
+            {
+                input_string = hash_inner_vector<string>(get<vector<string>>(a));
+                break;
+            }
+        }
+
+        if (input_string.empty()) {
+            input_string = null_string;
+        }
+
+        const uint8_t *input = reinterpret_cast<const uint8_t *>(input_string.c_str());
+        Hacl_Streaming_SHA2_256_update(p, (uint8_t *)input, input_string.size());
+        Hacl_Streaming_SHA2_256_update(p, delimiter, sizeof(delimiter));
     }
 } // namespace electionguard
