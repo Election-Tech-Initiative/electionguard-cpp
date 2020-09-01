@@ -40,6 +40,8 @@ class EGDataService {
     }
     
     func castBallot(contestId: String, completion: @escaping (String?) -> Void) {
+        _ = ElectionGuard.mainTest()
+
         // TODO: Replace hardcoded delay with actual API call
         votes[contestId] = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
@@ -48,6 +50,8 @@ class EGDataService {
     }
     
     func spoilBallot(contestId: String, completion: @escaping (String?) -> Void) {
+        _ = ElectionGuard.mainTest()
+
         // TODO: Replace hardcoded delay with actual API call
         votes[contestId] = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
