@@ -124,7 +124,7 @@ if(OPTION_ENABLE_TESTS)
 
     # When running tests, we set some specific compiler flags
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Werror -Wall -Wextra -pedantic -pedantic-errors -Wunreachable-code -Wmissing-field-initializers -Wno-unused-parameter -Wno-unused-variable)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Werror -Wall -Wextra -pedantic -pedantic-errors -Wunreachable-code -Wmissing-field-initializers -Wno-unused-parameter -Wno-unused-variable -Wno-unknown-pragmas)
     elseif(MSVC)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC /W4 /WX)
     endif()

@@ -4,6 +4,7 @@
 #include "log.hpp"
 
 #include <cstdlib>
+#include <cstring>
 using std::string;
 
 namespace electionguard
@@ -26,10 +27,10 @@ namespace electionguard
         : data()
     {
         size_t _osize = strlen(object_id) + 1;
-        strlcpy(data.object_id, object_id, _osize);
+        strncpy(data.object_id, object_id, _osize);
 
         size_t _csize = strlen(candidate_id) + 1;
-        strlcpy(data.candidate_id, candidate_id, _csize);
+        strncpy(data.candidate_id, candidate_id, _csize);
 
         data.sequence_order = sequence_order;
     }
