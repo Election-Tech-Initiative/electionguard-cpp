@@ -6,6 +6,8 @@ cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_facade.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/election.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/election_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/elgamal.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt_facade.cpp
@@ -25,6 +27,10 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Streaming_SHA2_256.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/constants.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/crypto_hashable.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/election.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/election.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.h
@@ -114,7 +120,7 @@ if(OPTION_ENABLE_TESTS)
 
     # When running tests, we set some specific compiler flags
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Werror -Wall -Wextra -pedantic -pedantic-errors -Wunreachable-code -Wmissing-field-initializers -Wno-unused-parameter -Wno-unused-variable)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Werror -Wall -Wextra -pedantic -pedantic-errors -Wunreachable-code -Wmissing-field-initializers -Wno-unused-parameter -Wno-unused-variable -Wno-unknown-pragmas)
     elseif(MSVC)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC /W4 /WX)
     endif()

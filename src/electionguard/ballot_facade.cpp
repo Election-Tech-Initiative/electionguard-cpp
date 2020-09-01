@@ -10,7 +10,7 @@ extern "C" {
 
 /// PlaintextBallotSelection
 eg_plaintext_ballot_selection_t *eg_plaintext_ballot_selection_new(const char *object_id,
-                                                                   char *vote)
+                                                                   const char *vote)
 {
     return AS_TYPE(eg_plaintext_ballot_selection_t,
                    new electionguard::PlaintextBallotSelection(object_id, vote));

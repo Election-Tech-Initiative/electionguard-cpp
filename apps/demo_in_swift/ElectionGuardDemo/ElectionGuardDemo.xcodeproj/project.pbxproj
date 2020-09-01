@@ -36,6 +36,8 @@
 		A56C8C7624EF1C1F0044EA70 /* ElectionGuardDemo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ElectionGuardDemo-Bridging-Header.h"; sourceTree = "<group>"; };
 		A56C8C7B24EF1C620044EA70 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		A56C8C7D24EF1CA70044EA70 /* ElectionGuard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectionGuard.swift; sourceTree = "<group>"; };
+		B160683B24F7F4B400EA2A14 /* constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constants.h; path = ../../../../../include/electionguard/constants.h; sourceTree = "<group>"; };
+		B160683C24F7F4B400EA2A14 /* election.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = election.h; path = ../../../../../include/electionguard/election.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +91,8 @@
 		A56C8C6D24EF15A20044EA70 /* electionguard-core */ = {
 			isa = PBXGroup;
 			children = (
+				B160683B24F7F4B400EA2A14 /* constants.h */,
+				B160683C24F7F4B400EA2A14 /* election.h */,
 				A56C8C7324EF16170044EA70 /* ballot.h */,
 				A56C8C7224EF16170044EA70 /* election_object_base.h */,
 				A56C8C7024EF16170044EA70 /* encrypt.h */,

@@ -13,7 +13,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        _ = ElectionGuard.encryptSelection(objectId: "some-object-id", vote: "1")
+        _ = ElectionGuard.mainTest()
     }
 }
 

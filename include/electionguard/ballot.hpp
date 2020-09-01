@@ -1,9 +1,13 @@
 #ifndef __ELECTIONGUARD_CORE_BALLOT_HPP_INCLUDED__
 #define __ELECTIONGUARD_CORE_BALLOT_HPP_INCLUDED__
 
+#include "crypto_hashable.hpp"
 #include "elgamal.hpp"
 #include "export.h"
 #include "group.hpp"
+
+#include <string>
+#include <vector>
 
 extern "C" {
 #include "election_object_base.h"
@@ -38,7 +42,7 @@ namespace electionguard
     class EG_API PlaintextBallotSelection
     {
       public:
-        PlaintextBallotSelection(const std::string object_id, std::string vote);
+        PlaintextBallotSelection(const string object_id, string vote);
         PlaintextBallotSelection(const char *object_id, const char *vote);
         ~PlaintextBallotSelection();
 
@@ -81,10 +85,10 @@ namespace electionguard
     ///
     ///By keeping the `proof` the nonce is not required fotor verify the encrypted selection.
     /// </summary>
-    class EG_API CiphertextBallotSelection
+    class EG_API CiphertextBallotSelection : public CryptoHashCheckable
     {
       public:
-        CiphertextBallotSelection(const std::string object_id, ElementModQ *descriptionHash);
+        CiphertextBallotSelection(const string object_id, ElementModQ *descriptionHash);
         CiphertextBallotSelection(const char *object_id, ElementModQ *descriptionHash);
         ~CiphertextBallotSelection();
 
@@ -95,8 +99,37 @@ namespace electionguard
         /// </summary>
         ElementModQ *getDescriptionHash();
 
+        /// <summary>
+        /// Given an encrypted BallotSelection, generates a hash, suitable for rolling up
+        /// into a hash / tracking code for an entire ballot. Of note, this particular hash examines
+        /// the `seed_hash` and `message`, but not the proof.
+        /// This is deliberate, allowing for the possibility of ElectionGuard variants running on
+        /// much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed
+        /// later on.
+        ///
+        /// In most cases the seed_hash should match the `description_hash`
+        /// </summary>
+        virtual ElementModQ *crypto_hash_with(ElementModQ *seed_hash);
+
+      protected:
+        // TODO: determine if these shouild be public or protected static functions
+        // since the python code exposes these, but marks them with an underscore
+        // to indicate they are internal library functions.
+        static ElementModQ *makeCryptoHash(string object_id, ElementModQ *seed_hash,
+                                           ElGamalCiphertext *ciphertext);
+
       private:
         CiphertextBallotSelectionData data;
+    };
+
+    class EG_API CiphertextBallotContest : public CryptoHashCheckable
+    {
+      public:
+        // TODO: ISSUE #36 make this member protected or private
+        // once the public api surface supports encrypt_contest
+        static ElementModQ *makeCryptoHash(string object_id,
+                                           vector<CiphertextBallotSelection> selections,
+                                           ElementModQ *seed_hash);
     };
 
 } // namespace electionguard

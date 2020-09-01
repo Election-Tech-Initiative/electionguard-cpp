@@ -1,5 +1,6 @@
 #ifndef __ELECTIONGUARD__CORE_ELGAMAL_HPP_INCLUDED__
 #define __ELECTIONGUARD__CORE_ELGAMAL_HPP_INCLUDED__
+#include "crypto_hashable.hpp"
 #include "export.h"
 #include "group.hpp"
 
@@ -15,7 +16,7 @@ namespace electionguard
     /// homomorphic addition). Create one with `elgamal_encrypt`. Add them with `elgamal_add`.
     /// Decrypt using one of the supplied instance methods.
     /// </summary>
-    class EG_API ElGamalCiphertext
+    class EG_API ElGamalCiphertext : public CryptoHashable
     {
       public:
         ElGamalCiphertext(ElementModP *pad, ElementModP *data);
@@ -23,6 +24,8 @@ namespace electionguard
 
         ElementModP *getPad();
         ElementModP *getData();
+
+        virtual ElementModQ *crypto_hash();
 
       private:
         ElGamalCiphertextData data;

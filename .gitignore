@@ -99,3 +99,5 @@ iOSInjectionProject/
 
 # End of https://www.toptal.com/developers/gitignore/api/swift,xcode
 *.a
+
+apps/demo_in_swift/ElectionGuardDemo/.idea/

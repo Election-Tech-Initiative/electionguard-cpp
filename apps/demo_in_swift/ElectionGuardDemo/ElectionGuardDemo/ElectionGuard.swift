@@ -1,46 +1,214 @@
-//
-//  ElectionGuard.swift
-//  ElectionGuardDemo
-//
-//  Created by Ed Snider on 8/20/20.
-//  Copyright © 2020 Microsoft. All rights reserved.
-//
-
 import Foundation
 
-struct ElectionGuard {
-    static func encryptSelection(objectId: String, vote: String) -> Bool {
-        // instantiate a selection on a ballot
-        let plaintextSelection = eg_plaintext_ballot_selection_new(
-            objectId, UnsafeMutablePointer<Int8>(mutating: (vote as NSString).utf8String)
-        )
-        
-        var ciphertextSelection: OpaquePointer?
-        let encryptResult = eg_encrypt_selection(plaintextSelection, &ciphertextSelection)
-        
-        // arbitrarily returns one for success
-        assert(encryptResult == 1)
-        
-        // check the object id by accessing the property getter
-        let plaintextObjectIdPtr = eg_plaintext_ballot_selection_get_object_id(plaintextSelection)
-        let ciphertextObjectIdPtr = eg_ciphertext_ballot_selection_get_object_id(ciphertextSelection)
-        
-        assert(String(cString: ciphertextObjectIdPtr!) == String(cString: plaintextObjectIdPtr!), "Ciphertext object ID not equal to original `objectId` value")
-        print(String(cString: ciphertextObjectIdPtr!))
-        
-        // get out one of the ElementModQ hashes
-        let descriptionHash = eg_ciphertext_ballot_selection_get_description_hash(ciphertextSelection)
-        var descriptionHashData: UnsafeMutablePointer<UInt64>?
-        let size = eg_element_mod_q_get(descriptionHash, &descriptionHashData)
-        
-        assert(size == 4, "Size not 4")
+protocol ElectionObjectBase {
+    var objectId: String { get }
+}
+protocol CryptoHash {
+    func cryptoHash() -> ElementModQ
+}
+
+struct CiphertextBallotSelection: ElectionObjectBase {
+    var objectId: String
+
+    let descriptionHash: ElementModQ
+    let ciphertext: ElgamalCiphetext
+    let cryptoHash: ElementModQ
+    let isPlaceholderSelection: Bool
+    let nonce: ElementModQ
+}
+
+struct PlaintextBallotSelection: ElectionObjectBase {
+    var objectId: String
+    let vote: UInt8
+}
+
+struct SelectionDescription: ElectionObjectBase {
+    var objectId: String
+    let candidateId: String
+    let sequenceOrder: UInt64
+}
+
+struct ElementModP {
+    var data: [UInt64] = [UInt64](repeating: 0, count: ElementModP.MAX_SIZE)
+    static let MAX_SIZE = 64
+
+    init(_ data: [UInt64]) {
+        // TODO: better safety
+        if data.count <= ElementModP.MAX_SIZE {
+            self.data = data
+        }
+    }
+}
+
+struct ElementModQ {
+    var data: [UInt64] = [UInt64](repeating: 0, count: ElementModQ.MAX_SIZE)
+    static let MAX_SIZE = 4
+
+    init(_ data: [UInt64]) {
+        // TODO: better safety
+        if data.count <= ElementModQ.MAX_SIZE {
+            self.data = data
+        }
+    }
+}
+
+struct ElgamalCiphetext: CryptoHash {
+    var pad: ElementModP
+    var data: ElementModP
+    
+    func cryptoHash() -> ElementModQ {
+        return ElementModQ([UInt64](repeating: 33, count: ElementModQ.MAX_SIZE))
+    }
+}
+
+class ElectionGuard {
+
+    static func mainTest() -> Bool {
+        let candidateId = "some-candidate-id"
+        let plaintext = PlaintextBallotSelection(objectId: candidateId, vote: 1)
+        let description = SelectionDescription(objectId: "some-selection-id", candidateId: candidateId, sequenceOrder: 5)
+        let publicKey = ElementModP([UInt64](repeating: 255, count: ElementModP.MAX_SIZE))
+        let extendedHash = ElementModQ([UInt64](repeating: 162, count: ElementModQ.MAX_SIZE))
+        let nonceSeed = getSecureRandomElementModQ() // just a stubbed method to simulate a secure value for now
+
+        guard let ciphertext = encryptSelection(plaintext, description, publicKey, extendedHash, nonceSeed, false, true) else {
+            print("encryption FAILED!")
+            return false
+        }
+
+        assert(ciphertext.objectId == plaintext.objectId, "Object Ids do not match")
+        assert(ciphertext.objectId == candidateId, "Candidate id does not match")
         // the current test just arbitrarily assigns the vote to the hash
-        assert(descriptionHashData?[0] == UInt64(vote), "Description hash not equal to original `vote` value")
-        print(descriptionHashData?[0] ?? "")
+        assert(ciphertext.descriptionHash.data[0] == 1, "the fake hash doesnt match the vote")
         
-        eg_plaintext_ballot_selection_free(plaintextSelection)
-        eg_ciphertext_ballot_selection_free(ciphertextSelection)
+        print("success!")
         
         return true
+
     }
+
+    static func getSecureRandomElementModQ() -> ElementModQ {
+        let allocation = [UInt64](repeating: 31, count: ElementModQ.MAX_SIZE)
+        // TODO: generate secure random data
+        return ElementModQ(allocation)
+    }
+
+    /// Encrypt a specific `BallotSelection` in the context of a specific `BallotContest`
+    ///
+    /// - parameter plaintext: the selection in the valid input form
+    /// - parameter description: the `SelectionDescription` from the `ContestDescription`
+    ///                          which defines this selection's structure
+    /// - parameter elgamalPublicKey: the public key (K) used to encrypt the ballot
+    /// - parameter extendedBaseHash: the extended base hash of the election
+    /// - parameter nonceSeed: an `ElementModQ` used as a header to seed the `Nonce` generated
+    ///                        for this selection. this value can be (or derived from) the
+    ///                        BallotContest nonce, but no relationship is required
+    /// - parameter isPlaceholder: specifies if this is a placeholder selection
+    /// - parameter shouldVerifyProofs: specify if the proofs should be verified prior to returning (default True)
+    /// - returns: A `CiphertextBallotSelection`
+    static func encryptSelection(
+            _ plaintext: PlaintextBallotSelection, _ description: SelectionDescription, _ elgamalPublicKey: ElementModP,
+            _ extendedBaseHash: ElementModQ, _ nonceSeed: ElementModQ, _ isPlaceholder: Bool, _ shouldVerifyProofs: Bool) -> CiphertextBallotSelection? {
+        let plaintext_ = setPlaintextBallotSelection(plaintext)
+        let description_ = setSelectionDescription(description)
+
+        let public_key_ = setElementModP(elgamalPublicKey)
+        let extended_base_hash_ = setElementModQ(extendedBaseHash)
+        let nonce_seed_ = setElementModQ(nonceSeed)
+
+        let ciphertext_ = eg_encrypt_selection(plaintext_, description_, public_key_, extended_base_hash_, nonce_seed_, isPlaceholder, shouldVerifyProofs)
+        
+        let ciphertext_object_id = eg_ciphertext_ballot_selection_get_object_id(ciphertext_)!
+        let descriptionHash_ = eg_ciphertext_ballot_selection_get_description_hash(ciphertext_)!
+        
+        let dh = getElementModQ(descriptionHash_)!
+        let elgamal = getElgamalCiphertext()
+        
+        return CiphertextBallotSelection(objectId: String(cString: ciphertext_object_id),
+            descriptionHash: dh, ciphertext: elgamal, cryptoHash: nonceSeed, isPlaceholderSelection: isPlaceholder, nonce: nonceSeed)
+
+    }
+
+    static func setSelectionDescription(_ description: SelectionDescription) -> OpaquePointer? {
+        return eg_selection_description_new(description.objectId, description.candidateId, description.sequenceOrder)
+    }
+
+    static func getSelectionDescription(_ description: OpaquePointer) -> SelectionDescription? {
+        guard let object_id = eg_selection_description_get_object_id(description) else { return nil }
+        guard let candidate_id = eg_selection_description_get_candidate_id(description) else { return nil }
+        let sequence_order = eg_selection_description_get_sequence_order(description)
+
+        let swift_type = SelectionDescription(objectId: String(cString: object_id), candidateId: String(cString: candidate_id), sequenceOrder: UInt64(sequence_order))
+        eg_selection_description_free(description)
+        return swift_type
+    }
+
+    static func setPlaintextBallotSelection(_ plaintext: PlaintextBallotSelection) -> OpaquePointer? {
+        let as_str = ("\(plaintext.vote)" as NSString).utf8String
+        return eg_plaintext_ballot_selection_new(plaintext.objectId, as_str)
+    }
+
+    static func setElementModP(_ element: ElementModP) -> OpaquePointer? {
+        let ptr = UnsafeMutablePointer<UInt64>.allocate(capacity: ElementModP.MAX_SIZE)
+        ptr.initialize(from: element.data, count: ElementModP.MAX_SIZE)
+        return eg_element_mod_p_new(ptr)
+    }
+
+    static func setElementModQ(_ element: ElementModQ) -> OpaquePointer? {
+        let ptr = UnsafeMutablePointer<UInt64>.allocate(capacity: ElementModQ.MAX_SIZE)
+        ptr.initialize(from: element.data, count: ElementModQ.MAX_SIZE)
+        return eg_element_mod_q_new(ptr)
+    }
+    
+    static func getElementModP(_ opaquePointer: OpaquePointer) -> ElementModP? {
+        var element: UnsafeMutablePointer<UInt64>?
+        let dh_size = eg_element_mod_q_get(opaquePointer, &element)
+        
+        if dh_size != ElementModP.MAX_SIZE {
+            print("wrong size")
+        }
+        
+        var elementData = [UInt64](repeating: 0, count: ElementModP.MAX_SIZE)
+        
+        for i in 0..<ElementModP.MAX_SIZE {
+            guard let value = element?[i] else {
+                print("value was wrong")
+                return nil
+            }
+            elementData[i] = value
+        }
+        
+        return ElementModP(elementData)
+        
+    }
+    
+    static func getElementModQ(_ opaquePointer: OpaquePointer) -> ElementModQ? {
+        var element: UnsafeMutablePointer<UInt64>?
+        let dh_size = eg_element_mod_q_get(opaquePointer, &element)
+        
+        if dh_size != ElementModQ.MAX_SIZE {
+            print("wrong size")
+        }
+        
+        var elementData = [UInt64](repeating: 0, count: ElementModQ.MAX_SIZE)
+        
+        for i in 0..<ElementModQ.MAX_SIZE {
+            guard let value = element?[i] else {
+                print("value was wrong")
+                return nil
+            }
+            elementData[i] = value
+        }
+        
+        return ElementModQ(elementData)
+        
+    }
+    
+    static func getElgamalCiphertext() -> ElgamalCiphetext {
+        let fake_pad = ElementModP([UInt64](repeating: 0, count: ElementModP.MAX_SIZE))
+        let fake_data = ElementModP([UInt64](repeating: 0, count: ElementModP.MAX_SIZE))
+        
+        return ElgamalCiphetext(pad: fake_pad, data: fake_data)
+    }
+
 }
