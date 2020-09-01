@@ -77,11 +77,6 @@ namespace electionguard
             throw "Value for ElementModP is greater than allowed";
         }
         memcpy(data.elem, elem, MAX_P_LEN * sizeof(elem[0]));
-        // cout << "ElementModP :: value of data.elem = ";
-        for (size_t i(0); i < MAX_P_LEN; i++) {
-            // cout << "[" << hex << setw(2) << setfill('0') << data.elem[i] << "]";
-        }
-        // cout << endl;
     }
     ElementModP::~ElementModP() {}
 
@@ -89,12 +84,6 @@ namespace electionguard
 
     string ElementModP::toHex()
     {
-        // cout << "\nElementModP::toHex value of data.elem = ";
-        for (size_t i(0); i < MAX_P_LEN; i++) {
-            // cout << "[" << hex << setw(2) << setfill('0') << data.elem[i] << "]";
-        }
-        // cout << endl;
-
         // Returned bytes array from Hacl needs to be pre-allocated to 512 bytes
         uint8_t byteResult[MAX_P_LEN * sizeof(data.elem[0])] = {};
 
@@ -123,6 +112,7 @@ namespace electionguard
         auto bn = Hacl_Bignum4096_new_bn_from_bytes_be(bLen, b);
         uint64_t p[MAX_P_LEN] = {};
         memcpy(p, bn, bLen);
+        free(bn); // free Hacl's bignum since we've copied it to p
         // since we're allocating the array to exactly the Max of P,
         // we can initialize ElementModP as unchecked
         return new ElementModP(p, true);
@@ -149,11 +139,6 @@ namespace electionguard
         if (carry > 0) {
             // just bypass compiler error
         }
-        // cout << "\nElementModP::add_mod_p value of res = ";
-        for (size_t i(0); i < MAX_P_LEN; i++) {
-            // cout << "[" << hex << setw(2) << setfill('0') << res[i] << "]";
-        }
-        // cout << endl;
         // TODO: % P?
         return new ElementModP(res);
     }
@@ -168,21 +153,10 @@ namespace electionguard
             if (!Hacl_Bignum4096_lt(q4096, const_cast<uint64_t *>(Q.data.elem))) {
                 // TODO: throw exception or just ignore it and set intance to a nullptr?
                 // this = nullptr;
-                // cout << "value of q4096 = ";
-                for (size_t i(0); i < MAX_P_LEN; i++) {
-                    // cout << "[" << hex << setw(2) << setfill('0') << (int)q4096[i] << "]";
-                }
-                // cout << endl;
                 throw "Value for ElementModQ is greater than allowed";
             }
         }
-
         memcpy(data.elem, elem, MAX_Q_LEN * sizeof(elem[0]));
-        // cout << "ElementModQ :: value of data.elem = ";
-        for (size_t i(0); i < MAX_Q_LEN; i++) {
-            // cout << "[" << hex << setw(2) << setfill('0') << data.elem[i] << "]";
-        }
-        // cout << endl;
     }
     ElementModQ::~ElementModQ() {}
 
@@ -196,11 +170,6 @@ namespace electionguard
         // convert to 4096-bits to use Hacl methods
         uint64_t p[MAX_P_LEN] = {};
         memcpy(p, data.elem, MAX_Q_LEN * sizeof(data.elem[0]));
-        // cout << "\nElementModQ::toElementModP :: value of p = ";
-        for (size_t i(0); i < MAX_P_LEN; i++) {
-            // cout << "[" << hex << setw(2) << setfill('0') << (int)p[i] << "]";
-        }
-        // cout << endl;
         return new ElementModP(p, true);
     }
 
@@ -227,11 +196,7 @@ namespace electionguard
         auto bn = Hacl_Bignum4096_new_bn_from_bytes_be(bLen, b);
         uint64_t q[MAX_Q_LEN] = {};
         memcpy(q, bn, bLen);
-        // cout << "bytes_to_q = ";
-        for (size_t i(0); i < MAX_Q_LEN; i++) {
-            // cout << "[" << hex << setw(2) << setfill('0') << (int)q[i] << "]";
-        }
-        // cout << endl;
+        free(bn); // free Hacl's bignum since we've copied it to ElementModQ
         // since we're allocating the array to exactly the Max of Q,
         // we can initialize ElementModQ as unchecked
         return new ElementModQ(q, true);
@@ -253,23 +218,11 @@ namespace electionguard
 
     ElementModQ *add_mod_q(ElementModQ *lhs, ElementModQ *rhs)
     {
-        // cout << "--- in add_mod_q ---" << endl;
         // Hacl expects the bignum uint64_t array to be exactly 4096-bits
         // so convert q to p
         auto pL = lhs->toElementModP();
-        // cout << "pL = " << pL->toHex() << endl;
         auto pR = rhs->toElementModP();
-        // cout << "pR = " << pR->toHex() << endl;
-
         auto sumP = add_mod_p(pL, pR);
-
-        Log::debug(" : sumP = " + sumP->toHex());
-
-        // cout << "sumP = ";
-        for (size_t i(0); i < MAX_P_LEN; i++) {
-            // cout << "[" << hex << setw(2) << setfill('0') << (sumP->get())[i] << "]";
-        }
-        // cout << endl;
         // TODO: % P
         return new ElementModQ(sumP->get());
     }

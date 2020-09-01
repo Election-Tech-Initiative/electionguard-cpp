@@ -37,9 +37,12 @@ namespace electionguard
 
         auto bn = Hacl_Bignum4096_new_bn_from_bytes_be(sizeof(output), output);
 
-        Hacl_Streaming_SHA2_256_free(p);
+        auto q = new ElementModQ(bn);
 
-        return new ElementModQ(bn);
+        Hacl_Streaming_SHA2_256_free(p);
+        free(bn);
+
+        return q;
     }
 
     ElementModQ *hash_elems(CryptoHashableType a)
