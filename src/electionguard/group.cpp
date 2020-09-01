@@ -56,10 +56,10 @@ uint64_t q_array[MAX_P_LEN] = {
 
 void hex_to_bytes(string hex, uint8_t *bytesOut)
 {
-    for (size_t i(0); i < hex.length(); i += 2) {
+    for (size_t i(0); i < (hex.length() - 1); i += 2) {
         string byteString = hex.substr(i, 2);
         uint8_t byte = (uint8_t)stoi(byteString.c_str(), NULL, 16);
-        bytesOut[i] = byte;
+        bytesOut[i / 2] = byte;
     }
 }
 

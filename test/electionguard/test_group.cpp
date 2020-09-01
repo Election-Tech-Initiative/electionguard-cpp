@@ -6,6 +6,7 @@
 #include <string>
 
 using namespace electionguard;
+
 TEST_CASE("add_mod_q for ints 1 and 1 should return q of 2")
 {
     auto one1 = uint64_to_q(1UL);
@@ -79,4 +80,12 @@ TEST_CASE("Max of Q")
     } catch (exception &e) {
         Log::debug(": exception = " + (string)e.what());
     }
+}
+
+TEST_CASE("Hex string converted to Q matches original hex when converted back toHex")
+{
+    string expectedHex("f0f0f0f0f0f0f0f0");
+    auto q = hex_to_q(expectedHex);
+    CHECK(q->toHex() == expectedHex);
+    Log::debug(": q->toHex() = " + q->toHex() + " and expectedHex = " + expectedHex);
 }
