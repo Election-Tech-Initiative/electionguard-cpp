@@ -34,8 +34,8 @@ namespace electionguard
         uint64_t hash_rep[4] = {};
         hash_rep[0] = selection_as_int;
         // TODO: Safety
-        auto *descriptionHash = new ElementModQ(hash_rep, sizeof(hash_rep));
-        auto *fakePublicKey = new ElementModP(hash_rep, sizeof(hash_rep));
+        auto *descriptionHash = new ElementModQ(hash_rep);
+        auto *fakePublicKey = new ElementModP(hash_rep);
         auto ciphertext = elgamalEncrypt(selection_as_int, descriptionHash, fakePublicKey);
         if (ciphertext->getPad()->get() != nullptr) {
             // just bypass compiler error
