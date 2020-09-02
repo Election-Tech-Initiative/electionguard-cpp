@@ -6,24 +6,28 @@
 //  Copyright © 2020 Microsoft. All rights reserved.
 //
 
-struct Name: Codable {
-    let text: [Text]?
+struct AnnontatedString: Codable {
+    let annotation: String?
+    let value: String?
 }
 
-struct Text: Codable {
-    let annotation: String?
+struct Language: Codable {
     let value: String?
     let language: String?
 }
 
-struct ElectionContactInfo: Codable {
-    let address: [String]?
+struct InternationalizedText: Codable {
+    let text: [Language]?
+}
+
+struct ContactInformation: Codable {
+    let addressLine: [String]?
     let name: String?
-    let email: [Text]?
-    let phone: [Text]?
+    let email: [AnnontatedString]?
+    let phone: [AnnontatedString]?
     
     enum CodingKeys: String, CodingKey {
-        case address = "address_line"
+        case addressLine = "address_line"
         case name
         case email
         case phone

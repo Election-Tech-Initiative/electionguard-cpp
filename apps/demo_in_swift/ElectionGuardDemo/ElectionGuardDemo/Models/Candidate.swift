@@ -10,14 +10,16 @@ import Foundation
 
 struct Candidate: Codable {
     let id: String?
-    let name: Name?
+    let ballotName: InternationalizedText?
     let partyId: String?
+    let imageUri: String?
     let isWriteIn: Bool?
     
     enum CodingKeys: String, CodingKey {
         case id = "object_id"
-        case name = "ballot_name"
+        case ballotName = "ballot_name"
         case partyId = "party_id"
+        case imageUri = "image_uri"
         case isWriteIn = "is_write_in"
     }
 }

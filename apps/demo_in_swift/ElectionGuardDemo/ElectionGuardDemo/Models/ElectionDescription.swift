@@ -1,5 +1,5 @@
 //
-//  ElectionManifest.swift
+//  ElectionDescription.swift
 //  ElectionGuardDemo
 //
 //  Created by Ed Snider on 8/21/20.
@@ -8,24 +8,24 @@
 
 import Foundation
 
-struct ElectionManifest: Codable {
-    let scopeId: String?
-    let name: Name?
+struct ElectionDescription: Codable {
+    let electionScopeId: String?
+    let name: InternationalizedText?
     let type: ElectionType?
-    let contactInfo: ElectionContactInfo?
+    let contactInformation: ContactInformation?
     let startDate: Date?
     let endDate: Date?
     let geopoliticalUnits: [GeopoliticalUnit]?
     let candidates: [Candidate]?
     let parties: [Party]?
-    let contests: [Contest]?
+    let contests: [ContestDescription]?
     let ballotStyles: [BallotStyle]?
     
     enum CodingKeys: String, CodingKey {
-        case scopeId = "election_scope_id"
+        case electionScopeId = "election_scope_id"
         case name
         case type
-        case contactInfo = "contact_information"
+        case contactInformation = "contact_information"
         case startDate = "start_date"
         case endDate = "end_date"
         case geopoliticalUnits = "geopolitical_units"
@@ -38,6 +38,11 @@ struct ElectionManifest: Codable {
 
 enum ElectionType: String, Codable {
     case unknown
-    case primary
     case general
+    case partisan_primary_closed
+    case partisan_primary_open
+    case primary
+    case runoff
+    case special
+    case other
 }

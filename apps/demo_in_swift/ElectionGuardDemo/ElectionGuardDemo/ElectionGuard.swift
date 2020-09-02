@@ -22,12 +22,6 @@ struct PlaintextBallotSelection: ElectionObjectBase {
     let vote: UInt8
 }
 
-struct SelectionDescription: ElectionObjectBase {
-    var objectId: String
-    let candidateId: String
-    let sequenceOrder: UInt64
-}
-
 struct ElementModP {
     var data: [UInt64] = [UInt64](repeating: 0, count: ElementModP.MAX_SIZE)
     static let MAX_SIZE = 64
@@ -155,7 +149,7 @@ class ElectionGuard {
     }
 
     static func setSelectionDescription(_ description: SelectionDescription) -> OpaquePointer? {
-        return eg_selection_description_new(description.objectId, description.candidateId, description.sequenceOrder)
+        return eg_selection_description_new(description.objectId, description.candidateId, description.sequenceOrder!)
     }
 
     static func getSelectionDescription(_ description: OpaquePointer) -> SelectionDescription? {

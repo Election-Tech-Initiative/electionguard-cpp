@@ -12,7 +12,7 @@ class ContestViewController: UIViewController {
     
     var contestId: String?
     
-    var selectedSelection: BallotSelection? {
+    var selectedSelection: SelectionDescription? {
         didSet {
             reviewButton.isEnabled = self.selectedSelection != nil
         }
@@ -63,7 +63,7 @@ class ContestViewController: UIViewController {
         return button
     }()
     
-    private var selections = [BallotSelection]()
+    private var selections = [SelectionDescription]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -122,14 +122,14 @@ class ContestViewController: UIViewController {
         let election = EGDataService.shared.getElectionManifest()
         let language = "en"
         
-        guard let contest = election?.contests?.first(where: { $0.id == contestId }) else {
+        guard let contest = election?.contests?.first(where: { $0.objectId == contestId }) else {
             showDialog(title: "Contest Not Found", body: "The contest could not be found. Please go back and try again.", okText: "OK")
             return
         }
         
         ballotTitleLabel.text = contest.ballotTitle?.text?.first(where: { $0.language == language })?.value
         ballotSubtitleLabel.text = contest.ballotSubtitle?.text?.first(where: { $0.language == language })?.value
-        selections = contest.ballotSelections ?? [BallotSelection]()
+        selections = contest.ballotSelections ?? [SelectionDescription]()
         selectionsCollectionView.reloadData()
     }
     
@@ -182,7 +182,7 @@ extension ContestViewController: UICollectionViewDelegateFlowLayout, UICollectio
     }
 
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        let shouldSelect = selectedSelection?.id != selections[indexPath.row].id
+        let shouldSelect = selectedSelection?.objectId != selections[indexPath.row].objectId
 
         if !shouldSelect {
             selectedSelection = nil

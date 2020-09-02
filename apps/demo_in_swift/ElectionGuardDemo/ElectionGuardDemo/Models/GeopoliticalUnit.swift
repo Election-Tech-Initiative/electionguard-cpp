@@ -9,8 +9,8 @@
 struct GeopoliticalUnit: Codable {
     let id: String?
     let name: String?
-    let type: GeopoliticalUnitType?
-    let contactInfo: ElectionContactInfo?
+    let type: ReportingUnitType?
+    let contactInfo: ContactInformation?
     
     enum CodingKeys: String, CodingKey {
         case id = "object_id"
@@ -20,9 +20,34 @@ struct GeopoliticalUnit: Codable {
     }
 }
 
-enum GeopoliticalUnitType: String, Codable {
+enum ReportingUnitType: String, Codable {
     case unknown
+    case ballot_batch
+    case ballot_style_area
+    case borough
+    case city
+    case city_council
+    case combined_precinct
+    case congressional
+    case country
     case county
-    case township
+    case county_council
+    case drop_box
+    case judicial
+    case municipality
+    case polling_place
+    case precinct
     case school
+    case special
+    case split_precinct
+    case state
+    case state_house
+    case state_senate
+    case township
+    case utility
+    case village
+    case vote_center
+    case ward
+    case water
+    case other
 }

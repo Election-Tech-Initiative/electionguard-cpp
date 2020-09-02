@@ -9,9 +9,13 @@
 struct BallotStyle: Codable {
     let id: String?
     let geopoliticalUnitIds: [String]?
+    let partyIds: [String]?
+    let imageUri: String?
     
     enum CodingKeys: String, CodingKey {
         case id = "object_id"
         case geopoliticalUnitIds = "geopolitical_unit_ids"
+        case partyIds = "party_ids"
+        case imageUri = "image_uri"
     }
 }

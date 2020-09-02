@@ -1,19 +1,19 @@
 //
-//  Contest.swift
+//  ContestDescription.swift
 //  ElectionGuardDemo
 //
 //  Created by Ed Snider on 8/21/20.
 //  Copyright © 2020 Microsoft. All rights reserved.
 //
 
-struct Contest: Codable {
+class ContestDescription: Codable {
     let type: ContestType?
-    let id: String?
+    let objectId: String?
     let sequenceOrder: Int?
-    let ballotSelections: [BallotSelection]?
-    let ballotTitle: Name?
-    let ballotSubtitle: Name?
-    let voteVariation: String? // TODO: enum?
+    let ballotSelections: [SelectionDescription]?
+    let ballotTitle: InternationalizedText?
+    let ballotSubtitle: InternationalizedText?
+    let voteVariation: VoteVariationType?
     let electoralDistrictId: String?
     let name: String?
     let primaryPartyIds: [String]?
@@ -22,7 +22,7 @@ struct Contest: Codable {
     
     enum CodingKeys: String, CodingKey {
         case type = "@type"
-        case id = "object_id"
+        case objectId = "object_id"
         case sequenceOrder = "sequence_order"
         case ballotSelections = "ballot_selections"
         case ballotTitle = "ballot_title"
@@ -36,15 +36,19 @@ struct Contest: Codable {
     }
 }
 
-struct BallotSelection: Codable {
-    let id: String?
-    let sequenceOrder: Int?
+class ContestDescriptionWithPlaceholders: ContestDescription {
+    let placeholderSelections: [SelectionDescription]? = nil
+}
+
+struct SelectionDescription: Codable {
+    let objectId: String?
     let candidateId: String?
+    let sequenceOrder: UInt64?
     
     enum CodingKeys : String, CodingKey {
-        case id = "object_id"
-        case sequenceOrder = "sequence_order"
+        case objectId = "object_id"
         case candidateId = "candidate_id"
+        case sequenceOrder = "sequence_order"
     }
 }
 
@@ -52,4 +56,20 @@ enum ContestType: String, Codable {
     case unknown
     case candidate = "CandidateContest"
     case referendum = "ReferendumContest"
+}
+
+enum VoteVariationType: String, Codable {
+    case unknown
+    case one_of_m
+    case approval
+    case borda
+    case cumulative
+    case majority
+    case n_of_m
+    case plurality
+    case proportional
+    case range
+    case rcv
+    case super_majority
+    case other
 }
