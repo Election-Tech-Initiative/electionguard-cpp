@@ -3,6 +3,7 @@
 #include "../../src/kremlin/Hacl_Bignum4096.h"
 
 #include <doctest/doctest.h>
+#include <electionguard/constants.h>
 #include <electionguard/hash.hpp>
 
 using namespace electionguard;
@@ -90,14 +91,12 @@ TEST_CASE("Test less than BigNum 4096")
 
 TEST_CASE("Test less than BigNum 256")
 {
-    uint64_t a[4] = {0xFFFFFFFFFFFFFF43, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
-                     0xFFFFFFFFFFFFFFFF};
-    // Log::debug(a, 4, " : Test less than BigNum 256 : a :");
+    // Log::debug(Q_ARRAY, 4, " : Test less than BigNum 256 : Q_ARRAY :");
     uint64_t b[4] = {0xFFFFFFFFFFFFFF45, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
                      0xFFFFFFFFFFFFFFFF};
     // Log::debug(b, 4, " : Test less than BigNum 256 : b :");
 
-    auto isLessThan = Hacl_Bignum256_lt(a, b);
+    auto isLessThan = Hacl_Bignum256_lt(const_cast<uint64_t *>(Q_ARRAY), b);
     // Log::debug(" : Test less than BigNum 256 : isLessThan : " + to_string(isLessThan));
 
     CHECK(isLessThan);

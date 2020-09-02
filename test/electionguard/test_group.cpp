@@ -203,9 +203,7 @@ TEST_CASE("a_minus_b_mod_q for max of q - 1 has hex value ending in 42")
 {
     string expectedHex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff42");
     // Max Q value in Hacl_Bignum4096 format
-    uint64_t maxArrayQ[4U] = {0xFFFFFFFFFFFFFF43, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
-                              0xFFFFFFFFFFFFFFFF};
-    auto maxQ = new ElementModQ(maxArrayQ, true);
+    auto maxQ = new ElementModQ(const_cast<uint64_t *>(Q_ARRAY), true);
     auto one = uint64_to_q(1);
 
     auto result = a_minus_b_mod_q(maxQ, one);
