@@ -63,6 +63,22 @@ namespace electionguard
         return bytes_to_hex(byteResult, sizeof(byteResult));
     }
 
+    bool ElementModP::operator==(const ElementModP &other)
+    {
+        // TODO: safety, specifically when the object underflows its max size
+        // e.g. if ((l == (uint64_t)0U) && (r == (uint64_t)0U))
+        for (int i = 0; i < MAX_P_LEN; i++) {
+            auto l = data.elem[i];
+            auto r = other.data.elem[i];
+            if (l != r) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool ElementModP::operator!=(const ElementModP &other) { return !(*this == other); }
+
     ElementModP *bytes_to_p(uint8_t *b, size_t bLen)
     {
         auto bn = Hacl_Bignum4096_new_bn_from_bytes_be(bLen, b);
@@ -113,14 +129,12 @@ namespace electionguard
 
     ElementModP *pow_mod_p(ElementModP *b, ElementModP *e)
     {
-        uint64_t one[MAX_P_LEN] = {1};
         // Log::debug(b, MAX_P_LEN, " : b = ");
         // Log::debug(e, MAX_P_LEN, " : e = ");
-        // Log::debug(one, MAX_P_LEN, " : one = ");
 
         uint64_t result[MAX_P_LEN] = {};
-        Hacl_Bignum4096_mod_exp(const_cast<uint64_t *>(P_ARRAY), b->get(), MAX_P_LEN, e->get(),
-                                result);
+        Hacl_Bignum4096_mod_exp(const_cast<uint64_t *>(P_ARRAY), b->get(),
+                                MAX_P_LEN * sizeof(e->get()[0]), e->get(), result);
 
         // Log::debug(result, MAX_P_LEN, " : result = ");
 

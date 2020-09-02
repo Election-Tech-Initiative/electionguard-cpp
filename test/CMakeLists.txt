@@ -31,6 +31,7 @@ add_executable(ElectionGuardTests
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_group.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hacl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_nonces.cpp
 )

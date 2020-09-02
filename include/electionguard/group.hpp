@@ -25,6 +25,9 @@ namespace electionguard
         uint64_t *get();
         string toHex();
 
+        bool operator==(const ElementModP &other);
+        bool operator!=(const ElementModP &other);
+
       private:
         ElementModPData data;
     };
