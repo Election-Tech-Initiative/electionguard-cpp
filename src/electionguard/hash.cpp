@@ -7,7 +7,7 @@
 
 extern "C" {
 #include "../kremlin/Hacl_Bignum4096.h"
-#include "../kremlin/Hacl_Streaming_SHA2_256.h"
+#include "../kremlin/Hacl_Streaming_SHA2.h"
 }
 
 namespace electionguard
@@ -23,8 +23,8 @@ namespace electionguard
     ElementModQ *hash_elems(vector<CryptoHashableType> a)
     {
         uint8_t output[32] = {};
-        Hacl_Streaming_Functor_state_s___uint32_t____ *p = Hacl_Streaming_SHA2_256_create_in();
-        Hacl_Streaming_SHA2_256_update(p, delimiter, sizeof(delimiter));
+        Hacl_Streaming_Functor_state_s___uint32_t____ *p = Hacl_Streaming_SHA2_create_in_256();
+        Hacl_Streaming_SHA2_update_256(p, delimiter, sizeof(delimiter));
 
         if (a.size() == 0) {
             push_hash_update(p, null_string);
@@ -34,13 +34,13 @@ namespace electionguard
             }
         }
 
-        Hacl_Streaming_SHA2_256_finish(p, output);
+        Hacl_Streaming_SHA2_finish_256(p, output);
 
         auto bn = Hacl_Bignum4096_new_bn_from_bytes_be(sizeof(output), output);
 
         auto q = new ElementModQ(bn);
 
-        Hacl_Streaming_SHA2_256_free(p);
+        Hacl_Streaming_SHA2_free_256(p);
         free(bn);
 
         return q;
@@ -127,7 +127,7 @@ namespace electionguard
         }
 
         const uint8_t *input = reinterpret_cast<const uint8_t *>(input_string.c_str());
-        Hacl_Streaming_SHA2_256_update(p, (uint8_t *)input, input_string.size());
-        Hacl_Streaming_SHA2_256_update(p, delimiter, sizeof(delimiter));
+        Hacl_Streaming_SHA2_update_256(p, (uint8_t *)input, input_string.size());
+        Hacl_Streaming_SHA2_update_256(p, delimiter, sizeof(delimiter));
     }
 } // namespace electionguard

@@ -134,6 +134,8 @@ namespace electionguard
     /// </summary>
     EG_API ElementModQ *rand_q();
 
+    // mul_mod_p, pow_mod_p, g_pow_p, rand_q, a_minus_b_mod_q, a_plus_bc_mod_q, negate_mod_q
+
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD__CORE_GROUP_HPP_INCLUDED__ */

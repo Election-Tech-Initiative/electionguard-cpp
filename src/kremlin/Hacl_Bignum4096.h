@@ -21,6 +21,14 @@
  * SOFTWARE.
  */
 
+
+#ifndef __Hacl_Bignum4096_H
+#define __Hacl_Bignum4096_H
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #include "evercrypt_targetconfig.h"
 #include "lib_intrinsics.h"
 #include "libintvector.h"
@@ -29,12 +37,9 @@
 #include <string.h>
 #include "kremlin/internal/target.h"
 
-#ifndef __Hacl_Bignum4096_H
-#define __Hacl_Bignum4096_H
 
 #include "Hacl_Kremlib.h"
 #include "Hacl_Bignum.h"
-
 
 /************************/
 /* Arithmetic functions */
@@ -76,7 +81,7 @@ Write `a ^ b mod n1` in `res`.
   bBits should be 4096.
 */
 void
-Hacl_Bignum4096_mod_exp(uint64_t *n1, uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res);
+Hacl_Bignum4096_mod_exp(uint64_t *n, uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res);
 
 
 /********************/
@@ -111,9 +116,13 @@ void Hacl_Bignum4096_bn_to_bytes_be(uint64_t *b, uint8_t *res);
 
 
 /*
-Returns true if and only if argument a is strictly see then argument b.
+Returns true if and only if argument a is strictly less than the argument b.
 */
 bool Hacl_Bignum4096_lt(uint64_t *a, uint64_t *b);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #define __Hacl_Bignum4096_H_DEFINED
 #endif
