@@ -11,7 +11,7 @@ struct CiphertextBallotSelection: ElectionObjectBase {
     var objectId: String
 
     let descriptionHash: ElementModQ
-    let ciphertext: ElgamalCiphetext
+    let ciphertext: ElgamalCiphertext
     let cryptoHash: ElementModQ
     let isPlaceholderSelection: Bool
     let nonce: ElementModQ
@@ -46,7 +46,7 @@ struct ElementModQ {
     }
 }
 
-struct ElgamalCiphetext: CryptoHash {
+struct ElgamalCiphertext: CryptoHash {
     var pad: ElementModP
     var data: ElementModP
     
@@ -223,11 +223,11 @@ class ElectionGuard {
         
     }
     
-    static func getElgamalCiphertext() -> ElgamalCiphetext {
+    static func getElgamalCiphertext() -> ElgamalCiphertext {
         let fake_pad = ElementModP([UInt64](repeating: 0, count: ElementModP.MAX_SIZE))
         let fake_data = ElementModP([UInt64](repeating: 0, count: ElementModP.MAX_SIZE))
         
-        return ElgamalCiphetext(pad: fake_pad, data: fake_data)
+        return ElgamalCiphertext(pad: fake_pad, data: fake_data)
     }
 
     static func getHashForDevice(_ uuid: UInt64, _ location: String) -> ElementModQ? {
