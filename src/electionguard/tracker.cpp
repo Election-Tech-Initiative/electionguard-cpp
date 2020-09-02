@@ -24,7 +24,7 @@ namespace electionguard
         return hash_elems({previous, timestamp, ballotHash});
     }
 
-    string Tracker::hashToWords(ElementModQ *trackerHash, char *separator)
+    string Tracker::hashToWords(ElementModQ *trackerHash, const char *separator)
     {
         // TODO: implement properly
         return "Doggo ipsum long woofer pats blep thicc shooberino, sub woofer pupper";

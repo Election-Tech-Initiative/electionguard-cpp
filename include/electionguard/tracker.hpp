@@ -15,7 +15,7 @@ namespace electionguard
         static ElementModQ *getRotatingTrackerHash(ElementModQ *previous, uint64_t timestamp,
                                                    ElementModQ *ballotHash);
 
-        static string hashToWords(ElementModQ *trackerHash, char *separator = " ");
+        static string hashToWords(ElementModQ *trackerHash, const char *separator = " ");
     };
 
 } // namespace electionguard
