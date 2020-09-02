@@ -81,7 +81,6 @@ namespace electionguard
         ~ElementModQ();
 
         uint64_t *get();
-        ElementModP *toElementModP();
         string toHex();
 
         bool operator==(const ElementModQ &other);
@@ -133,8 +132,6 @@ namespace electionguard
     /// Generate random number between 0 and Q
     /// </summary>
     EG_API ElementModQ *rand_q();
-
-    // mul_mod_p, pow_mod_p, g_pow_p, rand_q, a_minus_b_mod_q, a_plus_bc_mod_q, negate_mod_q
 
 } // namespace electionguard
 

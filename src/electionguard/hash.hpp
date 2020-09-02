@@ -3,7 +3,6 @@
 #include <electionguard/crypto_hashable.hpp>
 #include <electionguard/export.h>
 #include <electionguard/group.hpp>
-#include <initializer_list>
 #include <string>
 #include <variant>
 #include <vector>

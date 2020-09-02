@@ -1,14 +1,11 @@
 #include "hash.hpp"
 
+#include "../kremlin/Hacl_Bignum256.h"
+#include "../kremlin/Hacl_Streaming_SHA2.h"
 #include "log.hpp"
 
 #include <iomanip>
 #include <iostream>
-
-extern "C" {
-#include "../kremlin/Hacl_Bignum4096.h"
-#include "../kremlin/Hacl_Streaming_SHA2.h"
-}
 
 namespace electionguard
 {
@@ -36,7 +33,7 @@ namespace electionguard
 
         Hacl_Streaming_SHA2_finish_256(p, output);
 
-        auto bn = Hacl_Bignum4096_new_bn_from_bytes_be(sizeof(output), output);
+        auto bn = Hacl_Bignum256_new_bn_from_bytes_be(sizeof(output), output);
 
         auto q = new ElementModQ(bn);
 
