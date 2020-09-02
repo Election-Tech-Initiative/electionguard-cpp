@@ -56,8 +56,6 @@
 		A56C8C7624EF1C1F0044EA70 /* ElectionGuardDemo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ElectionGuardDemo-Bridging-Header.h"; sourceTree = "<group>"; };
 		A56C8C7B24EF1C620044EA70 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		A56C8C7D24EF1CA70044EA70 /* ElectionGuard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectionGuard.swift; sourceTree = "<group>"; };
-		B160683B24F7F4B400EA2A14 /* constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constants.h; path = ../../../../../include/electionguard/constants.h; sourceTree = "<group>"; };
-		B160683C24F7F4B400EA2A14 /* election.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = election.h; path = ../../../../../include/electionguard/election.h; sourceTree = "<group>"; };
 		A5A8009924F01F0C0068FE96 /* UIView+addSubviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+addSubviews.swift"; sourceTree = "<group>"; };
 		A5A8009C24F027410068FE96 /* SelectionCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionCollectionViewCell.swift; sourceTree = "<group>"; };
 		A5A8009E24F032DE0068FE96 /* EGButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EGButton.swift; sourceTree = "<group>"; };
@@ -72,6 +70,9 @@
 		A5A800AB24F045220068FE96 /* BallotStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BallotStyle.swift; sourceTree = "<group>"; };
 		A5DD4B3124F6D69400B9B176 /* ReviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewViewController.swift; sourceTree = "<group>"; };
 		A5DD4B3324F7EE1000B9B176 /* UIViewController+alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+alert.swift"; sourceTree = "<group>"; };
+		B12245AD25001CB300416B56 /* tracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tracker.h; path = ../../../../../include/electionguard/tracker.h; sourceTree = "<group>"; };
+		B160683B24F7F4B400EA2A14 /* constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constants.h; path = ../../../../../include/electionguard/constants.h; sourceTree = "<group>"; };
+		B160683C24F7F4B400EA2A14 /* election.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = election.h; path = ../../../../../include/electionguard/election.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +157,7 @@
 				A56C8C7024EF16170044EA70 /* encrypt.h */,
 				A56C8C7124EF16170044EA70 /* export.h */,
 				A56C8C6F24EF16170044EA70 /* group.h */,
+				B12245AD25001CB300416B56 /* tracker.h */,
 			);
 			path = "electionguard-core";
 			sourceTree = "<group>";

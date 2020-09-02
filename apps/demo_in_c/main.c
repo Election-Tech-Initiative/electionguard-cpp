@@ -2,6 +2,7 @@
 #include <electionguard/ballot.h>
 #include <electionguard/election.h>
 #include <electionguard/encrypt.h>
+#include <electionguard/tracker.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -10,7 +11,16 @@
 
 static bool strings_are_equal(char *expected, char *actual);
 
+static bool test_encrypt_selection();
+static bool test_generate_tracking_code();
+
 int main()
+{
+    assert(test_encrypt_selection() == true);
+    assert(test_generate_tracking_code() == true);
+}
+
+bool test_encrypt_selection()
 {
     // insantiate the stateful mediator
     eg_encryption_mediator_t *encrypter = eg_encryption_mediator_new();
@@ -62,6 +72,56 @@ int main()
     eg_encryption_mediator_free(encrypter);
     eg_plaintext_ballot_selection_free(plaintext);
     eg_ciphertext_ballot_selection_free(ciphertext);
+
+    return true;
+}
+
+bool test_generate_tracking_code()
+{
+    // Arrange
+    eg_element_mod_q_t *device_hash = eg_get_hash_for_device(1234, "some-location-string");
+    uint64_t first_hash[4] = {1, 2, 3, 4};
+    eg_element_mod_q_t *first_ballot_hash = eg_element_mod_q_new(first_hash);
+    uint64_t second_hash[4] = {2, 3, 4, 5};
+    eg_element_mod_q_t *second_ballot_hash = eg_element_mod_q_new(second_hash);
+
+    // Act
+    eg_element_mod_q_t *rotating_hash_1 =
+      eg_get_rotating_tracker_hash(device_hash, 1000, first_ballot_hash);
+    eg_element_mod_q_t *rotating_hash_2 =
+      eg_get_rotating_tracker_hash(rotating_hash_1, 1001, second_ballot_hash);
+
+    // Assert
+    assert(device_hash != NULL);
+    assert(rotating_hash_1 != NULL);
+    assert(rotating_hash_2 != NULL);
+
+    uint64_t *device_hash_data;
+    uint8_t device_hash_size = eg_element_mod_q_get(device_hash, &device_hash_data);
+
+    uint64_t *rotating_hash_1_data;
+    uint8_t rotating_hash_1_size = eg_element_mod_q_get(rotating_hash_1, &rotating_hash_1_data);
+
+    uint64_t *rotating_hash_2_data;
+    uint8_t rotating_hash_2_size = eg_element_mod_q_get(rotating_hash_2, &rotating_hash_2_data);
+
+    assert(device_hash_data != NULL);
+    assert(rotating_hash_1_data != NULL);
+    assert(rotating_hash_2_data != NULL);
+
+    assert(rotating_hash_1_data != device_hash_data);
+    assert(rotating_hash_2_data != device_hash_data);
+    assert(rotating_hash_1_data != rotating_hash_2_data);
+
+    assert(rotating_hash_1_data[0] != device_hash_data[0]);
+
+    eg_element_mod_q_free(device_hash);
+    eg_element_mod_q_free(first_ballot_hash);
+    eg_element_mod_q_free(second_ballot_hash);
+    eg_element_mod_q_free(rotating_hash_1);
+    eg_element_mod_q_free(rotating_hash_2);
+
+    return true;
 }
 
 bool strings_are_equal(char *expected, char *actual)
