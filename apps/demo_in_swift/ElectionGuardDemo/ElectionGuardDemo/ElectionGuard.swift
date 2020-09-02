@@ -246,7 +246,16 @@ class ElectionGuard {
         let ballot_ptr = setElementModQ(ballotHash)
 
         let rotating_hash_ptr = eg_get_rotating_tracker_hash(previous_ptr, timestamp, ballot_ptr)!
+        eg_element_mod_q_free(previous_ptr)
+        eg_element_mod_q_free(ballot_ptr)
         return getElementModQ(rotating_hash_ptr)
+    }
+
+    static func hashToWords(_ trackerHash: ElementModQ) -> String {
+        let tracker_hash_ptr = setElementModQ(trackerHash)!
+        let words = eg_hash_to_words_with_default_separator(tracker_hash_ptr)!
+        eg_element_mod_q_free(tracker_hash_ptr)
+        return String(cString: words)
     }
 
 }
