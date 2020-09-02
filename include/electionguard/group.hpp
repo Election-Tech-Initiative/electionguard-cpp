@@ -53,11 +53,6 @@ namespace electionguard
     EG_API ElementModP *add_mod_p(ElementModP *lhs, ElementModP *rhs);
 
     /// <summary>
-    /// Adds together the left hand side and right hand side and returns the sum mod P
-    /// </summary>
-    EG_API ElementModP *add_mod_p(uint64_t *lhs, uint64_t *rhs);
-
-    /// <summary>
     /// Multplies together the left hand side and right hand side and returns the product mod P
     /// </summary>
     EG_API ElementModP *mul_mod_p(ElementModP *lhs, ElementModP *rhs);
@@ -120,11 +115,25 @@ namespace electionguard
     EG_API ElementModQ *add_mod_q(ElementModQ *lhs, ElementModQ *rhs);
 
     /// <summary>
-    /// Adds together the left hand side and right hand side and returns the sum mod Q
+    /// Computes (a-b) mod q.
     /// </summary>
-    EG_API ElementModQ *add_mod_q(uint64_t *lhs, uint64_t *rhs);
+    EG_API ElementModQ *a_minus_b_mod_q(ElementModQ *a, ElementModQ *b);
 
-    // rand_q, a_minus_b_mod_q, a_plus_bc_mod_q, negate_mod_q
+    /// <summary>
+    /// Computes (a + b * c) mod q.
+    /// </summary>
+    EG_API ElementModQ *a_plus_bc_mod_q(ElementModQ *a, ElementModQ *b, ElementModQ *c);
+
+    /// <summary>
+    /// Computes (Q - a) mod q.
+    /// </summary>
+    EG_API ElementModQ *negate_mod_q(ElementModQ *a);
+
+    /// <summary>
+    /// Generate random number between 0 and Q
+    /// </summary>
+    EG_API ElementModQ *rand_q();
+
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD__CORE_GROUP_HPP_INCLUDED__ */

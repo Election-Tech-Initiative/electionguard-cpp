@@ -4,6 +4,7 @@
 
 #include <iomanip>
 #include <iostream>
+#include <random>
 #include <sstream>
 #include <stdint.h>
 #include <vector>
@@ -71,7 +72,7 @@ uint64_t g_array[MAX_P_LEN] = {
   0xd7f736fcba6c032e, 0x6b0e2a05be6af78f, 0xdd4b795f78de07d8, 0x4e65633480b396e1,
   0x25ef356fe5bb5931, 0xd3b308da86d1c3a5, 0x4a62dcbb93b1ddd8, 0xb706fa55d5038ffb,
   0x6387b98ee0e3def1, 0xcfb0cfb65363b256, 0x840ec7d4ec804794, 0xa142cdf33f6ef853,
-  0x750d6798f5196cf2, 0xd45ec4cc64cfd15e, 0x8d2a3141825b33d5, 0x37de384f98f6e03,
+  0x750d6798f5196cf2, 0xd45ec4cc64cfd15e, 0x8d2a3141825b33d5, 0x037de384f98f6e03,
 };
 
 uint64_t one[MAX_P_LEN] = {1};
@@ -94,9 +95,7 @@ namespace electionguard
     // param elem is expected to be allocated to uint64_t[MAX_P_LEN]
     ElementModP::ElementModP(uint64_t *elem, bool unchecked /* = false */) : data()
     {
-        if (!unchecked && !Hacl_Bignum4096_lt(elem, const_cast<uint64_t *>(P.data.elem))) {
-            // TODO: throw exception or just ignore it and set intance to a nullptr?
-            // this = nullptr;
+        if (!unchecked && Hacl_Bignum4096_lt(p_array, elem)) {
             throw "Value for ElementModP is greater than allowed";
         }
         memcpy(data.elem, elem, MAX_P_LEN * sizeof(elem[0]));
@@ -113,8 +112,9 @@ namespace electionguard
         // Use Hacl to convert the bignum to byte array
         Hacl_Bignum4096_bn_to_bytes_be(data.elem, byteResult);
 
-        Log::debug(byteResult, MAX_P_LEN * sizeof(data.elem[0]),
-                   " : byteResult from Hacl_Bignum4096_bn_to_bytes_be = ");
+        // Log::debug(byteResult, MAX_P_LEN * sizeof(data.elem[0]),
+        //            " : byteResult from Hacl_Bignum4096_bn_to_bytes_be = ");
+
         // Iterate through the returned bytes to convert to Hex representation
         // while ignoring any initial 0-bytes
         bool detectedFirstNonZeroBytes = false;
@@ -163,26 +163,21 @@ namespace electionguard
 
     ElementModP *add_mod_p(ElementModP *lhs, ElementModP *rhs)
     {
-        return add_mod_p(lhs->get(), rhs->get());
-    }
-
-    ElementModP *add_mod_p(uint64_t *lhs, uint64_t *rhs)
-    {
-        uint64_t res[MAX_P_LEN] = {};
-        uint64_t carry = Hacl_Bignum4096_add(lhs, rhs, res);
+        uint64_t result[MAX_P_LEN] = {};
+        uint64_t carry = Hacl_Bignum4096_add(lhs->get(), rhs->get(), result);
         if (carry > 0) {
             // just bypass compiler error
         }
         // TODO: % P
-        return new ElementModP(res, true);
+        return new ElementModP(result, true);
     }
 
     ElementModP *mul_mod_p(ElementModP *lhs, ElementModP *rhs)
     {
-        uint64_t res[128] = {};
-        Hacl_Bignum4096_mul(lhs->get(), rhs->get(), res);
+        uint64_t result[128] = {};
+        Hacl_Bignum4096_mul(lhs->get(), rhs->get(), result);
         // TODO: % P
-        return new ElementModP(res, true);
+        return new ElementModP(result, true);
     }
 
     ElementModP *pow_mod_p(ElementModP *b, ElementModP *e)
@@ -191,12 +186,12 @@ namespace electionguard
         // Log::debug(e, MAX_P_LEN, " : e = ");
         // Log::debug(one, MAX_P_LEN, " : one = ");
 
-        uint64_t resultModP[MAX_P_LEN] = {};
-        Hacl_Bignum4096_mod_exp(e->get(), b->get(), MAX_P_LEN, one, resultModP);
+        uint64_t result[MAX_P_LEN] = {};
+        Hacl_Bignum4096_mod_exp(e->get(), b->get(), MAX_P_LEN, one, result);
 
-        // Log::debug(resultModP, MAX_P_LEN, " : resultModP = ");
+        // Log::debug(result, MAX_P_LEN, " : result = ");
 
-        return new ElementModP(resultModP, true);
+        return new ElementModP(result, true);
     }
 
     ElementModP *g_pow_p(ElementModP *e) { return pow_mod_p(const_cast<ElementModP *>(&G), e); }
@@ -208,9 +203,7 @@ namespace electionguard
             // convert elem to 4096-bits to perform bignum comparison
             uint64_t q4096[MAX_P_LEN] = {};
             memcpy(q4096, elem, MAX_Q_LEN * sizeof(elem[0]));
-            if (!Hacl_Bignum4096_lt(q4096, const_cast<uint64_t *>(Q.data.elem))) {
-                // TODO: throw exception or just ignore it and set intance to a nullptr?
-                // this = nullptr;
+            if (Hacl_Bignum4096_lt(q_array, q4096)) {
                 throw "Value for ElementModQ is greater than allowed";
             }
         }
@@ -288,23 +281,87 @@ namespace electionguard
         auto pR = rhs->toElementModP();
         // Log::debug(pR->get(), MAX_P_LEN,
         //            " : rhs->toHex = " + rhs->toHex() + " : rhs->toElementModP->get() = ");
-        auto sumP = add_mod_p(pL, pR);
-        // Log::debug(sumP->get(), MAX_P_LEN,
-        //            " : sumP->toHex = " + sumP->toHex() + " : sumP->get() = ");
+
+        uint64_t result[MAX_P_LEN] = {};
+        uint64_t carry = Hacl_Bignum4096_add(pL->get(), pR->get(), result);
+        if (carry > 0) {
+            // just bypass compiler error
+        }
+        // Log::debug(result->get(), MAX_P_LEN,
+        //            " : result->toHex = " + result->toHex() + " : result->get() = ");
 
         // TODO: % Q isn't working
         // uint64_t resModQ[MAX_P_LEN] = {};
-        // Hacl_Bignum4096_mod_exp(q_array, sumP->get(), MAX_P_LEN, one, resModQ);
+        // Hacl_Bignum4096_mod_exp(q_array, result->get(), MAX_P_LEN, one, resModQ);
         // Log::debug(resModQ, MAX_P_LEN, " : resModQ = ");
         // Log::debug(q_array, MAX_P_LEN, " : q_array = ");
         // Log::debug(one, MAX_P_LEN, " : one = ");
 
         // return new ElementModQ(resModQ, true);
-        return new ElementModQ(sumP->get(), true);
+        return new ElementModQ(result, true);
     }
 
-    ElementModQ *add_mod_q(uint64_t *lhs, uint64_t *rhs)
+    ElementModQ *a_minus_b_mod_q(ElementModQ *a, ElementModQ *b)
     {
-        return add_mod_q(new ElementModQ(lhs, true), new ElementModQ(rhs, true));
+        // Hacl expects the bignum uint64_t array to be exactly 4096-bits
+        // so convert q to p
+        auto pA = a->toElementModP();
+        auto pB = b->toElementModP();
+
+        uint64_t result[MAX_P_LEN] = {};
+        Hacl_Bignum4096_sub(pA->get(), pB->get(), result);
+        // TODO: % Q
+        return new ElementModQ(result, true);
+    }
+
+    ElementModQ *a_plus_bc_mod_q(ElementModQ *a, ElementModQ *b, ElementModQ *c)
+    {
+        // Hacl expects the bignum uint64_t array to be exactly 4096-bits
+        // so convert q to p
+        auto pA = a->toElementModP();
+        auto pB = b->toElementModP();
+        auto pC = c->toElementModP();
+
+        uint64_t resultBC[MAX_P_LEN] = {};
+        Hacl_Bignum4096_mul(pB->get(), pC->get(), resultBC);
+
+        uint64_t result[MAX_P_LEN] = {};
+        uint64_t carry = Hacl_Bignum4096_add(pA->get(), resultBC, result);
+
+        // TODO: % Q
+        return new ElementModQ(result, true);
+    }
+
+    ElementModQ *negate_mod_q(ElementModQ *a)
+    {
+        // Hacl expects the bignum uint64_t array to be exactly 4096-bits
+        // so convert q to p
+        auto pA = a->toElementModP();
+
+        uint64_t result[MAX_P_LEN] = {};
+        Hacl_Bignum4096_sub(q_array, pA->get(), result);
+
+        // TODO: python version doesn't perform % Q on results...
+        return new ElementModQ(result, true);
+    }
+
+    ElementModQ *rand_q()
+    {
+        // TODO: choose a better random generator?
+        random_device rd;
+        uniform_int_distribution<uint64_t> dist(0, 0xFFFFFFFFFFFFFFFF);
+
+        uint64_t result[MAX_Q_LEN];
+        for (size_t i(0); i < MAX_Q_LEN; i++) {
+            if (i == 0) {
+                // first index of Q cannot cannod exceed 0xFFFFFFFFFFFFFF43
+                uniform_int_distribution<uint64_t> firstDist(0, 0xFFFFFFFFFFFFFF43);
+                result[i] = firstDist(rd);
+            } else {
+                result[i] = dist(rd);
+            }
+        }
+
+        return new ElementModQ(result);
     }
 } // namespace electionguard
