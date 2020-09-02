@@ -22,8 +22,8 @@
  */
 
 
-#ifndef __Hacl_IntTypes_Intrinsics_H
-#define __Hacl_IntTypes_Intrinsics_H
+#ifndef __Hacl_Blake2b_32_H
+#define __Hacl_Blake2b_32_H
 
 #if defined(__cplusplus)
 extern "C" {
@@ -38,38 +38,23 @@ extern "C" {
 
 
 #include "Hacl_Kremlib.h"
+#include "Hacl_Blake2s_32.h"
+#include "Lib_Memzero0.h"
+#include "Hacl_Impl_Blake2_Constants.h"
 
-static inline uint64_t
-Hacl_IntTypes_Intrinsics_add_carry_u64(uint64_t cin, uint64_t x, uint64_t y, uint64_t *result1)
-{
-  uint64_t res = x + cin + y;
-  uint64_t
-  c = (~FStar_UInt64_gte_mask(res, x) | (FStar_UInt64_eq_mask(res, x) & cin)) & (uint64_t)1U;
-  result1[0U] = res;
-  return c;
-}
-
-static inline uint64_t
-Hacl_IntTypes_Intrinsics_sub_borrow_u64(
-  uint64_t cin,
-  uint64_t x,
-  uint64_t y,
-  uint64_t *result1
-)
-{
-  uint64_t res = x - y - cin;
-  uint64_t eqlty = FStar_UInt64_eq_mask(res, x);
-  uint64_t
-  c1 =
-    ((FStar_UInt64_gte_mask(res, x) & ~FStar_UInt64_eq_mask(res, x)) | (eqlty & cin))
-    & (uint64_t)1U;
-  result1[0U] = res;
-  return c1;
-}
+void
+Hacl_Blake2b_32_blake2b(
+  uint32_t nn,
+  uint8_t *output,
+  uint32_t ll,
+  uint8_t *d,
+  uint32_t kk,
+  uint8_t *k
+);
 
 #if defined(__cplusplus)
 }
 #endif
 
-#define __Hacl_IntTypes_Intrinsics_H_DEFINED
+#define __Hacl_Blake2b_32_H_DEFINED
 #endif

@@ -19,12 +19,24 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/variant_cast.hpp
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum256.c
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum256.h
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.c
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.h
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Blake2b_32.c
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Blake2b_32.h
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Blake2s_32.c
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Blake2s_32.h
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Hash.c
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Hash.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Streaming_SHA2_256.c
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Streaming_SHA2_256.h
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Impl_Blake2_Constants.h
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Spec.c
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Spec.h
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Streaming_SHA2.c
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Streaming_SHA2.h
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Lib_Memzero.c
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Lib_Memzero0.c
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Lib_Memzero0.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/constants.h
