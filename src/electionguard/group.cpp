@@ -54,11 +54,31 @@ uint64_t q_array[MAX_P_LEN] = {
   0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
   0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000};
 
+// G in Hacl_Bignum4096 format
+uint64_t g_array[MAX_P_LEN] = {
+  0xb0c73abf03e8e0aa, 0x94b38ac417cddf40, 0x40d9992197d80a6e, 0x82dc54775ab83538,
+  0x10c136f8691101ad, 0x8e61369ba0ddbadb, 0xe8a317ae1e1d82,   0x288a89c931cf564f,
+  0xdba8a12c5ca82757, 0xd4809ef34abeb83f, 0x76ebd2d95a3dee96, 0x8f299bcb29005200,
+  0xe9f61c11a07bf421, 0xc3b1cbdb50f759d0, 0xbf7cd02d9661385a, 0x801328b2c6a60526,
+  0xf6bc80662ba06207, 0xcaec94c95e96d628, 0x76c94b2008926b38, 0x93ad97b8fe09274e,
+  0x9af5e71114a005f,  0xc0cdbdb76b6ad45f, 0x5a5d1cedeee01e4b, 0xc7e71fcb2255254,
+  0xbaad96aac96b0dbe, 0xc9b11ab6c59bce62, 0x72ceb313fdab069c, 0xeb276fb3685f3716,
+  0xdf23f1db8355bde1, 0x501fa2342b728263, 0xfb1918b2a2a30e69, 0xf7f72da39a2284fd,
+  0x8090c35da9355e6c, 0x322b37c50af18215, 0x86d24900742062c1, 0xf6932825bf45de83,
+  0x7aaa0e9fd8785702, 0xd8e41422b64d2cba, 0x1e221c41f55bba31, 0xa6750e7c8750b514,
+  0xf09d40ac20c2ab74, 0x872e62b5d1b13a98, 0xb3c39aa08b829b28, 0xcc3eda17dbfc47b8,
+  0xfdebeef58570669a, 0x7f3dabcbad8eb9d8, 0xfa7b6c87f4554cb5, 0x26e050af50a03c65,
+  0xd7f736fcba6c032e, 0x6b0e2a05be6af78f, 0xdd4b795f78de07d8, 0x4e65633480b396e1,
+  0x25ef356fe5bb5931, 0xd3b308da86d1c3a5, 0x4a62dcbb93b1ddd8, 0xb706fa55d5038ffb,
+  0x6387b98ee0e3def1, 0xcfb0cfb65363b256, 0x840ec7d4ec804794, 0xa142cdf33f6ef853,
+  0x750d6798f5196cf2, 0xd45ec4cc64cfd15e, 0x8d2a3141825b33d5, 0x37de384f98f6e03,
+};
+
 uint64_t one[MAX_P_LEN] = {1};
 
 void hex_to_bytes(string hex, uint8_t *bytesOut)
 {
-    for (size_t i(0); i < (hex.length() - 1); i += 2) {
+    for (size_t i(0); i < hex.size(); i += 2) {
         string byteString = hex.substr(i, 2);
         uint8_t byte = (uint8_t)stoi(byteString.c_str(), NULL, 16);
         bytesOut[i / 2] = byte;
@@ -69,6 +89,7 @@ namespace electionguard
 {
     const ElementModP P = ElementModP(p_array, true);
     const ElementModQ Q = ElementModQ(q_array, true);
+    const ElementModP G = ElementModP(g_array, true);
 
     // param elem is expected to be allocated to uint64_t[MAX_P_LEN]
     ElementModP::ElementModP(uint64_t *elem, bool unchecked /* = false */) : data()
@@ -92,6 +113,8 @@ namespace electionguard
         // Use Hacl to convert the bignum to byte array
         Hacl_Bignum4096_bn_to_bytes_be(data.elem, byteResult);
 
+        Log::debug(byteResult, MAX_P_LEN * sizeof(data.elem[0]),
+                   " : byteResult from Hacl_Bignum4096_bn_to_bytes_be = ");
         // Iterate through the returned bytes to convert to Hex representation
         // while ignoring any initial 0-bytes
         bool detectedFirstNonZeroBytes = false;
@@ -122,6 +145,10 @@ namespace electionguard
 
     ElementModP *hex_to_p(string h)
     {
+        bool isOdd = h.size() % 2;
+        if (isOdd) {
+            h.insert(0, 1, '0');
+        }
         size_t len = h.size() / 2;
         uint8_t *bytes = new uint8_t[len];
         hex_to_bytes(h, bytes);
@@ -171,6 +198,8 @@ namespace electionguard
 
         return new ElementModP(resultModP, true);
     }
+
+    ElementModP *g_pow_p(ElementModP *e) { return pow_mod_p(const_cast<ElementModP *>(&G), e); }
 
     // param elem is expected to be allocated to uint64_t[MAX_Q_LEN]
     ElementModQ::ElementModQ(uint64_t *elem, bool unchecked /* = false*/) : data()
@@ -233,6 +262,10 @@ namespace electionguard
 
     ElementModQ *hex_to_q(string h)
     {
+        bool isOdd = h.size() % 2;
+        if (isOdd) {
+            h.insert(0, 1, '0');
+        }
         size_t len = h.size() / 2;
         uint8_t *bytes = new uint8_t[len];
         hex_to_bytes(h, bytes);
