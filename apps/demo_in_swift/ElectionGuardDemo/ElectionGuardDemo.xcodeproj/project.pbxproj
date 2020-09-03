@@ -40,6 +40,7 @@
 		A52A8FDD24F01A2B0017244F /* ContestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContestViewController.swift; sourceTree = "<group>"; };
 		A54A05F624F8312300B9CFE2 /* ProgressHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressHUD.swift; sourceTree = "<group>"; };
 		A54A05F824FE98C300B9CFE2 /* CiphertextElectionContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CiphertextElectionContext.swift; sourceTree = "<group>"; };
+		A54E62A4250024230007BA4C /* hash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hash.h; path = ../../../../../include/electionguard/hash.h; sourceTree = "<group>"; };
 		A56C8C5624EF14B80044EA70 /* ElectionGuard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ElectionGuard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A56C8C5924EF14B80044EA70 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A56C8C5B24EF14B80044EA70 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -150,6 +151,7 @@
 		A56C8C6D24EF15A20044EA70 /* electionguard-core */ = {
 			isa = PBXGroup;
 			children = (
+				A54E62A4250024230007BA4C /* hash.h */,
 				B160683B24F7F4B400EA2A14 /* constants.h */,
 				B160683C24F7F4B400EA2A14 /* election.h */,
 				A56C8C7324EF16170044EA70 /* ballot.h */,
