@@ -1,6 +1,6 @@
 #include "electionguard/elgamal.hpp"
 
-#include "hash.hpp"
+#include "electionguard/hash.hpp"
 
 namespace electionguard
 {

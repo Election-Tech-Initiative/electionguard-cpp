@@ -1,7 +1,7 @@
 #include "electionguard/encrypt.hpp"
 
 #include "electionguard/elgamal.hpp"
-#include "hash.hpp"
+#include "electionguard/hash.hpp"
 #include "log.hpp"
 
 #include <iostream>
