@@ -20,7 +20,7 @@ namespace electionguard
         {
             cout << caller << msg << endl;
             for (size_t i(0); i < bnLen; i++) {
-                cout << "[" << hex << setw(2) << setfill('0') << bn[i] << "]";
+                cout << "[" << hex << setw(16) << setfill('0') << bn[i] << "]";
             }
             cout << endl;
         }
