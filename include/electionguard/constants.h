@@ -7,12 +7,12 @@ extern "C" {
 
 enum MAX_IDENIFIER_LENGTH { MAX_IDENIFIER_LENGTH = 256 };
 
-constexpr uint8_t MAX_P_LEN = 64;
-constexpr uint8_t MAX_Q_LEN = 4;
+const uint8_t MAX_P_LEN = 64;
+const uint8_t MAX_Q_LEN = 4;
 
-// TODO: is this the correct max P value? It's not matching python's max p
+// TODO: is this the correct max P value? It's not matching python's max p's hex output.. need to fix later
 // Max P value in Hacl_Bignum4096 format
-constexpr uint64_t P_ARRAY[MAX_P_LEN] = {
+const uint64_t P_ARRAY[MAX_P_LEN] = {
   0x1DB502994F24DFB1, 0xFE0175E30B1B0E79, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
   0xFFFFFFFFFFFFFFba, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
   0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
@@ -31,11 +31,11 @@ constexpr uint64_t P_ARRAY[MAX_P_LEN] = {
   0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF};
 
 // Max Q value in Hacl_Bignum256 format
-constexpr uint64_t Q_ARRAY[MAX_Q_LEN] = {0xFFFFFFFFFFFFFF43, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
-                                         0xFFFFFFFFFFFFFFFF};
+const uint64_t Q_ARRAY[MAX_Q_LEN] = {0xFFFFFFFFFFFFFF43, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                                     0xFFFFFFFFFFFFFFFF};
 
 // G in Hacl_Bignum4096 format
-constexpr uint64_t G_ARRAY[MAX_P_LEN] = {
+const uint64_t G_ARRAY[MAX_P_LEN] = {
   0xb0c73abf03e8e0aa, 0x94b38ac417cddf40, 0x40d9992197d80a6e, 0x82dc54775ab83538,
   0x10c136f8691101ad, 0x8e61369ba0ddbadb, 0xe8a317ae1e1d82,   0x288a89c931cf564f,
   0xdba8a12c5ca82757, 0xd4809ef34abeb83f, 0x76ebd2d95a3dee96, 0x8f299bcb29005200,
