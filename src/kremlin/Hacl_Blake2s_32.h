@@ -21,6 +21,14 @@
  * SOFTWARE.
  */
 
+
+#ifndef __Hacl_Blake2s_32_H
+#define __Hacl_Blake2s_32_H
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #include "evercrypt_targetconfig.h"
 #include "libintvector.h"
 #include "kremlin/internal/types.h"
@@ -28,30 +36,31 @@
 #include <string.h>
 #include "kremlin/internal/target.h"
 
-#ifndef __Hacl_Streaming_SHA2_256_H
-#define __Hacl_Streaming_SHA2_256_H
 
-#include "Hacl_Hash.h"
+#include "Hacl_Kremlib.h"
+#include "Lib_Memzero0.h"
+#include "Hacl_Impl_Blake2_Constants.h"
 
-
-typedef struct Hacl_Streaming_Functor_state_s___uint32_t_____s
-Hacl_Streaming_Functor_state_s___uint32_t____;
-
-Hacl_Streaming_Functor_state_s___uint32_t____ *Hacl_Streaming_SHA2_256_create_in();
-
-void Hacl_Streaming_SHA2_256_init(Hacl_Streaming_Functor_state_s___uint32_t____ *s);
+typedef struct K___uint32_t_uint32_t_s
+{
+  uint32_t fst;
+  uint32_t snd;
+}
+K___uint32_t_uint32_t;
 
 void
-Hacl_Streaming_SHA2_256_update(
-  Hacl_Streaming_Functor_state_s___uint32_t____ *p,
-  uint8_t *data,
-  uint32_t len
+Hacl_Blake2s_32_blake2s(
+  uint32_t nn,
+  uint8_t *output,
+  uint32_t ll,
+  uint8_t *d,
+  uint32_t kk,
+  uint8_t *k
 );
 
-void
-Hacl_Streaming_SHA2_256_finish(Hacl_Streaming_Functor_state_s___uint32_t____ *p, uint8_t *dst);
+#if defined(__cplusplus)
+}
+#endif
 
-void Hacl_Streaming_SHA2_256_free(Hacl_Streaming_Functor_state_s___uint32_t____ *s);
-
-#define __Hacl_Streaming_SHA2_256_H_DEFINED
+#define __Hacl_Blake2s_32_H_DEFINED
 #endif
