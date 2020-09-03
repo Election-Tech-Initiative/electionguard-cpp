@@ -24,7 +24,9 @@ struct eg_ciphertext_ballot_selection_s;
 typedef struct eg_ciphertext_ballot_selection_s eg_ciphertext_ballot_selection_t;
 
 EG_API eg_ciphertext_ballot_selection_t *
-eg_ciphertext_ballot_selection_new(const char *object_id, eg_element_mod_q_t *description_hash);
+eg_ciphertext_ballot_selection_new(const char *object_id, eg_element_mod_q_t *description_hash,
+                                   bool is_placeholder, eg_element_mod_q_t *nonce,
+                                   eg_element_mod_q_t *crypto_hash);
 EG_API void eg_ciphertext_ballot_selection_free(eg_ciphertext_ballot_selection_t *selection);
 
 EG_API char *

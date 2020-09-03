@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_facade.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/chaum_pedersen.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/election.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/election_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/elgamal.cpp
@@ -31,6 +32,8 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Streaming_SHA2_256.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/constants.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/crypto_hashable.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/election.hpp

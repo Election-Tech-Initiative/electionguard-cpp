@@ -12,10 +12,10 @@ namespace electionguard
 
     // Public Members
 
-    PlaintextBallotSelection::PlaintextBallotSelection(string object_id, const string vote) : data()
+    PlaintextBallotSelection::PlaintextBallotSelection(string objectId, const string vote) : data()
     {
-        auto _osize = object_id.size() + 1;
-        object_id.copy(data.object_id, _osize, 0UL);
+        auto _osize = objectId.size() + 1;
+        objectId.copy(data.object_id, _osize, 0UL);
 
         auto _vsize = vote.size() + 1;
         vote.copy(data.vote, _vsize, 0UL);
@@ -41,25 +41,47 @@ namespace electionguard
 
 #pragma region CiphertextBallotSelection
 
-    // Public Members
+    // Lifecycle Methods
 
-    CiphertextBallotSelection::CiphertextBallotSelection(const std::string object_id,
-                                                         ElementModQ *descriptionHash)
+    CiphertextBallotSelection::CiphertextBallotSelection(
+      const string objectId, ElementModQ *descriptionHash, ElGamalCiphertext *ciphertext,
+      bool isPlaceholder, ElementModQ *nonce, ElementModQ *cryptoHash,
+      DisjunctiveChaumPedersenProof *proof, ElGamalCiphertext *extendedData)
         : data()
     {
-        auto _osize = object_id.size() + 1;
-        object_id.copy(data.object_id, _osize);
+        // copy the object id
+        auto _osize = objectId.size() + 1;
+        objectId.copy(data.object_id, _osize);
+
         data.descriptionHash = descriptionHash;
+        data.ciphertext = ciphertext;
+        data.cryptoHash = cryptoHash;
+        data.isPlaceholderSelection = isPlaceholder;
+        data.nonce = nonce;
+        data.proof = proof;
+        data.extendedData = extendedData;
     }
 
-    CiphertextBallotSelection::CiphertextBallotSelection(const char *object_id,
-                                                         ElementModQ *descriptionHash)
+    CiphertextBallotSelection::CiphertextBallotSelection(
+      const char *object_id, ElementModQ *descriptionHash, ElGamalCiphertext *ciphertext,
+      bool isPlaceholder, ElementModQ *nonce, ElementModQ *cryptoHash,
+      DisjunctiveChaumPedersenProof *proof, ElGamalCiphertext *extendedData)
         : data()
     {
+        // copy the object id
         size_t _osize = strlen(object_id) + 1;
         strncpy(data.object_id, object_id, _osize);
+
         data.descriptionHash = descriptionHash;
+        data.ciphertext = ciphertext;
+        data.cryptoHash = cryptoHash;
+        data.isPlaceholderSelection = isPlaceholder;
+        data.nonce = nonce;
+        data.proof = proof;
+        data.extendedData = extendedData;
     }
+
+    // property Getters
 
     CiphertextBallotSelection::~CiphertextBallotSelection() { data = {}; }
 
@@ -67,17 +89,41 @@ namespace electionguard
 
     ElementModQ *CiphertextBallotSelection::getDescriptionHash() { return data.descriptionHash; }
 
-    ElementModQ *CiphertextBallotSelection::crypto_hash_with(ElementModQ *seed_hash)
+    ElGamalCiphertext *CiphertextBallotSelection::getCiphertext() { return data.ciphertext; }
+
+    DisjunctiveChaumPedersenProof *CiphertextBallotSelection::getProof() { return data.proof; }
+
+    // public Members
+
+    CiphertextBallotSelection *CiphertextBallotSelection::make(
+      const string object_id, ElementModQ *descriptionHash, ElGamalCiphertext *ciphertext,
+      ElementModP *elgamalPublicKey, ElementModQ *cryptoExtendedBaseHash, ElementModQ *proofSeed,
+      uint64_t plaintext, bool isPlaceholder, ElementModQ *nonce, ElementModQ *cryptoHash,
+      DisjunctiveChaumPedersenProof *proof, ElGamalCiphertext *extendedData)
     {
-        return makeCryptoHash(string(data.object_id), seed_hash, data.ciphertext);
+        // TODO: implement
+        return nullptr;
+    }
+
+    ElementModQ *CiphertextBallotSelection::crypto_hash_with(ElementModQ *seedHash)
+    {
+        return makeCryptoHash(string(data.object_id), seedHash, data.ciphertext);
+    }
+
+    bool CiphertextBallotSelection::isValidEncryption(ElementModQ *seedHash,
+                                                      ElementModP *elgamalPublicKey,
+                                                      ElementModQ *cryptoExtendedBaseHash)
+    {
+        // TODO: implement
+        return true;
     }
 
     // Protected Members
 
-    ElementModQ *CiphertextBallotSelection::makeCryptoHash(string object_id, ElementModQ *seed_hash,
+    ElementModQ *CiphertextBallotSelection::makeCryptoHash(string object_id, ElementModQ *seedHash,
                                                            ElGamalCiphertext *ciphertext)
     {
-        return hash_elems({object_id, seed_hash, ciphertext->crypto_hash()});
+        return hash_elems({object_id, seedHash, ciphertext->crypto_hash()});
     }
 
 #pragma endregion
