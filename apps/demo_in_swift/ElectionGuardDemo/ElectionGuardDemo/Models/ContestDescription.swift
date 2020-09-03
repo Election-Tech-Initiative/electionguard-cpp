@@ -40,10 +40,10 @@ class ContestDescriptionWithPlaceholders: ContestDescription {
     let placeholderSelections: [SelectionDescription]? = nil
 }
 
-struct SelectionDescription: Codable {
-    let objectId: String?
-    let candidateId: String?
-    let sequenceOrder: UInt64?
+class SelectionDescription: Codable {
+    var objectId: String? = ""
+    var candidateId: String? = ""
+    var sequenceOrder: UInt64? = 0
     
     enum CodingKeys : String, CodingKey {
         case objectId = "object_id"
@@ -72,4 +72,79 @@ enum VoteVariationType: String, Codable {
     case rcv
     case super_majority
     case other
+}
+
+
+extension SelectionDescription {
+    func toPlaintextBallotSelection(isPlaceholder: Bool = false, isAffirmative: Bool = false) -> PlaintextBallotSelection {
+        return PlaintextBallotSelection(objectId: self.objectId!, vote: isAffirmative ? 1 : 0)
+    }
+    
+    func cryptoHash() -> ElementModQ? {
+        var toHash = "|"
+        
+        toHash += self.objectId ?? "null"
+        toHash += "|"
+        toHash += self.sequenceOrder != nil ? String(self.sequenceOrder!) : "null"
+        toHash += "|"
+        toHash += self.candidateId ?? "null"
+        toHash += "|"
+        
+        return ElectionGuard.hash(toHash)
+    }
+}
+
+extension ContestDescription {
+    func cryptoHash() -> ElementModQ? {
+        
+        var toHash = "|"
+        
+        toHash += self.objectId ?? "null"
+        toHash += "|"
+        toHash += self.sequenceOrder != nil ? String(self.sequenceOrder!) : "null"
+        toHash += "|"
+        toHash += self.electoralDistrictId ?? "null"
+        toHash += "|"
+        toHash += self.voteVariation?.rawValue ?? "null" // TODO: Confirm this is correct
+        toHash += "|"
+        
+        if let titleLanguages = self.ballotTitle?.text {
+            for text in titleLanguages {
+                toHash += text.value ?? "null"
+                toHash += "|"
+                // TODO: Include .language?
+            }
+        } else {
+            toHash += "null|"
+        }
+        
+        if let subtitleLanguages = self.ballotSubtitle?.text {
+            for text in subtitleLanguages {
+                toHash += text.value ?? "null"
+                toHash += "|"
+                // TODO: Include .language?
+            }
+        } else {
+            toHash += "null|"
+        }
+        
+        toHash += self.name ?? "null"
+        toHash += "|"
+        toHash += self.numberElected != nil ? String(self.numberElected!) : "null"
+        toHash += "|"
+        toHash += self.votesAllowed != nil ? String(self.votesAllowed!) : "null"
+        toHash += "|"
+        
+        if let selections = self.ballotSelections {
+            for selection in selections {
+                // TODO: Replace with actual hash of an ElementModQ instance
+                toHash += "ELEMENT_MOD_Q_HASH"
+                toHash += "|"
+            }
+        } else {
+            toHash += "null|"
+        }
+        
+        return ElectionGuard.hash(toHash)
+    }
 }
