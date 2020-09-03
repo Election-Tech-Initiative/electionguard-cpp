@@ -118,29 +118,19 @@ TEST_CASE("pow_mod_p 2 ^ 3 = 8 and 3 ^ 2 = 9")
 
 TEST_CASE("Test G is converted correctly")
 {
-    string expectedGHex("037de384f98f6e038d2a3141825b33d5d45ec4cc64cfd15e750d6798f5196cf2a142cd"
-                        "f33f6ef853840ec7d4ec80"
-                        "4794cfb0cfb65363b2566387b98ee0e3def1b706fa55d5038ffb4a62dcbb93b1ddd8d3"
-                        "b308da86d1c3a525ef356f"
-                        "e5bb59314e65633480b396e1dd4b795f78de07d86b0e2a05be6af78fd7f736fcba6c03"
-                        "2e26e050af50a03c65fa7b"
-                        "6c87f4554cb57f3dabcbad8eb9d8fdebeef58570669acc3eda17dbfc47b8b3c39aa08b"
-                        "829b28872e62b5d1b13a98"
-                        "f09d40ac20c2ab74a6750e7c8750b5141e221c41f55bba31d8e41422b64d2cba7aaa0e"
-                        "9fd8785702f6932825bf45"
-                        "de8386d24900742062c1322b37c50af182158090c35da9355e6cf7f72da39a2284fdfb"
-                        "1918b2a2a30e69501fa234"
-                        "2b728263df23f1db8355bde1eb276fb3685f371672ceb313fdab069cc9b11ab6c59bce"
-                        "62baad96aac96b0dbe0c7e"
-                        "71fcb22552545a5d1cedeee01e4bc0cdbdb76b6ad45f09af5e71114a005f93ad97b8fe"
-                        "09274e76c94b2008926b38"
-                        "caec94c95e96d628f6bc80662ba06207801328b2c6a60526bf7cd02d9661385ac3b1cb"
-                        "db50f759d0e9f61c11a07b"
-                        "f4218f299bcb2900520076ebd2d95a3dee96d4809ef34abeb83fdba8a12c5ca8275728"
-                        "8a89c931cf564f00e8a317"
-                        "ae1e1d828e61369ba0ddbadb10c136f8691101ad82dc54775ab8353840d9992197d80a"
-                        "6e94b38ac417cddf40b0c7"
-                        "3abf03e8e0aa");
+    string expectedGHex(
+      "037de384f98f6e038d2a3141825b33d5d45ec4cc64cfd15e750d6798f5196cf2a142cdf33f6ef853840ec7d4ec80"
+      "4794cfb0cfb65363b2566387b98ee0e3def1b706fa55d5038ffb4a62dcbb93b1ddd8d3b308da86d1c3a525ef356f"
+      "e5bb59314e65633480b396e1dd4b795f78de07d86b0e2a05be6af78fd7f736fcba6c032e26e050af50a03c65fa7b"
+      "6c87f4554cb57f3dabcbad8eb9d8fdebeef58570669acc3eda17dbfc47b8b3c39aa08b829b28872e62b5d1b13a98"
+      "f09d40ac20c2ab74a6750e7c8750b5141e221c41f55bba31d8e41422b64d2cba7aaa0e9fd8785702f6932825bf45"
+      "de8386d24900742062c1322b37c50af182158090c35da9355e6cf7f72da39a2284fdfb1918b2a2a30e69501fa234"
+      "2b728263df23f1db8355bde1eb276fb3685f371672ceb313fdab069cc9b11ab6c59bce62baad96aac96b0dbe0c7e"
+      "71fcb22552545a5d1cedeee01e4bc0cdbdb76b6ad45f09af5e71114a005f93ad97b8fe09274e76c94b2008926b38"
+      "caec94c95e96d628f6bc80662ba06207801328b2c6a60526bf7cd02d9661385ac3b1cbdb50f759d0e9f61c11a07b"
+      "f4218f299bcb2900520076ebd2d95a3dee96d4809ef34abeb83fdba8a12c5ca82757288a89c931cf564f00e8a317"
+      "ae1e1d828e61369ba0ddbadb10c136f8691101ad82dc54775ab8353840d9992197d80a6e94b38ac417cddf40b0c7"
+      "3abf03e8e0aa");
 
     auto gFromHex = hex_to_p(expectedGHex);
     // Log::debug(gFromHex->get(), 64UL, " : gFromHex = ");
