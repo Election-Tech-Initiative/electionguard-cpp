@@ -18,7 +18,11 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/log.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/tracker.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/tracker_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/variant_cast.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/words.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/words.hpp
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.c
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.h
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Hash.c
@@ -38,6 +42,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/include/electionguard/export.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/group.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/group.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/tracker.hpp
 )
 
 add_library(${META_PROJECT_TARGET} ${PROJECT_SOURCE_FILES})

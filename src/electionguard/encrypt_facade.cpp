@@ -1,12 +1,9 @@
-// #include "electionguard/ballot.hpp"
-// #include "electionguard/election.hpp"
 #include "electionguard/encrypt.hpp"
 
 #include <cerrno>
 #include <exception>
 
 extern "C" {
-
 #include "electionguard/encrypt.h"
 }
 
