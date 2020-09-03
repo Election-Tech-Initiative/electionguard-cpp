@@ -64,6 +64,15 @@ struct ElgamalCiphetext: CryptoHash {
 class ElectionGuard {
 
     static func mainTest() -> Bool {
+        
+        assert(testEncryptSelection() == true, "Encrypting the selection failed")
+        assert(testGenerateTrackingCode() == true, "GEnerating the tracking code failed")
+        return true;
+
+    }
+    
+    static func testEncryptSelection() -> Bool
+    {
         let candidateId = "some-candidate-id"
         let plaintext = PlaintextBallotSelection(objectId: candidateId, vote: 1)
         let description = SelectionDescription(objectId: "some-selection-id", candidateId: candidateId, sequenceOrder: 5)
@@ -84,7 +93,23 @@ class ElectionGuard {
         print("success!")
         
         return true
-
+        
+    }
+    
+    static func testGenerateTrackingCode() -> Bool {
+        
+        let deviceHash = getHashForDevice(1234, "some-location-string")!
+        let firstBallotHash = ElementModQ([UInt64](repeating: 255, count: ElementModQ.MAX_SIZE))
+        let secondBallotHash = ElementModQ([UInt64](repeating: 162, count: ElementModQ.MAX_SIZE))
+        
+        let rotatingHash1 = getRotatingTrackerHash(deviceHash, 1000, firstBallotHash)!
+        let rotatingHash2 = getRotatingTrackerHash(rotatingHash1, 1001, secondBallotHash)!
+        
+        assert(rotatingHash1.data != deviceHash.data)
+        assert(rotatingHash2.data != deviceHash.data)
+        assert(rotatingHash1.data != rotatingHash2.data)
+        
+        return true
     }
 
     static func getSecureRandomElementModQ() -> ElementModQ {
@@ -209,6 +234,28 @@ class ElectionGuard {
         let fake_data = ElementModP([UInt64](repeating: 0, count: ElementModP.MAX_SIZE))
         
         return ElgamalCiphetext(pad: fake_pad, data: fake_data)
+    }
+
+    static func getHashForDevice(_ uuid: UInt64, _ location: String) -> ElementModQ? {
+        let ptr = eg_get_hash_for_device(uuid, location)!
+        return getElementModQ(ptr)
+    }
+
+    static func getRotatingTrackerHash(_ previous: ElementModQ, _ timestamp: UInt64, _ ballotHash: ElementModQ) -> ElementModQ? {
+        let previous_ptr = setElementModQ(previous)
+        let ballot_ptr = setElementModQ(ballotHash)
+
+        let rotating_hash_ptr = eg_get_rotating_tracker_hash(previous_ptr, timestamp, ballot_ptr)!
+        eg_element_mod_q_free(previous_ptr)
+        eg_element_mod_q_free(ballot_ptr)
+        return getElementModQ(rotating_hash_ptr)
+    }
+
+    static func hashToWords(_ trackerHash: ElementModQ) -> String {
+        let tracker_hash_ptr = setElementModQ(trackerHash)!
+        let words = eg_hash_to_words_with_default_separator(tracker_hash_ptr)!
+        eg_element_mod_q_free(tracker_hash_ptr)
+        return String(cString: words)
     }
 
 }
