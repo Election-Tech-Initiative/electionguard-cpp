@@ -121,7 +121,7 @@ namespace electionguard
 
     ElementModP *mul_mod_p(ElementModP *lhs, ElementModP *rhs)
     {
-        uint64_t result[128] = {};
+        uint64_t result[128UL] = {};
         Hacl_Bignum4096_mul(lhs->get(), rhs->get(), result);
         // TODO: % P
         return new ElementModP(result, true);
@@ -242,11 +242,17 @@ namespace electionguard
 
     ElementModQ *a_plus_bc_mod_q(ElementModQ *a, ElementModQ *b, ElementModQ *c)
     {
-        uint64_t resultBC[MAX_Q_LEN] = {};
+        uint64_t resultBC[512UL] = {};
         Hacl_Bignum256_mul(b->get(), c->get(), resultBC);
 
-        uint64_t result[MAX_Q_LEN] = {};
-        uint64_t carry = Hacl_Bignum256_add(a->get(), resultBC, result);
+        // since the result of b*c can be larger than Q's 256, use P's length and 4096 Hacl for rest of calculation
+        uint64_t a4096[MAX_P_LEN] = {};
+        uint64_t bc4096[MAX_P_LEN] = {};
+        memcpy(a4096, a, MAX_Q_LEN * sizeof(a[0]));
+        memcpy(bc4096, resultBC, 512UL);
+
+        uint64_t result[MAX_P_LEN] = {};
+        uint64_t carry = Hacl_Bignum4096_add(a4096, bc4096, result);
 
         // TODO: % Q
         return new ElementModQ(result, true);
