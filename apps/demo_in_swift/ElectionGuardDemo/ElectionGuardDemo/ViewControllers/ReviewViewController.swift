@@ -36,11 +36,11 @@ class ReviewViewController: UIViewController {
         return label
     }()
     
-    let castButton: EGButton = {
+    let submitButton: EGButton = {
         let button = EGButton()
         
-        button.setTitle("Cast Ballot", for: .normal)
-        button.addTarget(self, action: #selector(cast), for: .touchUpInside)
+        button.setTitle("Encrypt & Submit", for: .normal)
+        button.addTarget(self, action: #selector(submit), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         
         return button
@@ -50,7 +50,6 @@ class ReviewViewController: UIViewController {
         super.viewDidLoad()
         
         title = "Review"
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Spoil", style: .plain, target: self, action: #selector(spoil))
         
         loadCandidate()
     }
@@ -63,7 +62,7 @@ class ReviewViewController: UIViewController {
         view.addSubviews([
             instructionsLabel,
             selectionLabel,
-            castButton
+            submitButton
         ])
         
         let constraints = [
@@ -76,10 +75,10 @@ class ReviewViewController: UIViewController {
             selectionLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             selectionLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             
-            castButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            castButton.widthAnchor.constraint(equalToConstant: 300),
-            castButton.heightAnchor.constraint(equalToConstant: 60),
-            castButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12),
+            submitButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            submitButton.widthAnchor.constraint(equalToConstant: 300),
+            submitButton.heightAnchor.constraint(equalToConstant: 60),
+            submitButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12),
         ]
         
         NSLayoutConstraint.activate(constraints)
@@ -97,63 +96,40 @@ class ReviewViewController: UIViewController {
         selectionLabel.text = candidateName
     }
     
-    @objc private func cast() {
+    @objc private func submit() {
         guard selection != nil else {
             return
         }
-        
-        showDialog(title: "Cast ballot",
-                   body: "You are about to cast your ballot. This cannot be undone. Do you wish to continue?",
+
+        showDialog(title: "Encrypt ballot",
+                   body: "You are about to encrypt your ballot. This cannot be undone. Do you wish to continue?",
                    yesText: "Yes",
                    noText: "No",
                    handler: { yes in
             if yes {
-                self.castBallot { code in
-                    self.showVerification(code: code, isSpoiled: false)
+                self.encryptBallot { code in
+                    self.showVerification(code: code)
                 }
             }
         })
     }
-    
-    @objc private func spoil() {
-        guard selection != nil else {
-            return
-        }
+
+    private func encryptBallot(completion: @escaping (String?) -> Void) {
+        ProgressHUD.show("Encrypting ballot...", interaction: false)
         
-        showDialog(title: "Spoil ballot",
-                   body: "You are about to spoil your ballot. This cannot be undone. Do you wish to continue?",
-                   yesText: "Yes",
-                   noText: "No",
-                   handler: { yes in
-            if yes {
-                self.spoilBallot { code in
-                    self.showVerification(code: code, isSpoiled: true)
-                }
-            }
-        })
-    }
-    
-    private func castBallot(completion: @escaping (String?) -> Void) {
-        ProgressHUD.show("Casting ballot...", interaction: false)
-        EGDataService.shared.castBallot(contestId: contestId!, completion: { code in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
+            // TODO: Encrypt ballot here
+            _ = ElectionGuard.mainTest()
             ProgressHUD.dismiss()
-            completion(code)
+            completion("checker ACND2 sorry K2JJD connect 9ANDK four 8C372 unreal G338F blizzard FGG1J super 4RR81 tornado J7BCA")
         })
     }
-    
-    private func spoilBallot(completion: @escaping (String?) -> Void) {
-        ProgressHUD.show("Spoiling ballot...", interaction: false)
-        EGDataService.shared.spoilBallot(contestId: contestId!, completion: { code in
-            ProgressHUD.dismiss()
-            completion(code)
-        })
-    }
-    
-    private func showVerification(code: String?, isSpoiled: Bool) {
+
+    private func showVerification(code: String?) {
         let verification = VerificationViewController()
         
         verification.code = code
-        verification.isSpoiled = isSpoiled
+        verification.contestId = contestId
         self.navigationController?.pushViewController(verification, animated: true)
     }
 }

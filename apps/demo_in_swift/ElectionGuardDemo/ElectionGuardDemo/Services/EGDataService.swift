@@ -39,23 +39,19 @@ class EGDataService {
         return candidate?.ballotName
     }
     
-    func castBallot(contestId: String, completion: @escaping (String?) -> Void) {
-        _ = ElectionGuard.mainTest()
-
+    func castBallot(contestId: String, completion: @escaping () -> Void) {
         // TODO: Replace hardcoded delay with actual API call
         votes[contestId] = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
-            completion("checker ACND2 sorry K2JJD connect 9ANDK four 8C372 unreal G338F blizzard FGG1J super 4RR81 tornado J7BCA")
+            completion()
         })
     }
     
-    func spoilBallot(contestId: String, completion: @escaping (String?) -> Void) {
-        _ = ElectionGuard.mainTest()
-
+    func spoilBallot(contestId: String, completion: @escaping () -> Void) {
         // TODO: Replace hardcoded delay with actual API call
         votes[contestId] = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
-            completion("chess ACND2 sorry K2JJD connect 9ANDK four 8C372 unreal G338F blizzard FGG1J super 4RR81 tornado J7BCA")
+            completion()
         })
     }
 }
