@@ -26,8 +26,10 @@ namespace electionguard
         if (nonce->get() != nullptr) {
             // just bypass compiler error
         }
-        // TODO:Safety
-        return new ElGamalCiphertext(publicKey, publicKey);
+
+        return new ElGamalCiphertext(
+          g_pow_p(nonce->toP()),
+          mul_mod_p(g_pow_p(uint64_to_p(m)), pow_mod_p(publicKey, nonce->toP())));
     }
 
 } // namespace electionguard

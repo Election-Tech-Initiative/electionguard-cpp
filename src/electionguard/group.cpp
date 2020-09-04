@@ -168,6 +168,13 @@ namespace electionguard
         return bytes_to_hex(byteResult, sizeof(byteResult));
     }
 
+    ElementModP *ElementModQ::toP()
+    {
+        uint64_t p4096[MAX_P_LEN] = {};
+        memcpy(p4096, data.elem, MAX_Q_LEN * sizeof(data.elem[0]));
+        return new ElementModP(p4096, true);
+    }
+
     bool ElementModQ::operator==(const ElementModQ &other)
     {
         // TODO: safety, specifically when the object underflows its max size
@@ -246,13 +253,11 @@ namespace electionguard
         Hacl_Bignum256_mul(b->get(), c->get(), resultBC);
 
         // since the result of b*c can be larger than Q's 256, use P's length and 4096 Hacl for rest of calculation
-        uint64_t a4096[MAX_P_LEN] = {};
         uint64_t bc4096[MAX_P_LEN] = {};
-        memcpy(a4096, a, MAX_Q_LEN * sizeof(a[0]));
         memcpy(bc4096, resultBC, 512UL);
 
         uint64_t result[MAX_P_LEN] = {};
-        uint64_t carry = Hacl_Bignum4096_add(a4096, bc4096, result);
+        uint64_t carry = Hacl_Bignum4096_add(a->toP()->get(), bc4096, result);
 
         // TODO: % Q
         return new ElementModQ(result, true);

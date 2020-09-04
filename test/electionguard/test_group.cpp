@@ -116,6 +116,40 @@ TEST_CASE("pow_mod_p 2 ^ 3 = 8 and 3 ^ 2 = 9")
     // Log::debug(" : result9 = " + result9->toHex());
 }
 
+TEST_CASE("Test Q is converted correctly")
+{
+    string expectedQHex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff43");
+
+    auto qFromHex = hex_to_q(expectedQHex);
+    // Log::debug(qFromHex->get(), 64UL, " : qFromHex = ");
+    auto q = new ElementModQ(const_cast<uint64_t *>(Q_ARRAY), true);
+    // Log::debug(" : q->toHex() = " + q->toHex());
+    CHECK(q->toHex() == expectedQHex);
+}
+
+TEST_CASE("Test P is converted correctly")
+{
+    string expectedPHex(
+      "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff93c467e37db0c7a4d1be3f810152"
+      "cb56a1cecc3af65cc0190c03df34709affbd8e4b59fa03a9f0eed0649ccb621057d11056ae9132135a08e43b4673"
+      "d74bafea58deb878cc86d733dbe7bf38154b36cf8a96d1567899aaae0c09d4c8b6b7b86fd2a1ea1de62ff8643ec7"
+      "c271827977225e6ac2f0bd61c746961542a3ce3bea5db54fe70e63e6d09f8fc28658e80567a47cfde60ee741e5d8"
+      "5a7bd46931ced8220365594964b839896fcaabccc9b31959c083f22ad3ee591c32fab2c7448f2a057db2db49ee52"
+      "e0182741e53865f004cc8e704b7c5c40bf304c4d8c4f13edf6047c555302d2238d8ce11df2424f1b66c2c5d238d0"
+      "744db679af2890487031f9c0aea1c4bb6fe9554ee528fdf1b05e5b256223b2f09215f3719f9c7ccc69ddf172d0d6"
+      "234217fcc0037f18b93ef5389130b7a661e5c26e54214068bbcafea32a67818bd3075ad1f5c7e9cc3d1737fb2817"
+      "1baf84dbb6612b7881c1a48e439cd03a92bf52225a2b38e6542e9f722bce15a381b5753ea842763381ccae83512b"
+      "30511b32e5e8d80362149ad030aaba5f3a5798bb22aa7ec1b6d0f17903f4e234ea6034aa85973f79a93ffb82a75c"
+      "47c03d43d2f9ca02d03199baceddd45334dbc6b5ffffffffffffffffffffffffffffffffffffffffffffffffffff"
+      "ffffffffffff");
+
+    auto pFromHex = hex_to_p(expectedPHex);
+    // Log::debug(pFromHex->get(), 64UL, " : pFromHex = ");
+    auto p = new ElementModP(const_cast<uint64_t *>(P_ARRAY), true);
+    // Log::debug(" : p->toHex() = " + p->toHex());
+    CHECK(p->toHex() == expectedPHex);
+}
+
 TEST_CASE("Test G is converted correctly")
 {
     string expectedGHex(
@@ -158,6 +192,7 @@ TEST_CASE("Test g_pow_p with 0, 1, and 2")
       "f7d408d3a2572c889a7d25957bd7d206041452b60f513b24604cd8336c351d6b7a70bd39bedbad0b910d329230f4"
       "a3228df1398cbe7ee7eef49cb22c94be32ed6c3f51b4f2c43a40bc5c217106cd7a0550ba12bb3d84643f90976ecf"
       "ef79614f2c46");
+    auto *gPowPFromHex = hex_to_p(expectedGPow2Hex);
 
     auto result0 = g_pow_p(zero);
     auto result1 = g_pow_p(one);
@@ -169,9 +204,9 @@ TEST_CASE("Test g_pow_p with 0, 1, and 2")
     // Log::debug(" : result1->toHex() = " + result1->toHex());
     CHECK((*result1 == *g));
 
-    // TODO: mod P is not working
     // Log::debug(" : result2->toHex() = " + result2->toHex());
-    // CHECK(result2->toHex() == expectedGPow2Hex);
+    // Log::debug(" : gPowPFromHex->toHex() = " + gPowPFromHex->toHex());
+    CHECK((*result2 == *gPowPFromHex));
 }
 
 TEST_CASE("a_minus_b_mod_q 2 - 1 is 1 and 1 - 1 is 0")
