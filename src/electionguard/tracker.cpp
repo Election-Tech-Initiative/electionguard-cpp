@@ -1,6 +1,6 @@
 #include "electionguard/tracker.hpp"
 
-#include "hash.hpp"
+#include "electionguard/hash.hpp"
 #include "words.hpp"
 
 #include <algorithm>
