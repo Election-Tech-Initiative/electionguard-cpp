@@ -10,7 +10,6 @@ enum MAX_IDENIFIER_LENGTH { MAX_IDENIFIER_LENGTH = 256 };
 const uint8_t MAX_P_LEN = 64;
 const uint8_t MAX_Q_LEN = 4;
 
-// TODO: is this the correct max P value? It's not matching python's max p's hex output.. need to fix later
 // Max P value in Hacl_Bignum4096 format
 const uint64_t P_ARRAY[MAX_P_LEN] = {
   0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff,
