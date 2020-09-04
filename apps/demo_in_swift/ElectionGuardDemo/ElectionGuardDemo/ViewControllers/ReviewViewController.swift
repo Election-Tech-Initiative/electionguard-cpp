@@ -130,6 +130,8 @@ class ReviewViewController: UIViewController {
         
         verification.code = code
         verification.contestId = contestId
-        self.navigationController?.pushViewController(verification, animated: true)
+
+        // Do not animate this page transition - Prevents the selection on this page from possibly (partially) being seen at the same time as the verification code on the next screen as the page is animating in.
+        self.navigationController?.pushViewController(verification, animated: false)
     }
 }
