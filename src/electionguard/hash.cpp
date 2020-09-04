@@ -1,4 +1,4 @@
-#include "hash.hpp"
+#include "electionguard/hash.hpp"
 
 #include "../kremlin/Hacl_Bignum256.h"
 #include "../kremlin/Hacl_Streaming_SHA2.h"

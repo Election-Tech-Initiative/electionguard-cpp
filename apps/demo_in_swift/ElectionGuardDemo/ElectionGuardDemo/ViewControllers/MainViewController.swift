@@ -74,7 +74,7 @@ class MainViewController: UIViewController {
         return button
     }()
     
-    private var activeContest: Contest?
+    private var activeContest: ContestDescription?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -147,7 +147,7 @@ class MainViewController: UIViewController {
         contestNameLabel.text = activeContest?.name
         
         let votes = EGDataService.shared.votes
-        let canVote = !votes.contains(where: { $0.key == activeContest?.id && $0.value == true })
+        let canVote = !votes.contains(where: { $0.key == activeContest?.objectId && $0.value == true })
         
         // Adjust controls based on ability to vote for active contest
         beginButton.isHidden = !canVote
@@ -164,7 +164,7 @@ class MainViewController: UIViewController {
         
         let contest = ContestViewController()
         
-        contest.contestId = activeContest.id
+        contest.contestId = activeContest.objectId
         navigationController?.pushViewController(contest, animated: true)
     }
 }

@@ -24,4 +24,24 @@ struct CiphertextElectionContext: Codable {
         case cryptoBaseHash = "crypto_base_hash"
         case cryptoExtendedBaseHash = "crypto_extended_base_hash"
     }
+    
+    func elgamalPublicKeyAsElementModP() -> ElementModP {
+        // TODO: Implement
+        return ElementModP([UInt64](repeating: 0, count: ElementModP.MAX_SIZE))
+    }
+    
+    func descriptionHashAsElementModQ() -> ElementModQ {
+        // TODO: Implement
+        return ElementModQ([UInt64](repeating: 0, count: ElementModQ.MAX_SIZE))
+    }
+    
+    func cryptoBaseHashElementModQ() -> ElementModQ {
+        // TODO: Implement
+        return ElementModQ([UInt64](repeating: 0, count: ElementModQ.MAX_SIZE))
+    }
+    
+    func cryptoExtendedBaseHashAsElementModQ() -> ElementModQ {
+        // TODO: Implement
+        return ElementModQ([UInt64](repeating: 0, count: ElementModQ.MAX_SIZE))
+    }
 }

@@ -7,14 +7,33 @@ protocol CryptoHash {
     func cryptoHash() -> ElementModQ
 }
 
+struct CiphertextBallot: ElectionObjectBase {
+    var objectId: String
+    let ballotStyle: String
+    let descriptionHash: ElementModQ
+    let previousTrackingHash: ElementModQ
+    let contests: [CiphertextBallotContest]
+    let trackingHash: ElementModQ?
+    let timestamp: Int
+    let cryptoHash: ElementModQ
+    let nonce: ElementModQ?
+}
+
+struct PlaintextBallot: ElectionObjectBase {
+    var objectId: String
+    let ballotStyle: String
+    let contests: [PlaintextBallotContest]
+}
+
 struct CiphertextBallotSelection: ElectionObjectBase {
     var objectId: String
 
     let descriptionHash: ElementModQ
-    let ciphertext: ElgamalCiphetext
+    let ciphertext: ElgamalCiphertext
     let cryptoHash: ElementModQ
     let isPlaceholderSelection: Bool
     let nonce: ElementModQ
+    let proof: DisjunctiveChaumPedersenProof?
 }
 
 struct PlaintextBallotSelection: ElectionObjectBase {
@@ -22,10 +41,47 @@ struct PlaintextBallotSelection: ElectionObjectBase {
     let vote: UInt8
 }
 
-struct SelectionDescription: ElectionObjectBase {
+struct CiphertextBallotContest: ElectionObjectBase {
     var objectId: String
-    let candidateId: String
-    let sequenceOrder: UInt64
+    let descriptionHash: ElementModQ
+    let ballotSelections: [CiphertextBallotSelection]
+    let cryptoHash: ElementModQ
+    let nonce: ElementModQ?
+    let proof: ConstantChaumPedersenProof?
+}
+
+struct PlaintextBallotContest: ElectionObjectBase {
+    var objectId: String
+    let ballotSelections: [PlaintextBallotSelection]
+}
+
+struct ConstantChaumPedersenProof {
+    let pad: ElementModP
+    let data: ElementModP
+    let challenge: ElementModQ
+    let response: ElementModQ
+    let constant: Int
+    let usage: ProofUsage = .selectionLimit
+}
+
+struct DisjunctiveChaumPedersenProof {
+    let proofZeroPad: ElementModP
+    let proofZeroData: ElementModP
+    let proofOnePad: ElementModP
+    let proofOneData: ElementModP
+    let proofZeroChallenge: ElementModQ
+    let proofOneChallenge: ElementModQ
+    let challenge: ElementModQ
+    let proofZeroResponse: ElementModQ
+    let proofOneResponse: ElementModQ
+    let usage: ProofUsage = .selectionValue
+}
+
+enum ProofUsage: String {
+    case unknown = "Unknown"
+    case secretValue = "Prove knowledge of secret value"
+    case selectionLimit = "Prove value within selection's limit"
+    case selectionValue = "Prove selection's value (0 or 1)"
 }
 
 struct ElementModP {
@@ -52,7 +108,7 @@ struct ElementModQ {
     }
 }
 
-struct ElgamalCiphetext: CryptoHash {
+struct ElgamalCiphertext: CryptoHash {
     var pad: ElementModP
     var data: ElementModP
     
@@ -75,7 +131,10 @@ class ElectionGuard {
     {
         let candidateId = "some-candidate-id"
         let plaintext = PlaintextBallotSelection(objectId: candidateId, vote: 1)
-        let description = SelectionDescription(objectId: "some-selection-id", candidateId: candidateId, sequenceOrder: 5)
+        let description = SelectionDescription()
+        description.objectId = "some-selection-id"
+        description.candidateId = candidateId
+        description.sequenceOrder = 5
         let publicKey = ElementModP([UInt64](repeating: 255, count: ElementModP.MAX_SIZE))
         let extendedHash = ElementModQ([UInt64](repeating: 162, count: ElementModQ.MAX_SIZE))
         let nonceSeed = getSecureRandomElementModQ() // just a stubbed method to simulate a secure value for now
@@ -140,6 +199,7 @@ class ElectionGuard {
         let public_key_ = setElementModP(elgamalPublicKey)
         let extended_base_hash_ = setElementModQ(extendedBaseHash)
         let nonce_seed_ = setElementModQ(nonceSeed)
+        let proof: DisjunctiveChaumPedersenProof? = nil
 
         let ciphertext_ = eg_encrypt_selection(plaintext_, description_, public_key_, extended_base_hash_, nonce_seed_, isPlaceholder, shouldVerifyProofs)
         
@@ -150,20 +210,150 @@ class ElectionGuard {
         let elgamal = getElgamalCiphertext()
         
         return CiphertextBallotSelection(objectId: String(cString: ciphertext_object_id),
-            descriptionHash: dh, ciphertext: elgamal, cryptoHash: nonceSeed, isPlaceholderSelection: isPlaceholder, nonce: nonceSeed)
+                                         descriptionHash: dh, ciphertext: elgamal, cryptoHash: nonceSeed, isPlaceholderSelection: isPlaceholder, nonce: nonceSeed, proof: proof)
 
+    }
+    
+    static func encryptContest(
+            _ contest: PlaintextBallotContest, _ contestDescription: ContestDescriptionWithPlaceholders, _ elgamalPublicKey: ElementModP,
+            _ extendedBaseHash: ElementModQ, _ nonceSeed: ElementModQ, _ shouldVerifyProofs: Bool = true) -> CiphertextBallotContest? {
+
+        guard let ballotSelections = contestDescription.ballotSelections else {
+            return nil
+        }
+        
+        var encryptedSelections = [CiphertextBallotSelection]()
+        
+        for description in ballotSelections {
+            var hasSelection = false
+            var encryptedSelection: CiphertextBallotSelection?
+            
+            for selection in contest.ballotSelections {
+                if selection.objectId == description.objectId {
+                    hasSelection = true
+                    encryptedSelection = encryptSelection(selection, description, elgamalPublicKey, extendedBaseHash, nonceSeed, false, shouldVerifyProofs)
+                }
+            }
+
+            if !hasSelection {
+                encryptedSelection = encryptSelection(description.toPlaintextBallotSelection(), description, elgamalPublicKey, extendedBaseHash, nonceSeed, false, shouldVerifyProofs)
+            }
+            
+            guard encryptedSelection != nil else {
+                return nil
+            }
+            
+            encryptedSelections.append(encryptedSelection!)
+        }
+        
+        // TODO: Handle placeholder selections
+
+        let contestDescriptionHash = contestDescription.cryptoHash()!
+        let cryptoHash = createCiphertextBallotContextCryptoHash(objectId: contest.objectId, ballotSelections: encryptedSelections, seedHash: contestDescriptionHash)
+        let proof: ConstantChaumPedersenProof? = nil // TODO: Replace
+        
+        let encryptedContest = CiphertextBallotContest(objectId: contest.objectId, descriptionHash: contestDescriptionHash, ballotSelections: encryptedSelections, cryptoHash: cryptoHash, nonce: nonceSeed, proof: proof)
+        
+        if shouldVerifyProofs {
+            // TODO: Verify the proof
+        }
+        
+        return encryptedContest
+    }
+    
+    static func encryptBallot(_ ballot: PlaintextBallot, electionManifest: ElectionDescription, context: CiphertextElectionContext, seedHash: ElementModQ, nonce: ElementModQ?, shouldVerifyProofs: Bool = true) -> CiphertextBallot? {
+        let randomMasterNonce = nonce // TODO: Randomize
+        let nonceSeed = createCiphertextBallotNonceSeed(descriptionHash: context.descriptionHashAsElementModQ(), objectId: ballot.objectId, nonce: randomMasterNonce!)
+        
+        var encryptedContests = [CiphertextBallotContest]()
+        let contests = electionManifest.getContests(ballotStyleId: ballot.ballotStyle)
+        
+        for description in contests {
+            var useContest: PlaintextBallotContest? = nil
+            for contest in ballot.contests {
+                if contest.objectId == description.objectId {
+                    useContest = contest
+                    break
+                }
+            }
+            
+            if useContest == nil {
+                useContest = description.toPlaintextBallotContest()
+            }
+                        
+            guard let encryptedContest = encryptContest(useContest!, description as! ContestDescriptionWithPlaceholders, context.elgamalPublicKeyAsElementModP(), context.cryptoExtendedBaseHashAsElementModQ(), nonceSeed) else {
+                return nil
+            }
+            
+            encryptedContests.append(encryptedContest)
+        }
+        
+        let cryptoHash = createCiphertextBallotCryptoHash(objectId: ballot.objectId, descriptionHash: context.descriptionHashAsElementModQ(), contests: encryptedContests)
+        let timestamp = Int(Date().timeIntervalSince(Date.distantPast) * 10000000)
+        
+        let encryptedBallot = CiphertextBallot(objectId: ballot.objectId, ballotStyle: ballot.ballotStyle, descriptionHash: context.descriptionHashAsElementModQ(), previousTrackingHash: seedHash, contests: encryptedContests, trackingHash: nil, timestamp: timestamp, cryptoHash: cryptoHash, nonce: randomMasterNonce)
+        
+        if shouldVerifyProofs {
+            // TODO: Verify the proof
+        }
+        
+        return encryptedBallot
+    }
+    
+    static func hash(_ data: String) -> ElementModQ? {
+        guard let pointer = eg_hash_elems_string(data) else {
+            return nil
+        }
+        
+        return getElementModQ(pointer);
+    }
+    
+    static func hash(_ data: [String]) -> ElementModQ? {
+        // Convert swift [String] to c char **
+        var c_data = data.map { UnsafePointer<Int8>(strdup($0)) }
+        
+        guard let pointer = eg_hash_elems_strings(&c_data, Int32(data.count)) else {
+            return nil
+        }
+        
+        return getElementModQ(pointer);
+    }
+    
+    static func hash(_ data: UInt64) -> ElementModQ? {
+        guard let pointer = eg_hash_elems_int(data) else {
+            return nil
+        }
+        
+        return getElementModQ(pointer);
+    }
+    
+    static func createCiphertextBallotContextCryptoHash(objectId: String, ballotSelections: [CiphertextBallotSelection], seedHash: ElementModQ) -> ElementModQ {
+        // TODO: Implement
+        return ElementModQ([UInt64](repeating: 0, count: ElementModQ.MAX_SIZE))
+    }
+
+    static func createCiphertextBallotCryptoHash(objectId: String, descriptionHash: ElementModQ, contests: [CiphertextBallotContest]) -> ElementModQ {
+        // TODO: Implement (using hash of all incoming args)
+        return ElementModQ([UInt64](repeating: 0, count: ElementModQ.MAX_SIZE))
+    }
+    
+    static func createCiphertextBallotNonceSeed(descriptionHash: ElementModQ, objectId: String, nonce: ElementModQ) -> ElementModQ {
+        // TODO: Implement (using hash of all incoming args)
+        return ElementModQ([UInt64](repeating: 0, count: ElementModQ.MAX_SIZE))
     }
 
     static func setSelectionDescription(_ description: SelectionDescription) -> OpaquePointer? {
-        return eg_selection_description_new(description.objectId, description.candidateId, description.sequenceOrder)
+        return eg_selection_description_new(description.objectId, description.candidateId, description.sequenceOrder!)
     }
 
     static func getSelectionDescription(_ description: OpaquePointer) -> SelectionDescription? {
         guard let object_id = eg_selection_description_get_object_id(description) else { return nil }
         guard let candidate_id = eg_selection_description_get_candidate_id(description) else { return nil }
         let sequence_order = eg_selection_description_get_sequence_order(description)
-
-        let swift_type = SelectionDescription(objectId: String(cString: object_id), candidateId: String(cString: candidate_id), sequenceOrder: UInt64(sequence_order))
+        let swift_type = SelectionDescription()
+        swift_type.objectId = String(cString: object_id)
+        swift_type.candidateId = String(cString: candidate_id)
+        swift_type.sequenceOrder = UInt64(sequence_order)
         eg_selection_description_free(description)
         return swift_type
     }
@@ -229,11 +419,11 @@ class ElectionGuard {
         
     }
     
-    static func getElgamalCiphertext() -> ElgamalCiphetext {
+    static func getElgamalCiphertext() -> ElgamalCiphertext {
         let fake_pad = ElementModP([UInt64](repeating: 0, count: ElementModP.MAX_SIZE))
         let fake_data = ElementModP([UInt64](repeating: 0, count: ElementModP.MAX_SIZE))
         
-        return ElgamalCiphetext(pad: fake_pad, data: fake_data)
+        return ElgamalCiphertext(pad: fake_pad, data: fake_data)
     }
 
     static func getHashForDevice(_ uuid: UInt64, _ location: String) -> ElementModQ? {

@@ -10,7 +10,7 @@ import UIKit
 
 class SelectionCollectionViewCell: UICollectionViewCell {
     
-    var selection: BallotSelection? {
+    var selection: SelectionDescription? {
         didSet {
             setName()
         }

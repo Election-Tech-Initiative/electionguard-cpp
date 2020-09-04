@@ -1,6 +1,6 @@
 #include "nonces.hpp"
 
-#include "hash.hpp"
+#include "electionguard/hash.hpp"
 #include "variant_cast.hpp"
 
 namespace electionguard

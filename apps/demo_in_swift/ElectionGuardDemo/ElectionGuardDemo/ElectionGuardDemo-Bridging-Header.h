@@ -9,4 +9,5 @@
 #import "encrypt.h"
 #import "export.h"
 #import "group.h"
+#import "hash.h"
 #import "tracker.h"
