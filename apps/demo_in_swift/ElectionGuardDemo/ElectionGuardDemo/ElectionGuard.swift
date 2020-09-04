@@ -7,6 +7,24 @@ protocol CryptoHash {
     func cryptoHash() -> ElementModQ
 }
 
+struct CiphertextBallot: ElectionObjectBase {
+    var objectId: String
+    let ballotStyle: String
+    let descriptionHash: ElementModQ
+    let previousTrackingHash: ElementModQ
+    let contests: [CiphertextBallotContest]
+    let trackingHash: ElementModQ?
+    let timestamp: Int
+    let cryptoHash: ElementModQ
+    let nonce: ElementModQ?
+}
+
+struct PlaintextBallot: ElectionObjectBase {
+    var objectId: String
+    let ballotStyle: String
+    let contests: [PlaintextBallotContest]
+}
+
 struct CiphertextBallotSelection: ElectionObjectBase {
     var objectId: String
 
@@ -243,6 +261,45 @@ class ElectionGuard {
         return encryptedContest
     }
     
+    static func encryptBallot(_ ballot: PlaintextBallot, electionManifest: ElectionDescription, context: CiphertextElectionContext, seedHash: ElementModQ, nonce: ElementModQ?, shouldVerifyProofs: Bool = true) -> CiphertextBallot? {
+        let randomMasterNonce = nonce // TODO: Randomize
+        let nonceSeed = createCiphertextBallotNonceSeed(descriptionHash: context.descriptionHashAsElementModQ(), objectId: ballot.objectId, nonce: randomMasterNonce!)
+        
+        var encryptedContests = [CiphertextBallotContest]()
+        let contests = electionManifest.getContests(ballotStyleId: ballot.ballotStyle)
+        
+        for description in contests {
+            var useContest: PlaintextBallotContest? = nil
+            for contest in ballot.contests {
+                if contest.objectId == description.objectId {
+                    useContest = contest
+                    break
+                }
+            }
+            
+            if useContest == nil {
+                useContest = description.toPlaintextBallotContest()
+            }
+                        
+            guard let encryptedContest = encryptContest(useContest!, description as! ContestDescriptionWithPlaceholders, context.elgamalPublicKeyAsElementModP(), context.cryptoExtendedBaseHashAsElementModQ(), nonceSeed) else {
+                return nil
+            }
+            
+            encryptedContests.append(encryptedContest)
+        }
+        
+        let cryptoHash = createCiphertextBallotCryptoHash(objectId: ballot.objectId, descriptionHash: context.descriptionHashAsElementModQ(), contests: encryptedContests)
+        let timestamp = Int(Date().timeIntervalSince(Date.distantPast) * 10000000)
+        
+        let encryptedBallot = CiphertextBallot(objectId: ballot.objectId, ballotStyle: ballot.ballotStyle, descriptionHash: context.descriptionHashAsElementModQ(), previousTrackingHash: seedHash, contests: encryptedContests, trackingHash: nil, timestamp: timestamp, cryptoHash: cryptoHash, nonce: randomMasterNonce)
+        
+        if shouldVerifyProofs {
+            // TODO: Verify the proof
+        }
+        
+        return encryptedBallot
+    }
+    
     static func hash(_ data: String) -> ElementModQ? {
         guard let pointer = eg_hash_elems_string(data) else {
             return nil
@@ -272,6 +329,16 @@ class ElectionGuard {
     
     static func createCiphertextBallotContextCryptoHash(objectId: String, ballotSelections: [CiphertextBallotSelection], seedHash: ElementModQ) -> ElementModQ {
         // TODO: Implement
+        return ElementModQ([UInt64](repeating: 0, count: ElementModQ.MAX_SIZE))
+    }
+
+    static func createCiphertextBallotCryptoHash(objectId: String, descriptionHash: ElementModQ, contests: [CiphertextBallotContest]) -> ElementModQ {
+        // TODO: Implement (using hash of all incoming args)
+        return ElementModQ([UInt64](repeating: 0, count: ElementModQ.MAX_SIZE))
+    }
+    
+    static func createCiphertextBallotNonceSeed(descriptionHash: ElementModQ, objectId: String, nonce: ElementModQ) -> ElementModQ {
+        // TODO: Implement (using hash of all incoming args)
         return ElementModQ([UInt64](repeating: 0, count: ElementModQ.MAX_SIZE))
     }
 

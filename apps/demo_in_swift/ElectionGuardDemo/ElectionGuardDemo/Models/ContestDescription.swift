@@ -95,6 +95,12 @@ extension SelectionDescription {
 }
 
 extension ContestDescription {
+    func toPlaintextBallotContest() -> PlaintextBallotContest {
+        return PlaintextBallotContest(
+            objectId: self.objectId!,
+            ballotSelections: self.ballotSelections?.map { $0.toPlaintextBallotSelection() } ?? [PlaintextBallotSelection]())
+    }
+    
     func cryptoHash() -> ElementModQ? {
         
         var toHash = "|"

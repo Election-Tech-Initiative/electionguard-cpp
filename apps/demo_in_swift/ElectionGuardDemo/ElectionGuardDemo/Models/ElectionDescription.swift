@@ -34,6 +34,20 @@ struct ElectionDescription: Codable {
         case contests
         case ballotStyles = "ballot_styles"
     }
+    
+    func getContests(ballotStyleId: String) -> [ContestDescription] {
+        let style = getBallotStyle(objectId: ballotStyleId)
+        
+        guard let gpUnitIds = style?.geopoliticalUnitIds, !gpUnitIds.isEmpty else {
+            return [ContestDescription]()
+        }
+        
+        return contests?.filter { c in return gpUnitIds.contains(c.electoralDistrictId ?? "") } ?? [ContestDescription]()
+    }
+    
+    func getBallotStyle(objectId: String) -> BallotStyle? {
+        return ballotStyles?.first(where: { $0.objectId == objectId })
+    }
 }
 
 enum ElectionType: String, Codable {
