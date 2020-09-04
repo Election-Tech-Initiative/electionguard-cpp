@@ -1,6 +1,6 @@
 #include "electionguard/election.hpp"
 
-#include "hash.hpp"
+#include "electionguard/hash.hpp"
 #include "log.hpp"
 
 #include <cstring>

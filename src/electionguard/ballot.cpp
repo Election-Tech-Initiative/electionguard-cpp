@@ -1,6 +1,6 @@
 #include "electionguard/ballot.hpp"
 
-#include "hash.hpp"
+#include "electionguard/hash.hpp"
 
 #include <cstdlib>
 #include <cstring>

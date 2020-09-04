@@ -10,7 +10,7 @@ import UIKit
 
 class ReviewViewController: UIViewController {
     
-    var selection: BallotSelection?
+    var selection: SelectionDescription?
     var contestId: String?
     
     let instructionsLabel: UILabel = {

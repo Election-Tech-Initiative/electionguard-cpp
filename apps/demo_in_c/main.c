@@ -2,6 +2,7 @@
 #include <electionguard/ballot.h>
 #include <electionguard/election.h>
 #include <electionguard/encrypt.h>
+#include <electionguard/hash.h>
 #include <electionguard/tracker.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -68,6 +69,35 @@ bool test_encrypt_selection()
     assert(size == 4);
     // the current test just arbitrarily assigns the vote to the hash
     assert(description_hash_data[0] == 1);
+
+    // test crypto hashing
+    eg_element_mod_q_t *string_hash = eg_hash_elems_string("test");
+    uint64_t *string_hash_data;
+    size = eg_element_mod_q_get(string_hash, &string_hash_data);
+
+    assert(string_hash != NULL);
+    assert(string_hash != 0);
+    assert(size == 4);
+    assert(string_hash_data[0] > 0);
+
+    const char *strings[] = {"test", "strings"};
+    eg_element_mod_q_t *strings_hash = eg_hash_elems_strings(strings, 2);
+    uint64_t *strings_hash_data;
+    size = eg_element_mod_q_get(strings_hash, &strings_hash_data);
+
+    assert(strings_hash != NULL);
+    assert(strings_hash != 0);
+    assert(size == 4);
+    assert(strings_hash_data[0] > 0);
+
+    eg_element_mod_q_t *int_hash = eg_hash_elems_int(1234);
+    uint64_t *int_hash_data;
+    size = eg_element_mod_q_get(int_hash, &int_hash_data);
+
+    assert(int_hash != NULL);
+    assert(int_hash != 0);
+    assert(size == 4);
+    assert(int_hash_data[0] > 0);
 
     eg_encryption_mediator_free(encrypter);
     eg_plaintext_ballot_selection_free(plaintext);

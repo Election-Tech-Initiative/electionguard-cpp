@@ -7,17 +7,17 @@
 //
 
 struct Party: Codable {
-    let id: String?
+    let objectId: String?
     let abbreviation: String?
     let color: String?
     let logoUri: String?
-    let name: Name?
+    let ballotName: InternationalizedText?
     
     enum CodingKeys: String, CodingKey {
-        case id = "object_id"
+        case objectId = "object_id"
         case abbreviation
         case color
         case logoUri = "logo_uri"
-        case name
+        case ballotName = "name"
     }
 }

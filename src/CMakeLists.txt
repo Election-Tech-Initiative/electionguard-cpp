@@ -15,7 +15,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/group.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/group_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/hash.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/hash_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/log.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp
@@ -58,6 +58,8 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/include/electionguard/group.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/group.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/tracker.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/hash.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/hash.h
 )
 
 add_library(${META_PROJECT_TARGET} ${PROJECT_SOURCE_FILES})
