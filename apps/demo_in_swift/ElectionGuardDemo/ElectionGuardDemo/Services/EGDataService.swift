@@ -34,7 +34,7 @@ class EGDataService {
     
     func getCandidateName(forId id: String) -> InternationalizedText? {
         let manifest = getElectionManifest()
-        let candidate = manifest?.candidates?.first(where: { $0.id == id })
+        let candidate = manifest?.candidates?.first(where: { $0.objectId == id })
         
         return candidate?.ballotName
     }

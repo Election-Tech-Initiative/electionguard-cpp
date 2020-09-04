@@ -7,13 +7,13 @@
 //
 
 struct GeopoliticalUnit: Codable {
-    let id: String?
+    let objectId: String?
     let name: String?
     let type: ReportingUnitType?
     let contactInfo: ContactInformation?
     
     enum CodingKeys: String, CodingKey {
-        case id = "object_id"
+        case objectId = "object_id"
         case name
         case type
         case contactInfo = "contact_information"
