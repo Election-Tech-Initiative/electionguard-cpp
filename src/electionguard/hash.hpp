@@ -3,7 +3,6 @@
 #include <electionguard/crypto_hashable.hpp>
 #include <electionguard/export.h>
 #include <electionguard/group.hpp>
-#include <initializer_list>
 #include <string>
 #include <variant>
 #include <vector>
@@ -15,7 +14,7 @@ namespace electionguard
               vector<CryptoHashable *>, vector<ElementModP *>, vector<ElementModQ *>,
               vector<uint64_t>, vector<string>>;
 
-    // TODO: Fold Expressions for Variadic Templates  (iterating with initializer_lists for now)
+    // TODO: Fold Expressions for Variadic Templates  (iterating with vectors for now)
     // template <typename... Args> ElementModQ *hash_elems(CryptoHashableType a, Args... args);
     EG_INTERNAL_API ElementModQ *hash_elems(vector<CryptoHashableType> a);
     EG_INTERNAL_API ElementModQ *hash_elems(CryptoHashableType a);

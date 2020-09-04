@@ -3,9 +3,9 @@
 #include "hash.hpp"
 #include "log.hpp"
 
-#include <cstdlib>
 #include <cstring>
-using std::string;
+
+using namespace std;
 
 namespace electionguard
 {

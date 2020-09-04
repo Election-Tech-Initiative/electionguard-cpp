@@ -12,6 +12,11 @@ eg_element_mod_p_t *eg_element_mod_p_new(uint64_t *elem)
     return AS_TYPE(eg_element_mod_p_t, new electionguard::ElementModP(elem));
 }
 
+eg_element_mod_p_t *eg_element_mod_p_new_unchecked(uint64_t *elem)
+{
+    return AS_TYPE(eg_element_mod_p_t, new electionguard::ElementModP(elem, true));
+}
+
 void eg_element_mod_p_free(eg_element_mod_p_t *element)
 {
     if (element == nullptr) {
@@ -30,6 +35,11 @@ uint8_t eg_element_mod_p_get(eg_element_mod_p_t *element, uint64_t **data)
 eg_element_mod_q_t *eg_element_mod_q_new(uint64_t *elem)
 {
     return AS_TYPE(eg_element_mod_q_t, new electionguard::ElementModQ(elem));
+}
+
+eg_element_mod_q_t *eg_element_mod_q_new_unchecked(uint64_t *elem)
+{
+    return AS_TYPE(eg_element_mod_q_t, new electionguard::ElementModQ(elem, true));
 }
 
 void eg_element_mod_q_free(eg_element_mod_q_t *element)
