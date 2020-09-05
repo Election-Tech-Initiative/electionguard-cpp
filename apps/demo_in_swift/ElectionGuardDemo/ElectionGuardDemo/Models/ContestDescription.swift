@@ -58,20 +58,20 @@ enum ContestType: String, Codable {
     case referendum = "ReferendumContest"
 }
 
-enum VoteVariationType: String, Codable {
-    case unknown
-    case one_of_m
-    case approval
-    case borda
-    case cumulative
-    case majority
-    case n_of_m
-    case plurality
-    case proportional
-    case range
-    case rcv
-    case super_majority
-    case other
+enum VoteVariationType: Int, Codable {
+    case unknown = 0
+    case one_of_m = 1
+    case approval = 2
+    case borda = 3
+    case cumulative = 4
+    case majority = 5
+    case n_of_m = 6
+    case plurality = 7
+    case proportional = 8
+    case range = 9
+    case rcv = 10
+    case super_majority = 11
+    case other = 12
 }
 
 
@@ -111,7 +111,7 @@ extension ContestDescription {
         toHash += "|"
         toHash += self.electoralDistrictId ?? "null"
         toHash += "|"
-        toHash += self.voteVariation?.rawValue ?? "null" // TODO: Confirm this is correct
+        toHash += self.voteVariation != nil ? String(self.voteVariation!.rawValue) : "null" // TODO: Confirm this is correct
         toHash += "|"
         
         if let titleLanguages = self.ballotTitle?.text {

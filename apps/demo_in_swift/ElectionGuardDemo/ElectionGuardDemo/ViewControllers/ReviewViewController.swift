@@ -87,7 +87,7 @@ class ReviewViewController: UIViewController {
     private func loadCandidate() {
         guard
             let candidateId = selection?.candidateId,
-            let candidateName = EGDataService.shared.getCandidateName(forId: candidateId)?.text?.first(where: { $0.language == "en" })?.value
+            let candidateName = EGDataService.shared.getCandidateName(objectId: candidateId)?.text?.first(where: { $0.language == "en" })?.value
         else {
             showDialog(title: "Selection Not Found", body: "There was a problem with your selection. Please go back and try again.", okText: "OK")
             return

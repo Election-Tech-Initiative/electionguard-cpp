@@ -131,11 +131,18 @@ class MainViewController: UIViewController {
     }
     
     private func loadData() {
-        let election = EGDataService.shared.getElectionManifest()
-        
-        electionNameLabel.text = election?.name?.text?.first?.value
-        activeContest = election?.contests?.first
-
+        ProgressHUD.show("Downloading Election Manifest...", interaction: false)
+        EGDataService.shared.downloadElectionManifest(loadSampleElectionOnFailure: true) { election in
+            ProgressHUD.dismiss()
+            DispatchQueue.main.async {
+                self.electionNameLabel.text = election?.name?.text?.first?.value
+                self.activeContest = election?.contests?.first
+                self.setupForActiveContest()
+            }
+        }
+    }
+    
+    func setupForActiveContest() {
         guard activeContest != nil else {
             contestNameLabel.text = "There is currently not an active contest available"
             beginButton.isHidden = true
