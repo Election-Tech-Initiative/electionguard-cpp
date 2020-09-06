@@ -10,16 +10,10 @@ import UIKit
 
 class VerificationViewController: UIViewController {
     
+    var contestId: String?
     var code: String? {
         didSet {
             codeLabel.text = self.code
-        }
-    }
-    
-    var isSpoiled: Bool? {
-        didSet {
-            revoteButton.isHidden = self.isSpoiled != true
-            messageLabel.text = self.isSpoiled == true ? "Your vote has been spoiled." : "Your vote has been counted!"
         }
     }
     
@@ -66,21 +60,21 @@ class VerificationViewController: UIViewController {
         return button
     }()
 
-    let revoteButton: EGButton = {
+    let castButton: EGButton = {
         let button = EGButton()
         
-        button.setTitle("Re Vote", for: .normal)
-        button.addTarget(self, action: #selector(revote), for: .touchUpInside)
+        button.setTitle("Cast", for: .normal)
+        button.addTarget(self, action: #selector(cast), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         
         return button
     }()
     
-    let closeButton: EGButton = {
-        let button = EGButton()
+    let spoilButton: UIButton = {
+        let button = UIButton(type: .system)
         
-        button.setTitle("Close", for: .normal)
-        button.addTarget(self, action: #selector(close), for: .touchUpInside)
+        button.setTitle("Test", for: .normal)
+        button.addTarget(self, action: #selector(spoil), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         
         return button
@@ -103,8 +97,8 @@ class VerificationViewController: UIViewController {
             instructionsLabel,
             codeLabel,
             copyButton,
-            revoteButton,
-            closeButton
+            castButton,
+            spoilButton
         ])
         
         let constraints = [
@@ -123,15 +117,15 @@ class VerificationViewController: UIViewController {
             copyButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             copyButton.topAnchor.constraint(equalTo: codeLabel.bottomAnchor, constant: 12),
 
-            revoteButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            revoteButton.widthAnchor.constraint(equalToConstant: 300),
-            revoteButton.heightAnchor.constraint(equalToConstant: 60),
-            revoteButton.bottomAnchor.constraint(equalTo: closeButton.topAnchor, constant: -12),
+            castButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            castButton.widthAnchor.constraint(equalToConstant: 300),
+            castButton.heightAnchor.constraint(equalToConstant: 60),
+            castButton.bottomAnchor.constraint(equalTo: spoilButton.topAnchor, constant: -12),
             
-            closeButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            closeButton.widthAnchor.constraint(equalToConstant: 300),
-            closeButton.heightAnchor.constraint(equalToConstant: 60),
-            closeButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12),
+            spoilButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            spoilButton.widthAnchor.constraint(equalToConstant: 300),
+            spoilButton.heightAnchor.constraint(equalToConstant: 60),
+            spoilButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12),
         ]
         
         NSLayoutConstraint.activate(constraints)
@@ -142,20 +136,26 @@ class VerificationViewController: UIViewController {
         ProgressHUD.showSucceed("Copied to clipboard", interaction: false)
     }
 
-    @objc private func revote() {
-        guard isSpoiled == true else {
-            return
-        }
-        
-        guard let contest = navigationController?.viewControllers.first(where: { $0 is ContestViewController }) else {
-            navigationController?.popToRootViewController(animated: true)
-            return
-        }
-        
-        navigationController?.popToViewController(contest, animated: true)
+    @objc private func cast() {
+        ProgressHUD.show("Casting ballot...", interaction: false)
+        EGDataService.shared.castBallot(contestId: contestId!, completion: {
+            ProgressHUD.dismiss()
+            self.showFinished()
+        })
     }
     
-    @objc private func close() {
-        navigationController?.popToRootViewController(animated: true)
+    @objc private func spoil() {
+        ProgressHUD.show("Spoiling ballot...", interaction: false)
+        EGDataService.shared.spoilBallot(contestId: contestId!, completion: {
+            ProgressHUD.dismiss()
+            self.showFinished(isSpoiled: true)
+        })
+    }
+    
+    private func showFinished(isSpoiled: Bool = false) {
+        let finished = FinishedViewController()
+        
+        finished.isSpoiled = isSpoiled
+        self.navigationController?.pushViewController(finished, animated: true)
     }
 }
