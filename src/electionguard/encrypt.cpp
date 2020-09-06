@@ -43,9 +43,8 @@ namespace electionguard
 
         // Generate the encryption
         auto *ciphertext = elgamalEncrypt(plaintext, selectionNonce, elgamalPublicKey);
-
         if (ciphertext == nullptr) {
-            Log::debug("encryptSelection:: Error encrypting selection");
+            Log::debug("encryptSelection:: Error generating ciphertext");
             return nullptr;
         }
 
@@ -57,6 +56,7 @@ namespace electionguard
 
         // TODO: cleanup
         if (encryptedSelection == nullptr || encryptedSelection->getProof() == nullptr) {
+            Log::debug("encryptSelection:: Error constructing encrypted selection");
             return nullptr;
         }
 

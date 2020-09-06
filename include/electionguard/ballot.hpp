@@ -123,7 +123,7 @@ namespace electionguard
         /// the other fields.
         ///</summary>
         static CiphertextBallotSelection *
-        make(const string object_id, ElementModQ *descriptionHash, ElGamalCiphertext *ciphertext,
+        make(const string objectId, ElementModQ *descriptionHash, ElGamalCiphertext *ciphertext,
              ElementModP *elgamalPublicKey, ElementModQ *cryptoExtendedBaseHash,
              ElementModQ *proofSeed, uint64_t plaintext, bool isPlaceholder = false,
              ElementModQ *nonce = nullptr, ElementModQ *cryptoHash = nullptr,

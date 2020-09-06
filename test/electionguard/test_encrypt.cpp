@@ -3,53 +3,48 @@
 #include <electionguard/election.hpp>
 #include <electionguard/encrypt.hpp>
 
-TEST_CASE("Encrypt")
+using namespace electionguard;
+TEST_CASE("Encrypt Ballot with stateful mediator succeeds")
 {
-    using namespace electionguard;
-
     // insantiate the stateful mediator
     auto *cpp_encrypter = new EncryptionMediator();
     CHECK(cpp_encrypter->encrypt() == 9);
 
-    const auto *candidate_id = "some-candidate-id";
+    delete cpp_encrypter;
+}
 
-    // instantiate a selection description
-    auto description = new SelectionDescription("some-description-object_id", candidate_id, 1UL);
+TEST_CASE("Encrypt Selection with generic data succeeds")
+{
+    // Arrange
+    const auto *candidate_id = "some-candidate-id";
+    auto *metadata = new SelectionDescription("some-description-object_id", candidate_id, 1UL);
+    auto *hashContext = metadata->crypto_hash();
 
     // instantiate a fake public key, hash, and nonce
     uint64_t pub[64] = {10};
-    auto *public_key = new ElementModP(pub);
+    auto *publicKey = new ElementModP(pub);
 
     uint64_t hash[4] = {9};
-    auto *extended_base_hash = new ElementModQ(hash);
+    auto *extendedBaseHash = new ElementModQ(hash);
 
     uint64_t seed[4] = {4};
     auto *nonce_seed = new ElementModQ(seed);
 
-    // instantiate a fake selection on a ballot
     auto *plaintext = new PlaintextBallotSelection(candidate_id, "1");
 
-    // execute the encryption
-    auto *ciphertext = encrypt_selection(plaintext, description, public_key, extended_base_hash,
-                                         nonce_seed, false, true);
-    CHECK(ciphertext != nullptr);
+    // Act
+    auto *result =
+      encrypt_selection(plaintext, metadata, publicKey, extendedBaseHash, nonce_seed, false, true);
 
-    // check the object id by accessing the property getter
-    auto plaintext_object_id = plaintext->getObjectId();
-    auto ciphertext_object_id = ciphertext->getObjectId();
-    CHECK(string(plaintext_object_id) == string(ciphertext_object_id));
+    // Assert
+    CHECK(result != nullptr);
+    CHECK(result->getCiphertext() != nullptr);
+    CHECK(result->isValidEncryption(hashContext, publicKey, extendedBaseHash) == true);
 
-    // get out one of the ElementModQ hashes
-    auto *description_hash = ciphertext->getDescriptionHash()->get();
-
-    // the current test just arbitrarily assigns the vote to the hash
-    CHECK(description_hash[0] == 1);
-
-    delete cpp_encrypter;
-    delete description;
-    delete public_key;
-    delete extended_base_hash;
+    delete metadata;
+    delete publicKey;
+    delete extendedBaseHash;
     delete nonce_seed;
     delete plaintext;
-    delete ciphertext;
+    delete result;
 }

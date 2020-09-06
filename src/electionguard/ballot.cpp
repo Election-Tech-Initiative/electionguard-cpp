@@ -1,6 +1,7 @@
 #include "electionguard/ballot.hpp"
 
 #include "electionguard/hash.hpp"
+#include "log.hpp"
 
 #include <cstdlib>
 #include <cstring>
@@ -96,13 +97,22 @@ namespace electionguard
     // public Members
 
     CiphertextBallotSelection *CiphertextBallotSelection::make(
-      const string object_id, ElementModQ *descriptionHash, ElGamalCiphertext *ciphertext,
+      const string objectId, ElementModQ *descriptionHash, ElGamalCiphertext *ciphertext,
       ElementModP *elgamalPublicKey, ElementModQ *cryptoExtendedBaseHash, ElementModQ *proofSeed,
-      uint64_t plaintext, bool isPlaceholder, ElementModQ *nonce, ElementModQ *cryptoHash,
-      DisjunctiveChaumPedersenProof *proof, ElGamalCiphertext *extendedData)
+      uint64_t plaintext, bool isPlaceholder /* = false */, ElementModQ *nonce /* = nullptr */,
+      ElementModQ *cryptoHash /* = nullptr */, DisjunctiveChaumPedersenProof *proof /* = nullptr */,
+      ElGamalCiphertext *extendedData /* = nullptr */)
     {
-        // TODO: implement
-        return nullptr;
+        if (cryptoHash == nullptr) {
+            cryptoHash = makeCryptoHash(objectId, descriptionHash, ciphertext);
+        }
+
+        if (proof == nullptr) {
+            proof = DisjunctiveChaumPedersenProof::make(
+              ciphertext, nonce, elgamalPublicKey, cryptoExtendedBaseHash, proofSeed, plaintext);
+        }
+        return new CiphertextBallotSelection(objectId, descriptionHash, ciphertext, isPlaceholder,
+                                             nonce, cryptoHash, proof, nullptr);
     }
 
     ElementModQ *CiphertextBallotSelection::crypto_hash_with(ElementModQ *seedHash)
@@ -114,8 +124,17 @@ namespace electionguard
                                                       ElementModP *elgamalPublicKey,
                                                       ElementModQ *cryptoExtendedBaseHash)
     {
-        // TODO: implement
-        return true;
+        if ((*seedHash != *data.descriptionHash)) {
+            Log::debug("mismatching selection hash:");
+            return false;
+        }
+
+        auto *recalculatedCryptoHash = crypto_hash_with(seedHash);
+        if ((*data.cryptoHash != *recalculatedCryptoHash)) {
+            Log::debug("mismatching crypto hash: ");
+            return false;
+        }
+        return data.proof->isValid(data.ciphertext, elgamalPublicKey, cryptoExtendedBaseHash);
     }
 
     // Protected Members

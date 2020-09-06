@@ -1,5 +1,7 @@
 #include "electionguard/chaum_pedersen.hpp"
 
+#include "log.hpp"
+
 #include <cstdlib>
 #include <cstring>
 
@@ -44,8 +46,14 @@ namespace electionguard
     DisjunctiveChaumPedersenProof::make(ElGamalCiphertext *message, ElementModQ *r, ElementModP *k,
                                         ElementModQ *q, ElementModQ *seed, uint64_t plaintext)
     {
-        // TODO: implement
-        return nullptr;
+        if (plaintext < 0 || plaintext > 1) {
+            Log::debug("make_disjunctive_chaum_pedersen only supports plaintexts of 0 or 1");
+            return nullptr;
+        }
+        if (plaintext == 1) {
+            return make_one(message, r, k, q, seed);
+        }
+        return make_zero(message, r, k, q, seed);
     }
 
     // Private Members
@@ -54,7 +62,8 @@ namespace electionguard
                                              ElementModP *k, ElementModQ *q, ElementModQ *seed)
     {
         // TODO: implement
-        return nullptr;
+        return new DisjunctiveChaumPedersenProof(nullptr, nullptr, nullptr, nullptr, nullptr,
+                                                 nullptr, nullptr, nullptr, nullptr);
     }
 
     DisjunctiveChaumPedersenProof *
@@ -62,7 +71,8 @@ namespace electionguard
                                             ElementModP *k, ElementModQ *q, ElementModQ *seed)
     {
         // TODO: implement
-        return nullptr;
+        return new DisjunctiveChaumPedersenProof(nullptr, nullptr, nullptr, nullptr, nullptr,
+                                                 nullptr, nullptr, nullptr, nullptr);
     }
 
 #pragma endregion
@@ -100,7 +110,7 @@ namespace electionguard
                                      ElementModQ *seed, ElementModQ *hash_header, uint64_t constant)
     {
         // TODO: implement
-        return nullptr;
+        return new ConstantChaumPedersenProof(nullptr, nullptr, nullptr, nullptr, 0);
     }
 
 #pragma endregion
