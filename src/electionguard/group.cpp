@@ -168,7 +168,7 @@ namespace electionguard
         return bytes_to_hex(byteResult, sizeof(byteResult));
     }
 
-    ElementModP *ElementModQ::toP()
+    ElementModP *ElementModQ::toElementModP()
     {
         uint64_t p4096[MAX_P_LEN] = {};
         memcpy(p4096, data.elem, MAX_Q_LEN * sizeof(data.elem[0]));
@@ -257,7 +257,7 @@ namespace electionguard
         memcpy(bc4096, resultBC, 512UL);
 
         uint64_t result[MAX_P_LEN] = {};
-        uint64_t carry = Hacl_Bignum4096_add(a->toP()->get(), bc4096, result);
+        uint64_t carry = Hacl_Bignum4096_add(a->toElementModP()->get(), bc4096, result);
 
         // TODO: % Q
         return new ElementModQ(result, true);
@@ -273,7 +273,7 @@ namespace electionguard
 
     ElementModQ *rand_q()
     {
-        // TODO: choose a better random generator?
+        // TODO: choose a better random generator
         random_device rd;
         uniform_int_distribution<uint64_t> dist(0, 0xFFFFFFFFFFFFFFFF);
 

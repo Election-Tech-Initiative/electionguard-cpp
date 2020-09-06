@@ -85,7 +85,7 @@ namespace electionguard
 
         uint64_t *get();
         string toHex();
-        ElementModP *toP();
+        ElementModP *toElementModP();
 
         bool operator==(const ElementModQ &other);
         bool operator!=(const ElementModQ &other);

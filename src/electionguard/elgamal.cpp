@@ -28,8 +28,8 @@ namespace electionguard
         }
 
         return new ElGamalCiphertext(
-          g_pow_p(nonce->toP()),
-          mul_mod_p(g_pow_p(uint64_to_p(m)), pow_mod_p(publicKey, nonce->toP())));
+          g_pow_p(nonce->toElementModP()),
+          mul_mod_p(g_pow_p(uint64_to_p(m)), pow_mod_p(publicKey, nonce->toElementModP())));
     }
 
 } // namespace electionguard
