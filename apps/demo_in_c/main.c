@@ -12,11 +12,13 @@
 
 static bool strings_are_equal(char *expected, char *actual);
 
+static bool test_crypto_hashing();
 static bool test_encrypt_selection();
 static bool test_generate_tracking_code();
 
 int main()
 {
+    assert(test_crypto_hashing() == true);
     assert(test_encrypt_selection() == true);
     assert(test_generate_tracking_code() == true);
 }
@@ -25,8 +27,7 @@ bool test_encrypt_selection()
 {
     // insantiate the stateful mediator
     eg_encryption_mediator_t *encrypter = eg_encryption_mediator_new();
-    int instance_encrypt = eg_encryption_mediator_encrypt(encrypter);
-    assert(instance_encrypt == 9);
+    assert(encrypter != NULL);
 
     char *candidate_id = "some-candidate-id";
 
@@ -49,31 +50,38 @@ bool test_encrypt_selection()
       eg_plaintext_ballot_selection_new(candidate_id, "1");
 
     // execute the encryption
-    eg_ciphertext_ballot_selection_t *ciphertext = eg_encrypt_selection(
+    eg_ciphertext_ballot_selection_t *result = eg_encrypt_selection(
       plaintext, description, public_key, extended_base_hash, nonce_seed, false, false);
-    assert(ciphertext != NULL);
+    assert(result != NULL);
 
     // check the object id by accessing the property getter
     char *plaintext_object_id = eg_plaintext_ballot_selection_get_object_id(plaintext);
-    char *ciphertext_object_id = eg_ciphertext_ballot_selection_get_object_id(ciphertext);
+    char *ciphertext_object_id = eg_ciphertext_ballot_selection_get_object_id(result);
     assert(strings_are_equal(plaintext_object_id, ciphertext_object_id) == true);
     assert(strings_are_equal(ciphertext_object_id, candidate_id) == true);
 
     // get out one of the ElementModQ hashes
     eg_element_mod_q_t *description_hash =
-      eg_ciphertext_ballot_selection_get_description_hash(ciphertext);
+      eg_ciphertext_ballot_selection_get_description_hash(result);
 
     uint64_t *description_hash_data;
     uint8_t size = eg_element_mod_q_get(description_hash, &description_hash_data);
-
     assert(size == 4);
-    // the current test just arbitrarily assigns the vote to the hash
-    assert(description_hash_data[0] == 1);
 
-    // test crypto hashing
+    // TODO: checks similar to the cpp test
+
+    eg_encryption_mediator_free(encrypter);
+    eg_plaintext_ballot_selection_free(plaintext);
+    eg_ciphertext_ballot_selection_free(result);
+
+    return true;
+}
+
+bool test_crypto_hashing()
+{
     eg_element_mod_q_t *string_hash = eg_hash_elems_string("test");
     uint64_t *string_hash_data;
-    size = eg_element_mod_q_get(string_hash, &string_hash_data);
+    uint8_t size = eg_element_mod_q_get(string_hash, &string_hash_data);
 
     assert(string_hash != NULL);
     assert(string_hash != 0);
@@ -99,9 +107,9 @@ bool test_encrypt_selection()
     assert(size == 4);
     assert(int_hash_data[0] > 0);
 
-    eg_encryption_mediator_free(encrypter);
-    eg_plaintext_ballot_selection_free(plaintext);
-    eg_ciphertext_ballot_selection_free(ciphertext);
+    eg_element_mod_q_free(string_hash);
+    eg_element_mod_q_free(strings_hash);
+    eg_element_mod_q_free(int_hash);
 
     return true;
 }

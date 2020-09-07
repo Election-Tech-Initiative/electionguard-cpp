@@ -1,6 +1,7 @@
 #include "electionguard/elgamal.hpp"
 
 #include "electionguard/hash.hpp"
+#include "log.hpp"
 
 namespace electionguard
 {
@@ -20,11 +21,9 @@ namespace electionguard
 
     ElGamalCiphertext *elgamalEncrypt(uint64_t m, ElementModQ *nonce, ElementModP *publicKey)
     {
-        if (m > 0) {
-            // just bypass compiler error
-        }
-        if (nonce->get() != nullptr) {
-            // just bypass compiler error
+        if ((*nonce == *ZERO_MOD_Q())) {
+            Log::debug("ElGamal encryption requires a non-zero nonce");
+            return nullptr;
         }
 
         return new ElGamalCiphertext(
