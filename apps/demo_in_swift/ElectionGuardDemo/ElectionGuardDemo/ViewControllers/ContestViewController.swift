@@ -119,10 +119,10 @@ class ContestViewController: UIViewController {
     }
     
     private func loadSelections() {
-        let election = EGDataService.shared.getElectionManifest()
+        let contests = EGDataService.shared.getContests()
         let language = "en"
         
-        guard let contest = election?.contests?.first(where: { $0.objectId == contestId }) else {
+        guard let contest = contests?.first(where: { $0.objectId == contestId }) else {
             showDialog(title: "Contest Not Found", body: "The contest could not be found. Please go back and try again.", okText: "OK")
             return
         }

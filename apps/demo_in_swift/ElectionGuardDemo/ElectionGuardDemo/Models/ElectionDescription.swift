@@ -50,13 +50,13 @@ struct ElectionDescription: Codable {
     }
 }
 
-enum ElectionType: String, Codable {
-    case unknown
-    case general
-    case partisan_primary_closed
-    case partisan_primary_open
-    case primary
-    case runoff
-    case special
-    case other
+enum ElectionType: Int, Codable {
+    case unknown = 0
+    case general = 1
+    case partisan_primary_closed = 2
+    case partisan_primary_open = 3
+    case primary = 4
+    case runoff = 5
+    case special = 6
+    case other = 7
 }

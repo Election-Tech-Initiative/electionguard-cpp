@@ -53,7 +53,7 @@ class SelectionCollectionViewCell: UICollectionViewCell {
             return
         }
         
-        let candidateName = EGDataService.shared.getCandidateName(forId: candidateId)?
+        let candidateName = EGDataService.shared.getCandidateName(objectId: candidateId)?
                                 .text?.first(where: { $0.language == "en" })?.value
         
         nameLabel.text = candidateName ?? ""

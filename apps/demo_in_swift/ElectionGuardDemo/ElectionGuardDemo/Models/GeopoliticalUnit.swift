@@ -20,34 +20,34 @@ struct GeopoliticalUnit: Codable {
     }
 }
 
-enum ReportingUnitType: String, Codable {
-    case unknown
-    case ballot_batch
-    case ballot_style_area
-    case borough
-    case city
-    case city_council
-    case combined_precinct
-    case congressional
-    case country
-    case county
-    case county_council
-    case drop_box
-    case judicial
-    case municipality
-    case polling_place
-    case precinct
-    case school
-    case special
-    case split_precinct
-    case state
-    case state_house
-    case state_senate
-    case township
-    case utility
-    case village
-    case vote_center
-    case ward
-    case water
-    case other
+enum ReportingUnitType: Int, Codable {
+    case unknown = 0
+    case ballot_batch = 1
+    case ballot_style_area = 2
+    case borough = 3
+    case city = 4
+    case city_council = 5
+    case combined_precinct = 6
+    case congressional = 7
+    case country = 8
+    case county = 9
+    case county_council = 10
+    case drop_box = 11
+    case judicial = 12
+    case municipality = 13
+    case polling_place = 14
+    case precinct = 15
+    case school = 16
+    case special = 17
+    case split_precinct = 18
+    case state = 19
+    case state_house = 20
+    case state_senate = 21
+    case township = 22
+    case utility = 23
+    case village = 24
+    case vote_center = 25
+    case ward = 26
+    case water = 27
+    case other = 28
 }
