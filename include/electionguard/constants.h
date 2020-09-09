@@ -57,6 +57,8 @@ const uint64_t G_ARRAY[MAX_P_LEN] = {
 };
 
 const uint64_t ZERO_MOD_Q_ARRAY[MAX_Q_LEN] = {0UL, 0UL, 0UL, 0UL};
+const uint64_t ONE_MOD_Q_ARRAY[MAX_Q_LEN] = {1UL, 0UL, 0UL, 0UL};
+const uint64_t TWO_MOD_Q_ARRAY[MAX_Q_LEN] = {2UL, 0UL, 0UL, 0UL};
 
 #ifdef __cplusplus
 }

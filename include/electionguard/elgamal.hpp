@@ -6,6 +6,29 @@
 
 namespace electionguard
 {
+    struct ElGamalKeyPairData {
+        ElementModQ *secretKey;
+        ElementModP *publicKey;
+    };
+
+    /// <summary>
+    /// An exponential ElGamal keypair
+    /// </summary>
+    class EG_API ElGamalKeyPair
+    {
+      public:
+        ElGamalKeyPair(ElementModQ *secretKey, ElementModP *publicKey);
+        ~ElGamalKeyPair();
+
+        static ElGamalKeyPair *fromSecret(ElementModQ *a);
+
+        ElementModQ *getSecretKey();
+        ElementModP *getPublicKey();
+
+      private:
+        ElGamalKeyPairData data;
+    };
+
     struct ElGamalCiphertextData {
         ElementModP *pad;
         ElementModP *data;

@@ -36,14 +36,16 @@ namespace electionguard
                                                    ElementModP *k, ElementModQ *q,
                                                    ElementModQ *seed, uint64_t plaintext);
 
-      private:
-        DisjunctiveChaumPedersenProofData data;
+      protected:
         static DisjunctiveChaumPedersenProof *make_zero(ElGamalCiphertext *message, ElementModQ *r,
                                                         ElementModP *k, ElementModQ *q,
                                                         ElementModQ *seed);
         static DisjunctiveChaumPedersenProof *make_one(ElGamalCiphertext *message, ElementModQ *r,
                                                        ElementModP *k, ElementModQ *q,
                                                        ElementModQ *seed);
+
+      private:
+        DisjunctiveChaumPedersenProofData data;
     };
 
     struct ConstantChaumPedersenProofData {

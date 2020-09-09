@@ -5,6 +5,31 @@
 
 namespace electionguard
 {
+    // ElGamalKeyPair
+
+    ElGamalKeyPair::ElGamalKeyPair(ElementModQ *secretKey, ElementModP *publicKey) : data()
+    {
+        data.secretKey = secretKey;
+        data.publicKey = publicKey;
+    }
+
+    ElGamalKeyPair::~ElGamalKeyPair() {}
+
+    ElGamalKeyPair *ElGamalKeyPair::fromSecret(ElementModQ *a)
+    {
+        if (*a < *TWO_MOD_Q()) {
+            Log::debug("ElGamal secret key needs to be in [2,Q).");
+            return nullptr;
+        }
+
+        return new ElGamalKeyPair(a, g_pow_p(a->toElementModP()));
+    }
+
+    ElementModQ *ElGamalKeyPair::getSecretKey() { return data.secretKey; }
+
+    ElementModP *ElGamalKeyPair::getPublicKey() { return data.publicKey; }
+
+    // ElGamalCiphertext
 
     ElGamalCiphertext::ElGamalCiphertext(ElementModP *pad, ElementModP *data) : data()
     {
