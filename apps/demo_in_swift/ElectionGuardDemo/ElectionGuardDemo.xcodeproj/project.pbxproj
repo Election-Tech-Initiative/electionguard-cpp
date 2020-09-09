@@ -11,6 +11,7 @@
 		A52A8FDE24F01A2B0017244F /* ContestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52A8FDD24F01A2B0017244F /* ContestViewController.swift */; };
 		A54A05F724F8312300B9CFE2 /* ProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54A05F624F8312300B9CFE2 /* ProgressHUD.swift */; };
 		A54A05F924FE98C300B9CFE2 /* CiphertextElectionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54A05F824FE98C300B9CFE2 /* CiphertextElectionContext.swift */; };
+		A54A60E92502CCC40040F44A /* HttpDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54A60E82502CCC40040F44A /* HttpDataService.swift */; };
 		A56C8C5A24EF14B80044EA70 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A56C8C5924EF14B80044EA70 /* AppDelegate.swift */; };
 		A56C8C5C24EF14B80044EA70 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A56C8C5B24EF14B80044EA70 /* SceneDelegate.swift */; };
 		A56C8C5E24EF14B80044EA70 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A56C8C5D24EF14B80044EA70 /* MainViewController.swift */; };
@@ -34,6 +35,7 @@
 		A5DD4B3224F6D69400B9B176 /* ReviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5DD4B3124F6D69400B9B176 /* ReviewViewController.swift */; };
 		A5DD4B3424F7EE1000B9B176 /* UIViewController+alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5DD4B3324F7EE1000B9B176 /* UIViewController+alert.swift */; };
 		A5E778292502A57E0049D6D6 /* FinishedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E778282502A57E0049D6D6 /* FinishedViewController.swift */; };
+		A5F5972C2503D246009CFE8A /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5F5972B2503D246009CFE8A /* Constants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +43,7 @@
 		A52A8FDD24F01A2B0017244F /* ContestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContestViewController.swift; sourceTree = "<group>"; };
 		A54A05F624F8312300B9CFE2 /* ProgressHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressHUD.swift; sourceTree = "<group>"; };
 		A54A05F824FE98C300B9CFE2 /* CiphertextElectionContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CiphertextElectionContext.swift; sourceTree = "<group>"; };
+		A54A60E82502CCC40040F44A /* HttpDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpDataService.swift; sourceTree = "<group>"; };
 		A54E62A4250024230007BA4C /* hash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hash.h; path = ../../../../../include/electionguard/hash.h; sourceTree = "<group>"; };
 		A56C8C5624EF14B80044EA70 /* ElectionGuard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ElectionGuard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A56C8C5924EF14B80044EA70 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -73,6 +76,7 @@
 		A5DD4B3124F6D69400B9B176 /* ReviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewViewController.swift; sourceTree = "<group>"; };
 		A5DD4B3324F7EE1000B9B176 /* UIViewController+alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+alert.swift"; sourceTree = "<group>"; };
 		A5E778282502A57E0049D6D6 /* FinishedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishedViewController.swift; sourceTree = "<group>"; };
+		A5F5972B2503D246009CFE8A /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		B12245AD25001CB300416B56 /* tracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tracker.h; path = ../../../../../include/electionguard/tracker.h; sourceTree = "<group>"; };
 		B160683B24F7F4B400EA2A14 /* constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constants.h; path = ../../../../../include/electionguard/constants.h; sourceTree = "<group>"; };
 		B160683C24F7F4B400EA2A14 /* election.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = election.h; path = ../../../../../include/electionguard/election.h; sourceTree = "<group>"; };
@@ -147,6 +151,7 @@
 				A5A800A324F044EA0068FE96 /* Models */,
 				A5A8009B24F027290068FE96 /* Views */,
 				A52A8FDC24F019C60017244F /* ViewControllers */,
+				A5F5972B2503D246009CFE8A /* Constants.swift */,
 			);
 			path = ElectionGuardDemo;
 			sourceTree = "<group>";
@@ -197,6 +202,7 @@
 			isa = PBXGroup;
 			children = (
 				A5A800A124F044940068FE96 /* EGDataService.swift */,
+				A54A60E82502CCC40040F44A /* HttpDataService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -295,9 +301,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5F5972C2503D246009CFE8A /* Constants.swift in Sources */,
 				A5DD4B3424F7EE1000B9B176 /* UIViewController+alert.swift in Sources */,
 				A5A8009A24F01F0C0068FE96 /* UIView+addSubviews.swift in Sources */,
 				A5A8009F24F032DE0068FE96 /* EGButton.swift in Sources */,
+				A54A60E92502CCC40040F44A /* HttpDataService.swift in Sources */,
 				A5A8009D24F027410068FE96 /* SelectionCollectionViewCell.swift in Sources */,
 				A5A800B124F045220068FE96 /* Candidate.swift in Sources */,
 				A56C8C7E24EF1CA70044EA70 /* ElectionGuard.swift in Sources */,
