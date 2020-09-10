@@ -1,6 +1,7 @@
 #ifndef __ELECTIONGUARD_CORE_BALLOT_HPP_INCLUDED__
 #define __ELECTIONGUARD_CORE_BALLOT_HPP_INCLUDED__
 
+#include "chaum_pedersen.hpp"
 #include "crypto_hashable.hpp"
 #include "elgamal.hpp"
 #include "export.h"
@@ -42,7 +43,7 @@ namespace electionguard
     class EG_API PlaintextBallotSelection
     {
       public:
-        PlaintextBallotSelection(const string object_id, string vote);
+        PlaintextBallotSelection(const string objectId, string vote);
         PlaintextBallotSelection(const char *object_id, const char *vote);
         ~PlaintextBallotSelection();
 
@@ -57,9 +58,11 @@ namespace electionguard
     struct CiphertextBallotSelectionData : public ElectionObjectBase {
         ElementModQ *descriptionHash;
         ElGamalCiphertext *ciphertext;
-        ElementModQ *crypto_hash;
+        ElementModQ *cryptoHash;
         bool isPlaceholderSelection;
         ElementModQ *nonce;
+        DisjunctiveChaumPedersenProof *proof;
+        ElGamalCiphertext *extendedData;
     };
 
     /// <summary>
@@ -88,8 +91,16 @@ namespace electionguard
     class EG_API CiphertextBallotSelection : public CryptoHashCheckable
     {
       public:
-        CiphertextBallotSelection(const string object_id, ElementModQ *descriptionHash);
-        CiphertextBallotSelection(const char *object_id, ElementModQ *descriptionHash);
+        CiphertextBallotSelection(const string objectId, ElementModQ *descriptionHash,
+                                  ElGamalCiphertext *ciphertext, bool isPlaceholder,
+                                  ElementModQ *nonce, ElementModQ *cryptoHash,
+                                  DisjunctiveChaumPedersenProof *proof,
+                                  ElGamalCiphertext *extendedData);
+        CiphertextBallotSelection(const char *object_id, ElementModQ *descriptionHash,
+                                  ElGamalCiphertext *ciphertext, bool isPlaceholder,
+                                  ElementModQ *nonce, ElementModQ *cryptoHash,
+                                  DisjunctiveChaumPedersenProof *proof,
+                                  ElGamalCiphertext *extendedData);
         ~CiphertextBallotSelection();
 
         char *getObjectId();
@@ -98,6 +109,26 @@ namespace electionguard
         /// The SelectionDescription hash
         /// </summary>
         ElementModQ *getDescriptionHash();
+
+        /// The encrypted representation of the vote field
+        ElGamalCiphertext *getCiphertext();
+
+        /// The proof that demonstrates the selection is an encryption of 0 or 1, and was encrypted using the `nonce`
+        DisjunctiveChaumPedersenProof *getProof();
+
+        /// <summary>
+        /// Constructs a `CipherTextBallotSelection` object. Most of the parameters here match up to fields
+        /// in the class, but this helper function will optionally compute a Chaum-Pedersen proof if the
+        /// given nonce isn't `None`. Likewise, if a crypto_hash is not provided, it will be derived from
+        /// the other fields.
+        ///</summary>
+        static CiphertextBallotSelection *
+        make(const string objectId, ElementModQ *descriptionHash, ElGamalCiphertext *ciphertext,
+             ElementModP *elgamalPublicKey, ElementModQ *cryptoExtendedBaseHash,
+             ElementModQ *proofSeed, uint64_t plaintext, bool isPlaceholder = false,
+             ElementModQ *nonce = nullptr, ElementModQ *cryptoHash = nullptr,
+             DisjunctiveChaumPedersenProof *proof = nullptr,
+             ElGamalCiphertext *extendedData = nullptr);
 
         /// <summary>
         /// Given an encrypted BallotSelection, generates a hash, suitable for rolling up
@@ -109,7 +140,10 @@ namespace electionguard
         ///
         /// In most cases the seed_hash should match the `description_hash`
         /// </summary>
-        virtual ElementModQ *crypto_hash_with(ElementModQ *seed_hash);
+        virtual ElementModQ *crypto_hash_with(ElementModQ *seedHash);
+
+        bool isValidEncryption(ElementModQ *seedHash, ElementModP *elgamalPublicKey,
+                               ElementModQ *cryptoExtendedBaseHash);
 
       protected:
         // TODO: determine if these shouild be public or protected static functions
@@ -120,6 +154,14 @@ namespace electionguard
 
       private:
         CiphertextBallotSelectionData data;
+
+        /// set the hash of the encrypted values.
+        /// used when reconstrcuting objects from cache
+        // TODO: void setCryptoHash(ElementModQ *cryptoHash);
+
+        /// The nonce used to generate the encryption.
+        /// Sensitive & should be treated as a secret
+        //TODO: void setNonce(ElementModQ *nonce);
     };
 
     class EG_API CiphertextBallotContest : public CryptoHashCheckable

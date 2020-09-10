@@ -191,6 +191,12 @@ namespace electionguard
 
     bool ElementModQ::operator!=(const ElementModQ &other) { return !(*this == other); }
 
+    bool ElementModQ::operator<(const ElementModQ &other)
+    {
+        auto other_ = other;
+        return Hacl_Bignum256_lt(data.elem, other_.data.elem);
+    }
+
     ElementModQ *bytes_to_q(uint8_t *b, size_t bLen)
     {
         auto bn = Hacl_Bignum256_new_bn_from_bytes_be(bLen, b);

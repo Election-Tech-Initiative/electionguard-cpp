@@ -1,9 +1,35 @@
 #include "electionguard/elgamal.hpp"
 
 #include "electionguard/hash.hpp"
+#include "log.hpp"
 
 namespace electionguard
 {
+    // ElGamalKeyPair
+
+    ElGamalKeyPair::ElGamalKeyPair(ElementModQ *secretKey, ElementModP *publicKey) : data()
+    {
+        data.secretKey = secretKey;
+        data.publicKey = publicKey;
+    }
+
+    ElGamalKeyPair::~ElGamalKeyPair() {}
+
+    ElGamalKeyPair *ElGamalKeyPair::fromSecret(ElementModQ *a)
+    {
+        if (*a < *TWO_MOD_Q()) {
+            Log::debug("ElGamal secret key needs to be in [2,Q).");
+            return nullptr;
+        }
+
+        return new ElGamalKeyPair(a, g_pow_p(a->toElementModP()));
+    }
+
+    ElementModQ *ElGamalKeyPair::getSecretKey() { return data.secretKey; }
+
+    ElementModP *ElGamalKeyPair::getPublicKey() { return data.publicKey; }
+
+    // ElGamalCiphertext
 
     ElGamalCiphertext::ElGamalCiphertext(ElementModP *pad, ElementModP *data) : data()
     {
@@ -20,11 +46,9 @@ namespace electionguard
 
     ElGamalCiphertext *elgamalEncrypt(uint64_t m, ElementModQ *nonce, ElementModP *publicKey)
     {
-        if (m > 0) {
-            // just bypass compiler error
-        }
-        if (nonce->get() != nullptr) {
-            // just bypass compiler error
+        if ((*nonce == *ZERO_MOD_Q())) {
+            Log::debug("ElGamal encryption requires a non-zero nonce");
+            return nullptr;
         }
 
         return new ElGamalCiphertext(

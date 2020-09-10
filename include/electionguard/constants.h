@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include <cstdint>
+
 enum MAX_IDENIFIER_LENGTH { MAX_IDENIFIER_LENGTH = 256 };
 
 const uint8_t MAX_P_LEN = 64;
@@ -53,6 +55,10 @@ const uint64_t G_ARRAY[MAX_P_LEN] = {
   0x6387b98ee0e3def1, 0xcfb0cfb65363b256, 0x840ec7d4ec804794, 0xa142cdf33f6ef853,
   0x750d6798f5196cf2, 0xd45ec4cc64cfd15e, 0x8d2a3141825b33d5, 0x037de384f98f6e03,
 };
+
+const uint64_t ZERO_MOD_Q_ARRAY[MAX_Q_LEN] = {0UL, 0UL, 0UL, 0UL};
+const uint64_t ONE_MOD_Q_ARRAY[MAX_Q_LEN] = {1UL, 0UL, 0UL, 0UL};
+const uint64_t TWO_MOD_Q_ARRAY[MAX_Q_LEN] = {2UL, 0UL, 0UL, 0UL};
 
 #ifdef __cplusplus
 }

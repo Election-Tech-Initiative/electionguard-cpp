@@ -1,5 +1,6 @@
 #ifndef __ELECTIONGUARD__CORE_GROUP_HPP_INCLUDED__
 #define __ELECTIONGUARD__CORE_GROUP_HPP_INCLUDED__
+#include "constants.h"
 #include "export.h"
 
 #include <cstdint>
@@ -90,8 +91,25 @@ namespace electionguard
         bool operator==(const ElementModQ &other);
         bool operator!=(const ElementModQ &other);
 
+        bool operator<(const ElementModQ &other);
+
       private:
         ElementModQData data;
+    };
+
+    constexpr ElementModQ *ZERO_MOD_Q()
+    {
+        return new ElementModQ(const_cast<uint64_t *>(ZERO_MOD_Q_ARRAY), true);
+    };
+
+    constexpr ElementModQ *ONE_MOD_Q()
+    {
+        return new ElementModQ(const_cast<uint64_t *>(ONE_MOD_Q_ARRAY), true);
+    };
+
+    constexpr ElementModQ *TWO_MOD_Q()
+    {
+        return new ElementModQ(const_cast<uint64_t *>(TWO_MOD_Q_ARRAY), true);
     };
 
     /// <summary>
