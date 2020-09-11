@@ -122,6 +122,42 @@ TEST_CASE("Test mod exp for BigNum 256 valid preconditions succeeds")
     CHECK((*result == *expected));
 }
 
+TEST_CASE("Test mod for BigNum 256 invalid preconditions fails")
+{
+    uint64_t mod_valid[MAX_Q_LEN] = {0x05};
+    uint64_t mod_invalid[MAX_Q_LEN] = {0x06};
+    uint64_t a_valid[MAX_Q_LEN_DOUBLE] = {0x04};
+    uint64_t a_invalid[MAX_Q_LEN_DOUBLE] = {0x1a};
+
+    uint64_t result[MAX_Q_LEN] = {};
+
+    // verify that n % 2 = 1
+    bool n_is_odd = Hacl_Bignum256_mod(mod_invalid, a_valid, result);
+    CHECK(n_is_odd == false);
+
+    // verify that 1 < n
+    uint64_t mod_zero[MAX_Q_LEN] = {0x00};
+    bool n_is_in_range = Hacl_Bignum256_mod(mod_zero, a_valid, result);
+    CHECK(n_is_in_range == false);
+
+    // verify a < (n * n)
+    bool a_is_in_range = Hacl_Bignum256_mod(mod_valid, a_invalid, result);
+    CHECK(a_is_in_range == false);
+}
+
+TEST_CASE("Test mod for BigNum 256 valid preconditions succeeds")
+{
+    uint64_t mod[MAX_Q_LEN] = {0x09};
+    uint64_t a[MAX_Q_LEN_DOUBLE] = {0xc};
+    uint64_t expected[MAX_Q_LEN] = {0x03};
+
+    // 12 % 9 = 3
+    uint64_t result[MAX_Q_LEN] = {};
+    bool success = Hacl_Bignum256_mod(mod, a, result);
+    CHECK(success == true);
+    CHECK((*result == *expected));
+}
+
 TEST_CASE("Test less than BigNum 4096")
 {
     uint64_t a[MAX_P_LEN] = {

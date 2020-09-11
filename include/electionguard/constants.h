@@ -10,7 +10,9 @@ extern "C" {
 enum MAX_IDENIFIER_LENGTH { MAX_IDENIFIER_LENGTH = 256 };
 
 const uint8_t MAX_P_LEN = 64;
+const uint8_t MAX_P_LEN_DOUBLE = 128;
 const uint8_t MAX_Q_LEN = 4;
+const uint8_t MAX_Q_LEN_DOUBLE = 8;
 
 // Max P value in Hacl_Bignum4096 format
 const uint64_t P_ARRAY[MAX_P_LEN] = {
