@@ -18,7 +18,7 @@ namespace electionguard
     ElGamalKeyPair *ElGamalKeyPair::fromSecret(ElementModQ *a)
     {
         if (*a < *TWO_MOD_Q()) {
-            Log::debug("ElGamal secret key needs to be in [2,Q).");
+            Log::debug(" ElGamal secret key needs to be in [2,Q).");
             return nullptr;
         }
 
