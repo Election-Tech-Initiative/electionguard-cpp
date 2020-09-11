@@ -1,11 +1,10 @@
 #include "electionguard/group.hpp"
 #include "electionguard/hash.hpp"
+#include "variant_cast.hpp"
 
 extern "C" {
 #include "electionguard/hash.h"
 }
-
-#define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
 
 eg_element_mod_q_t *eg_hash_elems_string(const char *a)
 {

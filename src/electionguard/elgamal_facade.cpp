@@ -1,12 +1,10 @@
 #include "electionguard/elgamal.hpp"
 #include "electionguard/group.hpp"
+#include "variant_cast.hpp"
 
 extern "C" {
 #include "electionguard/elgamal.h"
 }
-
-#define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
-#define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
 
 using namespace electionguard;
 

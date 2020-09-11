@@ -1,4 +1,5 @@
 #include "electionguard/encrypt.hpp"
+#include "variant_cast.hpp"
 
 #include <cerrno>
 #include <exception>
@@ -6,9 +7,6 @@
 extern "C" {
 #include "electionguard/encrypt.h"
 }
-
-#define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
-#define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
 
 eg_encryption_mediator_t *eg_encryption_mediator_new()
 {

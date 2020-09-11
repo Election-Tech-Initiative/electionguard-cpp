@@ -1,7 +1,12 @@
 #ifndef __ELECTIONGUARD__CORE_VARIANT_CAST_HPP_INCLUDED__
 #define __ELECTIONGUARD__CORE_VARIANT_CAST_HPP_INCLUDED__
+
 #include <electionguard/export.h>
 #include <variant>
+
+#define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
+#define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
+
 using namespace std;
 
 namespace electionguard
