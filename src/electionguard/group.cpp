@@ -9,6 +9,7 @@
 #include <iostream>
 #include <random>
 #include <sstream>
+#include <stdexcept>
 #include <stdint.h>
 #include <vector>
 
@@ -45,8 +46,8 @@ namespace electionguard
     // param elem is expected to be allocated to uint64_t[MAX_P_LEN]
     ElementModP::ElementModP(uint64_t *elem, bool unchecked /* = false */) : data()
     {
-        if (!unchecked && Hacl_Bignum4096_lt(const_cast<uint64_t *>(P_ARRAY), elem)) {
-            throw "Value for ElementModP is greater than allowed";
+        if (!unchecked && Hacl_Bignum4096_lt_mask(const_cast<uint64_t *>(P_ARRAY), elem) > 0) {
+            throw out_of_range("Value for ElementModP is greater than allowed");
         }
         memcpy(data.elem, elem, MAX_P_LEN * sizeof(elem[0]));
     }
@@ -150,8 +151,8 @@ namespace electionguard
     // param elem is expected to be allocated to uint64_t[MAX_Q_LEN]
     ElementModQ::ElementModQ(uint64_t *elem, bool unchecked /* = false*/) : data()
     {
-        if (!unchecked && Hacl_Bignum256_lt(const_cast<uint64_t *>(Q_ARRAY), elem)) {
-            throw "Value for ElementModQ is greater than allowed";
+        if (!unchecked && Hacl_Bignum256_lt_mask(const_cast<uint64_t *>(Q_ARRAY), elem) > 0) {
+            throw out_of_range("Value for ElementModQ is greater than allowed");
         }
         memcpy(data.elem, elem, MAX_Q_LEN * sizeof(elem[0]));
     }
@@ -194,7 +195,7 @@ namespace electionguard
     bool ElementModQ::operator<(const ElementModQ &other)
     {
         auto other_ = other;
-        return Hacl_Bignum256_lt(data.elem, other_.data.elem);
+        return Hacl_Bignum256_lt_mask(data.elem, other_.data.elem) > 0;
     }
 
     ElementModQ *bytes_to_q(uint8_t *b, size_t bLen)
