@@ -44,22 +44,22 @@ TEST_CASE("Test mod exp for BigNum 4096 invalid preconditions fails")
     uint64_t result[MAX_P_LEN] = {};
 
     // verify that n % 2 = 1
-    bool n_is_odd = Hacl_Bignum4096_mod_exp(mod_invalid, a_valid, MAX_P_LEN, b_valid, result);
+    bool n_is_odd = Hacl_Bignum4096_mod_exp(mod_invalid, a_valid, MAX_P_SIZE, b_valid, result);
     CHECK(n_is_odd == false);
 
     // verify that 1 < n
     uint64_t mod_zero[MAX_P_LEN] = {0x00};
-    bool n_is_in_range = Hacl_Bignum4096_mod_exp(mod_zero, a_valid, MAX_P_LEN, b_valid, result);
+    bool n_is_in_range = Hacl_Bignum4096_mod_exp(mod_zero, a_valid, MAX_P_SIZE, b_valid, result);
     CHECK(n_is_in_range == false);
 
     // verify that 0 < b
-    bool b_is_in_range = Hacl_Bignum4096_mod_exp(mod_valid, a_valid, MAX_P_LEN, b_invalid, result);
+    bool b_is_in_range = Hacl_Bignum4096_mod_exp(mod_valid, a_valid, MAX_P_SIZE, b_invalid, result);
     CHECK(b_is_in_range == false);
 
     // TODO: verify b < pow2 bBits
 
     // verify a < n
-    bool a_is_in_range = Hacl_Bignum4096_mod_exp(mod_valid, a_invalid, MAX_P_LEN, b_valid, result);
+    bool a_is_in_range = Hacl_Bignum4096_mod_exp(mod_valid, a_invalid, MAX_P_SIZE, b_valid, result);
     CHECK(a_is_in_range == false);
 }
 
@@ -72,7 +72,7 @@ TEST_CASE("Test mod exp for BigNum 4096 valid preconditions succeeds")
 
     // 4 ^ 2 % 9 = 7
     uint64_t result[MAX_P_LEN] = {};
-    bool success = Hacl_Bignum4096_mod_exp(mod, a, MAX_P_LEN, b, result);
+    bool success = Hacl_Bignum4096_mod_exp(mod, a, MAX_Q_SIZE, b, result);
     CHECK(success == true);
     CHECK((*result == *expected));
 }
@@ -89,22 +89,22 @@ TEST_CASE("Test mod exp for BigNum 256 invalid preconditions fails")
     uint64_t result[MAX_Q_LEN] = {};
 
     // verify that n % 2 = 1
-    bool n_is_odd = Hacl_Bignum256_mod_exp(mod_invalid, a_valid, MAX_Q_LEN, b_valid, result);
+    bool n_is_odd = Hacl_Bignum256_mod_exp(mod_invalid, a_valid, MAX_Q_SIZE, b_valid, result);
     CHECK(n_is_odd == false);
 
     // verify that 1 < n
     uint64_t mod_zero[MAX_Q_LEN] = {0x00};
-    bool n_is_in_range = Hacl_Bignum256_mod_exp(mod_zero, a_valid, MAX_Q_LEN, b_valid, result);
+    bool n_is_in_range = Hacl_Bignum256_mod_exp(mod_zero, a_valid, MAX_Q_SIZE, b_valid, result);
     CHECK(n_is_in_range == false);
 
     // verify that 0 < b
-    bool b_is_in_range = Hacl_Bignum256_mod_exp(mod_valid, a_valid, MAX_Q_LEN, b_invalid, result);
+    bool b_is_in_range = Hacl_Bignum256_mod_exp(mod_valid, a_valid, MAX_Q_SIZE, b_invalid, result);
     CHECK(b_is_in_range == false);
 
     // TODO: verify b < pow2 bBits
 
     // verify a < n
-    bool a_is_in_range = Hacl_Bignum256_mod_exp(mod_valid, a_invalid, MAX_Q_LEN, b_valid, result);
+    bool a_is_in_range = Hacl_Bignum256_mod_exp(mod_valid, a_invalid, MAX_Q_SIZE, b_valid, result);
     CHECK(a_is_in_range == false);
 }
 
@@ -117,7 +117,7 @@ TEST_CASE("Test mod exp for BigNum 256 valid preconditions succeeds")
 
     // 4 ^ 2 % 9 = 7
     uint64_t result[MAX_Q_LEN] = {};
-    bool success = Hacl_Bignum256_mod_exp(mod, a, MAX_Q_LEN, b, result);
+    bool success = Hacl_Bignum256_mod_exp(mod, a, MAX_Q_SIZE, b, result);
     CHECK(success == true);
     CHECK((*result == *expected));
 }
@@ -178,9 +178,9 @@ TEST_CASE("Test less than BigNum 4096")
 TEST_CASE("Test less than BigNum 256")
 {
 
-    uint64_t b[MAX_Q_LEN] = {0xFFFFFFFFFFFFFF45, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
-                             0xFFFFFFFFFFFFFFFF};
+    uint64_t larger_than_q[MAX_Q_LEN] = {0xFFFFFFFFFFFFFF45, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                                         0xFFFFFFFFFFFFFFFF};
 
-    auto isLessThan = Hacl_Bignum256_lt_mask(const_cast<uint64_t *>(Q_ARRAY), b) >= 0;
+    auto isLessThan = Hacl_Bignum256_lt_mask(Q()->get(), larger_than_q) >= 0;
     CHECK(isLessThan);
 }

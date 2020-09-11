@@ -33,6 +33,25 @@ namespace electionguard
         ElementModPData data;
     };
 
+    constexpr ElementModP *G() { return new ElementModP(const_cast<uint64_t *>(G_ARRAY), true); };
+
+    constexpr ElementModP *P() { return new ElementModP(const_cast<uint64_t *>(P_ARRAY), true); };
+
+    constexpr ElementModP *ZERO_MOD_P()
+    {
+        return new ElementModP(const_cast<uint64_t *>(ZERO_MOD_P_ARRAY), true);
+    };
+
+    constexpr ElementModP *ONE_MOD_P()
+    {
+        return new ElementModP(const_cast<uint64_t *>(ONE_MOD_P_ARRAY), true);
+    };
+
+    constexpr ElementModP *TWO_MOD_P()
+    {
+        return new ElementModP(const_cast<uint64_t *>(TWO_MOD_P_ARRAY), true);
+    };
+
     /// <summary>
     /// Converts the binary value stored as a byte array
     /// to its big num representation stored as ElementModP
@@ -96,6 +115,8 @@ namespace electionguard
       private:
         ElementModQData data;
     };
+
+    constexpr ElementModQ *Q() { return new ElementModQ(const_cast<uint64_t *>(Q_ARRAY), true); };
 
     constexpr ElementModQ *ZERO_MOD_Q()
     {
