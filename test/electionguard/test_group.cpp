@@ -10,10 +10,11 @@ using namespace electionguard;
 
 TEST_CASE("add_mod_q for ints 1 and 1 should return q of 2")
 {
-    auto one1 = uint64_to_q(1UL);
-    auto one2 = hex_to_q("01");
-    auto two = uint64_to_q(2);
-    auto result = add_mod_q(one1, one2);
+    auto *one1 = uint64_to_q(1UL);
+    auto *one2 = hex_to_q("01");
+    auto *two = uint64_to_q(2);
+    auto *result = add_mod_q(one1, one2);
+    Log::debug(": result->toHex() = " + result->toHex() + " and expectedHex = " + two->toHex());
     CHECK(result->toHex() == two->toHex());
 }
 
@@ -53,9 +54,9 @@ TEST_CASE("add_mod_p for two huge P arrays")
       0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
       0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
       0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000};
-    auto p1 = new ElementModP(p1Array);
-    auto p2 = new ElementModP(p2Array);
-    auto result = add_mod_p(p1, p2);
+    auto *p1 = new ElementModP(p1Array);
+    auto *p2 = new ElementModP(p2Array);
+    auto *result = add_mod_p(p1, p2);
     // Log::debug(" : \n\t p1 = " + p1->toHex() + "\n\t p2 = " + p2->toHex() +
     //            "\n\t result = " + result->toHex());
 
@@ -66,7 +67,7 @@ TEST_CASE("add_mod_p for two huge P arrays")
 
 TEST_CASE("Max of Q")
 {
-    auto maxQ = new ElementModQ(const_cast<uint64_t *>(Q_ARRAY));
+    auto *maxQ = new ElementModQ(const_cast<uint64_t *>(Q_ARRAY));
     // Log::debug(": ElementModQ initalized with Q_ARRAY succeeds = " + maxQ->toHex());
 
     // when more than max of Q is passed in, ElementModQ should throw an exception
@@ -79,14 +80,14 @@ TEST_CASE("Max of Q")
 TEST_CASE("Hex string converted to Q matches original hex when converted back toHex")
 {
     string expectedHex("f0f0f0f0f0f0f0f0");
-    auto q = hex_to_q(expectedHex);
+    auto *q = hex_to_q(expectedHex);
     CHECK(q->toHex() == expectedHex);
     // Log::debug(": q->toHex() = " + q->toHex() + " and expectedHex = " + expectedHex);
 }
 
 TEST_CASE("mul_mod_p 3 * 3 should equal 9")
 {
-    auto p = mul_mod_p(uint64_to_p(3), uint64_to_p(3));
+    auto *p = mul_mod_p(uint64_to_p(3), uint64_to_p(3));
     CHECK(p->toHex() == "09");
     // Log::debug(": p->toHex() = " + p->toHex());
 }
@@ -95,23 +96,23 @@ TEST_CASE("mul_mod_p for max uint64 * max uint64 should equal hex value "
           "fffffffffffffffe0000000000000001)")
 {
     auto uint64Max = numeric_limits<uint64_t>::max();
-    auto p = mul_mod_p(uint64_to_p(uint64Max), uint64_to_p(uint64Max));
+    auto *p = mul_mod_p(uint64_to_p(uint64Max), uint64_to_p(uint64Max));
     CHECK(p->toHex() == "fffffffffffffffe0000000000000001");
     // Log::debug(": p->toHex() = " + p->toHex());
 }
 
 TEST_CASE("pow_mod_p 2 ^ 3 = 8 and 3 ^ 2 = 9")
 {
-    auto two = uint64_to_p(2);
-    auto three = uint64_to_p(3);
-    auto eight = uint64_to_p(8);
-    auto nine = uint64_to_p(9);
+    auto *two = uint64_to_p(2);
+    auto *three = uint64_to_p(3);
+    auto *eight = uint64_to_p(8);
+    auto *nine = uint64_to_p(9);
 
-    auto result8 = pow_mod_p(two, three);
+    auto *result8 = pow_mod_p(two, three);
     CHECK((*result8 == *eight));
     // Log::debug(" : result8 = " + result8->toHex());
 
-    auto result9 = pow_mod_p(three, two);
+    auto *result9 = pow_mod_p(three, two);
     CHECK((*result9 == *nine));
     // Log::debug(" : result9 = " + result9->toHex());
 }
@@ -120,9 +121,9 @@ TEST_CASE("Test Q is converted correctly")
 {
     string expectedQHex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff43");
 
-    auto qFromHex = hex_to_q(expectedQHex);
+    auto *qFromHex = hex_to_q(expectedQHex);
     // Log::debug(qFromHex->get(), 64UL, " : qFromHex = ");
-    auto q = new ElementModQ(const_cast<uint64_t *>(Q_ARRAY), true);
+    auto *q = new ElementModQ(const_cast<uint64_t *>(Q_ARRAY), true);
     // Log::debug(" : q->toHex() = " + q->toHex());
     CHECK(q->toHex() == expectedQHex);
 }
@@ -143,9 +144,9 @@ TEST_CASE("Test P is converted correctly")
       "47c03d43d2f9ca02d03199baceddd45334dbc6b5ffffffffffffffffffffffffffffffffffffffffffffffffffff"
       "ffffffffffff");
 
-    auto pFromHex = hex_to_p(expectedPHex);
+    auto *pFromHex = hex_to_p(expectedPHex);
     // Log::debug(pFromHex->get(), 64UL, " : pFromHex = ");
-    auto p = new ElementModP(const_cast<uint64_t *>(P_ARRAY), true);
+    auto *p = new ElementModP(const_cast<uint64_t *>(P_ARRAY), true);
     // Log::debug(" : p->toHex() = " + p->toHex());
     CHECK(p->toHex() == expectedPHex);
 }
@@ -168,17 +169,15 @@ TEST_CASE("Test G is converted correctly")
 
     auto gFromHex = hex_to_p(expectedGHex);
     // Log::debug(gFromHex->get(), 64UL, " : gFromHex = ");
-    auto g = new ElementModP(const_cast<uint64_t *>(G_ARRAY), true);
     // Log::debug(" : g->toHex() = " + g->toHex());
-    CHECK(g->toHex() == expectedGHex);
+    CHECK(G()->toHex() == expectedGHex);
 }
 
 TEST_CASE("Test g_pow_p with 0, 1, and 2")
 {
-    auto zero = uint64_to_p(0);
-    auto one = uint64_to_p(1);
-    auto two = uint64_to_p(2);
-    auto g = new ElementModP(const_cast<uint64_t *>(G_ARRAY), true);
+    auto *zero = uint64_to_p(0);
+    auto *one = uint64_to_p(1);
+    auto *two = uint64_to_p(2);
     string expectedGPow2Hex(
       "f258e409b1a130e00a3793555e0eab2f560aa12cc01a3cb6b357035c6e734256b4d67877c018cb57af150ddbbd0a"
       "c22b9d74c0b15c1ac80953086fddfaab7fc503022b61be8c6e4fecd02136f4afc68b51390d0e7e90661763455b8b"
@@ -194,15 +193,15 @@ TEST_CASE("Test g_pow_p with 0, 1, and 2")
       "ef79614f2c46");
     auto *gPowPFromHex = hex_to_p(expectedGPow2Hex);
 
-    auto result0 = g_pow_p(zero);
-    auto result1 = g_pow_p(one);
-    auto result2 = g_pow_p(two);
+    auto *result0 = g_pow_p(zero);
+    auto *result1 = g_pow_p(one);
+    auto *result2 = g_pow_p(two);
 
     // Log::debug(" : result0->toHex() = " + result0->toHex());
     CHECK((*result0 == *one));
 
     // Log::debug(" : result1->toHex() = " + result1->toHex());
-    CHECK((*result1 == *g));
+    CHECK((*result1 == *G()));
 
     // Log::debug(" : result2->toHex() = " + result2->toHex());
     // Log::debug(" : gPowPFromHex->toHex() = " + gPowPFromHex->toHex());
