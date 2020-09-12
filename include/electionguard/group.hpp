@@ -20,8 +20,8 @@ namespace electionguard
     class EG_API ElementModP
     {
       public:
-        ElementModP(vector<uint64_t> *elem, bool unchecked = false);
-        ElementModP(uint64_t *elem, bool unchecked = false);
+        ElementModP(const vector<uint64_t> &elem, bool unchecked = false);
+        ElementModP(const uint64_t *elem, bool unchecked = false);
         ~ElementModP();
 
         uint64_t *get();
@@ -49,24 +49,15 @@ namespace electionguard
         ElementModPData data;
     };
 
-    constexpr ElementModP *G() { return new ElementModP(const_cast<uint64_t *>(G_ARRAY), true); };
+    constexpr ElementModP *G() { return new ElementModP(G_ARRAY, true); };
 
-    constexpr ElementModP *P() { return new ElementModP(const_cast<uint64_t *>(P_ARRAY), true); };
+    constexpr ElementModP *P() { return new ElementModP(P_ARRAY, true); };
 
-    constexpr ElementModP *ZERO_MOD_P()
-    {
-        return new ElementModP(const_cast<uint64_t *>(ZERO_MOD_P_ARRAY), true);
-    };
+    constexpr ElementModP *ZERO_MOD_P() { return new ElementModP(ZERO_MOD_P_ARRAY, true); };
 
-    constexpr ElementModP *ONE_MOD_P()
-    {
-        return new ElementModP(const_cast<uint64_t *>(ONE_MOD_P_ARRAY), true);
-    };
+    constexpr ElementModP *ONE_MOD_P() { return new ElementModP(ONE_MOD_P_ARRAY, true); };
 
-    constexpr ElementModP *TWO_MOD_P()
-    {
-        return new ElementModP(const_cast<uint64_t *>(TWO_MOD_P_ARRAY), true);
-    };
+    constexpr ElementModP *TWO_MOD_P() { return new ElementModP(TWO_MOD_P_ARRAY, true); };
 
     /// <summary>
     /// Adds together the left hand side and right hand side and returns the sum mod P
@@ -98,8 +89,8 @@ namespace electionguard
     class EG_API ElementModQ
     {
       public:
-        ElementModQ(vector<uint64_t> *elem, bool unchecked = false);
-        ElementModQ(uint64_t *elem, bool unchecked = false);
+        ElementModQ(const vector<uint64_t> &elem, bool unchecked = false);
+        ElementModQ(const uint64_t *elem, bool unchecked = false);
         ~ElementModQ();
 
         uint64_t *get();
@@ -128,22 +119,13 @@ namespace electionguard
         ElementModQData data;
     };
 
-    constexpr ElementModQ *Q() { return new ElementModQ(const_cast<uint64_t *>(Q_ARRAY), true); };
+    constexpr ElementModQ *Q() { return new ElementModQ(Q_ARRAY, true); };
 
-    constexpr ElementModQ *ZERO_MOD_Q()
-    {
-        return new ElementModQ(const_cast<uint64_t *>(ZERO_MOD_Q_ARRAY), true);
-    };
+    constexpr ElementModQ *ZERO_MOD_Q() { return new ElementModQ(ZERO_MOD_Q_ARRAY, true); };
 
-    constexpr ElementModQ *ONE_MOD_Q()
-    {
-        return new ElementModQ(const_cast<uint64_t *>(ONE_MOD_Q_ARRAY), true);
-    };
+    constexpr ElementModQ *ONE_MOD_Q() { return new ElementModQ(ONE_MOD_Q_ARRAY, true); };
 
-    constexpr ElementModQ *TWO_MOD_Q()
-    {
-        return new ElementModQ(const_cast<uint64_t *>(TWO_MOD_Q_ARRAY), true);
-    };
+    constexpr ElementModQ *TWO_MOD_Q() { return new ElementModQ(TWO_MOD_Q_ARRAY, true); };
 
     /// <summary>
     /// Adds together the left hand side and right hand side and returns the sum mod Q

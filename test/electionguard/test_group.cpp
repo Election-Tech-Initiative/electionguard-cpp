@@ -13,9 +13,9 @@ TEST_CASE("add_mod_q for ints 1 and 1 should return q of 2")
     auto *one1 = ElementModQ::fromUint64(1UL);
     auto *one2 = ElementModQ::fromHex("01");
     auto *two = ElementModQ::fromUint64(2);
-    Log::debug(": one1 = " + one1->toHex() + " one2 = " + one2->toHex());
+    //Log::debug(": one1 = " + one1->toHex() + " one2 = " + one2->toHex());
     auto *result = add_mod_q(one1, one2);
-    Log::debug(": result->toHex() = " + result->toHex() + " and expectedHex = " + two->toHex());
+    //Log::debug(": result->toHex() = " + result->toHex() + " and expectedHex = " + two->toHex());
     CHECK(result->toHex() == two->toHex());
 }
 
@@ -24,15 +24,15 @@ TEST_CASE("add_mod_p for ints 1 and 1 should return q of 2")
     auto *one1 = ElementModP::fromUint64(1UL);
     auto *one2 = ElementModP::fromHex("01");
     auto *two = ElementModP::fromUint64(2);
-    Log::debug(": one1 = " + one1->toHex() + " one2 = " + one2->toHex());
+    //Log::debug(": one1 = " + one1->toHex() + " one2 = " + one2->toHex());
     auto *result = add_mod_p(one1, one2);
-    Log::debug(": result->toHex() = " + result->toHex() + " and expectedHex = " + two->toHex());
+    //Log::debug(": result->toHex() = " + result->toHex() + " and expectedHex = " + two->toHex());
     CHECK(result->toHex() == two->toHex());
 }
 
 TEST_CASE("add_mod_p for two huge P arrays")
 {
-    uint64_t p1Array[64U] = {
+    const uint64_t p1Array[64U] = {
       0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
       0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
       0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
@@ -49,7 +49,7 @@ TEST_CASE("add_mod_p for two huge P arrays")
       0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
       0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
       0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000};
-    uint64_t p2Array[64U] = {
+    const uint64_t p2Array[64U] = {
       0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
       0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
       0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
@@ -79,13 +79,11 @@ TEST_CASE("add_mod_p for two huge P arrays")
 
 TEST_CASE("Max of Q")
 {
-    auto *maxQ = new ElementModQ(const_cast<uint64_t *>(Q_ARRAY));
-    // Log::debug(": ElementModQ initalized with Q_ARRAY succeeds = " + maxQ->toHex());
-
     // when more than max of Q is passed in, ElementModQ should throw an exception
-    uint64_t maxArrayQPlus1[4U] = {0xFFFFFFFFFFFFFF44, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
-                                   0xFFFFFFFFFFFFFFFF};
-    CHECK_THROWS_WITH(new ElementModQ(maxArrayQPlus1),
+    const uint64_t maxArrayQPlus1[4U] = {0xFFFFFFFFFFFFFF44, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                                         0xFFFFFFFFFFFFFFFF};
+
+    CHECK_THROWS_WITH(new ElementModQ(const_cast<uint64_t *>(maxArrayQPlus1)),
                       "Value for ElementModQ is greater than allowed");
 }
 
@@ -134,10 +132,14 @@ TEST_CASE("Test Q is converted correctly")
     string expectedQHex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff43");
 
     auto *qFromHex = ElementModQ::fromHex(expectedQHex);
-    // Log::debug(qFromHex->get(), 64UL, " : qFromHex = ");
-    auto *q = new ElementModQ(const_cast<uint64_t *>(Q_ARRAY), true);
-    // Log::debug(" : q->toHex() = " + q->toHex());
-    CHECK(q->toHex() == expectedQHex);
+    auto *qFromRawArray = new ElementModQ(const_cast<uint64_t *>(Q_ARRAY), true);
+    auto *qFromConstExpr = Q();
+
+    CHECK(qFromHex->toHex() == expectedQHex);
+    CHECK(qFromRawArray->toHex() == expectedQHex);
+    CHECK(qFromConstExpr->toHex() == expectedQHex);
+
+    CHECK((*qFromHex == *qFromRawArray));
 }
 
 TEST_CASE("Test P is converted correctly")

@@ -60,10 +60,10 @@ electionguard::ElementModP *bytes_to_p(vector<uint8_t> bytes)
 /// Converts the binary value stored as a big-endian byte array
 /// to its big num representation stored as ElementModQ
 /// </summary>
-electionguard::ElementModQ *bytes_to_q(uint8_t *bytes, size_t size)
+electionguard::ElementModQ *bytes_to_q(const uint8_t *bytes, size_t size)
 {
     // TODO: validate inputs are within range
-    auto *bigNum = Hacl_Bignum256_new_bn_from_bytes_be(size, bytes);
+    auto *bigNum = Hacl_Bignum256_new_bn_from_bytes_be(size, const_cast<uint8_t *>(bytes));
     if (bigNum == nullptr) {
         throw out_of_range("bytes_to_q could not allocate");
     }
@@ -97,23 +97,25 @@ namespace electionguard
 
     // Lifecycle Methods
 
-    ElementModP::ElementModP(vector<uint64_t> *elem, bool unchecked /* = false */) : data()
+    ElementModP::ElementModP(const vector<uint64_t> &elem, bool unchecked /* = false */) : data()
     {
         Lib_Memzero0_memzero(static_cast<uint64_t *>(data.elem), MAX_P_LEN);
 
         uint64_t array[MAX_P_LEN] = {};
-        copy(elem->begin(), elem->end(), static_cast<uint64_t *>(array));
-        if (!unchecked && Hacl_Bignum4096_lt_mask(const_cast<uint64_t *>(P_ARRAY), array) > 0) {
+        copy(elem.begin(), elem.end(), static_cast<uint64_t *>(array));
+        if (!unchecked && Hacl_Bignum4096_lt_mask(const_cast<uint64_t *>(P_ARRAY),
+                                                  static_cast<uint64_t *>(array)) > 0) {
             throw out_of_range("Value for ElementModP is greater than allowed");
         }
         memcpy(static_cast<uint64_t *>(data.elem), static_cast<uint64_t *>(array), MAX_P_SIZE);
     }
 
     // param elem is expected to be allocated to uint64_t[MAX_P_LEN]
-    ElementModP::ElementModP(uint64_t *elem, bool unchecked /* = false */) : data()
+    ElementModP::ElementModP(const uint64_t *elem, bool unchecked /* = false */) : data()
     {
         Lib_Memzero0_memzero(static_cast<uint64_t *>(data.elem), MAX_P_LEN);
-        if (!unchecked && Hacl_Bignum4096_lt_mask(const_cast<uint64_t *>(P_ARRAY), elem) > 0) {
+        if (!unchecked && Hacl_Bignum4096_lt_mask(const_cast<uint64_t *>(P_ARRAY),
+                                                  const_cast<uint64_t *>(elem)) > 0) {
             throw out_of_range("Value for ElementModP is greater than allowed");
         }
         memcpy(static_cast<uint64_t *>(data.elem), elem, MAX_P_SIZE);
@@ -141,7 +143,7 @@ namespace electionguard
     ElementModP *ElementModP::fromHex(const string &representation)
     {
         auto sanitized = sanitize_hex_string(representation);
-        auto bytes = hex_to_bytes_be(sanitized);
+        auto bytes = hex_to_bytes(sanitized);
         auto *element = bytes_to_p(bytes);
         release(bytes);
         return element;
@@ -244,12 +246,12 @@ namespace electionguard
 
     // Lifecycle Methods
 
-    ElementModQ::ElementModQ(vector<uint64_t> *elem, bool unchecked /* = false */) : data()
+    ElementModQ::ElementModQ(const vector<uint64_t> &elem, bool unchecked /* = false */) : data()
     {
         Lib_Memzero0_memzero(static_cast<uint64_t *>(data.elem), MAX_P_LEN);
 
         uint64_t array[MAX_Q_LEN] = {};
-        copy(elem->begin(), elem->end(), static_cast<uint64_t *>(array));
+        copy(elem.begin(), elem.end(), static_cast<uint64_t *>(array));
         if (!unchecked && Hacl_Bignum4096_lt_mask(const_cast<uint64_t *>(Q_ARRAY),
                                                   static_cast<uint64_t *>(array)) > 0) {
             throw out_of_range("Value for ElementModQ is greater than allowed");
@@ -258,9 +260,10 @@ namespace electionguard
     }
 
     // param elem is expected to be allocated to uint64_t[MAX_Q_LEN]
-    ElementModQ::ElementModQ(uint64_t *elem, bool unchecked /* = false*/) : data()
+    ElementModQ::ElementModQ(const uint64_t *elem, bool unchecked /* = false*/) : data()
     {
-        if (!unchecked && Hacl_Bignum256_lt_mask(const_cast<uint64_t *>(Q_ARRAY), elem) > 0) {
+        if (!unchecked && Hacl_Bignum256_lt_mask(const_cast<uint64_t *>(Q_ARRAY),
+                                                 const_cast<uint64_t *>(elem)) > 0) {
             throw out_of_range("Value for ElementModQ is greater than allowed");
         }
         memcpy(static_cast<uint64_t *>(data.elem), elem, MAX_Q_SIZE);
@@ -289,7 +292,7 @@ namespace electionguard
     ElementModQ *ElementModQ::fromHex(const string &representation)
     {
         auto sanitized = sanitize_hex_string(representation);
-        auto bytes = hex_to_bytes_be(sanitized);
+        auto bytes = hex_to_bytes(sanitized);
         auto *element = bytes_to_q(bytes);
         release(bytes);
         return element;
