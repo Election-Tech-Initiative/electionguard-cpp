@@ -20,14 +20,30 @@ namespace electionguard
     class EG_API ElementModP
     {
       public:
+        ElementModP(vector<uint64_t> *elem, bool unchecked = false);
         ElementModP(uint64_t *elem, bool unchecked = false);
         ~ElementModP();
 
         uint64_t *get();
         string toHex();
 
+        /// <summary>
+        /// Converts the binary value stored by the hex string
+        /// to its big num representation stored as ElementModQ
+        /// </summary>
+        static ElementModP *fromHex(const string &representation);
+
+        /// <summary>
+        /// Converts an unsigned long integer value
+        /// (that is no larger than an unsigned long int)
+        /// to its big num representation stored as ElementModQ
+        /// </summary>
+        static ElementModP *fromUint64(uint64_t representation);
+
         bool operator==(const ElementModP &other);
         bool operator!=(const ElementModP &other);
+
+        bool operator<(const ElementModP &other);
 
       private:
         ElementModPData data;
@@ -51,24 +67,6 @@ namespace electionguard
     {
         return new ElementModP(const_cast<uint64_t *>(TWO_MOD_P_ARRAY), true);
     };
-
-    /// <summary>
-    /// Converts the binary value stored as a byte array
-    /// to its big num representation stored as ElementModP
-    /// </summary>
-    EG_API ElementModP *bytes_to_p(uint8_t *b, size_t bLen);
-
-    /// <summary>
-    /// Converts the binary value stored by the hex string
-    /// to its big num representation stored as ElementModP
-    /// </summary>
-    EG_API ElementModP *hex_to_p(string h);
-
-    /// <summary>
-    /// Converts an unsigned long integer value (that is no larger than an unsigned long int)
-    /// to its big num representation stored as ElementModP
-    /// </summary>
-    EG_API ElementModP *uint64_to_p(uint64_t i);
 
     /// <summary>
     /// Adds together the left hand side and right hand side and returns the sum mod P
@@ -100,12 +98,26 @@ namespace electionguard
     class EG_API ElementModQ
     {
       public:
+        ElementModQ(vector<uint64_t> *elem, bool unchecked = false);
         ElementModQ(uint64_t *elem, bool unchecked = false);
         ~ElementModQ();
 
         uint64_t *get();
         string toHex();
         ElementModP *toElementModP();
+
+        /// <summary>
+        /// Converts the binary value stored by the hex string
+        /// to its big num representation stored as ElementModQ
+        /// </summary>
+        static ElementModQ *fromHex(const string &representation);
+
+        /// <summary>
+        /// Converts an unsigned long integer value
+        /// (that is no larger than an unsigned long int)
+        /// to its big num representation stored as ElementModQ
+        /// </summary>
+        static ElementModQ *fromUint64(uint64_t representation);
 
         bool operator==(const ElementModQ &other);
         bool operator!=(const ElementModQ &other);
@@ -132,24 +144,6 @@ namespace electionguard
     {
         return new ElementModQ(const_cast<uint64_t *>(TWO_MOD_Q_ARRAY), true);
     };
-
-    /// <summary>
-    /// Converts the binary value stored as a big-endian byte array
-    /// to its big num representation stored as ElementModQ
-    /// </summary>
-    EG_API ElementModQ *bytes_to_q(uint8_t *b, size_t bLen);
-
-    /// <summary>
-    /// Converts the binary value stored by the hex string
-    /// to its big num representation stored as ElementModQ
-    /// </summary>
-    EG_API ElementModQ *hex_to_q(string h);
-
-    /// <summary>
-    /// Converts an unsigned long integer value (that is no larger than an unsigned long int)
-    /// to its big num representation stored as ElementModQ
-    /// </summary>
-    EG_API ElementModQ *uint64_to_q(uint64_t i);
 
     /// <summary>
     /// Adds together the left hand side and right hand side and returns the sum mod Q

@@ -51,9 +51,9 @@ namespace electionguard
             return nullptr;
         }
 
-        return new ElGamalCiphertext(
-          g_pow_p(nonce->toElementModP()),
-          mul_mod_p(g_pow_p(uint64_to_p(m)), pow_mod_p(publicKey, nonce->toElementModP())));
+        return new ElGamalCiphertext(g_pow_p(nonce->toElementModP()),
+                                     mul_mod_p(g_pow_p(ElementModP::fromUint64(m)),
+                                               pow_mod_p(publicKey, nonce->toElementModP())));
     }
 
 } // namespace electionguard

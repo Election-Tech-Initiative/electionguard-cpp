@@ -3,6 +3,7 @@
 
 #include <iomanip>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -30,6 +31,24 @@ namespace electionguard
             cout << caller << msg << endl;
             for (size_t i(0); i < bLen; i++) {
                 cout << "[" << hex << setw(2) << setfill('0') << (uint32_t)bytes[i] << "]";
+            }
+            cout << endl;
+        }
+        static void debug(vector<uint64_t> &container, string msg,
+                          const char *caller = __builtin_FUNCTION())
+        {
+            cout << caller << msg << endl;
+            for (auto element : container) {
+                cout << "[" << hex << setw(2) << setfill('0') << element << "]";
+            }
+            cout << endl;
+        }
+        static void debug(vector<uint8_t> &container, string msg,
+                          const char *caller = __builtin_FUNCTION())
+        {
+            cout << caller << msg << endl;
+            for (auto element : container) {
+                cout << "[" << hex << setw(2) << setfill('0') << (uint32_t)element << "]";
             }
             cout << endl;
         }
