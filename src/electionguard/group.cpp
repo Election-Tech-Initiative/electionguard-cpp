@@ -38,7 +38,6 @@ electionguard::ElementModP *bytes_to_p(uint8_t *bytes, size_t size)
     // TODO: validate that we actually want to copy 'size' elements from bignum
     memcpy(static_cast<uint64_t *>(element), bigNum, size);
     free(bigNum);
-
     return new electionguard::ElementModP(static_cast<uint64_t *>(element));
 }
 
@@ -89,6 +88,26 @@ electionguard::ElementModQ *bytes_to_q(vector<uint8_t> bytes)
     return element;
 }
 
+bool isMax(uint64_t (&array)[MAX_Q_LEN_DOUBLE])
+{
+    for (uint32_t i = 0; i < MAX_Q_LEN; i++) {
+        if (array[i] != 0xffffffffffffffff) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isMax(uint64_t (&array)[MAX_P_LEN_DOUBLE])
+{
+    for (uint32_t i = 0; i < MAX_P_LEN; i++) {
+        if (array[i] != 0xffffffffffffffff) {
+            return false;
+        }
+    }
+    return true;
+}
+
 #pragma endregion
 
 namespace electionguard
@@ -103,7 +122,7 @@ namespace electionguard
 
         uint64_t array[MAX_P_LEN] = {};
         copy(elem.begin(), elem.end(), static_cast<uint64_t *>(array));
-        if (!unchecked && Hacl_Bignum4096_lt_mask(const_cast<uint64_t *>(P_ARRAY),
+        if (!unchecked && Hacl_Bignum4096_lt_mask(const_cast<uint64_t *>(P_ARRAY_REVERSE),
                                                   static_cast<uint64_t *>(array)) > 0) {
             throw out_of_range("Value for ElementModP is greater than allowed");
         }
@@ -114,7 +133,7 @@ namespace electionguard
     ElementModP::ElementModP(const uint64_t *elem, bool unchecked /* = false */) : data()
     {
         Lib_Memzero0_memzero(static_cast<uint64_t *>(data.elem), MAX_P_LEN);
-        if (!unchecked && Hacl_Bignum4096_lt_mask(const_cast<uint64_t *>(P_ARRAY),
+        if (!unchecked && Hacl_Bignum4096_lt_mask(const_cast<uint64_t *>(P_ARRAY_REVERSE),
                                                   const_cast<uint64_t *>(elem)) > 0) {
             throw out_of_range("Value for ElementModP is greater than allowed");
         }
@@ -129,6 +148,13 @@ namespace electionguard
     // Property Getters
 
     uint64_t *ElementModP::get() { return static_cast<uint64_t *>(data.elem); }
+
+    bool ElementModP::isInBounds() { return (*ZERO_MOD_P() < *this) && (*this < *P()); }
+    bool ElementModP::isValidResidue()
+    {
+        auto residue = (*pow_mod_p(this, Q()) == *ONE_MOD_P());
+        return this->isInBounds() && residue;
+    }
 
     string ElementModP::toHex()
     {
@@ -183,65 +209,6 @@ namespace electionguard
 
 #pragma endregion
 
-#pragma region ElementModP Global Functions
-
-    ElementModP *add_mod_p(ElementModP *lhs, ElementModP *rhs)
-    {
-        uint64_t result[MAX_P_LEN] = {};
-        uint64_t carry =
-          Hacl_Bignum4096_add(lhs->get(), rhs->get(), static_cast<uint64_t *>(result));
-        if (carry > 0) {
-            // just bypass compiler error
-        }
-
-        // TODO: temporarily using a mul operation to expand the data
-        uint64_t mulResult[MAX_P_LEN_DOUBLE] = {};
-        Hacl_Bignum4096_mul(static_cast<uint64_t *>(result), ONE_MOD_P()->get(),
-                            static_cast<uint64_t *>(mulResult));
-
-        uint64_t modResult[MAX_P_LEN] = {};
-        bool success = Hacl_Bignum4096_mod(P()->get(), static_cast<uint64_t *>(mulResult),
-                                           static_cast<uint64_t *>(modResult));
-        if (!success) {
-            throw runtime_error(" add_mod_p mod operation failed");
-        }
-        return new ElementModP(static_cast<uint64_t *>(result));
-    }
-
-    ElementModP *mul_mod_p(ElementModP *lhs, ElementModP *rhs)
-    {
-        uint64_t mulResult[MAX_P_LEN_DOUBLE] = {};
-        Hacl_Bignum4096_mul(lhs->get(), rhs->get(), static_cast<uint64_t *>(mulResult));
-        uint64_t modResult[MAX_P_LEN] = {};
-        bool success = Hacl_Bignum4096_mod(P()->get(), static_cast<uint64_t *>(mulResult),
-                                           static_cast<uint64_t *>(modResult));
-        if (!success) {
-            throw runtime_error(" mul_mod_p mod operation failed");
-        }
-        return new ElementModP(static_cast<uint64_t *>(modResult));
-    }
-
-    ElementModP *pow_mod_p(ElementModP *b, ElementModP *e)
-    {
-        // HACL's input constraints require the exponent to be greater than zero
-        if (*e == *ZERO_MOD_P()) {
-            return ElementModP::fromUint64(1);
-        }
-
-        uint64_t result[MAX_P_LEN] = {};
-        bool success = Hacl_Bignum4096_mod_exp(P()->get(), b->get(), MAX_P_SIZE, e->get(),
-                                               static_cast<uint64_t *>(result));
-        if (!success) {
-            throw runtime_error(" pow_mod_p mod operation failed");
-        }
-
-        return new ElementModP(result, true);
-    }
-
-    ElementModP *g_pow_p(ElementModP *e) { return pow_mod_p(G(), e); }
-
-#pragma endregion
-
 #pragma region ElementModQ
 
     // Lifecycle Methods
@@ -252,7 +219,7 @@ namespace electionguard
 
         uint64_t array[MAX_Q_LEN] = {};
         copy(elem.begin(), elem.end(), static_cast<uint64_t *>(array));
-        if (!unchecked && Hacl_Bignum4096_lt_mask(const_cast<uint64_t *>(Q_ARRAY),
+        if (!unchecked && Hacl_Bignum4096_lt_mask(const_cast<uint64_t *>(Q_ARRAY_REVERSE),
                                                   static_cast<uint64_t *>(array)) > 0) {
             throw out_of_range("Value for ElementModQ is greater than allowed");
         }
@@ -262,7 +229,7 @@ namespace electionguard
     // param elem is expected to be allocated to uint64_t[MAX_Q_LEN]
     ElementModQ::ElementModQ(const uint64_t *elem, bool unchecked /* = false*/) : data()
     {
-        if (!unchecked && Hacl_Bignum256_lt_mask(const_cast<uint64_t *>(Q_ARRAY),
+        if (!unchecked && Hacl_Bignum256_lt_mask(const_cast<uint64_t *>(Q_ARRAY_REVERSE),
                                                  const_cast<uint64_t *>(elem)) > 0) {
             throw out_of_range("Value for ElementModQ is greater than allowed");
         }
@@ -278,6 +245,8 @@ namespace electionguard
     uint64_t *ElementModQ::get() { return static_cast<uint64_t *>(data.elem); }
 
     // Public Methods
+
+    bool ElementModQ::isInBounds() { return (*ZERO_MOD_Q() < *this) && (*this < *Q()); }
 
     string ElementModQ::toHex()
     {
@@ -339,93 +308,261 @@ namespace electionguard
 
 #pragma endregion
 
+#pragma region ElementModP Global Functions
+
+    ElementModP *add_mod_p(ElementModP *lhs, ElementModP *rhs)
+    {
+
+        uint64_t result[MAX_P_LEN_DOUBLE] = {};
+        uint64_t carry =
+          Hacl_Bignum4096_add(lhs->get(), rhs->get(), static_cast<uint64_t *>(result));
+
+        // handle the specific case where the the sum == MAX_4096
+        // but the carry value is not set.  We still need to offset.
+        if (carry > 0 || isMax(result)) {
+
+            auto big_a = (*P() < *lhs);
+            auto big_b = (*P() < *rhs);
+
+            // TODO: genericize this in a HACL wrapper
+            // the single byte shifts belong in the wrapper
+            // but the Q array shifts belong in this class
+            if (big_a || big_b) {
+
+                // TODO: handle carry like in ElementModQ
+
+                // uint64_t offset[MAX_Q_LEN] = {};
+
+                // if (big_a) {
+                //     Hacl_Bignum4096_add(offset, const_cast<uint64_t *>(P_ARRAY_INVERSE_REVERSE),
+                //                         offset);
+                //     Hacl_Bignum4096_add(offset, const_cast<uint64_t *>(ONE_MOD_P_ARRAY), offset);
+                // }
+
+                // if (big_b) {
+                //     Hacl_Bignum4096_add(offset, const_cast<uint64_t *>(P_ARRAY_INVERSE_REVERSE),
+                //                         offset);
+                //     Hacl_Bignum4096_add(offset, const_cast<uint64_t *>(ONE_MOD_P_ARRAY), offset);
+                // }
+
+                // // adjust
+                // Hacl_Bignum4096_add(result, offset, static_cast<uint64_t *>(result));
+
+            } else {
+                // uint64_t offset[MAX_P_LEN] = {0x00000000000000bd};
+                // Hacl_Bignum4096_add(result, offset, static_cast<uint64_t *>(result));
+            }
+        }
+
+        uint64_t modResult[MAX_P_LEN] = {};
+        bool success = Hacl_Bignum4096_mod(P()->get(), static_cast<uint64_t *>(result),
+                                           static_cast<uint64_t *>(modResult));
+        if (!success) {
+            throw runtime_error(" add_mod_p mod operation failed");
+        }
+        return new ElementModP(static_cast<uint64_t *>(result));
+    }
+
+    ElementModP *mul_mod_p(ElementModP *lhs, ElementModP *rhs)
+    {
+        uint64_t mulResult[MAX_P_LEN_DOUBLE] = {};
+        Hacl_Bignum4096_mul(lhs->get(), rhs->get(), static_cast<uint64_t *>(mulResult));
+        uint64_t modResult[MAX_P_LEN] = {};
+        bool success = Hacl_Bignum4096_mod(P()->get(), static_cast<uint64_t *>(mulResult),
+                                           static_cast<uint64_t *>(modResult));
+        if (!success) {
+            throw runtime_error(" mul_mod_p mod operation failed");
+        }
+        return new ElementModP(static_cast<uint64_t *>(modResult));
+    }
+
+    ElementModP *mul_mod_p(vector<ElementModPOrQ> elems)
+    {
+        auto *product = ElementModP::fromUint64(1);
+        for (auto x : elems) {
+            ElementModP *elem;
+            if (holds_alternative<ElementModQ *>(x)) {
+                elem = get<ElementModQ *>(x)->toElementModP();
+
+            } else if (holds_alternative<ElementModP *>(x)) {
+                elem = get<ElementModP *>(x);
+            } else {
+                throw "invalid type";
+            }
+
+            auto *res = mul_mod_p(product, elem);
+            product = res;
+        }
+        return product;
+    }
+
+    ElementModP *pow_mod_p(ElementModPOrQ b, ElementModPOrQ e)
+    {
+        ElementModP *base;
+        ElementModP *exponent;
+
+        if (holds_alternative<ElementModQ *>(b)) {
+            base = get<ElementModQ *>(b)->toElementModP();
+        } else if (holds_alternative<ElementModP *>(b)) {
+            base = get<ElementModP *>(b);
+        } else {
+            throw "unsupported type";
+        }
+
+        if (holds_alternative<ElementModQ *>(e)) {
+            exponent = get<ElementModQ *>(e)->toElementModP();
+        } else if (holds_alternative<ElementModP *>(e)) {
+            exponent = get<ElementModP *>(e);
+        } else {
+            throw "unsupported type";
+        }
+
+        // HACL's input constraints require the exponent to be greater than zero
+        if (*exponent == *ZERO_MOD_P()) {
+            return ElementModP::fromUint64(1);
+        }
+
+        uint64_t result[MAX_P_LEN] = {};
+        bool success = Hacl_Bignum4096_mod_exp(P()->get(), base->get(), MAX_P_SIZE, exponent->get(),
+                                               static_cast<uint64_t *>(result));
+        if (!success) {
+            throw runtime_error(" pow_mod_p mod operation failed");
+        }
+
+        return new ElementModP(result, true);
+    }
+
+    ElementModP *g_pow_p(ElementModPOrQ e) { return pow_mod_p(G(), e); }
+
+#pragma endregion
+
 #pragma region ElementModQ Global Functions
 
     ElementModQ *add_mod_q(ElementModQ *lhs, ElementModQ *rhs)
     {
-        uint64_t addResult[MAX_Q_LEN] = {};
+        uint64_t addResult[MAX_Q_LEN_DOUBLE] = {};
         uint64_t carry =
           Hacl_Bignum256_add(lhs->get(), rhs->get(), static_cast<uint64_t *>(addResult));
-        if (carry > 0) {
-            // just bypass compiler error
-        }
 
-        // TODO: Temporarily executing a mul operation to widen the result
-        uint64_t mulResult[MAX_Q_LEN_DOUBLE] = {};
-        Hacl_Bignum256_mul(static_cast<uint64_t *>(addResult), ONE_MOD_Q()->get(),
-                           static_cast<uint64_t *>(mulResult));
+        // handle the specific case where the the sum == MAX_256
+        // but the carry value is not set.  We still need to offset.
+        if (carry > 0 || isMax(addResult)) {
+
+            auto big_a = (*Q() < *lhs);
+            auto big_b = (*Q() < *rhs);
+
+            // TODO: genericize this in a HACL wrapper
+            // the single byte shifts belong in the wrapper
+            // but the Q array shifts belong in this class
+            if (big_a || big_b) {
+
+                uint64_t offset[MAX_Q_LEN] = {};
+
+                if (big_a) {
+                    Hacl_Bignum256_add(offset, const_cast<uint64_t *>(Q_ARRAY_INVERSE_REVERSE),
+                                       offset);
+                    Hacl_Bignum256_add(offset, const_cast<uint64_t *>(ONE_MOD_Q_ARRAY), offset);
+                }
+
+                if (big_b) {
+                    Hacl_Bignum256_add(offset, const_cast<uint64_t *>(Q_ARRAY_INVERSE_REVERSE),
+                                       offset);
+                    Hacl_Bignum256_add(offset, const_cast<uint64_t *>(ONE_MOD_Q_ARRAY), offset);
+                }
+
+                // adjust
+                Hacl_Bignum256_add(addResult, offset, static_cast<uint64_t *>(addResult));
+
+            } else {
+                uint64_t offset[MAX_Q_LEN] = {0x00000000000000bd};
+                Hacl_Bignum256_add(addResult, offset, static_cast<uint64_t *>(addResult));
+            }
+        }
 
         uint64_t resModQ[MAX_Q_LEN] = {};
-        bool modSuccess = Hacl_Bignum256_mod(Q()->get(), static_cast<uint64_t *>(mulResult),
+        bool modSuccess = Hacl_Bignum256_mod(Q()->get(), static_cast<uint64_t *>(addResult),
                                              static_cast<uint64_t *>(resModQ));
         if (!modSuccess) {
-            throw runtime_error(" add_mod_q mod operation failed");
+            throw runtime_error("add_mod_q mod operation failed");
         }
-
         return new ElementModQ(static_cast<uint64_t *>(resModQ));
     }
 
-    ElementModQ *a_minus_b_mod_q(ElementModQ *a, ElementModQ *b)
+    ElementModQ *sub_mod_q(ElementModQ *a, ElementModQ *b)
     {
-        uint64_t subResult[MAX_Q_LEN] = {};
-        Hacl_Bignum256_sub(a->get(), b->get(), static_cast<uint64_t *>(subResult));
+        uint64_t subResult[MAX_Q_LEN_DOUBLE] = {};
+        uint64_t carry = Hacl_Bignum256_sub(a->get(), b->get(), static_cast<uint64_t *>(subResult));
 
-        // TODO: Temporarily executing a mul operation to widen the result
-        uint64_t mulResult[MAX_Q_LEN_DOUBLE] = {};
-        Hacl_Bignum256_mul(static_cast<uint64_t *>(subResult), ONE_MOD_Q()->get(),
-                           static_cast<uint64_t *>(mulResult));
+        if (carry > 0) {
+
+            auto big_a = (*Q() < *a);
+            auto big_b = (*Q() < *b);
+
+            if (big_a || big_b) {
+
+                // TODO: genericize and precompute
+
+                uint64_t offset[MAX_Q_LEN] = {};
+
+                Hacl_Bignum256_add(offset, const_cast<uint64_t *>(Q_ARRAY_INVERSE_REVERSE), offset);
+                Hacl_Bignum256_add(offset, const_cast<uint64_t *>(ONE_MOD_Q_ARRAY), offset);
+
+                // adjust
+                Hacl_Bignum256_sub(subResult, offset, static_cast<uint64_t *>(subResult));
+
+            } else {
+                uint64_t offset[MAX_Q_LEN] = {0x00000000000000bd};
+                Hacl_Bignum256_sub(subResult, offset, static_cast<uint64_t *>(subResult));
+            }
+        }
 
         uint64_t resModQ[MAX_Q_LEN] = {};
-        bool modSuccess = Hacl_Bignum256_mod(Q()->get(), static_cast<uint64_t *>(mulResult),
+        bool modSuccess = Hacl_Bignum256_mod(Q()->get(), static_cast<uint64_t *>(subResult),
                                              static_cast<uint64_t *>(resModQ));
         if (!modSuccess) {
             throw runtime_error(" a_minus_b_mod_q mod operation failed");
         }
-
         return new ElementModQ(static_cast<uint64_t *>(resModQ));
     }
 
     ElementModQ *a_plus_bc_mod_q(ElementModQ *a, ElementModQ *b, ElementModQ *c)
     {
-        uint64_t resultBC[MAX_Q_LEN_DOUBLE] = {};
-        Hacl_Bignum256_mul(b->get(), c->get(), static_cast<uint64_t *>(resultBC));
-
-        // TODO: Temprarily using P address space
         // since the result of b*c can be larger than Q's 256,
         // use P's length and 4096 Hacl for rest of calculation
-        uint64_t bc4096[MAX_P_LEN] = {};
-        memcpy(static_cast<uint64_t *>(bc4096), static_cast<uint64_t *>(resultBC),
-               MAX_Q_LEN_DOUBLE);
 
-        uint64_t a_plus_bc_result[MAX_P_LEN] = {};
+        uint64_t resultBC[MAX_P_LEN] = {}; // init to MAX_P_LEN
+        Hacl_Bignum256_mul(b->get(), c->get(), static_cast<uint64_t *>(resultBC));
+
+        auto *bc_as_p = new ElementModP(resultBC);
+        auto *a_as_p = a->toElementModP()->get();
+
+        uint64_t a_plus_bc_result[MAX_P_LEN_DOUBLE] = {};
         uint64_t carry =
-          Hacl_Bignum4096_add(a->toElementModP()->get(), static_cast<uint64_t *>(bc4096),
-                              static_cast<uint64_t *>(a_plus_bc_result));
+          Hacl_Bignum4096_add(a_as_p, bc_as_p->get(), static_cast<uint64_t *>(a_plus_bc_result));
+
+        // we should never overflow P space since our max size
+        // is resultBC[MAX_Q_LEN_DOUBLE] + a[MAX_Q_LEN]
         if (carry > 0) {
-            // just bypass compiler error
+            throw overflow_error("a_plus_bc_mod_q add operation out of bounds");
         }
 
-        // TODO: Temporarily executing a mul operation to widen the result
-        uint64_t mulResult[MAX_P_LEN_DOUBLE] = {};
-        Hacl_Bignum256_mul(static_cast<uint64_t *>(a_plus_bc_result), ONE_MOD_P()->get(),
-                           static_cast<uint64_t *>(mulResult));
-
         uint64_t resModQ[MAX_P_LEN] = {};
-        bool modSuccess =
-          Hacl_Bignum4096_mod(Q()->toElementModP()->get(), static_cast<uint64_t *>(mulResult),
-                              static_cast<uint64_t *>(resModQ));
+        bool modSuccess = Hacl_Bignum4096_mod(Q()->toElementModP()->get(),
+                                              static_cast<uint64_t *>(a_plus_bc_result),
+                                              static_cast<uint64_t *>(resModQ));
         if (!modSuccess) {
-            throw runtime_error(" a_plus_bc_mod_q mod operation failed");
+            throw runtime_error("a_plus_bc_mod_q mod operation failed");
         }
 
         return new ElementModQ(static_cast<uint64_t *>(resModQ));
     }
 
-    ElementModQ *negate_mod_q(ElementModQ *a)
+    ElementModQ *sub_from_q(ElementModQ *a)
     {
         uint64_t result[MAX_Q_LEN] = {};
         Hacl_Bignum256_sub(Q()->get(), a->get(), static_cast<uint64_t *>(result));
-        // TODO: python version doesn't perform % Q on results...
+        // TODO: python version doesn't perform % Q on results,
+        // but we still needto handle the overflow values between (Q, MAX_256]
         return new ElementModQ(static_cast<uint64_t *>(result), true);
     }
 

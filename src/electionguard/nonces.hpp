@@ -16,7 +16,7 @@ namespace electionguard
         uint64_t nextItem;
     };
 
-    class Nonces
+    class EG_INTERNAL_API Nonces
     {
       public:
         Nonces(ElementModQ *seed, NoncesHeaderType headers);

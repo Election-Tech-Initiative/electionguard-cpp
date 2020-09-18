@@ -16,8 +16,8 @@ namespace electionguard
 
     // TODO: Fold Expressions for Variadic Templates  (iterating with vectors for now)
     // template <typename... Args> ElementModQ *hash_elems(CryptoHashableType a, Args... args);
-    EG_INTERNAL_API ElementModQ *hash_elems(vector<CryptoHashableType> a);
-    EG_INTERNAL_API ElementModQ *hash_elems(CryptoHashableType a);
+    EG_API ElementModQ *hash_elems(vector<CryptoHashableType> a);
+    EG_API ElementModQ *hash_elems(CryptoHashableType a);
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD_CORE_HASH_HPP_INCLUDED__ */

@@ -19,7 +19,7 @@ namespace electionguard
 
     ElementModQ *hash_elems(vector<CryptoHashableType> a)
     {
-        uint8_t output[32] = {};
+        uint8_t output[MAX_Q_SIZE] = {};
         Hacl_Streaming_Functor_state_s___uint32_t____ *p = Hacl_Streaming_SHA2_create_in_256();
         Hacl_Streaming_SHA2_update_256(p, delimiter, sizeof(delimiter));
 
@@ -33,9 +33,12 @@ namespace electionguard
 
         Hacl_Streaming_SHA2_finish_256(p, output);
 
-        auto bn = Hacl_Bignum256_new_bn_from_bytes_be(sizeof(output), output);
+        auto *bn = Hacl_Bignum256_new_bn_from_bytes_be(sizeof(output), output);
 
-        auto q = new ElementModQ(bn);
+        // TODO: take the result mod Q - 1
+        // to produce a result that is [0,q-1]
+
+        auto *q = new ElementModQ(bn);
 
         Hacl_Streaming_SHA2_free_256(p);
         free(bn);

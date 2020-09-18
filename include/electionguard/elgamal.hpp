@@ -20,10 +20,10 @@ namespace electionguard
         ElGamalKeyPair(ElementModQ *secretKey, ElementModP *publicKey);
         ~ElGamalKeyPair();
 
-        static ElGamalKeyPair *fromSecret(ElementModQ *a);
-
         ElementModQ *getSecretKey();
         ElementModP *getPublicKey();
+
+        static ElGamalKeyPair *fromSecret(ElementModQ *a);
 
       private:
         ElGamalKeyPairData data;
@@ -47,6 +47,10 @@ namespace electionguard
 
         ElementModP *getPad();
         ElementModP *getData();
+
+        uint64_t decrypt(ElementModP *product);
+        uint64_t decrypt(ElementModQ *secretKey);
+        uint64_t decrypt(ElementModP *publicKey, ElementModQ *nonce);
 
         virtual ElementModQ *crypto_hash();
 

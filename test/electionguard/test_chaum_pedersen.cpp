@@ -31,14 +31,15 @@ TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
     auto *firstMessage = elgamalEncrypt(0, nonce, keypair->getPublicKey());
     auto *firstMessageZeroProof = DisjunctiveChaumPedersenProofHarness::make_zero(
       firstMessage, nonce, keypair->getPublicKey(), ONE_MOD_Q(), seed);
+
     auto *firstMessageOneProof = DisjunctiveChaumPedersenProofHarness::make_one(
       firstMessage, nonce, keypair->getPublicKey(), ONE_MOD_Q(), seed);
 
     CHECK(firstMessageZeroProof->isValid(firstMessage, keypair->getPublicKey(), ONE_MOD_Q()) ==
           true);
-    // TODO: execute with new math
-    // CHECK(firstMessageOneProof->isValid(firstMessage, keypair->getPublicKey(), ONE_MOD_Q()) ==
-    //       false);
+
+    CHECK(firstMessageOneProof->isValid(firstMessage, keypair->getPublicKey(), ONE_MOD_Q()) ==
+          false);
 
     auto *secondMessage = elgamalEncrypt(1, nonce, keypair->getPublicKey());
     auto *secondMessageZeroProof = DisjunctiveChaumPedersenProofHarness::make_zero(
@@ -46,10 +47,9 @@ TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
     auto *secondMessageOneProof = DisjunctiveChaumPedersenProofHarness::make_one(
       secondMessage, nonce, keypair->getPublicKey(), ONE_MOD_Q(), seed);
 
-    // TODO: execute with new math
-    // CHECK(secondMessageZeroProof->isValid(secondMessage, keypair->getPublicKey(), ONE_MOD_Q()) ==
-    //       false);
-    CHECK(secondMessageOneProof->isValid(firstMessage, keypair->getPublicKey(), ONE_MOD_Q()) ==
+    CHECK(secondMessageZeroProof->isValid(secondMessage, keypair->getPublicKey(), ONE_MOD_Q()) ==
+          false);
+    CHECK(secondMessageOneProof->isValid(secondMessage, keypair->getPublicKey(), ONE_MOD_Q()) ==
           true);
 }
 

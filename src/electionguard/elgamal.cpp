@@ -5,7 +5,9 @@
 
 namespace electionguard
 {
-    // ElGamalKeyPair
+#pragma region ElgamalKeyPair
+
+    // Lifecycle Methods
 
     ElGamalKeyPair::ElGamalKeyPair(ElementModQ *secretKey, ElementModP *publicKey) : data()
     {
@@ -13,7 +15,19 @@ namespace electionguard
         data.publicKey = publicKey;
     }
 
-    ElGamalKeyPair::~ElGamalKeyPair() {}
+    ElGamalKeyPair::~ElGamalKeyPair()
+    {
+        delete data.secretKey;
+        delete data.publicKey;
+    }
+
+    // Property Getters
+
+    ElementModQ *ElGamalKeyPair::getSecretKey() { return data.secretKey; }
+
+    ElementModP *ElGamalKeyPair::getPublicKey() { return data.publicKey; }
+
+    // Public Members
 
     ElGamalKeyPair *ElGamalKeyPair::fromSecret(ElementModQ *a)
     {
@@ -25,11 +39,9 @@ namespace electionguard
         return new ElGamalKeyPair(a, g_pow_p(a->toElementModP()));
     }
 
-    ElementModQ *ElGamalKeyPair::getSecretKey() { return data.secretKey; }
+#pragma endregion
 
-    ElementModP *ElGamalKeyPair::getPublicKey() { return data.publicKey; }
-
-    // ElGamalCiphertext
+#pragma region ElGamalCiphertext
 
     ElGamalCiphertext::ElGamalCiphertext(ElementModP *pad, ElementModP *data) : data()
     {
@@ -42,6 +54,14 @@ namespace electionguard
     ElementModP *ElGamalCiphertext::getPad() { return data.pad; }
     ElementModP *ElGamalCiphertext::getData() { return data.data; }
 
+    uint64_t ElGamalCiphertext::decrypt(ElementModP *product) { return 0; }
+    uint64_t ElGamalCiphertext::decrypt(ElementModQ *secretKey)
+    {
+        auto *result = pow_mod_p(data.pad, secretKey->toElementModP());
+        return result->get()[0];
+    }
+    uint64_t ElGamalCiphertext::decrypt(ElementModP *publicKey, ElementModQ *nonce) { return 0; }
+
     ElementModQ *ElGamalCiphertext::crypto_hash() { return hash_elems({data.pad, data.data}); }
 
     ElGamalCiphertext *elgamalEncrypt(uint64_t m, ElementModQ *nonce, ElementModP *publicKey)
@@ -51,9 +71,26 @@ namespace electionguard
             return nullptr;
         }
 
-        return new ElGamalCiphertext(g_pow_p(nonce->toElementModP()),
-                                     mul_mod_p(g_pow_p(ElementModP::fromUint64(m)),
-                                               pow_mod_p(publicKey, nonce->toElementModP())));
+        auto *pad = g_pow_p(nonce);
+        auto *e = ElementModP::fromUint64(m);
+        auto *gpowp_m = g_pow_p(e);
+        auto *pubkey_pow_n = pow_mod_p(publicKey, nonce->toElementModP());
+        auto *data = mul_mod_p(gpowp_m, pubkey_pow_n);
+
+        // Log::debugHex(" e->get: ", e->toHex());
+        // Log::debugHex(" gpowp_m->get: ", gpowp_m->toHex());
+        // Log::debugHex(" pubkey_pow_n->get: ", pubkey_pow_n->toHex());
+        // Log::debugHex(" data->get: ", data->toHex());
+
+        auto *ciphertext = new ElGamalCiphertext(pad, data);
+
+        delete pubkey_pow_n;
+        delete gpowp_m;
+        delete e;
+
+        return ciphertext;
     }
+
+#pragma endregion
 
 } // namespace electionguard
