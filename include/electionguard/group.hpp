@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -49,15 +50,15 @@ namespace electionguard
         ElementModPData data;
     };
 
-    constexpr ElementModP *G() { return new ElementModP(G_ARRAY, true); };
+    ElementModP *G();
 
-    constexpr ElementModP *P() { return new ElementModP(P_ARRAY, true); };
+    ElementModP *P();
 
-    constexpr ElementModP *ZERO_MOD_P() { return new ElementModP(ZERO_MOD_P_ARRAY, true); };
+    ElementModP *ZERO_MOD_P();
 
-    constexpr ElementModP *ONE_MOD_P() { return new ElementModP(ONE_MOD_P_ARRAY, true); };
+    ElementModP *ONE_MOD_P();
 
-    constexpr ElementModP *TWO_MOD_P() { return new ElementModP(TWO_MOD_P_ARRAY, true); };
+    ElementModP *TWO_MOD_P();
 
     /// <summary>
     /// Adds together the left hand side and right hand side and returns the sum mod P
@@ -119,13 +120,13 @@ namespace electionguard
         ElementModQData data;
     };
 
-    constexpr ElementModQ *Q() { return new ElementModQ(Q_ARRAY, true); };
+    ElementModQ *Q();
 
-    constexpr ElementModQ *ZERO_MOD_Q() { return new ElementModQ(ZERO_MOD_Q_ARRAY, true); };
+    ElementModQ *ZERO_MOD_Q();
 
-    constexpr ElementModQ *ONE_MOD_Q() { return new ElementModQ(ONE_MOD_Q_ARRAY, true); };
+    ElementModQ *ONE_MOD_Q();
 
-    constexpr ElementModQ *TWO_MOD_Q() { return new ElementModQ(TWO_MOD_Q_ARRAY, true); };
+    ElementModQ *TWO_MOD_Q();
 
     /// <summary>
     /// Adds together the left hand side and right hand side and returns the sum mod Q
