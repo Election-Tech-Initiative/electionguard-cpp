@@ -1,12 +1,10 @@
 #include "electionguard/election.hpp"
+#include "variant_cast.hpp"
 
 extern "C" {
 
 #include "electionguard/election.h"
 }
-
-#define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
-#define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
 
 EG_API eg_selection_description_t *eg_selection_description_new(const char *object_id,
                                                                 const char *candidate_id,

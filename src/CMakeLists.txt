@@ -21,6 +21,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/log.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/serialize.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/tracker.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/tracker_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/variant_cast.hpp

@@ -9,8 +9,8 @@ using namespace electionguard;
 
 TEST_CASE("elgamalEncrypt simple with nonce is 1, publickey is g_pow_p(2)")
 {
-    auto *one = uint64_to_q(1UL);
-    auto *two = uint64_to_p(2UL);
+    auto *one = ElementModQ::fromUint64(1UL);
+    auto *two = ElementModP::fromUint64(2UL);
     auto *publicKey = g_pow_p(two);
     auto *g = new ElementModP(const_cast<uint64_t *>(G_ARRAY), true);
 
