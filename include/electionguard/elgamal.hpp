@@ -51,9 +51,7 @@ namespace electionguard
         ElementModP *getPad();
         ElementModP *getData();
 
-        // uint64_t decrypt(ElementModP *product);
-        // uint64_t decrypt(ElementModQ *secretKey);
-        // uint64_t decrypt(ElementModP *publicKey, ElementModQ *nonce);
+        uint64_t decrypt(const ElementModQ &secretKey);
 
         virtual unique_ptr<ElementModQ> crypto_hash() const;
 

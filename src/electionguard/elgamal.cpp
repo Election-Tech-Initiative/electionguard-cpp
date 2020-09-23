@@ -1,5 +1,6 @@
 #include "electionguard/elgamal.hpp"
 
+#include "../kremlin/Hacl_Bignum4096.h"
 #include "electionguard/hash.hpp"
 #include "log.hpp"
 
@@ -86,6 +87,57 @@ namespace electionguard
 
     ElementModP *ElGamalCiphertext::getPad() { return pimpl->pad.get(); }
     ElementModP *ElGamalCiphertext::getData() { return pimpl->data.get(); }
+
+    uint64_t ElGamalCiphertext::decrypt(const ElementModQ &secretKey)
+    {
+        // Note this decryption method is primarily used for testing
+        // and is only capable of decrypting boolean results (0/1)
+        // it should be extended with a discrete_log search to decrypt
+        // values other than 0 or 1
+        const auto &p = P();
+        auto secret = secretKey.toElementModP();
+        uint64_t divisor[MAX_P_LEN] = {};
+        bool success = Hacl_Bignum4096_mod_exp(p.get(), this->getPad()->get(), MAX_P_SIZE,
+                                               secret->get(), static_cast<uint64_t *>(divisor));
+        if (!success) {
+            Log::debug(": could not calculate mod exp");
+            return 0;
+        }
+
+        uint64_t inverse[MAX_P_LEN] = {};
+        success = Hacl_Bignum4096_mod_inv_prime(p.get(), static_cast<uint64_t *>(divisor),
+                                                static_cast<uint64_t *>(inverse));
+        if (!success) {
+            Log::debug(": could not calculate inverse");
+            return 0;
+        }
+
+        uint64_t mulResult[MAX_P_LEN_DOUBLE] = {};
+        Hacl_Bignum4096_mul(this->getData()->get(), static_cast<uint64_t *>(inverse),
+                            static_cast<uint64_t *>(mulResult));
+
+        uint64_t result[MAX_P_LEN] = {};
+        success = Hacl_Bignum4096_mod(p.get(), static_cast<uint64_t *>(mulResult),
+                                      static_cast<uint64_t *>(result));
+        if (!success) {
+            Log::debug(": could not calculate mod");
+            return 0;
+        }
+
+        // TODO: traverse a discrete_log lookup to find the result
+        auto result_as_p = make_unique<ElementModP>(result);
+        uint64_t retval = 0xffffffffffffffff;
+        if (*result_as_p == ONE_MOD_P()) {
+            // if it is 1 it is false
+            retval = 0;
+        } else if (*result_as_p == G()) {
+            // if it is g, it is true
+            retval = 1;
+        }
+
+        // if it is anything else no result found (decrypt failed)
+        return retval;
+    }
 
     unique_ptr<ElementModQ> ElGamalCiphertext::crypto_hash() const
     {
