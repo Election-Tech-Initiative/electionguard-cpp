@@ -7,19 +7,6 @@
 
 using namespace electionguard;
 
-// TEST_CASE("elgamalEncrypt simple with nonce is 1, publickey is g_pow_p(2)")
-// {
-//     const auto &one = ONE_MOD_Q();
-//     const auto &two = TWO_MOD_P();
-//     auto publicKey = g_pow_p(two);
-//     const auto &g = G();
-
-//     auto cipherText = elgamalEncrypt(0UL, one, *publicKey);
-
-//     CHECK((*publicKey == *cipherText->getData()));
-//     CHECK((const_cast<ElementModP &>(g) == *cipherText->getPad()));
-// }
-
 TEST_CASE("elgamalEncrypt simple encrypt 0, with nonce 1 then publickey is g_pow_p(2)")
 {
     auto &nonce = ONE_MOD_Q();
