@@ -109,9 +109,9 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DUSE_SANITIZER="address;undefined"
 	cmake --build $(ELECTIONGUARD_BUILD_DIR)
-	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp
-	cmake --build build/apps/demo_in_cpp --target DemoInCPP
-	./build/apps/demo_in_cpp/DemoInCPP
+	# ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp
+	# cmake --build build/apps/demo_in_cpp --target DemoInCPP
+	# ./build/apps/demo_in_cpp/DemoInCPP
 	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_c -B build/apps/demo_in_c
 	cmake --build build/apps/demo_in_c --target DemoInC
 	./build/apps/demo_in_c/DemoInC
@@ -123,9 +123,9 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DUSE_SANITIZER="thread"
 	cmake --build $(ELECTIONGUARD_BUILD_DIR)
-	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp
-	cmake --build build/apps/demo_in_cpp --target DemoInCPP
-	./build/apps/demo_in_cpp/DemoInCPP
+	# ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp
+	# cmake --build build/apps/demo_in_cpp --target DemoInCPP
+	# ./build/apps/demo_in_cpp/DemoInCPP
 	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_c -B build/apps/demo_in_c
 	cmake --build build/apps/demo_in_c --target DemoInC
 	./build/apps/demo_in_c/DemoInC

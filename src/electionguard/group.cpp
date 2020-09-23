@@ -652,18 +652,19 @@ namespace electionguard
             throw overflow_error("a_plus_bc_mod_q add operation out of bounds");
         }
 
-        // Even though the method can overlow, the result does not
-        // since we take the inputs mod Q
-        uint64_t resModQ[MAX_Q_LEN] = {};
-
-        auto q_as_p = Q().toElementModP();
+        const auto &q = Q();
+        auto q_as_p = q.toElementModP();
+        uint64_t resModQ[MAX_P_LEN] = {};
         bool modSuccess =
           Hacl_Bignum4096_mod(q_as_p->get(), static_cast<uint64_t *>(a_plus_bc_result),
                               static_cast<uint64_t *>(resModQ));
         if (!modSuccess) {
             throw runtime_error("a_plus_bc_mod_q mod operation failed");
         }
-        return make_unique<ElementModQ>(resModQ);
+        uint64_t result[MAX_Q_LEN] = {};
+        memcpy(result, resModQ, MAX_Q_SIZE);
+
+        return make_unique<ElementModQ>(result);
     }
 
     unique_ptr<ElementModQ> sub_from_q(const ElementModQ &a)
