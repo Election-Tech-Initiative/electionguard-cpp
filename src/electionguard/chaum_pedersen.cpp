@@ -170,7 +170,7 @@ namespace electionguard
                                         const ElementModP &k, const ElementModQ &q,
                                         const ElementModQ &seed, uint64_t plaintext)
     {
-        if (plaintext < 0 || plaintext > 1) {
+        if (plaintext > 1) {
             throw invalid_argument(
               "DisjunctiveChaumPedersenProof::make:: only supports plaintexts of 0 or 1");
         }

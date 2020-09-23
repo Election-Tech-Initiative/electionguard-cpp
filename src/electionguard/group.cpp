@@ -119,56 +119,56 @@ namespace electionguard
     {
         static ElementModP instance{G_ARRAY_REVERSE, true};
         return instance;
-    };
+    }
 
     const ElementModP &P()
     {
         static ElementModP instance{P_ARRAY_REVERSE, true};
         return instance;
-    };
+    }
 
     const ElementModP &ZERO_MOD_P()
     {
         static ElementModP instance{ZERO_MOD_P_ARRAY, true};
         return instance;
-    };
+    }
 
     const ElementModP &ONE_MOD_P()
     {
         static ElementModP instance{ONE_MOD_P_ARRAY, true};
         return instance;
-    };
+    }
 
     const ElementModP &TWO_MOD_P()
     {
         static ElementModP instance{TWO_MOD_P_ARRAY, true};
         return instance;
-    };
+    }
 
     const ElementModQ &Q()
     {
         static ElementModQ instance{Q_ARRAY_REVERSE, true};
         return instance;
-    };
+    }
 
     const ElementModQ &ZERO_MOD_Q()
     {
         static ElementModQ instance{ZERO_MOD_Q_ARRAY, true};
         return instance;
-    };
+    }
 
     const ElementModQ &ONE_MOD_Q()
     {
 
         static ElementModQ instance{ONE_MOD_Q_ARRAY, true};
         return instance;
-    };
+    }
 
     const ElementModQ &TWO_MOD_Q()
     {
         static ElementModQ instance{TWO_MOD_Q_ARRAY, true};
         return instance;
-    };
+    }
 
 #pragma endregion
 
