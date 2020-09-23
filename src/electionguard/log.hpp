@@ -12,6 +12,7 @@ using namespace std;
 
 namespace electionguard
 {
+    // TODO: cleanup
     class Log
     {
       public:

@@ -1,9 +1,11 @@
 #ifndef __ELECTIONGUARD__CORE_GROUP_HPP_INCLUDED__
 #define __ELECTIONGUARD__CORE_GROUP_HPP_INCLUDED__
+
 #include "constants.h"
 #include "export.h"
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <variant>
 #include <vector>
@@ -12,9 +14,6 @@ using namespace std;
 
 namespace electionguard
 {
-    struct ElementModPData {
-        uint64_t elem[64];
-    };
 
     /// <summary>
     /// An element of the larger `mod p` space, i.e., in [0, P), where P is a 4096-bit prime.
@@ -22,39 +21,42 @@ namespace electionguard
     class EG_API ElementModP
     {
       public:
+        ElementModP(const ElementModP &other);
+        ElementModP(ElementModP &&other);
         ElementModP(const vector<uint64_t> &elem, bool unchecked = false);
-        ElementModP(const uint64_t *elem, bool unchecked = false);
+        ElementModP(const uint64_t (&elem)[MAX_P_LEN], bool unchecked = false);
         ~ElementModP();
 
-        uint64_t *get();
-        bool isInBounds();
-        bool isValidResidue();
-        string toHex();
+        uint64_t *get() const;
+        bool isInBounds() const;
+        bool isValidResidue() const;
+        string toHex() const;
 
         /// <summary>
         /// Converts the binary value stored by the hex string
         /// to its big num representation stored as ElementModQ
         /// </summary>
-        static ElementModP *fromHex(const string &representation);
+        static unique_ptr<ElementModP> fromHex(const string &representation);
 
         /// <summary>
         /// Converts an unsigned long integer value
         /// (that is no larger than an unsigned long int)
         /// to its big num representation stored as ElementModQ
         /// </summary>
-        static ElementModP *fromUint64(uint64_t representation);
+        static unique_ptr<ElementModP> fromUint64(uint64_t representation);
 
+        ElementModP &operator=(ElementModP other);
+        ElementModP &operator=(ElementModP &&other);
         bool operator==(const ElementModP &other);
         bool operator!=(const ElementModP &other);
 
         bool operator<(const ElementModP &other);
 
-      private:
-        ElementModPData data;
-    };
+        // TODO: math operators
 
-    struct ElementModQData {
-        uint64_t elem[4];
+      private:
+        class Impl;
+        unique_ptr<Impl> pimpl;
     };
 
     /// <summary>
@@ -63,110 +65,125 @@ namespace electionguard
     class EG_API ElementModQ
     {
       public:
+        ElementModQ(const ElementModQ &other);
+        ElementModQ(ElementModQ &&other);
         ElementModQ(const vector<uint64_t> &elem, bool unchecked = false);
-        ElementModQ(const uint64_t *elem, bool unchecked = false);
+        ElementModQ(const uint64_t (&elem)[MAX_Q_LEN], bool unchecked = false);
         ~ElementModQ();
 
-        uint64_t *get();
-        string toHex();
-        ElementModP *toElementModP();
+        uint64_t *get() const;
 
-        bool isInBounds();
+        bool isInBounds() const;
+
+        string toHex() const;
+        unique_ptr<ElementModP> toElementModP() const;
 
         /// <summary>
         /// Converts the binary value stored by the hex string
         /// to its big num representation stored as ElementModQ
         /// </summary>
-        static ElementModQ *fromHex(const string &representation);
+        static unique_ptr<ElementModQ> fromHex(const string &representation);
 
         /// <summary>
         /// Converts an unsigned long integer value
         /// (that is no larger than an unsigned long int)
         /// to its big num representation stored as ElementModQ
         /// </summary>
-        static ElementModQ *fromUint64(uint64_t representation);
+        static unique_ptr<ElementModQ> fromUint64(uint64_t representation);
 
-        // TODO: overload math operators and redirect to functions
-
+        ElementModQ &operator=(ElementModQ other);
+        ElementModQ &operator=(ElementModQ &&other);
         bool operator==(const ElementModQ &other);
         bool operator!=(const ElementModQ &other);
 
         bool operator<(const ElementModQ &other);
 
+        // TODO: overload math operators and redirect to functions
+
       private:
-        ElementModQData data;
+        class Impl;
+        unique_ptr<Impl> pimpl;
     };
 
     // Common constants
 
-    constexpr ElementModP *G() { return new ElementModP(G_ARRAY_REVERSE, true); };
+    const ElementModP &G();
 
-    constexpr ElementModP *P() { return new ElementModP(P_ARRAY_REVERSE, true); };
+    const ElementModP &P();
 
-    constexpr ElementModP *ZERO_MOD_P() { return new ElementModP(ZERO_MOD_P_ARRAY, true); };
+    const ElementModP &ZERO_MOD_P();
 
-    constexpr ElementModP *ONE_MOD_P() { return new ElementModP(ONE_MOD_P_ARRAY, true); };
+    const ElementModP &ONE_MOD_P();
 
-    constexpr ElementModP *TWO_MOD_P() { return new ElementModP(TWO_MOD_P_ARRAY, true); };
+    const ElementModP &TWO_MOD_P();
 
-    constexpr ElementModQ *Q() { return new ElementModQ(Q_ARRAY_REVERSE, true); };
+    const ElementModQ &Q();
 
-    constexpr ElementModQ *ZERO_MOD_Q() { return new ElementModQ(ZERO_MOD_Q_ARRAY, true); };
+    const ElementModQ &ZERO_MOD_Q();
 
-    constexpr ElementModQ *ONE_MOD_Q() { return new ElementModQ(ONE_MOD_Q_ARRAY, true); };
+    const ElementModQ &ONE_MOD_Q();
 
-    constexpr ElementModQ *TWO_MOD_Q() { return new ElementModQ(TWO_MOD_Q_ARRAY, true); };
-
-    using ElementModPOrQ = variant<ElementModP *, ElementModQ *>;
+    const ElementModQ &TWO_MOD_Q();
 
     /// <summary>
     /// Adds together the left hand side and right hand side and returns the sum mod P
     /// </summary>
-    EG_API ElementModP *add_mod_p(ElementModP *lhs, ElementModP *rhs);
+    EG_API unique_ptr<ElementModP> add_mod_p(const ElementModP &lhs, const ElementModP &rhs);
 
     /// <summary>
     /// Multplies together the left hand side and right hand side and returns the product mod P
     /// </summary>
-    EG_API ElementModP *mul_mod_p(ElementModP *lhs, ElementModP *rhs);
+    EG_API unique_ptr<ElementModP> mul_mod_p(const ElementModP &lhs, const ElementModP &rhs);
 
-    EG_API ElementModP *mul_mod_p(vector<ElementModPOrQ> elems);
+    using ElementModPOrQ = variant<ElementModP *, ElementModQ *>;
+
+    EG_API unique_ptr<ElementModP> mul_mod_p(const vector<ElementModPOrQ> &elems);
 
     /// <summary>
     /// Computes b^e mod p.
     /// </summary>
-    EG_API ElementModP *pow_mod_p(ElementModPOrQ b, ElementModPOrQ e);
+    EG_API unique_ptr<ElementModP> pow_mod_p(const ElementModP &base, const ElementModP &exponent);
+
+    /// <summary>
+    /// Computes b^e mod p.
+    /// </summary>
+    EG_API unique_ptr<ElementModP> pow_mod_p(const ElementModP &base, const ElementModQ &exponent);
 
     /// <summary>
     /// Computes g^e mod p.
     /// </summary>
-    EG_API ElementModP *g_pow_p(ElementModPOrQ e);
+    EG_API unique_ptr<ElementModP> g_pow_p(const ElementModP &exponent);
 
-    //EG_API ElementModP *mul_inv_mod_p
+    /// <summary>
+    /// Computes g^e mod p.
+    /// </summary>
+    EG_API unique_ptr<ElementModP> g_pow_p(const ElementModQ &exponent);
 
     /// <summary>
     /// Adds together the left hand side and right hand side and returns the sum mod Q
     /// </summary>
-    EG_API ElementModQ *add_mod_q(ElementModQ *lhs, ElementModQ *rhs);
+    EG_API unique_ptr<ElementModQ> add_mod_q(const ElementModQ &lhs, const ElementModQ &rhs);
 
     /// <summary>
     /// Computes (a-b) mod q.
     /// </summary>
-    EG_API ElementModQ *sub_mod_q(ElementModQ *a, ElementModQ *b);
+    EG_API unique_ptr<ElementModQ> sub_mod_q(const ElementModQ &a, const ElementModQ &b);
 
     /// <summary>
     /// Computes (a + b * c) mod q.
     /// </summary>
-    EG_API ElementModQ *a_plus_bc_mod_q(ElementModQ *a, ElementModQ *b, ElementModQ *c);
+    EG_API unique_ptr<ElementModQ> a_plus_bc_mod_q(const ElementModQ &a, const ElementModQ &b,
+                                                   const ElementModQ &c);
 
     /// <summary>
     /// Computes (Q - a) mod q.
     /// </summary>
-    EG_API ElementModQ *sub_from_q(ElementModQ *a);
+    EG_API unique_ptr<ElementModQ> sub_from_q(const ElementModQ &a);
 
     /// <summary>
     /// Generate random number between 0 and Q
     /// </summary>
-    EG_API ElementModQ *rand_q();
+    EG_API unique_ptr<ElementModQ> rand_q();
 
 } // namespace electionguard
 

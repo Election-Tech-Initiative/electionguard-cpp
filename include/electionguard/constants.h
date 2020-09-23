@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include <cstdint>
+#include <stdint.h>
 
 enum MAX_IDENIFIER_LENGTH { MAX_IDENIFIER_LENGTH = 256 };
 

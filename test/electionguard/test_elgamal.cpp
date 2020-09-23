@@ -9,17 +9,17 @@ using namespace electionguard;
 
 TEST_CASE("elgamalEncrypt simple with nonce is 1, publickey is g_pow_p(2)")
 {
-    auto *one = ONE_MOD_Q();
-    auto *two = TWO_MOD_P();
-    auto *publicKey = g_pow_p(two);
-    auto *g = G();
+    const auto &one = ONE_MOD_Q();
+    const auto &two = TWO_MOD_P();
+    auto publicKey = g_pow_p(two);
+    const auto &g = G();
 
-    auto *cipherText = elgamalEncrypt(0UL, one, publicKey);
+    auto cipherText = elgamalEncrypt(0UL, one, *publicKey);
 
     // Log::debug(" : cipherText->getData()->toHex() = " + cipherText->getData()->toHex());
     // Log::debug(" : cipherText->getPad()->toHex() = " + cipherText->getPad()->toHex());
     CHECK((*publicKey == *cipherText->getData()));
-    CHECK((*g == *cipherText->getPad()));
+    CHECK((const_cast<ElementModP &>(g) == *cipherText->getPad()));
 }
 
 // TEST_CASE("elgamalEncrypt simple encrypt 0")

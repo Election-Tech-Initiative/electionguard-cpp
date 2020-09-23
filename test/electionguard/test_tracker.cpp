@@ -11,15 +11,15 @@ using namespace electionguard;
 TEST_CASE("Get rotating tracker hash rotates")
 {
     // Arrange
-    auto *deviceHash = Tracker::getHashForDevice(1234, "some-location-string");
-    uint64_t firstHash[4] = {1, 2, 3, 4};
-    auto firstBallotHash = new ElementModQ(firstHash);
-    uint64_t secondHash[4] = {2, 3, 4, 5};
-    auto secondBallotHash = new ElementModQ(secondHash);
+    auto deviceHash = Tracker::getHashForDevice(1234UL, "some-location-string");
+    uint64_t firstHash[MAX_Q_LEN] = {1, 2, 3, 4};
+    auto firstBallotHash = make_unique<ElementModQ>(firstHash);
+    uint64_t secondHash[MAX_Q_LEN] = {2, 3, 4, 5};
+    auto secondBallotHash = make_unique<ElementModQ>(secondHash);
 
     // Act
-    auto *rotatingHash1 = Tracker::getRotatingTrackerHash(deviceHash, 1000, firstBallotHash);
-    auto *rotatingHash2 = Tracker::getRotatingTrackerHash(rotatingHash1, 1001, secondBallotHash);
+    auto rotatingHash1 = Tracker::getRotatingTrackerHash(*deviceHash, 1000UL, *firstBallotHash);
+    auto rotatingHash2 = Tracker::getRotatingTrackerHash(*rotatingHash1, 1001UL, *secondBallotHash);
 
     //Assert
     CHECK(deviceHash != nullptr);

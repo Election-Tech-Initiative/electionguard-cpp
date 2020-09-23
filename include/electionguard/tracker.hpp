@@ -4,6 +4,7 @@
 #include "export.h"
 #include "group.hpp"
 
+#include <memory>
 #include <string>
 
 namespace electionguard
@@ -11,11 +12,14 @@ namespace electionguard
     class EG_API Tracker
     {
       public:
-        static ElementModQ *getHashForDevice(uint64_t uuid, const string location);
-        static ElementModQ *getRotatingTrackerHash(ElementModQ *previous, uint64_t timestamp,
-                                                   ElementModQ *ballotHash);
+        static unique_ptr<ElementModQ> getHashForDevice(uint64_t uuid, const string &location);
 
-        static string hashToWords(ElementModQ *trackerHash, const char *separator = " ");
+        // TODO: use explicit time type
+        static unique_ptr<ElementModQ> getRotatingTrackerHash(const ElementModQ &previous,
+                                                              uint64_t timestamp,
+                                                              const ElementModQ &ballotHash);
+
+        static string hashToWords(const ElementModQ &trackerHash, const char *separator = " ");
     };
 
 } // namespace electionguard

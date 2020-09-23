@@ -1,5 +1,6 @@
 #include "electionguard/ballot.hpp"
 
+#include "electionguard/election_object_base.hpp"
 #include "electionguard/hash.hpp"
 #include "log.hpp"
 
@@ -11,138 +12,167 @@ namespace electionguard
 {
 #pragma region PlaintextBallotSelection
 
+    struct PlaintextBallotSelection::Impl : public ElectionObjectBase {
+        string vote;
+        bool isPlaceholderSelection;
+
+        Impl(const string &objectId, const string &vote, bool isPlaceholderSelection /* = false */)
+            : vote(vote), isPlaceholderSelection(isPlaceholderSelection)
+        {
+            this->object_id = objectId;
+        }
+
+        // TODO: secure erase the vote
+    };
+
     // Public Members
 
-    PlaintextBallotSelection::PlaintextBallotSelection(string objectId, const string vote) : data()
+    PlaintextBallotSelection::PlaintextBallotSelection(const string &objectId, const string &vote,
+                                                       bool isPlaceholderSelection /* = false */)
+        : pimpl(new Impl(objectId, vote, isPlaceholderSelection))
     {
-        auto _osize = objectId.size() + 1;
-        objectId.copy(data.object_id, _osize, 0UL);
-
-        auto _vsize = vote.size() + 1;
-        vote.copy(data.vote, _vsize, 0UL);
     }
 
-    PlaintextBallotSelection::PlaintextBallotSelection(const char *object_id, const char *vote)
-        : data()
-    {
-        size_t _osize = strlen(object_id) + 1;
-        strncpy(data.object_id, object_id, _osize);
+    PlaintextBallotSelection::~PlaintextBallotSelection() = default;
 
-        size_t _vsize = strlen(vote) + 1;
-        strncpy(data.vote, vote, _vsize);
+    PlaintextBallotSelection &PlaintextBallotSelection::operator=(PlaintextBallotSelection other)
+    {
+        swap(pimpl, other.pimpl);
+        return *this;
     }
 
-    PlaintextBallotSelection::~PlaintextBallotSelection() { data = {}; }
+    uint64_t PlaintextBallotSelection::toInt() const { return stoul(pimpl->vote); }
 
-    int PlaintextBallotSelection::toInt() { return atoi(data.vote); }
-
-    char *PlaintextBallotSelection::getObjectId() { return data.object_id; }
+    string PlaintextBallotSelection::getObjectId() const { return pimpl->object_id; }
 
 #pragma endregion
 
 #pragma region CiphertextBallotSelection
 
+    struct CiphertextBallotSelection::Impl {
+        string objectId;
+        unique_ptr<ElementModQ> descriptionHash;
+        unique_ptr<ElGamalCiphertext> ciphertext;
+        bool isPlaceholder;
+        unique_ptr<ElementModQ> nonce;
+        unique_ptr<ElementModQ> cryptoHash;
+        unique_ptr<DisjunctiveChaumPedersenProof> proof;
+        unique_ptr<ElGamalCiphertext> extendedData;
+
+        Impl(const string &objectId, unique_ptr<ElementModQ> descriptionHash,
+             unique_ptr<ElGamalCiphertext> ciphertext, bool isPlaceholder,
+             unique_ptr<ElementModQ> nonce, unique_ptr<ElementModQ> cryptoHash,
+             unique_ptr<DisjunctiveChaumPedersenProof> proof,
+             unique_ptr<ElGamalCiphertext> extendedData)
+            : objectId(objectId), descriptionHash(move(descriptionHash)),
+              ciphertext(move(ciphertext)), nonce(move(nonce)), cryptoHash(move(cryptoHash)),
+              proof(move(proof)), extendedData(move(extendedData))
+        {
+            this->isPlaceholder = isPlaceholder;
+        }
+    };
+
     // Lifecycle Methods
 
     CiphertextBallotSelection::CiphertextBallotSelection(
-      const string objectId, ElementModQ *descriptionHash, ElGamalCiphertext *ciphertext,
-      bool isPlaceholder, ElementModQ *nonce, ElementModQ *cryptoHash,
-      DisjunctiveChaumPedersenProof *proof, ElGamalCiphertext *extendedData)
-        : data()
+      const string &objectId, const ElementModQ &descriptionHash,
+      unique_ptr<ElGamalCiphertext> ciphertext, bool isPlaceholder, unique_ptr<ElementModQ> nonce,
+      unique_ptr<ElementModQ> cryptoHash, unique_ptr<DisjunctiveChaumPedersenProof> proof,
+      unique_ptr<ElGamalCiphertext> extendedData)
+        : pimpl(new Impl(objectId, make_unique<ElementModQ>(descriptionHash), move(ciphertext),
+                         isPlaceholder, move(nonce), move(cryptoHash), move(proof),
+                         move(extendedData)))
+
     {
-        // copy the object id
-        auto _osize = objectId.size() + 1;
-        objectId.copy(data.object_id, _osize);
-
-        data.descriptionHash = descriptionHash;
-        data.ciphertext = ciphertext;
-        data.cryptoHash = cryptoHash;
-        data.isPlaceholderSelection = isPlaceholder;
-        data.nonce = nonce;
-        data.proof = proof;
-        data.extendedData = extendedData;
-    }
-
-    CiphertextBallotSelection::CiphertextBallotSelection(
-      const char *object_id, ElementModQ *descriptionHash, ElGamalCiphertext *ciphertext,
-      bool isPlaceholder, ElementModQ *nonce, ElementModQ *cryptoHash,
-      DisjunctiveChaumPedersenProof *proof, ElGamalCiphertext *extendedData)
-        : data()
-    {
-        // copy the object id
-        size_t _osize = strlen(object_id) + 1;
-        strncpy(data.object_id, object_id, _osize);
-
-        data.descriptionHash = descriptionHash;
-        data.ciphertext = ciphertext;
-        data.cryptoHash = cryptoHash;
-        data.isPlaceholderSelection = isPlaceholder;
-        data.nonce = nonce;
-        data.proof = proof;
-        data.extendedData = extendedData;
     }
 
     // property Getters
 
-    CiphertextBallotSelection::~CiphertextBallotSelection() { data = {}; }
+    CiphertextBallotSelection::~CiphertextBallotSelection() = default;
 
-    char *CiphertextBallotSelection::getObjectId() { return data.object_id; }
+    CiphertextBallotSelection &CiphertextBallotSelection::operator=(CiphertextBallotSelection other)
+    {
+        swap(pimpl, other.pimpl);
+        return *this;
+    }
 
-    ElementModQ *CiphertextBallotSelection::getDescriptionHash() { return data.descriptionHash; }
+    string CiphertextBallotSelection::getObjectId() const { return pimpl->objectId; }
 
-    ElGamalCiphertext *CiphertextBallotSelection::getCiphertext() { return data.ciphertext; }
+    ElementModQ *CiphertextBallotSelection::getDescriptionHash() const
+    {
+        return pimpl->descriptionHash.get();
+    }
 
-    DisjunctiveChaumPedersenProof *CiphertextBallotSelection::getProof() { return data.proof; }
+    ElGamalCiphertext *CiphertextBallotSelection::getCiphertext() const
+    {
+        return pimpl->ciphertext.get();
+    }
+
+    DisjunctiveChaumPedersenProof *CiphertextBallotSelection::getProof() const
+    {
+        return pimpl->proof.get();
+    }
 
     // public Members
 
-    CiphertextBallotSelection *CiphertextBallotSelection::make(
-      const string objectId, ElementModQ *descriptionHash, ElGamalCiphertext *ciphertext,
-      ElementModP *elgamalPublicKey, ElementModQ *cryptoExtendedBaseHash, ElementModQ *proofSeed,
-      uint64_t plaintext, bool isPlaceholder /* = false */, ElementModQ *nonce /* = nullptr */,
-      ElementModQ *cryptoHash /* = nullptr */, DisjunctiveChaumPedersenProof *proof /* = nullptr */,
-      ElGamalCiphertext *extendedData /* = nullptr */)
+    unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make(
+      const string &objectId, const ElementModQ &descriptionHash,
+      unique_ptr<ElGamalCiphertext> ciphertext, const ElementModP &elgamalPublicKey,
+      const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &proofSeed, uint64_t plaintext,
+      bool isPlaceholder /* = false */, unique_ptr<ElementModQ> nonce /* = nullptr */,
+      unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
+      unique_ptr<DisjunctiveChaumPedersenProof> proof /* = nullptr */,
+      unique_ptr<ElGamalCiphertext> extendedData /* = nullptr */)
     {
         if (cryptoHash == nullptr) {
-            cryptoHash = makeCryptoHash(objectId, descriptionHash, ciphertext);
+            auto crypto_hash = makeCryptoHash(objectId, descriptionHash, *ciphertext);
+            cryptoHash = move(crypto_hash);
         }
-
         if (proof == nullptr) {
             proof = DisjunctiveChaumPedersenProof::make(
-              ciphertext, nonce, elgamalPublicKey, cryptoExtendedBaseHash, proofSeed, plaintext);
+              *ciphertext, *nonce, elgamalPublicKey, cryptoExtendedBaseHash, proofSeed, plaintext);
         }
-        return new CiphertextBallotSelection(objectId, descriptionHash, ciphertext, isPlaceholder,
-                                             nonce, cryptoHash, proof, nullptr);
+        return make_unique<CiphertextBallotSelection>(objectId, descriptionHash, move(ciphertext),
+                                                      isPlaceholder, move(nonce), move(cryptoHash),
+                                                      move(proof), move(extendedData));
     }
 
-    ElementModQ *CiphertextBallotSelection::crypto_hash_with(ElementModQ *seedHash)
+    unique_ptr<ElementModQ> CiphertextBallotSelection::crypto_hash_with(const ElementModQ &seedHash)
     {
-        return makeCryptoHash(string(data.object_id), seedHash, data.ciphertext);
+        return makeCryptoHash(pimpl->objectId, seedHash, *pimpl->ciphertext);
     }
 
-    bool CiphertextBallotSelection::isValidEncryption(ElementModQ *seedHash,
-                                                      ElementModP *elgamalPublicKey,
-                                                      ElementModQ *cryptoExtendedBaseHash)
+    bool CiphertextBallotSelection::isValidEncryption(const ElementModQ &seedHash,
+                                                      const ElementModP &elgamalPublicKey,
+                                                      const ElementModQ &cryptoExtendedBaseHash)
     {
-        if ((*seedHash != *data.descriptionHash)) {
-            Log::debug("mismatching selection hash:");
+        if ((const_cast<ElementModQ &>(seedHash) != *pimpl->descriptionHash)) {
+            Log::debug(": mismatching selection hash: ");
+            Log::debugHex(": expected: ", seedHash.toHex());
+            Log::debugHex(": actual: ", pimpl->descriptionHash->toHex());
             return false;
         }
 
-        auto *recalculatedCryptoHash = crypto_hash_with(seedHash);
-        if ((*data.cryptoHash != *recalculatedCryptoHash)) {
-            Log::debug("mismatching crypto hash: ");
+        auto recalculatedCryptoHash = crypto_hash_with(seedHash);
+        if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
+            Log::debug(": mismatching crypto hash: ");
+            Log::debugHex(": expected: ", recalculatedCryptoHash->toHex());
+            Log::debugHex(": actual: ", pimpl->cryptoHash->toHex());
             return false;
         }
-        return data.proof->isValid(data.ciphertext, elgamalPublicKey, cryptoExtendedBaseHash);
+        return pimpl->proof->isValid(*pimpl->ciphertext, elgamalPublicKey, cryptoExtendedBaseHash);
     }
 
     // Protected Members
 
-    ElementModQ *CiphertextBallotSelection::makeCryptoHash(string object_id, ElementModQ *seedHash,
-                                                           ElGamalCiphertext *ciphertext)
+    unique_ptr<ElementModQ>
+    CiphertextBallotSelection::makeCryptoHash(const string &objectId, const ElementModQ &seedHash,
+                                              const ElGamalCiphertext &ciphertext)
     {
-        return hash_elems({object_id, seedHash, ciphertext->crypto_hash()});
+        auto *seed = &const_cast<ElementModQ &>(seedHash);
+        auto ciphertextHash = ciphertext.crypto_hash();
+        auto hash = hash_elems({objectId, seed, ciphertextHash.get()});
+        return hash;
     }
 
 #pragma endregion

@@ -14,17 +14,20 @@ using std::vector;
 
 namespace electionguard
 {
-    ElementModQ *Tracker::getHashForDevice(uint64_t uuid, const string location)
+    unique_ptr<ElementModQ> Tracker::getHashForDevice(uint64_t uuid, const string &location)
     {
         return hash_elems({uuid, location});
     }
-    ElementModQ *Tracker::getRotatingTrackerHash(ElementModQ *previous, uint64_t timestamp,
-                                                 ElementModQ *ballotHash)
+
+    unique_ptr<ElementModQ> Tracker::getRotatingTrackerHash(const ElementModQ &previous,
+                                                            uint64_t timestamp,
+                                                            const ElementModQ &ballotHash)
     {
-        return hash_elems({previous, timestamp, ballotHash});
+        return hash_elems({&const_cast<ElementModQ &>(previous), timestamp,
+                           &const_cast<ElementModQ &>(ballotHash)});
     }
 
-    string Tracker::hashToWords(ElementModQ *trackerHash, const char *separator)
+    string Tracker::hashToWords(const ElementModQ &trackerHash, const char *separator)
     {
         // TODO: implement properly
         return "Doggo ipsum long woofer pats blep thicc shooberino, sub woofer pupper";

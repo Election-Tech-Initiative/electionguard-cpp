@@ -14,12 +14,12 @@ using namespace electionguard;
 TEST_CASE("add_mod_q for ints 1 and 1 should return q of 2")
 {
     // Arrange
-    auto *one1 = ElementModQ::fromUint64(1UL);
-    auto *one2 = ElementModQ::fromHex("01");
-    auto *two = ElementModQ::fromUint64(2);
+    auto one1 = ElementModQ::fromUint64(1UL);
+    auto one2 = ElementModQ::fromHex("01");
+    auto two = ElementModQ::fromUint64(2);
 
     // Act
-    auto *result = add_mod_q(one1, one2);
+    auto result = add_mod_q(*one1, *one2);
     //Log::debug(": result->toHex() = " + result->toHex() + " and expectedHex = " + two->toHex());
 
     // Assert
@@ -29,12 +29,12 @@ TEST_CASE("add_mod_q for ints 1 and 1 should return q of 2")
 TEST_CASE("add_mod_q (Q + 0) % Q = 0")
 {
     // Arrange
-    auto *q = Q();
-    auto *zero = ElementModQ::fromUint64(0UL);
-    auto *residue = ElementModQ::fromUint64(189);
+    const auto &q = Q();
+    auto zero = ElementModQ::fromUint64(0UL);
+    auto residue = ElementModQ::fromUint64(189);
 
     // Act
-    auto *result = add_mod_q(q, zero);
+    auto result = add_mod_q(q, *zero);
     //Log::debug(result->get(), MAX_Q_LEN, ": result->get() = ");
 
     // Assert
@@ -44,10 +44,10 @@ TEST_CASE("add_mod_q (Q + 0) % Q = 0")
 
 TEST_CASE("add_mod_q (Q + 1) % Q = 1")
 {
-    auto *q = Q();
-    auto *one = ElementModQ::fromUint64(1UL);
+    const auto &q = Q();
+    auto one = ElementModQ::fromUint64(1UL);
 
-    auto *result = add_mod_q(q, one);
+    auto result = add_mod_q(q, *one);
     //Log::debug(result->get(), MAX_Q_LEN, ": result->get() = ");
 
     CHECK((*result == *one));
@@ -56,10 +56,10 @@ TEST_CASE("add_mod_q (Q + 1) % Q = 1")
 
 TEST_CASE("add_mod_q (Q + 2) % Q = 2")
 {
-    auto *q = Q();
-    auto *two = ElementModQ::fromUint64(2UL);
+    const auto &q = Q();
+    auto two = ElementModQ::fromUint64(2UL);
 
-    auto *result = add_mod_q(q, two);
+    auto result = add_mod_q(q, *two);
     //Log::debug(result->get(), MAX_Q_LEN, ": result->get() = ");
 
     CHECK((*result == *two));
@@ -68,10 +68,10 @@ TEST_CASE("add_mod_q (Q + 2) % Q = 2")
 
 TEST_CASE("add_mod_q (Q + 188) % Q = 188")
 {
-    auto *q = Q();
-    auto *residue = ElementModQ::fromUint64(188UL);
+    const auto &q = Q();
+    auto residue = ElementModQ::fromUint64(188UL);
 
-    auto *result = add_mod_q(q, residue);
+    auto result = add_mod_q(q, *residue);
     //Log::debug(result->get(), MAX_Q_LEN, ": result->get() = ");
 
     CHECK((*result == *residue));
@@ -80,10 +80,10 @@ TEST_CASE("add_mod_q (Q + 188) % Q = 188")
 
 TEST_CASE("add_mod_q (Q + 189) % Q = 189")
 {
-    auto *q = Q();
-    auto *residue = ElementModQ::fromUint64(189UL);
+    const auto &q = Q();
+    auto residue = ElementModQ::fromUint64(189UL);
 
-    auto *result = add_mod_q(q, residue);
+    auto result = add_mod_q(q, *residue);
     //Log::debug(result->get(), MAX_Q_LEN, ": result->get() = ");
 
     CHECK((*result == *residue));
@@ -92,11 +92,11 @@ TEST_CASE("add_mod_q (Q + 189) % Q = 189")
 
 TEST_CASE("add_mod_q (MAX_256 + 0) % Q = 189")
 {
-    auto *max = new ElementModQ(MAX_256, true);
-    auto *zero = ElementModQ::fromUint64(0UL);
-    auto *residue = ElementModQ::fromUint64(189UL);
+    auto max = make_unique<ElementModQ>(MAX_256, true);
+    auto zero = ElementModQ::fromUint64(0UL);
+    auto residue = ElementModQ::fromUint64(189UL);
 
-    auto *result = add_mod_q(max, zero);
+    auto result = add_mod_q(*max, *zero);
     //Log::debug(result->get(), MAX_Q_LEN, ": result->get() = ");
 
     CHECK((*result == *residue));
@@ -105,11 +105,11 @@ TEST_CASE("add_mod_q (MAX_256 + 0) % Q = 189")
 
 TEST_CASE("add_mod_q (MAX_256 + 1) % Q = 190")
 {
-    auto *max = new ElementModQ(MAX_256, true);
-    auto *one = ElementModQ::fromUint64(1UL);
-    auto *residue = ElementModQ::fromUint64(190UL);
+    auto max = make_unique<ElementModQ>(MAX_256, true);
+    auto one = ElementModQ::fromUint64(1UL);
+    auto residue = ElementModQ::fromUint64(190UL);
 
-    auto *result = add_mod_q(max, one);
+    auto result = add_mod_q(*max, *one);
     //Log::debug(result->get(), MAX_Q_LEN, ": result->get() = ");
 
     CHECK((*result == *residue));
@@ -118,10 +118,10 @@ TEST_CASE("add_mod_q (MAX_256 + 1) % Q = 190")
 
 TEST_CASE("add_mod_q (MAX_256 + MAX_256) % Q = 378")
 {
-    auto *max = new ElementModQ(MAX_256, true);
-    auto *residue = ElementModQ::fromUint64(378UL);
+    auto max = make_unique<ElementModQ>(MAX_256, true);
+    auto residue = ElementModQ::fromUint64(378UL);
 
-    auto *result = add_mod_q(max, max);
+    auto result = add_mod_q(*max, *max);
     //Log::debug(result->get(), MAX_Q_LEN, ": result->get() = ");
 
     CHECK((*result == *residue));
@@ -130,11 +130,11 @@ TEST_CASE("add_mod_q (MAX_256 + MAX_256) % Q = 378")
 
 TEST_CASE("add_mod_q ((MAX_256 - 1) + MAX_256) % Q = 377")
 {
-    auto *max = new ElementModQ(MAX_256, true);
-    auto *maxMinusOne = new ElementModQ(MAX_256_MINUS_ONE, true);
-    auto *residue = ElementModQ::fromUint64(377UL);
+    auto max = make_unique<ElementModQ>(MAX_256, true);
+    auto maxMinusOne = make_unique<ElementModQ>(MAX_256_MINUS_ONE, true);
+    auto residue = ElementModQ::fromUint64(377UL);
 
-    auto *result = add_mod_q(maxMinusOne, max);
+    auto result = add_mod_q(*maxMinusOne, *max);
     //Log::debug(result->get(), MAX_Q_LEN, ": result->get() = ");
 
     CHECK((*result == *residue));
@@ -143,10 +143,10 @@ TEST_CASE("add_mod_q ((MAX_256 - 1) + MAX_256) % Q = 377")
 
 TEST_CASE("add_mod_q ((MAX_256 - 1) + (MAX_256 - 1)) % Q = 376")
 {
-    auto *maxMinusOne = new ElementModQ(MAX_256_MINUS_ONE, true);
-    auto *residue = ElementModQ::fromUint64(376UL);
+    auto maxMinusOne = make_unique<ElementModQ>(MAX_256_MINUS_ONE, true);
+    auto residue = ElementModQ::fromUint64(376UL);
 
-    auto *result = add_mod_q(maxMinusOne, maxMinusOne);
+    auto result = add_mod_q(*maxMinusOne, *maxMinusOne);
     //Log::debug(result->get(), MAX_Q_LEN, ": result->get() = ");
 
     CHECK((*result == *residue));
@@ -159,17 +159,17 @@ TEST_CASE("add_mod_q ((MAX_256 - 1) + (MAX_256 - 1)) % Q = 376")
 
 TEST_CASE("a_minus_b_mod_q (2 - 1) % Q == 1 and (1 - 1) & Q == 0")
 {
-    auto *one = ElementModQ::fromUint64(1);
-    auto *two = ElementModQ::fromUint64(2);
-    auto *zero = ElementModQ::fromUint64(0);
+    auto one = ElementModQ::fromUint64(1);
+    auto two = ElementModQ::fromUint64(2);
+    auto zero = ElementModQ::fromUint64(0);
 
-    auto *result1 = sub_mod_q(two, one);
+    auto result1 = sub_mod_q(*two, *one);
     // Log::debug(" : result1->toHex() = " + result1->toHex());
 
     CHECK((*result1 == *one));
     CHECK(result1->toHex() == one->toHex());
 
-    auto *result0 = sub_mod_q(one, one);
+    auto result0 = sub_mod_q(*one, *one);
     // Log::debug(" : result0->toHex() = " + result0->toHex());
 
     CHECK((*result0 == *zero));
@@ -178,10 +178,10 @@ TEST_CASE("a_minus_b_mod_q (2 - 1) % Q == 1 and (1 - 1) & Q == 0")
 
 TEST_CASE("a_minus_b_mod_q:  (Q - Q) % Q == 0")
 {
-    auto *q = Q();
-    auto *residue = ElementModQ::fromUint64(0UL);
+    const auto &q = Q();
+    auto residue = ElementModQ::fromUint64(0UL);
 
-    auto *result = sub_mod_q(q, q);
+    auto result = sub_mod_q(q, q);
     //Log::debug(" : result->toHex() = " + result->toHex());
 
     CHECK((*result == *residue));
@@ -191,10 +191,10 @@ TEST_CASE("a_minus_b_mod_q:  (Q - Q) % Q == 0")
 TEST_CASE("a_minus_b_mod_q:  (0 - Q) % Q == 0")
 {
     string expectedHex("00");
-    auto *zero = ElementModQ::fromUint64(0UL);
-    auto *q = Q();
+    auto zero = ElementModQ::fromUint64(0UL);
+    const auto &q = Q();
 
-    auto *result = sub_mod_q(zero, q);
+    auto result = sub_mod_q(*zero, q);
     //Log::debug(" : result->toHex() = " + result->toHex());
 
     CHECK((*result == *zero));
@@ -205,13 +205,13 @@ TEST_CASE("a_minus_b_mod_q:  (Q - MAX_256) % Q == (Q - 189)")
 {
     string expectedHex("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe86");
 
-    auto *q = Q();
-    auto *max = new ElementModQ(MAX_256, true);
-    auto *offset = ElementModQ::fromUint64(189UL);
-    auto *residue = sub_mod_q(Q(), offset);
+    const auto &q = Q();
+    auto max = make_unique<ElementModQ>(MAX_256, true);
+    auto offset = ElementModQ::fromUint64(189UL);
+    auto residue = sub_mod_q(q, *offset);
     CHECK(residue->toHex() == expectedHex);
 
-    auto *result = sub_mod_q(q, max);
+    auto result = sub_mod_q(q, *max);
     //Log::debug(" : result->toHex() = " + result->toHex());
 
     CHECK((*result == *residue));
@@ -222,13 +222,13 @@ TEST_CASE("a_minus_b_mod_q:  ((Q + 1) - MAX_256)) % Q == (Q - 188)")
 {
     string expectedHex("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe87");
 
-    auto *qplusone = new ElementModQ(Q_PLUS_ONE, true);
-    auto *max = new ElementModQ(MAX_256, true);
-    auto *offset = ElementModQ::fromUint64(188UL);
-    auto *residue = sub_mod_q(Q(), offset);
+    auto qplusone = make_unique<ElementModQ>(Q_PLUS_ONE, true);
+    auto max = make_unique<ElementModQ>(MAX_256, true);
+    auto offset = ElementModQ::fromUint64(188UL);
+    auto residue = sub_mod_q(Q(), *offset);
     CHECK(residue->toHex() == expectedHex);
 
-    auto *result = sub_mod_q(qplusone, max);
+    auto result = sub_mod_q(*qplusone, *max);
     //Log::debug(" : result->toHex() = " + result->toHex());
 
     CHECK((*result == *residue));
@@ -239,13 +239,13 @@ TEST_CASE("a_minus_b_mod_q:  (Q - (MAX_256 - 1)) % Q == (Q - 188)")
 {
     string expectedHex("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe87");
 
-    auto *q = Q();
-    auto *max = new ElementModQ(MAX_256_MINUS_ONE, true);
-    auto *offset = ElementModQ::fromUint64(188UL);
-    auto *residue = sub_mod_q(Q(), offset);
+    const auto &q = Q();
+    auto max = make_unique<ElementModQ>(MAX_256_MINUS_ONE, true);
+    auto offset = ElementModQ::fromUint64(188UL);
+    auto residue = sub_mod_q(q, *offset);
     CHECK(residue->toHex() == expectedHex);
 
-    auto *result = sub_mod_q(q, max);
+    auto result = sub_mod_q(q, *max);
     //Log::debug(" : result->toHex() = " + result->toHex());
 
     CHECK((*result == *residue));
@@ -256,13 +256,13 @@ TEST_CASE("a_minus_b_mod_q:  ((Q + 1) - (MAX_256 - 1)) % Q == (Q - 187)")
 {
     string expectedHex("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe88");
 
-    auto *qplusone = new ElementModQ(Q_PLUS_ONE, true);
-    auto *max = new ElementModQ(MAX_256_MINUS_ONE, true);
-    auto *offset = ElementModQ::fromUint64(187UL);
-    auto *residue = sub_mod_q(Q(), offset);
+    auto qplusone = make_unique<ElementModQ>(Q_PLUS_ONE, true);
+    auto max = make_unique<ElementModQ>(MAX_256_MINUS_ONE, true);
+    auto offset = ElementModQ::fromUint64(187UL);
+    auto residue = sub_mod_q(Q(), *offset);
     CHECK(residue->toHex() == expectedHex);
 
-    auto *result = sub_mod_q(qplusone, max);
+    auto result = sub_mod_q(*qplusone, *max);
     //Log::debug(" : result->toHex() = " + result->toHex());
 
     CHECK((*result == *residue));
@@ -272,10 +272,10 @@ TEST_CASE("a_minus_b_mod_q:  ((Q + 1) - (MAX_256 - 1)) % Q == (Q - 187)")
 TEST_CASE("a_minus_b_mod_q:  (1 - Q) % Q == 1")
 {
     string expectedHex("01");
-    auto *one = ElementModQ::fromUint64(1UL);
-    auto *q = Q();
+    auto one = ElementModQ::fromUint64(1UL);
+    const auto &q = Q();
 
-    auto *result = sub_mod_q(one, q);
+    auto result = sub_mod_q(*one, q);
     //Log::debug(" : result->toHex() = " + result->toHex());
     CHECK((*result == *one));
     CHECK(result->toHex() == one->toHex());
@@ -284,13 +284,13 @@ TEST_CASE("a_minus_b_mod_q:  (1 - Q) % Q == 1")
 TEST_CASE("a_minus_b_mod_q:  (1 - 2) % Q == (Q - 1)")
 {
     string expectedHex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff42");
-    auto *one = ElementModQ::fromUint64(1UL);
-    auto *two = ElementModQ::fromUint64(2UL);
-    auto *zero = ElementModQ::fromUint64(0UL);
-    auto *residue = new ElementModQ(const_cast<uint64_t *>(Q_MINUS_ONE));
+    auto one = ElementModQ::fromUint64(1UL);
+    auto two = ElementModQ::fromUint64(2UL);
+    auto zero = ElementModQ::fromUint64(0UL);
+    auto residue = make_unique<ElementModQ>(Q_MINUS_ONE);
     CHECK(residue->toHex() == expectedHex);
 
-    auto *result = sub_mod_q(one, two);
+    auto result = sub_mod_q(*one, *two);
     //Log::debug(" : result->toHex() = " + result->toHex());
 
     CHECK((*result == *residue));
@@ -300,13 +300,13 @@ TEST_CASE("a_minus_b_mod_q:  (1 - 2) % Q == (Q - 1)")
 TEST_CASE("a_minus_b_mod_q:  (10 - 15) % Q == (Q - 5)")
 {
     string expectedHex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff3e");
-    auto *ten = ElementModQ::fromUint64(10UL);
-    auto *fifteen = ElementModQ::fromUint64(15UL);
-    auto *five = ElementModQ::fromUint64(5UL);
-    auto *residue = sub_mod_q(Q(), five);
+    auto ten = ElementModQ::fromUint64(10UL);
+    auto fifteen = ElementModQ::fromUint64(15UL);
+    auto five = ElementModQ::fromUint64(5UL);
+    auto residue = sub_mod_q(Q(), *five);
     CHECK(residue->toHex() == expectedHex);
 
-    auto *result = sub_mod_q(ten, fifteen);
+    auto result = sub_mod_q(*ten, *fifteen);
     //Log::debug(" : result->toHex() = " + result->toHex());
 
     CHECK((*result == *residue));
@@ -316,11 +316,11 @@ TEST_CASE("a_minus_b_mod_q:  (10 - 15) % Q == (Q - 5)")
 TEST_CASE("a_minus_b_mod_q (Q - 1) % Q has hex value ending in 42")
 {
     string expectedHex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff42");
-    auto *q = Q();
-    auto *one = ElementModQ::fromUint64(1);
-    auto *residue = new ElementModQ(const_cast<uint64_t *>(Q_MINUS_ONE));
+    const auto &q = Q();
+    auto one = ElementModQ::fromUint64(1);
+    auto residue = make_unique<ElementModQ>(Q_MINUS_ONE);
 
-    auto *result = sub_mod_q(q, one);
+    auto result = sub_mod_q(q, *one);
     // Log::debug(" : result->toHex() = " + result->toHex());
 
     CHECK((*result == *residue));
@@ -332,25 +332,26 @@ TEST_CASE("a_minus_b_mod_q (Q - 1) % Q has hex value ending in 42")
 
 #pragma region a_plus_bc_mod_q
 
-TEST_CASE("a_plus_bc_mod_q for 1 + 2 x 3 is 7")
+TEST_CASE("a_plus_bc_mod_q for 1 + (2 x 3) % Q = 7")
 {
-    auto *one = ElementModQ::fromUint64(1);
-    auto *two = ElementModQ::fromUint64(2);
-    auto *three = ElementModQ::fromUint64(3);
-    auto *seven = ElementModQ::fromUint64(7);
+    auto one = ElementModQ::fromUint64(1);
+    auto two = ElementModQ::fromUint64(2);
+    auto three = ElementModQ::fromUint64(3);
+    auto seven = ElementModQ::fromUint64(7);
 
-    auto *result = a_plus_bc_mod_q(one, two, three);
-    // Log::debug(" : result->toHex() = " + result->toHex());
+    auto result = a_plus_bc_mod_q(*one, *two, *three);
+    //Log::debug(" : result->toHex() = " + result->toHex());
 
     CHECK((*result == *seven));
+    CHECK(result->toHex() == seven->toHex());
 }
 
 TEST_CASE("negate_mod_q for MAX Q is 0")
 {
-    auto *maxQ = new ElementModQ(const_cast<uint64_t *>(Q_ARRAY_REVERSE));
-    auto *zero = ElementModQ::fromUint64(0);
+    auto maxQ = make_unique<ElementModQ>(Q_ARRAY_REVERSE);
+    auto zero = ElementModQ::fromUint64(0);
 
-    auto *result = sub_from_q(maxQ);
+    auto result = sub_from_q(*maxQ);
     // Log::debug(" : result->toHex() = " + result->toHex());
 
     CHECK((*result == *zero));
@@ -362,21 +363,21 @@ TEST_CASE("negate_mod_q for MAX Q is 0")
 
 TEST_CASE("add_mod_p for ints 1 and 1 should return q of 2")
 {
-    auto *one1 = ElementModP::fromUint64(1UL);
-    auto *one2 = ElementModP::fromHex("01");
-    auto *two = ElementModP::fromUint64(2);
+    auto one1 = ElementModP::fromUint64(1UL);
+    auto one2 = ElementModP::fromHex("01");
+    auto two = ElementModP::fromUint64(2);
 
-    auto *result = add_mod_p(one1, one2);
+    auto result = add_mod_p(*one1, *one2);
 
     CHECK(result->toHex() == two->toHex());
 }
 
 TEST_CASE("add_mod_p for two huge P arrays")
 {
-    auto *p1 = new ElementModP(LARGE_P_ARRAY_1);
-    auto *p2 = new ElementModP(LARGE_P_ARRAY_2);
+    auto p1 = make_unique<ElementModP>(LARGE_P_ARRAY_1);
+    auto p2 = make_unique<ElementModP>(LARGE_P_ARRAY_2);
 
-    auto *result = add_mod_p(p1, p2);
+    auto result = add_mod_p(*p1, *p2);
 
     CHECK(p1->toHex() != "00");
     CHECK(p2->toHex() != "00");
@@ -514,7 +515,7 @@ TEST_CASE("add_mod_p for two huge P arrays")
 
 TEST_CASE("mul_mod_p 3 * 3 should equal 9")
 {
-    auto *p = mul_mod_p(ElementModP::fromUint64(3), ElementModP::fromUint64(3));
+    auto p = mul_mod_p(*ElementModP::fromUint64(3), *ElementModP::fromUint64(3));
     // Log::debug(": p->toHex() = " + p->toHex());
 
     CHECK(p->toHex() == "09");
@@ -524,7 +525,7 @@ TEST_CASE("mul_mod_p for max uint64 * max uint64 should equal hex value "
           "fffffffffffffffe0000000000000001)")
 {
     auto uint64Max = numeric_limits<uint64_t>::max();
-    auto *p = mul_mod_p(ElementModP::fromUint64(uint64Max), ElementModP::fromUint64(uint64Max));
+    auto p = mul_mod_p(*ElementModP::fromUint64(uint64Max), *ElementModP::fromUint64(uint64Max));
     // Log::debug(": p->toHex() = " + p->toHex());
 
     CHECK(p->toHex() == "fffffffffffffffe0000000000000001");
@@ -536,17 +537,17 @@ TEST_CASE("mul_mod_p for max uint64 * max uint64 should equal hex value "
 
 TEST_CASE("pow_mod_p 2 ^ 3 = 8 and 3 ^ 2 = 9")
 {
-    auto *two = ElementModP::fromUint64(2);
-    auto *three = ElementModP::fromUint64(3);
-    auto *eight = ElementModP::fromUint64(8);
-    auto *nine = ElementModP::fromUint64(9);
+    auto two = ElementModP::fromUint64(2);
+    auto three = ElementModP::fromUint64(3);
+    auto eight = ElementModP::fromUint64(8);
+    auto nine = ElementModP::fromUint64(9);
 
-    auto *result8 = pow_mod_p(two, three);
+    auto result8 = pow_mod_p(*two, *three);
     // Log::debug(" : result8 = " + result8->toHex());
 
     CHECK((*result8 == *eight));
 
-    auto *result9 = pow_mod_p(three, two);
+    auto result9 = pow_mod_p(*three, *two);
     // Log::debug(" : result9 = " + result9->toHex());
 
     CHECK((*result9 == *nine));
@@ -558,9 +559,9 @@ TEST_CASE("pow_mod_p 2 ^ 3 = 8 and 3 ^ 2 = 9")
 
 TEST_CASE("Test g_pow_p with 0, 1, and 2")
 {
-    auto *zero = ElementModP::fromUint64(0);
-    auto *one = ElementModP::fromUint64(1);
-    auto *two = ElementModP::fromUint64(2);
+    auto zero = ElementModP::fromUint64(0);
+    auto one = ElementModP::fromUint64(1);
+    auto two = ElementModP::fromUint64(2);
     string expectedGPow2Hex(
       "f258e409b1a130e00a3793555e0eab2f560aa12cc01a3cb6b357035c6e734256b4d67877c018cb57af150ddbbd0a"
       "c22b9d74c0b15c1ac80953086fddfaab7fc503022b61be8c6e4fecd02136f4afc68b51390d0e7e90661763455b8b"
@@ -574,17 +575,17 @@ TEST_CASE("Test g_pow_p with 0, 1, and 2")
       "f7d408d3a2572c889a7d25957bd7d206041452b60f513b24604cd8336c351d6b7a70bd39bedbad0b910d329230f4"
       "a3228df1398cbe7ee7eef49cb22c94be32ed6c3f51b4f2c43a40bc5c217106cd7a0550ba12bb3d84643f90976ecf"
       "ef79614f2c46");
-    auto *gPowPFromHex = ElementModP::fromHex(expectedGPow2Hex);
+    auto gPowPFromHex = ElementModP::fromHex(expectedGPow2Hex);
 
-    auto *result0 = g_pow_p(zero);
-    auto *result1 = g_pow_p(one);
-    auto *result2 = g_pow_p(two);
+    auto result0 = g_pow_p(*zero);
+    auto result1 = g_pow_p(*one);
+    auto result2 = g_pow_p(*two);
 
     // Log::debug(" : result0->toHex() = " + result0->toHex());
     CHECK((*result0 == *one));
 
     // Log::debug(" : result1->toHex() = " + result1->toHex());
-    CHECK((*result1 == *G()));
+    CHECK((*result1 == G()));
 
     // Log::debug(" : result2->toHex() = " + result2->toHex());
     // Log::debug(" : gPowPFromHex->toHex() = " + gPowPFromHex->toHex());
@@ -601,14 +602,14 @@ TEST_CASE("Max of Q")
     const uint64_t maxArrayQPlus1[4U] = {0xFFFFFFFFFFFFFF44, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
                                          0xFFFFFFFFFFFFFFFF};
 
-    CHECK_THROWS_WITH(new ElementModQ(const_cast<uint64_t *>(maxArrayQPlus1)),
+    CHECK_THROWS_WITH(new ElementModQ(maxArrayQPlus1),
                       "Value for ElementModQ is greater than allowed");
 }
 
 TEST_CASE("Hex string converted to Q matches original hex when converted back toHex")
 {
     string expectedHex("f0f0f0f0f0f0f0f0");
-    auto *q = ElementModQ::fromHex(expectedHex);
+    auto q = ElementModQ::fromHex(expectedHex);
     // Log::debug(": q->toHex() = " + q->toHex() + " and expectedHex = " + expectedHex);
 
     CHECK(q->toHex() == expectedHex);
@@ -618,13 +619,13 @@ TEST_CASE("Test Q is converted correctly")
 {
     string expectedQHex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff43");
 
-    auto *qFromHex = ElementModQ::fromHex(expectedQHex);
-    auto *qFromRawArray = new ElementModQ(const_cast<uint64_t *>(Q_ARRAY_REVERSE), true);
-    auto *qFromConstExpr = Q();
+    auto qFromHex = ElementModQ::fromHex(expectedQHex);
+    auto qFromRawArray = make_unique<ElementModQ>(Q_ARRAY_REVERSE, true);
+    const auto &q = Q();
 
     CHECK(qFromHex->toHex() == expectedQHex);
     CHECK(qFromRawArray->toHex() == expectedQHex);
-    CHECK(qFromConstExpr->toHex() == expectedQHex);
+    CHECK(q.toHex() == expectedQHex);
 
     CHECK((*qFromHex == *qFromRawArray));
 }
@@ -649,10 +650,10 @@ TEST_CASE("Test P is converted correctly")
       "47c03d43d2f9ca02d03199baceddd45334dbc6b5ffffffffffffffffffffffffffffffffffffffffffffffffffff"
       "ffffffffffff");
 
-    auto *pFromHex = ElementModP::fromHex(expectedPHex);
-    auto *p = P();
+    auto pFromHex = ElementModP::fromHex(expectedPHex);
+    const auto &p = P();
 
-    CHECK(p->toHex() == expectedPHex);
+    CHECK(p.toHex() == expectedPHex);
 }
 
 TEST_CASE("Test G is converted correctly")
@@ -671,9 +672,9 @@ TEST_CASE("Test G is converted correctly")
       "ae1e1d828e61369ba0ddbadb10c136f8691101ad82dc54775ab8353840d9992197d80a6e94b38ac417cddf40b0c7"
       "3abf03e8e0aa");
 
-    auto *gFromHex = ElementModP::fromHex(expectedGHex);
+    auto gFromHex = ElementModP::fromHex(expectedGHex);
 
-    CHECK(G()->toHex() == expectedGHex);
+    CHECK(const_cast<ElementModP &>(G()).toHex() == expectedGHex);
 }
 
 #pragma endregion

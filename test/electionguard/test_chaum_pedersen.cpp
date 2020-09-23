@@ -1,3 +1,5 @@
+#include "../../src/electionguard/log.hpp"
+
 #include <doctest/doctest.h>
 #include <electionguard/chaum_pedersen.hpp>
 #include <electionguard/elgamal.hpp>
@@ -8,15 +10,15 @@ using namespace electionguard;
 class DisjunctiveChaumPedersenProofHarness : DisjunctiveChaumPedersenProof
 {
   public:
-    static DisjunctiveChaumPedersenProof *make_zero(ElGamalCiphertext *message, ElementModQ *r,
-                                                    ElementModP *k, ElementModQ *q,
-                                                    ElementModQ *seed)
+    static unique_ptr<DisjunctiveChaumPedersenProof>
+    make_zero(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
+              const ElementModQ &q, const ElementModQ &seed)
     {
         return DisjunctiveChaumPedersenProof::make_zero(message, r, k, q, seed);
     }
-    static DisjunctiveChaumPedersenProof *make_one(ElGamalCiphertext *message, ElementModQ *r,
-                                                   ElementModP *k, ElementModQ *q,
-                                                   ElementModQ *seed)
+    static unique_ptr<DisjunctiveChaumPedersenProof>
+    make_one(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
+             const ElementModQ &q, const ElementModQ &seed)
     {
         return DisjunctiveChaumPedersenProof::make_one(message, r, k, q, seed);
     }
@@ -24,32 +26,32 @@ class DisjunctiveChaumPedersenProofHarness : DisjunctiveChaumPedersenProof
 
 TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
 {
-    auto *keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto *nonce = ONE_MOD_Q();
-    auto *seed = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    const auto &nonce = ONE_MOD_Q();
+    const auto &seed = TWO_MOD_Q();
 
-    auto *firstMessage = elgamalEncrypt(0, nonce, keypair->getPublicKey());
-    auto *firstMessageZeroProof = DisjunctiveChaumPedersenProofHarness::make_zero(
-      firstMessage, nonce, keypair->getPublicKey(), ONE_MOD_Q(), seed);
+    auto firstMessage = elgamalEncrypt(0UL, nonce, *keypair->getPublicKey());
 
-    auto *firstMessageOneProof = DisjunctiveChaumPedersenProofHarness::make_one(
-      firstMessage, nonce, keypair->getPublicKey(), ONE_MOD_Q(), seed);
+    auto firstMessageZeroProof = DisjunctiveChaumPedersenProofHarness::make_zero(
+      *firstMessage, nonce, *keypair->getPublicKey(), ONE_MOD_Q(), seed);
+    auto firstMessageOneProof = DisjunctiveChaumPedersenProofHarness::make_one(
+      *firstMessage, nonce, *keypair->getPublicKey(), ONE_MOD_Q(), seed);
 
-    CHECK(firstMessageZeroProof->isValid(firstMessage, keypair->getPublicKey(), ONE_MOD_Q()) ==
+    CHECK(firstMessageZeroProof->isValid(*firstMessage, *keypair->getPublicKey(), ONE_MOD_Q()) ==
           true);
 
-    CHECK(firstMessageOneProof->isValid(firstMessage, keypair->getPublicKey(), ONE_MOD_Q()) ==
+    CHECK(firstMessageOneProof->isValid(*firstMessage, *keypair->getPublicKey(), ONE_MOD_Q()) ==
           false);
 
-    auto *secondMessage = elgamalEncrypt(1, nonce, keypair->getPublicKey());
-    auto *secondMessageZeroProof = DisjunctiveChaumPedersenProofHarness::make_zero(
-      secondMessage, nonce, keypair->getPublicKey(), ONE_MOD_Q(), seed);
-    auto *secondMessageOneProof = DisjunctiveChaumPedersenProofHarness::make_one(
-      secondMessage, nonce, keypair->getPublicKey(), ONE_MOD_Q(), seed);
+    auto secondMessage = elgamalEncrypt(1UL, nonce, *keypair->getPublicKey());
+    auto secondMessageZeroProof = DisjunctiveChaumPedersenProofHarness::make_zero(
+      *secondMessage, nonce, *keypair->getPublicKey(), ONE_MOD_Q(), seed);
+    auto secondMessageOneProof = DisjunctiveChaumPedersenProofHarness::make_one(
+      *secondMessage, nonce, *keypair->getPublicKey(), ONE_MOD_Q(), seed);
 
-    CHECK(secondMessageZeroProof->isValid(secondMessage, keypair->getPublicKey(), ONE_MOD_Q()) ==
+    CHECK(secondMessageZeroProof->isValid(*secondMessage, *keypair->getPublicKey(), ONE_MOD_Q()) ==
           false);
-    CHECK(secondMessageOneProof->isValid(secondMessage, keypair->getPublicKey(), ONE_MOD_Q()) ==
+    CHECK(secondMessageOneProof->isValid(*secondMessage, *keypair->getPublicKey(), ONE_MOD_Q()) ==
           true);
 }
 

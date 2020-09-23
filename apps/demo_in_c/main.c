@@ -1,7 +1,11 @@
+#include <ElectionGuard/chaum_pedersen.h>
 #include <assert.h>
 #include <electionguard/ballot.h>
+#include <electionguard/constants.h>
 #include <electionguard/election.h>
+#include <electionguard/elgamal.h>
 #include <electionguard/encrypt.h>
+#include <electionguard/group.h>
 #include <electionguard/hash.h>
 #include <electionguard/tracker.h>
 #include <stdbool.h>
@@ -10,7 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static bool strings_are_equal(char *expected, char *actual);
+//static bool strings_are_equal(char *expected, char *actual);
 
 static bool test_crypto_hashing();
 static bool test_encrypt_selection();
@@ -18,61 +22,49 @@ static bool test_generate_tracking_code();
 
 int main()
 {
+    // TODO: currently these tests just mimick the c++ tests
+    // however this class file should instead execute an
+    // end to end test to demonstrate usage
     assert(test_crypto_hashing() == true);
     assert(test_encrypt_selection() == true);
     assert(test_generate_tracking_code() == true);
+
+    printf("TEST STATUS SUCCESS!");
 }
 
 bool test_encrypt_selection()
 {
-    // insantiate the stateful mediator
-    eg_encryption_mediator_t *encrypter = eg_encryption_mediator_new();
-    assert(encrypter != NULL);
+    // Arrange
+    const char *candidate_id = "some-candidate-id";
+    eg_element_mod_q_t *one_mod_q = eg_element_mod_q_create(ONE_MOD_Q_ARRAY);
+    eg_element_mod_q_t *two_mod_q = eg_element_mod_q_create(TWO_MOD_Q_ARRAY);
+    eg_elgamal_keypair_t *key_pair = eg_elgamal_keypair_from_secret(two_mod_q);
 
-    char *candidate_id = "some-candidate-id";
+    eg_element_mod_q_t *nonce = eg_rand_q();
+    eg_selection_description_t *metadata =
+      eg_selection_description_create("some-selection-object_id", candidate_id, 1UL);
 
-    // instantiate a selection description
-    eg_selection_description_t *description =
-      eg_selection_description_new("some-description-object-id", candidate_id, (uint64_t)1);
-
-    // instantiate a fake public key, hash, and nonce
-    uint64_t pub[64] = {10};
-    eg_element_mod_p_t *public_key = eg_element_mod_p_new(pub);
-
-    uint64_t hash[4] = {9};
-    eg_element_mod_q_t *extended_base_hash = eg_element_mod_q_new(hash);
-
-    uint64_t seed[4] = {4};
-    eg_element_mod_q_t *nonce_seed = eg_element_mod_q_new(seed);
-
-    // instantiate a fake selection on a ballot
+    eg_element_mod_q_t *hash_context = eg_selection_description_crypto_hash(metadata);
     eg_plaintext_ballot_selection_t *plaintext =
-      eg_plaintext_ballot_selection_new(candidate_id, "1");
+      eg_plaintext_ballot_selection_create(candidate_id, "1");
 
-    // execute the encryption
-    eg_ciphertext_ballot_selection_t *result = eg_encrypt_selection(
-      plaintext, description, public_key, extended_base_hash, nonce_seed, false, false);
+    eg_element_mod_p_t *public_key = eg_elgamal_keypair_get_public_key(key_pair);
+
+    // Act
+    eg_ciphertext_ballot_selection_t *result =
+      eg_encrypt_selection(plaintext, metadata, public_key, one_mod_q, nonce, false, true);
+
+    // Assert
     assert(result != NULL);
 
-    // check the object id by accessing the property getter
-    char *plaintext_object_id = eg_plaintext_ballot_selection_get_object_id(plaintext);
-    char *ciphertext_object_id = eg_ciphertext_ballot_selection_get_object_id(result);
-    assert(strings_are_equal(plaintext_object_id, ciphertext_object_id) == true);
-    assert(strings_are_equal(ciphertext_object_id, candidate_id) == true);
+    eg_elgamal_ciphertext_t *ciphertext = eg_ciphertext_ballot_selection_get_ciphertext(result);
+    eg_disjunctive_chaum_pedersen_proof_t *proof = eg_ciphertext_ballot_selection_get_proof(result);
 
-    // get out one of the ElementModQ hashes
-    eg_element_mod_q_t *description_hash =
-      eg_ciphertext_ballot_selection_get_description_hash(result);
+    assert(eg_ciphertext_ballot_selection_is_valid_encryption(result, hash_context, public_key,
+                                                              one_mod_q) == true);
 
-    uint64_t *description_hash_data;
-    uint8_t size = eg_element_mod_q_get(description_hash, &description_hash_data);
-    assert(size == 4);
-
-    // TODO: checks similar to the cpp test
-
-    eg_encryption_mediator_free(encrypter);
-    eg_plaintext_ballot_selection_free(plaintext);
-    eg_ciphertext_ballot_selection_free(result);
+    assert(eg_disjunctive_chaum_pedersen_proof_is_valid(proof, ciphertext, public_key, one_mod_q) ==
+           true);
 
     return true;
 }
@@ -83,6 +75,7 @@ bool test_crypto_hashing()
     uint64_t *string_hash_data;
     uint8_t size = eg_element_mod_q_get(string_hash, &string_hash_data);
 
+    // TODO: check the actual hash string
     assert(string_hash != NULL);
     assert(string_hash != 0);
     assert(size == 4);
@@ -93,6 +86,7 @@ bool test_crypto_hashing()
     uint64_t *strings_hash_data;
     size = eg_element_mod_q_get(strings_hash, &strings_hash_data);
 
+    // TODO: check the actual hash string
     assert(strings_hash != NULL);
     assert(strings_hash != 0);
     assert(size == 4);
@@ -102,14 +96,11 @@ bool test_crypto_hashing()
     uint64_t *int_hash_data;
     size = eg_element_mod_q_get(int_hash, &int_hash_data);
 
+    // TODO: check the actual hash string
     assert(int_hash != NULL);
     assert(int_hash != 0);
     assert(size == 4);
     assert(int_hash_data[0] > 0);
-
-    eg_element_mod_q_free(string_hash);
-    eg_element_mod_q_free(strings_hash);
-    eg_element_mod_q_free(int_hash);
 
     return true;
 }
@@ -119,9 +110,9 @@ bool test_generate_tracking_code()
     // Arrange
     eg_element_mod_q_t *device_hash = eg_get_hash_for_device(1234, "some-location-string");
     uint64_t first_hash[4] = {1, 2, 3, 4};
-    eg_element_mod_q_t *first_ballot_hash = eg_element_mod_q_new(first_hash);
+    eg_element_mod_q_t *first_ballot_hash = eg_element_mod_q_create(first_hash);
     uint64_t second_hash[4] = {2, 3, 4, 5};
-    eg_element_mod_q_t *second_ballot_hash = eg_element_mod_q_new(second_hash);
+    eg_element_mod_q_t *second_ballot_hash = eg_element_mod_q_create(second_hash);
 
     // Act
     eg_element_mod_q_t *rotating_hash_1 =
@@ -153,29 +144,23 @@ bool test_generate_tracking_code()
 
     assert(rotating_hash_1_data[0] != device_hash_data[0]);
 
-    eg_element_mod_q_free(device_hash);
-    eg_element_mod_q_free(first_ballot_hash);
-    eg_element_mod_q_free(second_ballot_hash);
-    eg_element_mod_q_free(rotating_hash_1);
-    eg_element_mod_q_free(rotating_hash_2);
-
     return true;
 }
 
-bool strings_are_equal(char *expected, char *actual)
-{
-    while (*expected == *actual) {
-        if (*expected == '\0' || *actual == '\0') {
-            break;
-        }
-        expected++;
-        actual++;
-    }
+// bool strings_are_equal(char *expected, char *actual)
+// {
+//     while (*expected == *actual) {
+//         if (*expected == '\0' || *actual == '\0') {
+//             break;
+//         }
+//         expected++;
+//         actual++;
+//     }
 
-    if (*expected == '\0' && *actual == '\0') {
-        return true;
-    } else {
-        printf("compare_string: failed!\n");
-        return false;
-    }
-}
+//     if (*expected == '\0' && *actual == '\0') {
+//         return true;
+//     } else {
+//         printf("compare_string: failed!\n");
+//         return false;
+//     }
+// }

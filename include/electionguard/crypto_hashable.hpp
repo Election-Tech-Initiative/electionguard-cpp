@@ -4,6 +4,8 @@
 #include "export.h"
 #include "group.hpp"
 
+#include <memory>
+
 namespace electionguard
 {
     class EG_API CryptoHashable
@@ -14,7 +16,7 @@ namespace electionguard
         /// <summary>
         /// Generates a hash given the fields on the implementing instance.
         /// </summary>
-        virtual ElementModQ *crypto_hash() { return nullptr; };
+        virtual unique_ptr<ElementModQ> crypto_hash() { return nullptr; };
     };
 
     class EG_API CryptoHashCheckable
@@ -24,7 +26,10 @@ namespace electionguard
         /// <summary>
         /// Generates a hash with a given seed that can be checked later against the seed and class metadata.
         /// </summary>
-        virtual ElementModQ *crypto_hash_with(ElementModQ *seed_hash) { return nullptr; };
+        virtual unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash)
+        {
+            return nullptr;
+        };
     };
 } // namespace electionguard
 

@@ -13,6 +13,7 @@ extern "C" {
 
 namespace electionguard
 {
+    // TODO: implement
     EncryptionMediator::EncryptionMediator() { Log::debug(" : Creating EncryptionCompositor[]"); }
     EncryptionMediator::~EncryptionMediator()
     {
@@ -26,34 +27,34 @@ namespace electionguard
     }
 
     //todo: renmame using the cpp style, and maybe move into a class as static
-    CiphertextBallotSelection *
-    encrypt_selection(PlaintextBallotSelection *selection, SelectionDescription *description,
-                      ElementModP *elgamalPublicKey, ElementModQ *cryptoExtendedBaseHash,
-                      ElementModQ *nonceSeed, bool isPlaceholder, bool shouldVerifyProofs)
+    unique_ptr<CiphertextBallotSelection>
+    encryptSelection(const PlaintextBallotSelection &plaintext,
+                     const SelectionDescription &description, const ElementModP &elgamalPublicKey,
+                     const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &nonceSeed,
+                     bool isPlaceholder /* = false */, bool shouldVerifyProofs /* = true */)
     {
-        // Validate Input
-        // TODO:
+        // TODO: Validate Input
 
-        auto *descriptionHash = description->crypto_hash();
-        auto *nonceSequence = new Nonces(descriptionHash, nonceSeed);
-        auto *selectionNonce = nonceSequence->get(description->getSequenceOrder());
-        auto *proofNonce = nonceSequence->next();
+        auto descriptionHash = description.crypto_hash();
+        auto nonceSequence =
+          make_unique<Nonces>(*descriptionHash, &const_cast<ElementModQ &>(nonceSeed));
+        auto selectionNonce = nonceSequence->get(description.getSequenceOrder());
+        auto proofNonce = nonceSequence->next();
 
-        uint64_t plaintext = selection->toInt();
+        uint64_t plaintext_ = plaintext.toInt();
 
         // Generate the encryption
-        auto *ciphertext = elgamalEncrypt(plaintext, selectionNonce, elgamalPublicKey);
+        auto ciphertext = elgamalEncrypt(plaintext_, *selectionNonce, elgamalPublicKey);
         if (ciphertext == nullptr) {
             throw runtime_error("encryptSelection:: Error generating ciphertext");
         }
 
         // TODO: encrypt/decrypt: encrypt the extended_data field
 
-        auto *encryptedSelection = CiphertextBallotSelection::make(
-          selection->getObjectId(), descriptionHash, ciphertext, elgamalPublicKey,
-          cryptoExtendedBaseHash, proofNonce, plaintext, isPlaceholder, selectionNonce);
+        auto encryptedSelection = CiphertextBallotSelection::make(
+          plaintext.getObjectId(), *descriptionHash, move(ciphertext), elgamalPublicKey,
+          cryptoExtendedBaseHash, *proofNonce, plaintext_, isPlaceholder, move(selectionNonce));
 
-        // TODO: cleanup
         if (encryptedSelection == nullptr || encryptedSelection->getProof() == nullptr) {
             throw runtime_error("encryptSelection:: Error constructing encrypted selection");
         }
@@ -64,14 +65,12 @@ namespace electionguard
         }
 
         // verify the selection.
-        if (encryptedSelection->isValidEncryption(descriptionHash, elgamalPublicKey,
+        if (encryptedSelection->isValidEncryption(*descriptionHash, elgamalPublicKey,
                                                   cryptoExtendedBaseHash)) {
             return encryptedSelection;
         }
 
         Log::debug("encryptSelection:: failed validity check");
-
-        // TODO: cleanup
         return nullptr;
     }
 
