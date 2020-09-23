@@ -46,7 +46,7 @@ namespace electionguard
     DisjunctiveChaumPedersenProof::make(ElGamalCiphertext *message, ElementModQ *r, ElementModP *k,
                                         ElementModQ *q, ElementModQ *seed, uint64_t plaintext)
     {
-        if (plaintext < 0 || plaintext > 1) {
+        if (plaintext > 1) {
             Log::debug("make_disjunctive_chaum_pedersen only supports plaintexts of 0 or 1");
             return nullptr;
         }

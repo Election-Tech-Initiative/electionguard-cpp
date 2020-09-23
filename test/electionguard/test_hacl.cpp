@@ -171,7 +171,7 @@ TEST_CASE("Test less than BigNum 4096")
       0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
       0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF};
 
-    auto isLessThan = Hacl_Bignum4096_lt_mask(a, b) >= 0;
+    auto isLessThan = Hacl_Bignum4096_lt_mask(a, b) > 0;
     CHECK(isLessThan);
 }
 
@@ -181,6 +181,6 @@ TEST_CASE("Test less than BigNum 256")
     uint64_t larger_than_q[MAX_Q_LEN] = {0xFFFFFFFFFFFFFF45, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
                                          0xFFFFFFFFFFFFFFFF};
 
-    auto isLessThan = Hacl_Bignum256_lt_mask(Q()->get(), larger_than_q) >= 0;
+    auto isLessThan = Hacl_Bignum256_lt_mask(Q()->get(), larger_than_q) > 0;
     CHECK(isLessThan);
 }
