@@ -1,6 +1,6 @@
-#include <ElectionGuard/chaum_pedersen.h>
 #include <assert.h>
 #include <electionguard/ballot.h>
+#include <electionguard/chaum_pedersen.h>
 #include <electionguard/constants.h>
 #include <electionguard/election.h>
 #include <electionguard/elgamal.h>

@@ -48,23 +48,23 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/kremlin/Lib_Memzero0.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/constants.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/crypto_hashable.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/election.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/election.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/election.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/election.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/export.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/group.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/group.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/tracker.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/hash.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/group.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/hash.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/hash.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/tracker.hpp
 )
 
 add_library(${META_PROJECT_TARGET} ${PROJECT_SOURCE_FILES})

@@ -9,10 +9,14 @@ extern "C" {
 
 #include "../log.hpp"
 
+#include <cstring>
+
 using electionguard::Cache;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
 using electionguard::rand_q;
+
+using std::string;
 
 // TODO: safe initialization
 static Cache<ElementModP> cache_element_mod_p;

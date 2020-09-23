@@ -893,7 +893,7 @@ bool Hacl_Bignum4096_mod_inv_prime(uint64_t *n, uint64_t *a, uint64_t *res)
         c0 = Lib_IntTypes_Intrinsics_sub_borrow_u64(c0, t1, t2, res0 + i);
     }
     uint64_t c00 = c0;
-    uint64_t c1;
+    //uint64_t c1;
     if ((uint32_t)(1U) < (uint32_t)64U) {
         uint32_t rLen = (uint32_t)63U;
         uint64_t *a1 = n + (uint32_t)1U;
@@ -919,9 +919,9 @@ bool Hacl_Bignum4096_mod_inv_prime(uint64_t *n, uint64_t *a, uint64_t *res)
             c = Lib_IntTypes_Intrinsics_sub_borrow_u64(c, t1, (uint64_t)0U, res1 + i);
         }
         uint64_t c10 = c;
-        c1 = c10;
+        //c1 = c10;
     } else {
-        c1 = c00;
+        //c1 = c00;
     }
     bool is_valid = Hacl_Bignum4096_mod_exp(n, a, (uint32_t)4096U, n2, res);
     return is_valid;
