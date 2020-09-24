@@ -1,8 +1,6 @@
-﻿using System;
-using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
+﻿using Xamarin.Forms;
 
-namespace ElectionGuardCore
+namespace ElectionGuardCore.Ui.Forms
 {
     public partial class App : Application
     {
