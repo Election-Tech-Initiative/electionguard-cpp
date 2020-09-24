@@ -80,6 +80,23 @@ make build
 export BUILD_DEBUG=true && make build
 ```
 
+# Build for android
+
+Set the path to the NDK, replacing the version with your own
+
+```sh
+export NDK_PATH=/Users/$USER/Library/Android/sdk/ndk/21.3.6528147 && make build-android
+```
+
+
+### Build for iOS
+
+Creates a fat binary for the simulator and targets a recent version of ios
+
+```sh
+make build-ios
+```
+
 ### Run the Tests
 
 ```sh

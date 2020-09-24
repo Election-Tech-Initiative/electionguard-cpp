@@ -61,7 +61,7 @@ endif()
 # HACK: Disable x86 intrinsics
 # TODO: load the appropriate intrinsics for the processor architecture
 # this is currently only being set when the platform is explicitly set (such as on ios)
-if(DEFINED PLATFORM)
+if(DEFINED PLATFORM OR DEFINED CMAKE_ANDROID_ARCH_ABI)
     add_compile_definitions(BROKEN_INTRINSICS)
 endif()
 

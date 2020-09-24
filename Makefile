@@ -1,9 +1,14 @@
-.PHONY: build build-debug build-release build-ios clean demo-c demo-cpp format memcheck sanitize sanitize-asan sanitize-tsan test
+.PHONY: build build-debug build-debug-all build-release build-android build-ios clean demo-c demo-cpp format memcheck sanitize sanitize-asan sanitize-tsan test
 
 BUILD_DEBUG?=true
 
 .EXPORT_ALL_VARIABLES:
-ELECTIONGUARD_BUILD_DIR="$(realpath .)/build/electionguard-core"
+ELECTIONGUARD_BUILD_DIR=$(realpath .)/build
+ELECTIONGUARD_BUILD_APPS_DIR=$(ELECTIONGUARD_BUILD_DIR)/apps
+ELECTIONGUARD_BUILD_BINDING_DIR=$(ELECTIONGUARD_BUILD_DIR)/bindings
+ELECTIONGUARD_BUILD_LIBS_DIR=$(ELECTIONGUARD_BUILD_DIR)/libs
+NDK_PATH=/Users/$$USER/Library/Android/sdk/ndk/21.3.6528147
+IOS_TOOLCHAIN=cmake/ios.toolchain.cmake
 
 # Detect operating system
 ifeq ($(OS),Windows_NT)
@@ -44,62 +49,87 @@ endif
 
 build-debug:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 -G "MSYS Makefiles" \
+		-DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 \
+		-DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON
 endif
-	cmake --build $(ELECTIONGUARD_BUILD_DIR)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64
 
 build-release: clean
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DUSE_STATIC_ANALYSIS=ON
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 -G "MSYS Makefiles" \
+		-DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DUSE_STATIC_ANALYSIS=ON
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DUSE_STATIC_ANALYSIS=ON
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 \
+		-DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DUSE_STATIC_ANALYSIS=ON
 endif
-	cmake --build $(ELECTIONGUARD_BUILD_DIR)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64
+
+build-android:
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/arm64-v8a \
+		-DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_SYSTEM_NAME=Android \
+		-DCMAKE_ANDROID_NDK=$(NDK_PATH) -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a -DCMAKE_SYSTEM_VERSION=21
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/arm64-v8a
 
 build-ios:
-	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G Xcode -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=cmake/ios.toolchain.cmake -DPLATFORM=OS64COMBINED -DDEPLOYMENT_TARGET=12.0
-	cmake --build $(ELECTIONGUARD_BUILD_DIR) --config Release --target install
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/ios -G Xcode \
+		-DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$(IOS_TOOLCHAIN) \
+		-DPLATFORM=OS64COMBINED -DDEPLOYMENT_TARGET=12.0
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/ios --config Release --target install
+
+build-debug-all: build-debug build-android build-ios
 
 clean:
-	if [ -d "build" ]; then rm -rf ./build/*; fi
-	if [ ! -d "build" ]; then mkdir build; fi
-	if [ ! -d "$($(ELECTIONGUARD_BUILD_DIR))" ]; then mkdir $(ELECTIONGUARD_BUILD_DIR); fi
-	if [ ! -d "build/apps" ]; then mkdir build/apps; fi
-	if [ ! -d "build/apps/demo_in_c" ]; then mkdir build/apps/demo_in_c; fi
-	if [ ! -d "build/apps/demo_in_cpp" ]; then mkdir build/apps/demo_in_cpp; fi
+	if [ -d "$(ELECTIONGUARD_BUILD_DIR)" ]; then rm -rf $(ELECTIONGUARD_BUILD_DIR)/*; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_DIR); fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_APPS_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_APPS_DIR); fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_BINDING_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_BINDING_DIR); fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard" ]; then mkdir $(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR); fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c" ]; then mkdir $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_cpp" ]; then mkdir $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_cpp; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/android" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/android; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/android/arm64-v8a" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/arm64-v8a; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/android/x86_64" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/x86_64; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/ios" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/ios; fi
 	
 demo-c: build
 ifeq ($(OPERATING_SYSTEM),Windows)
-	CMAKE_PREFIX_PATH="$(ELECTIONGUARD_BUILD_DIR)" cmake -S apps/demo_in_c -B build/apps/demo_in_c -G "MSYS Makefiles"
-	cmake --build build/apps/demo_in_c --target DemoInC
-	PATH=$(ELECTIONGUARD_BUILD_DIR)/src:$$PATH; ./build/apps/demo_in_c/DemoInC
+	CMAKE_PREFIX_PATH=".$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64" cmake -S apps/demo_in_c \
+		-B $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c -G "MSYS Makefiles"
+	cmake --build $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c --target DemoInC
+	PATH=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/src:$$PATH; ./$(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c/DemoInC
 else
-	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_c -B build/apps/demo_in_c
-	cmake --build build/apps/demo_in_c --target DemoInC
-	./build/apps/demo_in_c/DemoInC
+	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 cmake -S apps/demo_in_c \
+		-B $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c
+	cmake --build $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c --target DemoInC
+	$(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c/DemoInC
 endif
 
 demo-cpp: build
 ifeq ($(OPERATING_SYSTEM),Windows)
-	CMAKE_PREFIX_PATH="./build/electionguard-core" cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp -G "MSYS Makefiles"
-	cmake --build build/apps/demo_in_cpp --target DemoInCPP
-	PATH=$(ELECTIONGUARD_BUILD_DIR)/src:$$PATH; ./build/apps/demo_in_cpp/DemoInCPP
+	CMAKE_PREFIX_PATH=".$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64" cmake -S apps/demo_in_cpp \
+		-B $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_cpp -G "MSYS Makefiles"
+	cmake --build $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_cpp --target DemoInCPP
+	PATH=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/src:$$PATH; $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_cpp/DemoInCPP
 else
-	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp
-	cmake --build build/apps/demo_in_cpp --target DemoInCPP
-	./build/apps/demo_in_cpp/DemoInCPP
+	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 cmake -S apps/demo_in_cpp \
+		-B $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_cpp
+	cmake --build $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_cpp --target DemoInCPP
+	$(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_cpp/DemoInCPP
 endif
 
 format: build
-	cd ./build/electionguard-core && $(MAKE) format
+	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 && $(MAKE) format
 
 memcheck:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	echo "Static analysis is only supported on Linux"
 else
-	cd ./build/electionguard-core && $(MAKE) memcheck-ElectionGuardTests
+	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 && $(MAKE) memcheck-ElectionGuardTests
 endif
 
 rebuild: clean build
@@ -110,39 +140,46 @@ sanitize-asan: clean
 ifeq ($(OPERATING_SYSTEM),Windows)
 	echo "Address sanitizer is only supported on Linux & Mac"
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DUSE_SANITIZER="address;undefined"
-	cmake --build $(ELECTIONGUARD_BUILD_DIR)
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 \
+		-DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DUSE_SANITIZER="address;undefined"
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64
 	# TODO: reenable
-	# ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp
-	# cmake --build build/apps/demo_in_cpp --target DemoInCPP
-	# ./build/apps/demo_in_cpp/DemoInCPP
-	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_c -B build/apps/demo_in_c
-	cmake --build build/apps/demo_in_c --target DemoInC
-	./build/apps/demo_in_c/DemoInC
+	# ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 cmake -S apps/demo_in_cpp -B $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_cpp
+	# cmake --build $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_cpp --target DemoInCPP
+	# $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_cpp/DemoInCPP
+	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 cmake -S apps/demo_in_c \
+		-B $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c
+	cmake --build $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c --target DemoInC
+	$(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c/DemoInC
 endif
 
 sanitize-tsan: clean
 ifeq ($(OPERATING_SYSTEM),Windows)
 	echo "Thread sanitizer is only supported on Linux & Mac"
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DUSE_SANITIZER="thread"
-	cmake --build $(ELECTIONGUARD_BUILD_DIR)
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 \
+		-DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DUSE_SANITIZER="thread"
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64
 	# TODO: reenable
-	# ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_cpp -B build/apps/demo_in_cpp
-	# cmake --build build/apps/demo_in_cpp --target DemoInCPP
-	# ./build/apps/demo_in_cpp/DemoInCPP
-	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_c -B build/apps/demo_in_c
-	cmake --build build/apps/demo_in_c --target DemoInC
-	./build/apps/demo_in_c/DemoInC
+	# ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_DIR) cmake -S apps/demo_in_cpp -B $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_cpp
+	# cmake --build $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_cpp --target DemoInCPP
+	# $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_cpp/DemoInCPP
+	ElectionGuard_DIR=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 cmake -S apps/demo_in_c \
+		-B $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c
+	cmake --build $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c --target DemoInC
+	$(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c/DemoInC
 endif
 
 test:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DOPTION_ENABLE_TESTS=ON
-	cmake --build $(ELECTIONGUARD_BUILD_DIR)
-	PATH=$(ELECTIONGUARD_BUILD_DIR)/src:$$PATH; $(ELECTIONGUARD_BUILD_DIR)/test/ElectionGuardTests
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 -G "MSYS Makefiles" \
+		-DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DOPTION_ENABLE_TESTS=ON
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64
+	PATH=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/src:$$PATH; $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/test/ElectionGuardTests
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DOPTION_ENABLE_TESTS=ON -DCODE_COVERAGE=ON -DUSE_STATIC_ANALYSIS=ON -DUSE_DYNAMIC_ANALYSIS=ON
-	cmake --build $(ELECTIONGUARD_BUILD_DIR)
-	$(ELECTIONGUARD_BUILD_DIR)/test/ElectionGuardTests
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 \
+		-DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DOPTION_ENABLE_TESTS=ON \
+		-DCODE_COVERAGE=ON -DUSE_STATIC_ANALYSIS=ON -DUSE_DYNAMIC_ANALYSIS=ON
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/test/ElectionGuardTests
 endif
