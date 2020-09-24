@@ -119,7 +119,6 @@ class ReviewViewController: UIViewController {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
             // TODO: Encrypt ballot here
-            _ = ElectionGuard.mainTest()
             ProgressHUD.dismiss()
             completion("checker ACND2 sorry K2JJD connect 9ANDK four 8C372 unreal G338F blizzard FGG1J super 4RR81 tornado J7BCA")
         })
