@@ -75,6 +75,7 @@ namespace electionguard
 
         bool isInBounds() const;
 
+        vector<uint8_t> toBytes() const;
         string toHex() const;
         unique_ptr<ElementModP> toElementModP() const;
 

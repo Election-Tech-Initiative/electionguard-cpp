@@ -18,10 +18,10 @@ TEST_CASE("Retrieving words from the words list succeeds")
     uint16_t INDEX_MAX = 4095;
 
     // Act
-    auto *word_min = getWord(INDEX_MIN);
+    auto word_min = getWord(INDEX_MIN);
 
     // Assert
-    CHECK(string(word_min) == "aardvark");
+    CHECK(word_min == "aardvark");
 }
 
 TEST_CASE("Retrieving indicies from the words list succeeds")

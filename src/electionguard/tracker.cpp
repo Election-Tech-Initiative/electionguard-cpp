@@ -1,9 +1,11 @@
 #include "electionguard/tracker.hpp"
 
 #include "electionguard/hash.hpp"
+#include "log.hpp"
 #include "words.hpp"
 
 #include <algorithm>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -29,7 +31,16 @@ namespace electionguard
 
     string Tracker::hashToWords(const ElementModQ &trackerHash, const char *separator)
     {
-        // TODO: implement properly
-        return "Doggo ipsum long woofer pats blep thicc shooberino, sub woofer pupper";
+        auto bytes = trackerHash.toBytes();
+        stringstream stream;
+        for (auto byte : bytes) {
+            auto word = getWord((uint16_t)byte);
+            if (byte == bytes.back()) {
+                separator = "";
+            }
+            stream << word << separator;
+        }
+
+        return stream.str();
     }
 } // namespace electionguard

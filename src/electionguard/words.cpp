@@ -5992,18 +5992,16 @@ namespace electionguard
       "zucchini",
     };
 
-    const char *getWord(uint16_t index) { return WORDS[index & 0xfff].c_str(); }
+    const string getWord(uint16_t index) { return WORDS[index & 0xfff]; }
 
     int16_t getIndex(const char *word) { return getIndex(string(word)); }
 
-    int16_t getIndex(const string word)
+    int16_t getIndex(const string &word)
     {
         auto element = find(WORDS.begin(), WORDS.end(), word);
 
         if (element != WORDS.end()) {
             int index = distance(WORDS.begin(), element);
-            std::cout << "get index::" << index << endl;
-            //Log::debug("index:: ");
             return index;
         }
         std::cout << "get index:: NOT FOUND!!!" << endl;
