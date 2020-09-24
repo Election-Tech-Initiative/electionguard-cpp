@@ -244,7 +244,7 @@ namespace electionguard
 
 #pragma region ConstantChaumPedersenProof
 
-    struct ConstantChaumPedersenProof ::Impl {
+    struct ConstantChaumPedersenProof::Impl {
         unique_ptr<ElementModP> pad;
         unique_ptr<ElementModP> data;
         unique_ptr<ElementModQ> challenge;
@@ -318,7 +318,7 @@ namespace electionguard
         auto consistent_kv = (*mul_mod_p(*g_pow_p(*mul_mod_p({c_ptr, constant_q.get()})),
                                          *pow_mod_p(k, v)) == *mul_mod_p(b, *pow_mod_p(*beta, c)));
 
-                auto success = inBounds_alpha && inBounds_beta && inBounds_a && inBounds_b && inBounds_c &&
+        auto success = inBounds_alpha && inBounds_beta && inBounds_a && inBounds_b && inBounds_c &&
                        inBounds_v && consistent_c && consistent_gv && consistent_kv;
 
         if (!success) {
