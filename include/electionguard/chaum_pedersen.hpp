@@ -45,29 +45,28 @@ namespace electionguard
         unique_ptr<Impl> pimpl;
     };
 
-    struct ConstantChaumPedersenProofData {
-        ElementModP *pad;
-        ElementModP *data;
-        ElementModQ *challenge;
-        ElementModQ *response;
-        uint64_t constant;
-    };
-
     class EG_API ConstantChaumPedersenProof
     {
       public:
-        ConstantChaumPedersenProof(ElementModP *pad, ElementModP *data, ElementModQ *challenge,
-                                   ElementModQ *response, uint64_t constant);
+        ConstantChaumPedersenProof(const ConstantChaumPedersenProof &other);
+        ConstantChaumPedersenProof(const ConstantChaumPedersenProof &&other);
+        ConstantChaumPedersenProof(unique_ptr<ElementModP> pad, unique_ptr<ElementModP> data,
+                                   unique_ptr<ElementModQ> challenge,
+                                   unique_ptr<ElementModQ> response, uint64_t constant);
         ~ConstantChaumPedersenProof();
 
-        bool isValid(ElGamalCiphertext *message, ElementModP *k, ElementModQ *q);
+        ConstantChaumPedersenProof &operator=(ConstantChaumPedersenProof other);
+        ConstantChaumPedersenProof &operator=(ConstantChaumPedersenProof &&other);
 
-        static ConstantChaumPedersenProof *make(ElGamalCiphertext *message, ElementModQ *r,
-                                                ElementModP *k, ElementModQ *seed,
-                                                ElementModQ *hash_header, uint64_t constant);
+        bool isValid(const ElGamalCiphertext &message, const ElementModP &k, const ElementModQ &q);
+
+        static unique_ptr<ConstantChaumPedersenProof>
+        make(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
+             const ElementModQ &seed, const ElementModQ &hash_header, uint64_t constant);
 
       private:
-        ConstantChaumPedersenProofData data;
+        class Impl;
+        unique_ptr<Impl> pimpl;
     };
 } // namespace electionguard
 

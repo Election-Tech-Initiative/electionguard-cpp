@@ -244,38 +244,132 @@ namespace electionguard
 
 #pragma region ConstantChaumPedersenProof
 
+    struct ConstantChaumPedersenProof::Impl {
+        unique_ptr<ElementModP> pad;
+        unique_ptr<ElementModP> data;
+        unique_ptr<ElementModQ> challenge;
+        unique_ptr<ElementModQ> response;
+        uint64_t constant;
+
+        Impl(unique_ptr<ElementModP> pad, unique_ptr<ElementModP> data,
+             unique_ptr<ElementModQ> challenge, unique_ptr<ElementModQ> response, uint64_t constant)
+            : pad(move(pad)), data(move(data)), challenge(move(challenge)), response(move(response))
+        {
+            this->constant = constant;
+        }
+    };
+
     // Lifecycle Methods
 
-    ConstantChaumPedersenProof::ConstantChaumPedersenProof(ElementModP *pad, ElementModP *data,
-                                                           ElementModQ *challenge,
-                                                           ElementModQ *response, uint64_t constant)
+    ConstantChaumPedersenProof::ConstantChaumPedersenProof(unique_ptr<ElementModP> pad,
+                                                           unique_ptr<ElementModP> data,
+                                                           unique_ptr<ElementModQ> challenge,
+                                                           unique_ptr<ElementModQ> response,
+                                                           uint64_t constant)
+        : pimpl(new Impl(move(pad), move(data), move(challenge), move(response), constant))
     {
-        this->data.pad = pad;
-        this->data.data = data;
-        this->data.challenge = challenge;
-        this->data.response = response;
-        this->data.constant = constant;
     }
 
-    ConstantChaumPedersenProof::~ConstantChaumPedersenProof() {}
+    ConstantChaumPedersenProof::~ConstantChaumPedersenProof() = default;
+
+    ConstantChaumPedersenProof &
+    ConstantChaumPedersenProof::operator=(ConstantChaumPedersenProof other)
+    {
+        swap(pimpl, other.pimpl);
+        return *this;
+    }
 
     // Property Getters
 
     // Public Members
 
-    bool ConstantChaumPedersenProof::isValid(ElGamalCiphertext *message, ElementModP *k,
-                                             ElementModQ *q)
+    bool ConstantChaumPedersenProof::isValid(const ElGamalCiphertext &message, const ElementModP &k,
+                                             const ElementModQ &q)
     {
-        // TODO: implement
-        return true;
+        auto *alpha = const_cast<ElGamalCiphertext &>(message).getPad();
+        auto *beta = const_cast<ElGamalCiphertext &>(message).getData();
+
+        auto *a_ptr = pimpl->pad.get();
+        auto *b_ptr = pimpl->data.get();
+        auto *c_ptr = pimpl->challenge.get();
+
+        auto a = *pimpl->pad;
+        auto b = *pimpl->data;
+        auto c = *pimpl->challenge;
+        auto v = *pimpl->response;
+        auto constant = pimpl->constant;
+
+        auto inBounds_alpha = alpha->isValidResidue();
+        auto inBounds_beta = beta->isValidResidue();
+        auto inBounds_a = a.isValidResidue();
+        auto inBounds_b = b.isValidResidue();
+        auto inBounds_c = c.isInBounds();
+        auto inBounds_v = v.isInBounds();
+
+        auto constant_q = ElementModQ::fromUint64(constant);
+
+        auto consistent_c =
+          (c == *hash_elems({&const_cast<ElementModQ &>(q), alpha, beta, a_ptr, b_ptr}));
+
+        // 𝑔^𝑉 = 𝑎 ⋅ 𝐴^𝐶 mod 𝑝
+        auto consistent_gv = (*g_pow_p(v) == *mul_mod_p(a, *pow_mod_p(*alpha, c)));
+
+        // 𝑔^𝐿 ⋅ 𝐾^𝑣 = 𝑏 ⋅ 𝐵^𝐶 mod 𝑝
+        auto consistent_kv = (*mul_mod_p(*g_pow_p(*mul_mod_p({c_ptr, constant_q.get()})),
+                                         *pow_mod_p(k, v)) == *mul_mod_p(b, *pow_mod_p(*beta, c)));
+
+        auto success = inBounds_alpha && inBounds_beta && inBounds_a && inBounds_b && inBounds_c &&
+                       inBounds_v && consistent_c && consistent_gv && consistent_kv;
+
+        if (!success) {
+
+            map<string, bool> printMap{
+              {"inBounds_alpha", inBounds_alpha}, {"inBounds_beta", inBounds_beta},
+              {"inBounds_a", inBounds_a},         {"inBounds_b", inBounds_b},
+              {"inBounds_c", inBounds_c},         {"inBounds_v", inBounds_v},
+              {"consistent_c", consistent_c},     {"consistent_gv", consistent_gv},
+              {"consistent_kv", consistent_kv},
+            };
+
+            Log::debug(printMap, ": found an invalid Constant Chaum-Pedersen proof: ");
+
+            Log::debugHex(" q->get: ", const_cast<ElementModQ &>(q).toHex());
+            Log::debugHex(" alpha->get: ", alpha->toHex());
+            Log::debugHex(" beta->get: ", beta->toHex());
+            Log::debugHex(" a->get: ", a.toHex());
+            Log::debugHex(" b->get: ", b.toHex());
+            Log::debugHex(" c->get: ", c.toHex());
+            Log::debugHex(" v->get: ", v.toHex());
+
+            return false;
+        }
+
+        return success;
     }
 
-    ConstantChaumPedersenProof *
-    ConstantChaumPedersenProof::make(ElGamalCiphertext *message, ElementModQ *r, ElementModP *k,
-                                     ElementModQ *seed, ElementModQ *hash_header, uint64_t constant)
+    unique_ptr<ConstantChaumPedersenProof>
+    ConstantChaumPedersenProof::make(const ElGamalCiphertext &message, const ElementModQ &r,
+                                     const ElementModP &k, const ElementModQ &seed,
+                                     const ElementModQ &hash_header, uint64_t constant)
     {
-        // TODO: implement
-        return new ConstantChaumPedersenProof(nullptr, nullptr, nullptr, nullptr, 0);
+        auto *alpha = const_cast<ElGamalCiphertext &>(message).getPad();
+        auto *beta = const_cast<ElGamalCiphertext &>(message).getData();
+
+        // Pick a random number in Q.
+        auto nonces = make_unique<Nonces>(seed, "disjoint-chaum-pedersen-proof");
+        auto u = nonces->get(0);
+
+        // Compute the NIZKP
+        auto a = g_pow_p(*u);      //𝑔^𝑢 mod 𝑝
+        auto b = pow_mod_p(k, *u); // 𝐾^𝑢 mod 𝑝
+
+        // sha256(𝑄', A, B, a, b)
+        auto c =
+          hash_elems({&const_cast<ElementModQ &>(hash_header), alpha, beta, a.get(), b.get()});
+        auto v = a_plus_bc_mod_q(*u, *c, r);
+
+        return make_unique<ConstantChaumPedersenProof>(move(a), move(b), move(c), move(v),
+                                                       constant);
     }
 
 #pragma endregion

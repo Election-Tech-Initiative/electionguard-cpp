@@ -17,6 +17,7 @@
 //static bool strings_are_equal(char *expected, char *actual);
 
 static bool test_crypto_hashing();
+static bool test_constant_chaum_pedersen_proof();
 static bool test_encrypt_selection();
 static bool test_generate_tracking_code();
 
@@ -26,10 +27,70 @@ int main()
     // however this class file should instead execute an
     // end to end test to demonstrate usage
     assert(test_crypto_hashing() == true);
+    assert(test_constant_chaum_pedersen_proof() == true);
     assert(test_encrypt_selection() == true);
     assert(test_generate_tracking_code() == true);
 
     printf("TEST STATUS SUCCESS!");
+}
+
+bool test_crypto_hashing()
+{
+    eg_element_mod_q_t *string_hash = eg_hash_elems_string("test");
+    uint64_t *string_hash_data;
+    uint8_t size = eg_element_mod_q_get(string_hash, &string_hash_data);
+
+    // TODO: check the actual hash string
+    assert(string_hash != NULL);
+    assert(string_hash != 0);
+    assert(size == 4);
+    assert(string_hash_data[0] > 0);
+
+    const char *strings[] = {"test", "strings"};
+    eg_element_mod_q_t *strings_hash = eg_hash_elems_strings(strings, 2);
+    uint64_t *strings_hash_data;
+    size = eg_element_mod_q_get(strings_hash, &strings_hash_data);
+
+    // TODO: check the actual hash string
+    assert(strings_hash != NULL);
+    assert(strings_hash != 0);
+    assert(size == 4);
+    assert(strings_hash_data[0] > 0);
+
+    eg_element_mod_q_t *int_hash = eg_hash_elems_int(1234);
+    uint64_t *int_hash_data;
+    size = eg_element_mod_q_get(int_hash, &int_hash_data);
+
+    // TODO: check the actual hash string
+    assert(int_hash != NULL);
+    assert(int_hash != 0);
+    assert(size == 4);
+    assert(int_hash_data[0] > 0);
+
+    return true;
+}
+
+bool test_constant_chaum_pedersen_proof()
+{
+    eg_element_mod_q_t *one_mod_q = eg_element_mod_q_create(ONE_MOD_Q_ARRAY);
+    eg_element_mod_q_t *two_mod_q = eg_element_mod_q_create(TWO_MOD_Q_ARRAY);
+    eg_elgamal_keypair_t *key_pair = eg_elgamal_keypair_from_secret(two_mod_q);
+    eg_element_mod_q_t *nonce = eg_element_mod_q_create(ONE_MOD_Q_ARRAY);
+    eg_element_mod_q_t *seed = eg_element_mod_q_create(TWO_MOD_Q_ARRAY);
+
+    eg_element_mod_p_t *public_key = eg_elgamal_keypair_get_public_key(key_pair);
+
+    eg_elgamal_ciphertext_t *message = eg_elgamal_encrypt(0UL, nonce, public_key);
+    eg_constant_chaum_pedersen_proof_t *proof =
+      eg_constant_chaum_pedersen_proof_make(message, nonce, public_key, seed, one_mod_q, 0UL);
+    eg_constant_chaum_pedersen_proof_t *bad_proof =
+      eg_constant_chaum_pedersen_proof_make(message, nonce, public_key, seed, one_mod_q, 1UL);
+    assert(eg_constant_chaum_pedersen_proof_is_valid(proof, message, public_key, one_mod_q) ==
+           true);
+    assert(eg_constant_chaum_pedersen_proof_is_valid(bad_proof, message, public_key, one_mod_q) ==
+           false);
+
+    return true;
 }
 
 bool test_encrypt_selection()
@@ -65,42 +126,6 @@ bool test_encrypt_selection()
 
     assert(eg_disjunctive_chaum_pedersen_proof_is_valid(proof, ciphertext, public_key, one_mod_q) ==
            true);
-
-    return true;
-}
-
-bool test_crypto_hashing()
-{
-    eg_element_mod_q_t *string_hash = eg_hash_elems_string("test");
-    uint64_t *string_hash_data;
-    uint8_t size = eg_element_mod_q_get(string_hash, &string_hash_data);
-
-    // TODO: check the actual hash string
-    assert(string_hash != NULL);
-    assert(string_hash != 0);
-    assert(size == 4);
-    assert(string_hash_data[0] > 0);
-
-    const char *strings[] = {"test", "strings"};
-    eg_element_mod_q_t *strings_hash = eg_hash_elems_strings(strings, 2);
-    uint64_t *strings_hash_data;
-    size = eg_element_mod_q_get(strings_hash, &strings_hash_data);
-
-    // TODO: check the actual hash string
-    assert(strings_hash != NULL);
-    assert(strings_hash != 0);
-    assert(size == 4);
-    assert(strings_hash_data[0] > 0);
-
-    eg_element_mod_q_t *int_hash = eg_hash_elems_int(1234);
-    uint64_t *int_hash_data;
-    size = eg_element_mod_q_get(int_hash, &int_hash_data);
-
-    // TODO: check the actual hash string
-    assert(int_hash != NULL);
-    assert(int_hash != 0);
-    assert(size == 4);
-    assert(int_hash_data[0] > 0);
 
     return true;
 }
@@ -146,21 +171,3 @@ bool test_generate_tracking_code()
 
     return true;
 }
-
-// bool strings_are_equal(char *expected, char *actual)
-// {
-//     while (*expected == *actual) {
-//         if (*expected == '\0' || *actual == '\0') {
-//             break;
-//         }
-//         expected++;
-//         actual++;
-//     }
-
-//     if (*expected == '\0' && *actual == '\0') {
-//         return true;
-//     } else {
-//         printf("compare_string: failed!\n");
-//         return false;
-//     }
-// }
