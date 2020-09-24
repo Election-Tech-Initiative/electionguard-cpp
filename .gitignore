@@ -136,3 +136,5 @@ bindings/netstandard/ElectionGuard/packages/
 .idea/
 
 cmake-build-debug/
+
+*.csproj.user
