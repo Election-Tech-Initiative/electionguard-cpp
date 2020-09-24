@@ -7,17 +7,47 @@
 
 using namespace electionguard;
 
-TEST_CASE("elgamalEncrypt simple with nonce is 1, publickey is g_pow_p(2)")
+TEST_CASE("elgamalEncrypt simple encrypt 0, with nonce 1 then publickey is g_pow_p(2)")
 {
-    auto *one = ElementModQ::fromUint64(1UL);
-    auto *two = ElementModP::fromUint64(2UL);
-    auto *publicKey = g_pow_p(two);
-    auto *g = new ElementModP(const_cast<uint64_t *>(G_ARRAY), true);
+    auto &nonce = ONE_MOD_Q();
+    auto &secret = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(secret);
+    auto *publicKey = keypair->getPublicKey();
 
-    auto *cipherText = elgamalEncrypt(0UL, one, publicKey);
+    CHECK((*publicKey < P()));
 
-    // Log::debug(" : cipherText->getData()->toHex() = " + cipherText->getData()->toHex());
-    // Log::debug(" : cipherText->getPad()->toHex() = " + cipherText->getPad()->toHex());
+    auto elem = g_pow_p(ZERO_MOD_P());
+    CHECK((*elem == ONE_MOD_P())); // g^0 = 1
+
+    auto cipherText = elgamalEncrypt(0UL, nonce, *publicKey);
+
     CHECK((*publicKey == *cipherText->getData()));
-    CHECK((*g == *cipherText->getPad()));
+    CHECK((const_cast<ElementModP &>(G()) == *cipherText->getPad()));
+
+    auto decryptedData = pow_mod_p(*cipherText->getPad(), *secret.toElementModP());
+    auto calculatedData = pow_mod_p(*publicKey, *nonce.toElementModP());
+    CHECK((*decryptedData == *calculatedData));
+    CHECK((*cipherText->getData() == *calculatedData));
+
+    auto decrypted = cipherText->decrypt(secret);
+    CHECK((0UL == decrypted));
+}
+
+TEST_CASE("elgamalEncrypt simple encrypt 1 decrypts with secret")
+{
+    auto &nonce = ONE_MOD_Q();
+    auto &secret = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(secret);
+    auto *publicKey = keypair->getPublicKey();
+
+    CHECK((*publicKey < P()));
+
+    auto elem = g_pow_p(ONE_MOD_P());
+    CHECK((*elem == G())); // g^1 = g
+
+    auto cipherText = elgamalEncrypt(1UL, nonce, *publicKey);
+    CHECK((const_cast<ElementModP &>(G()) == *cipherText->getPad()));
+
+    auto decrypted = cipherText->decrypt(secret);
+    CHECK(1UL == decrypted);
 }

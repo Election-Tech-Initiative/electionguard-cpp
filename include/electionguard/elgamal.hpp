@@ -4,34 +4,32 @@
 #include "export.h"
 #include "group.hpp"
 
+#include <memory>
+
 namespace electionguard
 {
-    struct ElGamalKeyPairData {
-        ElementModQ *secretKey;
-        ElementModP *publicKey;
-    };
-
     /// <summary>
     /// An exponential ElGamal keypair
     /// </summary>
     class EG_API ElGamalKeyPair
     {
       public:
-        ElGamalKeyPair(ElementModQ *secretKey, ElementModP *publicKey);
+        ElGamalKeyPair(const ElGamalKeyPair &other);
+        ElGamalKeyPair(const ElGamalKeyPair &&other);
+        ElGamalKeyPair(unique_ptr<ElementModQ> secretKey, unique_ptr<ElementModP> publicKey);
         ~ElGamalKeyPair();
 
-        static ElGamalKeyPair *fromSecret(ElementModQ *a);
+        ElGamalKeyPair &operator=(ElGamalKeyPair rhs);
+        ElGamalKeyPair &operator=(ElGamalKeyPair &&rhs);
 
         ElementModQ *getSecretKey();
         ElementModP *getPublicKey();
 
-      private:
-        ElGamalKeyPairData data;
-    };
+        static unique_ptr<ElGamalKeyPair> fromSecret(const ElementModQ &secretKey);
 
-    struct ElGamalCiphertextData {
-        ElementModP *pad;
-        ElementModP *data;
+      private:
+        class Impl;
+        unique_ptr<Impl> pimpl;
     };
 
     /// <summary>
@@ -42,16 +40,24 @@ namespace electionguard
     class EG_API ElGamalCiphertext : public CryptoHashable
     {
       public:
-        ElGamalCiphertext(ElementModP *pad, ElementModP *data);
+        ElGamalCiphertext(const ElGamalCiphertext &other);
+        ElGamalCiphertext(ElGamalCiphertext &&other);
+        ElGamalCiphertext(unique_ptr<ElementModP> pad, unique_ptr<ElementModP> data);
         ~ElGamalCiphertext();
+
+        ElGamalCiphertext &operator=(ElGamalCiphertext rhs);
+        ElGamalCiphertext &operator=(ElGamalCiphertext &&rhs);
 
         ElementModP *getPad();
         ElementModP *getData();
 
-        virtual ElementModQ *crypto_hash();
+        uint64_t decrypt(const ElementModQ &secretKey);
+
+        virtual unique_ptr<ElementModQ> crypto_hash() const;
 
       private:
-        ElGamalCiphertextData data;
+        class Impl;
+        unique_ptr<Impl> pimpl;
     };
 
     /// <summary>
@@ -62,8 +68,8 @@ namespace electionguard
     /// <param name="publicKey"> ElGamal public key. </param>
     /// <returns>A ciphertext tuple.</returns>
     /// </summary>
-    EG_API ElGamalCiphertext *elgamalEncrypt(uint64_t m, ElementModQ *nonce,
-                                             ElementModP *publicKey);
+    EG_API unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModQ &nonce,
+                                                        const ElementModP &publicKey);
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD__CORE_ELGAMAL_HPP_INCLUDED__ */

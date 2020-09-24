@@ -2,15 +2,11 @@
 #define __ELECTIONGUARD_CORE_ELECTION_HPP_INCLUDED__
 
 #include "crypto_hashable.hpp"
+#include "election_object_base.hpp"
 #include "export.h"
 #include "group.hpp"
 
 #include <string>
-
-// TODO: think we can remove the exern c since its handled internally
-extern "C" {
-#include "election_object_base.h"
-}
 
 namespace electionguard
 {
@@ -34,18 +30,18 @@ namespace electionguard
     class EG_API SelectionDescription : public CryptoHashable
     {
       public:
-        SelectionDescription(const string object_id, string candidate_id, uint64_t sequence_order);
-        SelectionDescription(const char *object_id, char *candidate_id, uint64_t sequence_order);
+        SelectionDescription(const string &object_id, const string &candidate_id,
+                             uint64_t sequence_order);
         ~SelectionDescription();
 
         // TODO: to hex?
         int toInt();
 
-        char *getObjectId();
+        string getObjectId() const;
         char *getCandidateId();
-        uint64_t getSequenceOrder();
+        uint64_t getSequenceOrder() const;
 
-        virtual ElementModQ *crypto_hash();
+        virtual unique_ptr<ElementModQ> crypto_hash() const;
 
       private:
         SelectionDescriptionData data;

@@ -16,34 +16,23 @@ TEST_CASE("Encrypt Selection with generic data succeeds")
 {
     // Arrange
     const auto *candidateId = "some-candidate-id";
-    auto *metadata = new SelectionDescription("some-description-object_id", candidateId, 1UL);
-    auto *hashContext = metadata->crypto_hash();
-
-    // instantiate a fake public key, hash, and nonce
-    uint64_t pub[64] = {10};
-    auto *publicKey = new ElementModP(pub);
-
-    uint64_t hash[4] = {9};
-    auto *extendedBaseHash = new ElementModQ(hash);
-
-    uint64_t seed[4] = {4};
-    auto *nonceSeed = new ElementModQ(seed);
-
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto nonce = rand_q();
+    auto *metadata = new SelectionDescription("some-selection-object_id", candidateId, 1UL);
+    auto hashContext = metadata->crypto_hash();
     auto *plaintext = new PlaintextBallotSelection(candidateId, "1");
 
     // Act
-    auto *result =
-      encrypt_selection(plaintext, metadata, publicKey, extendedBaseHash, nonceSeed, false, true);
+    auto result = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
+                                   *nonce, false, true);
 
     // Assert
     CHECK(result != nullptr);
     CHECK(result->getCiphertext() != nullptr);
-    CHECK(result->isValidEncryption(hashContext, publicKey, extendedBaseHash) == true);
+    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
+    CHECK(result->getProof()->isValid(*result->getCiphertext(), *keypair->getPublicKey(),
+                                      ONE_MOD_Q()) == true);
 
     delete metadata;
-    delete publicKey;
-    delete extendedBaseHash;
-    delete nonceSeed;
     delete plaintext;
-    delete result;
 }

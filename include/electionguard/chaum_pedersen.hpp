@@ -5,47 +5,44 @@
 #include "export.h"
 #include "group.hpp"
 
+#include <memory>
+
 namespace electionguard
 {
-    struct DisjunctiveChaumPedersenProofData {
-        ElementModP *proof_zero_pad;
-        ElementModP *proof_zero_data;
-        ElementModP *proof_one_pad;
-        ElementModP *proof_one_data;
-        ElementModQ *proof_zero_challenge;
-        ElementModQ *proof_one_challenge;
-        ElementModQ *challenge;
-        ElementModQ *proof_zero_response;
-        ElementModQ *proof_one_response;
-    };
 
     class EG_API DisjunctiveChaumPedersenProof
     {
       public:
-        DisjunctiveChaumPedersenProof(ElementModP *proof_zero_pad, ElementModP *proof_zero_data,
-                                      ElementModP *proof_one_pad, ElementModP *proof_one_data,
-                                      ElementModQ *proof_zero_challenge,
-                                      ElementModQ *proof_one_challenge, ElementModQ *challenge,
-                                      ElementModQ *proof_zero_response,
-                                      ElementModQ *proof_one_response);
+        DisjunctiveChaumPedersenProof(const DisjunctiveChaumPedersenProof &other);
+        DisjunctiveChaumPedersenProof(const DisjunctiveChaumPedersenProof &&other);
+        DisjunctiveChaumPedersenProof(
+          unique_ptr<ElementModP> proof_zero_pad, unique_ptr<ElementModP> proof_zero_data,
+          unique_ptr<ElementModP> proof_one_pad, unique_ptr<ElementModP> proof_one_data,
+          unique_ptr<ElementModQ> proof_zero_challenge, unique_ptr<ElementModQ> proof_one_challenge,
+          unique_ptr<ElementModQ> challenge, unique_ptr<ElementModQ> proof_zero_response,
+          unique_ptr<ElementModQ> proof_one_response);
         ~DisjunctiveChaumPedersenProof();
 
-        bool isValid(ElGamalCiphertext *message, ElementModP *k, ElementModQ *q);
+        DisjunctiveChaumPedersenProof &operator=(DisjunctiveChaumPedersenProof other);
+        DisjunctiveChaumPedersenProof &operator=(DisjunctiveChaumPedersenProof &&other);
 
-        static DisjunctiveChaumPedersenProof *make(ElGamalCiphertext *message, ElementModQ *r,
-                                                   ElementModP *k, ElementModQ *q,
-                                                   ElementModQ *seed, uint64_t plaintext);
+        bool isValid(const ElGamalCiphertext &message, const ElementModP &k, const ElementModQ &q);
+
+        static unique_ptr<DisjunctiveChaumPedersenProof>
+        make(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
+             const ElementModQ &q, const ElementModQ &seed, uint64_t plaintext);
 
       protected:
-        static DisjunctiveChaumPedersenProof *make_zero(ElGamalCiphertext *message, ElementModQ *r,
-                                                        ElementModP *k, ElementModQ *q,
-                                                        ElementModQ *seed);
-        static DisjunctiveChaumPedersenProof *make_one(ElGamalCiphertext *message, ElementModQ *r,
-                                                       ElementModP *k, ElementModQ *q,
-                                                       ElementModQ *seed);
+        static unique_ptr<DisjunctiveChaumPedersenProof>
+        make_zero(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
+                  const ElementModQ &q, const ElementModQ &seed);
+        static unique_ptr<DisjunctiveChaumPedersenProof>
+        make_one(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
+                 const ElementModQ &q, const ElementModQ &seed);
 
       private:
-        DisjunctiveChaumPedersenProofData data;
+        class Impl;
+        unique_ptr<Impl> pimpl;
     };
 
     struct ConstantChaumPedersenProofData {

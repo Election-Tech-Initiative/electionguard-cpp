@@ -4,26 +4,27 @@ cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 # ---- Library Sources ----
 
 set(PROJECT_SOURCE_FILES
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/ballot.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/chaum_pedersen.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/election.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/elgamal.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/encrypt.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/group.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/hash.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/memory_cache.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/tracker.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/chaum_pedersen.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/chaum_pedersen_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/election.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/election_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/elgamal.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/elgamal_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/group.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/group_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/hash_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/log.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/serialize.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/tracker.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/tracker_facade.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/variant_cast.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/words.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/words.hpp
@@ -47,23 +48,23 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/kremlin/Lib_Memzero0.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/constants.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/crypto_hashable.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/election.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/election.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/election.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/export.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/group.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/group.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/tracker.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/hash.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/group.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/hash.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/hash.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/tracker.hpp
 )
 
 add_library(${META_PROJECT_TARGET} ${PROJECT_SOURCE_FILES})

@@ -17,35 +17,45 @@ namespace electionguard
 
     uint8_t delimiter[1] = {delimiter_char};
 
-    ElementModQ *hash_elems(vector<CryptoHashableType> a)
+    unique_ptr<ElementModQ> hash_elems(const vector<CryptoHashableType> &a)
     {
-        uint8_t output[32] = {};
+        uint8_t output[MAX_Q_SIZE] = {};
         Hacl_Streaming_Functor_state_s___uint32_t____ *p = Hacl_Streaming_SHA2_create_in_256();
-        Hacl_Streaming_SHA2_update_256(p, delimiter, sizeof(delimiter));
+        Hacl_Streaming_SHA2_update_256(p, static_cast<uint8_t *>(delimiter), sizeof(delimiter));
 
-        if (a.size() == 0) {
+        if (a.empty()) {
             push_hash_update(p, null_string);
         } else {
-            for (CryptoHashableType item : a) {
+            for (const CryptoHashableType &item : a) {
                 push_hash_update(p, item);
             }
         }
 
-        Hacl_Streaming_SHA2_finish_256(p, output);
+        Hacl_Streaming_SHA2_finish_256(p, static_cast<uint8_t *>(output));
 
-        auto bn = Hacl_Bignum256_new_bn_from_bytes_be(sizeof(output), output);
+        auto *bigNum = Hacl_Bignum256_new_bn_from_bytes_be(sizeof(output), output);
+        if (bigNum == nullptr) {
+            throw out_of_range("bytes_to_p could not allocate");
+        }
 
-        auto q = new ElementModQ(bn);
-
+        // The ElementModQ constructor expects the bignum
+        // to be a certain size, but there's no guarantee
+        // that constraint is satisfied by new_bn_from_bytes_be
+        // so copy it into a new element that is the correct size
+        // and free the allocated resources
+        uint64_t element[MAX_Q_LEN] = {};
+        memcpy(static_cast<uint64_t *>(element), bigNum, sizeof(output));
         Hacl_Streaming_SHA2_free_256(p);
-        free(bn);
+        free(bigNum);
 
-        return q;
+        // TODO: take the result mod Q - 1
+        // to produce a result that is [0,q-1]
+        return make_unique<ElementModQ>(element);
     }
 
-    ElementModQ *hash_elems(CryptoHashableType a)
+    unique_ptr<ElementModQ> hash_elems(CryptoHashableType a)
     {
-        return hash_elems(vector<CryptoHashableType>{a});
+        return hash_elems(vector<CryptoHashableType>{move(a)});
     }
 
     template <typename T> string hash_inner_vector(vector<T> inner_vector)
@@ -65,7 +75,8 @@ namespace electionguard
             }
             case 1: // CryptoHashable *
             {
-                input_string = get<CryptoHashable *>(a)->crypto_hash()->toHex();
+                auto hashable = get<CryptoHashable *>(a)->crypto_hash();
+                input_string = hashable->toHex();
                 break;
             }
             case 2: // ElementModP *
@@ -125,6 +136,6 @@ namespace electionguard
 
         const uint8_t *input = reinterpret_cast<const uint8_t *>(input_string.c_str());
         Hacl_Streaming_SHA2_update_256(p, (uint8_t *)input, input_string.size());
-        Hacl_Streaming_SHA2_update_256(p, delimiter, sizeof(delimiter));
+        Hacl_Streaming_SHA2_update_256(p, static_cast<uint8_t *>(delimiter), sizeof(delimiter));
     }
 } // namespace electionguard

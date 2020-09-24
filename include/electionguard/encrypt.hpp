@@ -6,6 +6,8 @@
 #include "electionguard/group.hpp"
 #include "export.h"
 
+#include <memory>
+
 namespace electionguard
 {
     class EG_API EncryptionMediator
@@ -32,11 +34,11 @@ namespace electionguard
     /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
     /// <returns>A `CiphertextBallotSelection`</returns>
     /// </summary>
-    EG_API CiphertextBallotSelection *
-    encrypt_selection(PlaintextBallotSelection *plaintext, SelectionDescription *description,
-                      ElementModP *elgamalPublicKey, ElementModQ *cryptoExtendedBaseHash,
-                      ElementModQ *nonceSeed, bool isPlaceholder = false,
-                      bool shouldVerifyProofs = true);
+    EG_API unique_ptr<CiphertextBallotSelection>
+    encryptSelection(const PlaintextBallotSelection &plaintext,
+                     const SelectionDescription &description, const ElementModP &elgamalPublicKey,
+                     const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &nonceSeed,
+                     bool isPlaceholder = false, bool shouldVerifyProofs = true);
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD_CORE_ENCRYPT_HPP_INCLUDED__ */

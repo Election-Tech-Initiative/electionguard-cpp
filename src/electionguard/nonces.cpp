@@ -1,46 +1,75 @@
 #include "nonces.hpp"
 
 #include "electionguard/hash.hpp"
+#include "log.hpp"
 #include "variant_cast.hpp"
 
 namespace electionguard
 {
-    Nonces::Nonces(ElementModQ *seed, NoncesHeaderType headers) : data()
+    struct Nonces::Impl {
+
+        Impl(const ElementModQ &seed, const NoncesHeaderType &headers)
+        {
+            CryptoHashableType headers_ = variant_cast(headers);
+            this->seed = hash_elems({&const_cast<ElementModQ &>(seed), headers_});
+            nextItem = 0;
+        }
+        explicit Impl(const ElementModQ &seed)
+        {
+            this->seed = make_unique<ElementModQ>(const_cast<ElementModQ &>(seed));
+            nextItem = 0;
+        }
+
+        unique_ptr<ElementModQ> get(uint64_t item)
+        {
+            nextItem = item + 1;
+            return hash_elems({seed.get(), item});
+        }
+
+        unique_ptr<ElementModQ> get(uint64_t item, string headers)
+        {
+            nextItem = item + 1;
+            return hash_elems({seed.get(), item, headers});
+        }
+
+        unique_ptr<ElementModQ> next() { return this->get(nextItem); }
+
+        unique_ptr<ElementModQ> seed;
+        uint64_t nextItem;
+    };
+
+    Nonces::Nonces(const ElementModQ &seed, const NoncesHeaderType &headers)
+        : pimpl(new Impl(seed, headers))
     {
-        CryptoHashableType h = variant_cast(headers);
-        this->data.seed = hash_elems({seed, h});
-        this->data.nextItem = 0;
     }
 
-    Nonces::Nonces(ElementModQ *seed) : data()
+    Nonces::Nonces(const ElementModQ &seed) : pimpl(new Impl(seed)) {}
+
+    Nonces &Nonces::operator=(Nonces rhs)
     {
-        this->data.seed = seed;
-        this->data.nextItem = 0;
+        swap(pimpl, rhs.pimpl);
+        return *this;
     }
 
-    Nonces::~Nonces() {}
+    Nonces::~Nonces() = default;
 
-    ElementModQ *Nonces::get(uint64_t item)
+    unique_ptr<ElementModQ> Nonces::get(uint64_t item) { return pimpl->get(item); }
+
+    unique_ptr<ElementModQ> Nonces::get(uint64_t item, string headers)
     {
-        this->data.nextItem = item + 1;
-        return hash_elems({this->data.seed, item});
+        return pimpl->get(item, headers);
     }
 
-    ElementModQ *Nonces::get(uint64_t item, string headers)
+    vector<unique_ptr<ElementModQ>> Nonces::get(uint64_t startItem, uint64_t count)
     {
-        this->data.nextItem = item + 1;
-        return hash_elems({this->data.seed, item, headers});
-    }
-
-    vector<ElementModQ *> Nonces::get(uint64_t startItem, uint64_t count)
-    {
-        vector<ElementModQ *> result;
-        int endItem = startItem + count;
-        for (int i(startItem); i < endItem; i++) {
+        // TODO: preallocate and address possible overflow
+        vector<unique_ptr<ElementModQ>> result;
+        uint64_t endItem = startItem + count;
+        for (uint64_t i(startItem); i < endItem; i++) {
             result.push_back(this->get(i));
         }
         return result;
     }
 
-    ElementModQ *Nonces::next() { return this->get(this->data.nextItem); }
+    unique_ptr<ElementModQ> Nonces::next() { return pimpl->next(); }
 } // namespace electionguard

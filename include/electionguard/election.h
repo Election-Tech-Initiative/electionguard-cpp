@@ -14,12 +14,11 @@ extern "C" {
 struct eg_selection_description_s;
 typedef struct eg_selection_description_s eg_selection_description_t;
 
-EG_API eg_selection_description_t *eg_selection_description_new(const char *object_id,
-                                                                const char *candidate_id,
-                                                                uint64_t sequence_order);
-EG_API void eg_selection_description_free(eg_selection_description_t *selection);
+EG_API eg_selection_description_t *eg_selection_description_create(const char *object_id,
+                                                                   const char *candidate_id,
+                                                                   uint64_t sequence_order);
 
-EG_API char *eg_selection_description_get_object_id(eg_selection_description_t *selection);
+EG_API const char *eg_selection_description_get_object_id(eg_selection_description_t *selection);
 EG_API char *eg_selection_description_get_candidate_id(eg_selection_description_t *selection);
 EG_API uint64_t eg_selection_description_get_sequence_order(eg_selection_description_t *selection);
 
