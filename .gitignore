@@ -129,5 +129,6 @@ artifacts/
 **/Properties/launchSettings.json
 
 
-
+# Project Specific
 apps/demo_in_swift/ElectionGuardDemo/.idea/
+bindings/netstandard/ElectionGuard/packages/

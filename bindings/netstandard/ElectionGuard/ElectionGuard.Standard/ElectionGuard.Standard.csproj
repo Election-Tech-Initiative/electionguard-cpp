@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>ElectionGuard</RootNamespace>
+    <AssemblyName>ElectionGuard</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+  </PropertyGroup>
+  <Import Project="..\ElectionGuard.Shared\ElectionGuard.Shared.projitems" Label="Shared" Condition="Exists('..\ElectionGuard.Shared\ElectionGuard.Shared.projitems')" />
+</Project>
