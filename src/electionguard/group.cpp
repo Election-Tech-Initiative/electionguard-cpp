@@ -476,20 +476,19 @@ namespace electionguard
 
     unique_ptr<ElementModP> mul_mod_p(const vector<ElementModPOrQ> &elems)
     {
-        auto product = ElementModP::fromUint64(1);
+        auto product = ElementModP::fromUint64(1UL);
         for (auto x : elems) {
-            ElementModP *elem = nullptr;
             if (holds_alternative<ElementModQ *>(x)) {
-                auto elem_as_p = get<ElementModQ *>(x)->toElementModP();
-                elem = elem_as_p.get();
+                auto elem = get<ElementModQ *>(x)->toElementModP();
+                auto res = mul_mod_p(*product, *elem);
+                product.swap(res);
             } else if (holds_alternative<ElementModP *>(x)) {
-                elem = get<ElementModP *>(x);
+                auto elem = get<ElementModP *>(x);
+                auto res = mul_mod_p(*product, *elem);
+                product.swap(res);
             } else {
                 throw "invalid type";
             }
-
-            auto res = mul_mod_p(*product, *elem);
-            product = move(res);
         }
         return make_unique<ElementModP>(*product);
     }
