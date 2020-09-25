@@ -3,10 +3,11 @@ using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
-    internal static unsafe class ElectionGuardWrapper
+
+    internal static unsafe class NativeInterface
     {
 #if Android
-        const string DllName = "libMathFuncs.so";
+        const string DllName = "libelectionguard.so";
 #else
     const string DllName = "__Internal";
 #endif

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ElectionGuard
+﻿namespace ElectionGuard
 {
 }
 

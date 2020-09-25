@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>ElectionGuard</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-    <AssemblyName>Electionguard</AssemblyName>
+    <AssemblyName>ElectionGuard.Core</AssemblyName>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -48,7 +48,14 @@
   <ItemGroup>
     <ObjcBindingCoreSource Include="Structs.cs" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <NativeReference Include="..\..\..\..\build\libs\ios\src\Debug-iphonesimulator\libelectionguard.a">
+      <Kind>Static</Kind>
+      <ForceLoad>True</ForceLoad>
+      <IsCxx>True</IsCxx>
+    </NativeReference>
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <NativeReference Include="..\..\..\..\build\libs\ios\src\Release-iphonesimulator\libelectionguard.a">
       <Kind>Static</Kind>
       <ForceLoad>True</ForceLoad>

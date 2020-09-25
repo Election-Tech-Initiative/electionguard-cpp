@@ -12,6 +12,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)ElectionGuard.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ElectionguardSafeHandle.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ElementModQ.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ElectionGuardWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NativeInterface.cs" />
   </ItemGroup>
 </Project>
