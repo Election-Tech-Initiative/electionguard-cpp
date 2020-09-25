@@ -1,6 +1,6 @@
 ﻿using Autofac;
+using Autofac.Features.ResolveAnything;
 using ElectionGuardCore.Elections;
-using ElectionGuardCore.Ui.Elections;
 using ElectionGuardCore.Ui.Forms.Elections;
 using ElectionGuardCore.Ui.Forms.Services;
 
@@ -19,9 +19,9 @@ namespace ElectionGuardCore.Ui.Forms
         private IContainer CreateContainer()
         {
             var builder = new ContainerBuilder();
+            builder.RegisterSource(new AnyConcreteTypeNotAlreadyRegisteredSource());
+
             builder.RegisterType<MockElectionService>().As<IElectionService>().InstancePerLifetimeScope();
-            builder.RegisterType<ActiveContestViewModel>().AsSelf().InstancePerLifetimeScope();
-            builder.RegisterType<ActiveContestViewPage>().AsSelf();
 
             return builder.Build();
         }
