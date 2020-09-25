@@ -1,23 +1,29 @@
-﻿using ElectionGuardCore.Ui.Forms.Elections;
-using ElectionGuardCore.Ui.Forms.NinjectModules;
-using Ninject;
-using Xamarin.Forms;
+﻿using Autofac;
+using ElectionGuardCore.Elections;
+using ElectionGuardCore.Ui.Elections;
+using ElectionGuardCore.Ui.Forms.Elections;
+using ElectionGuardCore.Ui.Forms.Services;
 
 namespace ElectionGuardCore.Ui.Forms
 {
-    public partial class App : Application
+    public partial class App
     {
         public App()
         {
             InitializeComponent();
 
-            var kernel = CreateKernel();
-            MainPage = kernel.Get<ActiveContestViewPage>();
+            var container = CreateContainer();
+            MainPage = container.Resolve<ActiveContestViewPage>();
         }
 
-        private IKernel CreateKernel()
+        private IContainer CreateContainer()
         {
-            return new StandardKernel(new ElectionsModule());
+            var builder = new ContainerBuilder();
+            builder.RegisterType<MockElectionService>().As<IElectionService>().InstancePerLifetimeScope();
+            builder.RegisterType<ActiveContestViewModel>().AsSelf().InstancePerLifetimeScope();
+            builder.RegisterType<ActiveContestViewPage>().AsSelf();
+
+            return builder.Build();
         }
 
         protected override void OnStart()
