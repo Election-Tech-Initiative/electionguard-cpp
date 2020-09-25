@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ElectionGuard.Shared", "ElectionGuard.Shared\ElectionGuard.Shared.shproj", "{6ACA3077-AE61-4ABC-B927-62E360A1922B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuard.iOS", "ElectionGuard.iOS\ElectionGuard.iOS.csproj", "{E749A240-551A-4F1A-B12F-DEA6E7F060BB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuard.Android", "ElectionGuard.Android\ElectionGuard.Android.csproj", "{893438E6-22EC-4A9C-B6AD-24BE545171B6}"
 EndProject
 Project("{5DD5E4FA-CB73-4610-85AB-557B54E96AA9}") = "ElectionGuard.NuGet", "ElectionGuard.NuGet\ElectionGuard.NuGet.nuproj", "{B327EC46-948E-4756-BF81-152B07BB2134}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuard.Standard", "ElectionGuard.Standard\ElectionGuard.Standard.csproj", "{7BC16153-D7CF-4BC4-88A6-A230ACD910D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuard.iOS", "ElectionGuard.iOS\ElectionGuard.iOS.csproj", "{57BF1F50-4963-4E0F-8B81-10C3E9981F25}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E749A240-551A-4F1A-B12F-DEA6E7F060BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E749A240-551A-4F1A-B12F-DEA6E7F060BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E749A240-551A-4F1A-B12F-DEA6E7F060BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E749A240-551A-4F1A-B12F-DEA6E7F060BB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{893438E6-22EC-4A9C-B6AD-24BE545171B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{893438E6-22EC-4A9C-B6AD-24BE545171B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{893438E6-22EC-4A9C-B6AD-24BE545171B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,5 +29,9 @@ Global
 		{7BC16153-D7CF-4BC4-88A6-A230ACD910D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BC16153-D7CF-4BC4-88A6-A230ACD910D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BC16153-D7CF-4BC4-88A6-A230ACD910D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57BF1F50-4963-4E0F-8B81-10C3E9981F25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57BF1F50-4963-4E0F-8B81-10C3E9981F25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57BF1F50-4963-4E0F-8B81-10C3E9981F25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57BF1F50-4963-4E0F-8B81-10C3E9981F25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

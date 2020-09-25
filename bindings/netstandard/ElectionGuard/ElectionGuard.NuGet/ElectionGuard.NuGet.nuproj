@@ -7,14 +7,14 @@
     <ProjectGuid>{B327EC46-948E-4756-BF81-152B07BB2134}</ProjectGuid>
     <Description>ElectionGuard</Description>
     <PackageId>ElectionGuard</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
-    <Authors>mwilhelm</Authors>
+    <PackageVersion>0.0.1</PackageVersion>
+    <Authors>Microsoft</Authors>
     <DevelopmentDependency>false</DevelopmentDependency>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <OutputType>Exe</OutputType>
     <RootNamespace>ElectionGuard</RootNamespace>
     <UsePartialTypes>false</UsePartialTypes>
-    <AssemblyName>ElectionGuard.NuGet</AssemblyName>
+    <AssemblyName>ElectionGuard</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -34,9 +34,12 @@
       <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
     </ProjectReference>
     <ProjectReference Include="..\ElectionGuard.iOS\ElectionGuard.iOS.csproj">
-      <Project>{E749A240-551A-4F1A-B12F-DEA6E7F060BB}</Project>
+      <Project>{57BF1F50-4963-4E0F-8B81-10C3E9981F25}</Project>
       <Name>ElectionGuard.iOS</Name>
-      <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+    </ProjectReference>
+    <ProjectReference Include="..\ElectionGuard.Standard\ElectionGuard.Standard.csproj">
+      <Project>{7BC16153-D7CF-4BC4-88A6-A230ACD910D0}</Project>
+      <Name>ElectionGuard.Standard</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

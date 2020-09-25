@@ -44,15 +44,24 @@ Outline the file contents of the repository. It helps users navigate the codebas
 
 ### C++17
 
-This code builds against the [C++17](https://isocpp.org/get-started) standard.  a `C++17` compliant compiler is required to build the core library.
+- [C++17](https://isocpp.org/get-started) standard.  a `C++17` compliant compiler is required to build the core library.
 
 ### CMake 
 
-This code uses [CMake 3.14](https://cmake.org/) as it's build system.
+- [CMake 3.14](https://cmake.org/) as it's build system.
 
-### GMP
+### Android (optional)
 
-This code depends on [The GNU Multiple Precision Arithmetic Library](https://gmplib.org/#DOWNLOAD) to calculate large integers.
+- [Android SDK](https://developer.android.com/studio/#downloads)
+- [NDK 21](https://developer.android.com/ndk/downloads/)
+
+### iOS (optional)
+
+- [XCode](https://developer.apple.com/xcode/resources/)
+
+### Xamarin
+
+- [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/)
 
 ### make (optional)
 

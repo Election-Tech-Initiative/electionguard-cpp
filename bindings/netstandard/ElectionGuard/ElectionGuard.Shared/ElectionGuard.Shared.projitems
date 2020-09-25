@@ -10,5 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ElectionGuard.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ElectionguardSafeHandle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ElementModQ.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ElectionGuardWrapper.cs" />
   </ItemGroup>
 </Project>
