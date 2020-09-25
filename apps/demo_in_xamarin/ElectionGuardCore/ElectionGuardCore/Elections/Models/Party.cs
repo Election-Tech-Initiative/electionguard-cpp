@@ -1,7 +1,7 @@
 ﻿using ElectionGuardCore.Models;
 using Newtonsoft.Json;
 
-namespace ElectionGuardCore.Elections
+namespace ElectionGuardCore.Elections.Models
 {
     public class Party
     {

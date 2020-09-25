@@ -1,4 +1,4 @@
-﻿namespace ElectionGuardCore.Elections
+﻿namespace ElectionGuardCore.Elections.Models
 {
     public enum ReportingUnitType
     {

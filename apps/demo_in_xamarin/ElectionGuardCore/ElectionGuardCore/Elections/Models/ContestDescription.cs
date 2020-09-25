@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using ElectionGuardCore.Models;
 
-namespace ElectionGuardCore.Elections
+namespace ElectionGuardCore.Elections.Models
 {
     public class ContestDescription
     {

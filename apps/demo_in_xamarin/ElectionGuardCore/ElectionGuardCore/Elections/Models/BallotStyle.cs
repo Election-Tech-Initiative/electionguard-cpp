@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ElectionGuardCore.Elections
+namespace ElectionGuardCore.Elections.Models
 {
     public class BallotStyle
     {
