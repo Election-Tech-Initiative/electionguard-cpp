@@ -1,7 +1,6 @@
 ﻿using Autofac;
 using Autofac.Features.ResolveAnything;
 using ElectionGuardCore.Elections;
-using ElectionGuardCore.Ui.Forms.Elections;
 using ElectionGuardCore.Ui.Forms.Services;
 
 namespace ElectionGuardCore.Ui.Forms
@@ -12,16 +11,17 @@ namespace ElectionGuardCore.Ui.Forms
         {
             InitializeComponent();
 
-            var container = CreateContainer();
-            MainPage = container.Resolve<ActiveContestViewPage>();
+            var navigationService = new NavigationService(CreateContainer());
+
+            MainPage = navigationService.GetDefaultPage();
         }
 
         private IContainer CreateContainer()
         {
             var builder = new ContainerBuilder();
-            builder.RegisterSource(new AnyConcreteTypeNotAlreadyRegisteredSource());
-
             builder.RegisterType<MockElectionService>().As<IElectionService>().InstancePerLifetimeScope();
+
+            builder.RegisterSource(new AnyConcreteTypeNotAlreadyRegisteredSource());
 
             return builder.Build();
         }

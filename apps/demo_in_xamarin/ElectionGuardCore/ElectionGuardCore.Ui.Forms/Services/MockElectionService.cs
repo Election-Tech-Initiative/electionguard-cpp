@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace ElectionGuardCore.Ui.Forms.Services
 {
-    public class MockElectionService : IElectionService
+    internal class MockElectionService : IElectionService
     {
         private static readonly string SampleElectionDescriptionJson = @"
 {
