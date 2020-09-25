@@ -1,7 +1,9 @@
-﻿namespace ElectionGuardCore
+﻿using System.Collections.Generic;
+
+namespace ElectionGuardCore
 {
     public class InternationalizedText
     {
-        public LanguageText Text { get; set; }
+        public List<LanguageText> Text { get; set; }
     }
 }
