@@ -48,15 +48,8 @@
   <ItemGroup>
     <ObjcBindingCoreSource Include="Structs.cs" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <NativeReference Include="..\..\..\..\build\libs\ios\src\Debug-iphonesimulator\libelectionguard.a">
-      <Kind>Static</Kind>
-      <ForceLoad>True</ForceLoad>
-      <IsCxx>True</IsCxx>
-    </NativeReference>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <NativeReference Include="..\..\..\..\build\libs\ios\src\Release-iphonesimulator\libelectionguard.a">
+  <ItemGroup>
+    <NativeReference Include="..\..\..\..\build\libs\ios\lib\libelectionguard.a">
       <Kind>Static</Kind>
       <ForceLoad>True</ForceLoad>
       <IsCxx>True</IsCxx>

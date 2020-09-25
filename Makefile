@@ -1,7 +1,6 @@
 .PHONY: build build-debug build-debug-all build-release build-android build-ios clean demo-c demo-cpp format memcheck sanitize sanitize-asan sanitize-tsan test
 
-BUILD_DEBUG?=true
-TARGET=Release
+TARGET?=Release
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_BUILD_DIR=$(realpath .)/build
@@ -9,7 +8,6 @@ ELECTIONGUARD_BUILD_APPS_DIR=$(ELECTIONGUARD_BUILD_DIR)/apps
 ELECTIONGUARD_BUILD_BINDING_DIR=$(ELECTIONGUARD_BUILD_DIR)/bindings
 ELECTIONGUARD_BUILD_LIBS_DIR=$(ELECTIONGUARD_BUILD_DIR)/libs
 NDK_PATH=/Users/$$USER/Library/Android/sdk/ndk/21.3.6528147
-IOS_TOOLCHAIN=cmake/ios.toolchain.cmake
 
 # Detect operating system
 ifeq ($(OS),Windows_NT)
@@ -22,7 +20,6 @@ all: environment build
 
 environment:
 	wget -O cmake/CPM.cmake https://github.com/TheLartians/CPM.cmake/releases/latest/download/CPM.cmake
-	wget -O cmake/ios.toolchain.cmake https://raw.githubusercontent.com/leetal/ios-cmake/e4a930c911002c048472e0400c1ab041ef930b10/ios.toolchain.cmake
 ifeq ($(OPERATING_SYSTEM),Darwin)
 	brew install cmake
 	brew install cppcheck
@@ -42,10 +39,10 @@ ifeq ($(OPERATING_SYSTEM),Windows)
     
 endif
 
-ifeq ($(BUILD_DEBUG),true)
-build: build-debug
-else
+ifeq ($(TARGET),Release)
 build: build-release
+else
+build: build-debug
 endif
 
 build-debug:
@@ -100,12 +97,16 @@ build-ios:
 		-DCMAKE_SYSTEM_NAME=iOS \
 		"-DCMAKE_OSX_ARCHITECTURES=arm64;arm64e;x86_64" \
 		-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 \
-		-DCMAKE_INSTALL_PREFIX=`pwd`/_install \
+		-DCMAKE_INSTALL_PREFIX=$(ELECTIONGUARD_BUILD_LIBS_DIR)/ios \
 		-DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
 		-DCMAKE_IOS_INSTALL_COMBINED=YES
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/ios --config $(TARGET) --target install
 
-build-debug-all: build-debug build-android build-ios
+build-netstandard: build-android build-ios
+	msbuild ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /t:Build /p:Configuration=$(TARGET)
+	cp ./bindings/netstandard/ElectionGuard/ElectionGuard.NuGet/bin/$(TARGET)/* $(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/
+
+build-all: build build-android build-ios
 
 clean:
 	if [ -d "$(ELECTIONGUARD_BUILD_DIR)" ]; then rm -rf $(ELECTIONGUARD_BUILD_DIR)/*; fi

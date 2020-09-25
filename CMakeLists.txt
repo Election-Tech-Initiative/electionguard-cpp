@@ -61,8 +61,14 @@ endif()
 # HACK: Disable x86 intrinsics
 # TODO: load the appropriate intrinsics for the processor architecture
 # this is currently only being set when the platform is explicitly set (such as on ios)
-if(DEFINED PLATFORM OR DEFINED CMAKE_ANDROID_ARCH_ABI)
+if(DEFINED CMAKE_OSX_DEPLOYMENT_TARGET OR DEFINED CMAKE_ANDROID_ARCH_ABI)
     add_compile_definitions(BROKEN_INTRINSICS)
+endif()
+
+# HACK: Disable explicit bzero on android
+# TODO: define explicit secure zero on android and re-enable
+if(DEFINED CMAKE_ANDROID_ARCH_ABI)
+    add_compile_definitions(LINUX_NO_EXPLICIT_BZERO)
 endif()
 
 # ---- Sources ----

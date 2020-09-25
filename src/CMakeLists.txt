@@ -85,6 +85,15 @@ if (MINGW)
     add_compile_definitions(ELECTIONGUARD_BUILD_SHARED)
 endif()
 
+if (IOS AND CMAKE_IOS_INSTALL_COMBINED)
+    # Tell XCode how to merge the fat binary
+    # see: https://github.com/leetal/ios-cmake/issues/12#issuecomment-421425541
+    set_target_properties(${META_PROJECT_TARGET} PROPERTIES
+        XCODE_ATTRIBUTE_ARCHS[sdk=iphonesimulator*] x86_64
+        XCODE_ATTRIBUTE_VALID_ARCHS[sdk=iphonesimulator*] x86_64
+    )
+endif()
+
 # Set the public include directory depending on 
 # if the target is being exported or installed
 target_include_directories(${META_PROJECT_TARGET}
