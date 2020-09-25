@@ -1,7 +1,5 @@
 ﻿using System.Threading.Tasks;
 using ElectionGuardCore.Elections;
-using ElectionGuardCore.Elections.Models;
-using ElectionGuardCore.Ui.ViewModels;
 
 namespace ElectionGuardCore.Ui.Elections
 {

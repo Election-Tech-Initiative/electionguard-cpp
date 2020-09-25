@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ElectionGuardCore.Models
+namespace ElectionGuardCore
 {
     public class ContactInformation
     {

@@ -1,6 +1,4 @@
-﻿using ElectionGuardCore.Models;
-
-namespace ElectionGuardCore.Elections.Models
+﻿namespace ElectionGuardCore.Elections
 {
     public class Candidate
     {

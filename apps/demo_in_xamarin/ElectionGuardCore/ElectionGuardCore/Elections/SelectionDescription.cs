@@ -1,4 +1,4 @@
-﻿namespace ElectionGuardCore.Elections.Models
+﻿namespace ElectionGuardCore.Elections
 {
     public class SelectionDescription
     {

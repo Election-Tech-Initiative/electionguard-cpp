@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
 using ElectionGuardCore.Elections;
-using ElectionGuardCore.Elections.Models;
 using Newtonsoft.Json;
 
 namespace ElectionGuardCore.Ui.Forms.Services
 {
-    public class ElectionService : IElectionService
+    public class MockElectionService : IElectionService
     {
         private static readonly string SampleElectionDescriptionJson = @"
 {

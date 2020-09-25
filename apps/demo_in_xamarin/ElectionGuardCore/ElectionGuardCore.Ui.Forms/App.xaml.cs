@@ -1,4 +1,7 @@
-﻿using Xamarin.Forms;
+﻿using ElectionGuardCore.Ui.Forms.Elections;
+using ElectionGuardCore.Ui.Forms.NinjectModules;
+using Ninject;
+using Xamarin.Forms;
 
 namespace ElectionGuardCore.Ui.Forms
 {
@@ -8,7 +11,13 @@ namespace ElectionGuardCore.Ui.Forms
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            var kernel = CreateKernel();
+            MainPage = kernel.Get<ActiveContestViewPage>();
+        }
+
+        private IKernel CreateKernel()
+        {
+            return new StandardKernel(new ElectionsModule());
         }
 
         protected override void OnStart()

@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace ElectionGuardCore.Ui.ViewModels
+namespace ElectionGuardCore.Ui
 {
     public abstract class ViewModelBase : INotifyPropertyChanged
     {

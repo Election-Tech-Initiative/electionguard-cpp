@@ -1,4 +1,4 @@
-﻿namespace ElectionGuardCore.Models
+﻿namespace ElectionGuardCore
 {
     public class LanguageText
     {
