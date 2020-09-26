@@ -72,16 +72,19 @@ namespace electionguard
         CRYPTOHASHABLE_REF = 4,
         ELEMENTMODP_REF = 5,
         ELEMENTMODQ_REF = 6,
-        UINT64_T = 7,
-        STRING = 8,
-        VECTOR_CRYPTOHASHABLE_PTR = 9,
-        VECTOR_ELEMENTMODP_PTR = 10,
-        VECTOR_ELEMENTMODQ_PTR = 11,
-        VECTOR_CRYPTOHASHABLE_REF = 12,
-        VECTOR_ELEMENTMODP_REF = 13,
-        VECTOR_ELEMENTMODQ_REF = 14,
-        VECTOR_UINT64_T = 15,
-        VECTOR_STRING = 16
+        CRYPTOHASHABLE_CONST_REF = 7,
+        ELEMENTMODP_CONST_REF = 8,
+        ELEMENTMODQ_CONST_REF = 9,
+        UINT64_T = 10,
+        STRING = 11,
+        VECTOR_CRYPTOHASHABLE_PTR = 12,
+        VECTOR_ELEMENTMODP_PTR = 13,
+        VECTOR_ELEMENTMODQ_PTR = 14,
+        VECTOR_CRYPTOHASHABLE_REF = 15,
+        VECTOR_ELEMENTMODP_REF = 16,
+        VECTOR_ELEMENTMODQ_REF = 17,
+        VECTOR_UINT64_T = 18,
+        VECTOR_STRING = 19
     };
 
     void push_hash_update(Hacl_Streaming_Functor_state_s___uint32_t____ *p, CryptoHashableType a)
@@ -123,6 +126,22 @@ namespace electionguard
             case ELEMENTMODQ_REF: // reference_wrapper<ElementModQ>
             {
                 input_string = get<reference_wrapper<ElementModQ>>(a).get().toHex();
+                break;
+            }
+            case CRYPTOHASHABLE_CONST_REF: // reference_wrapper<const CryptoHashable>
+            {
+                auto hashable = get<reference_wrapper<const CryptoHashable>>(a).get().crypto_hash();
+                input_string = hashable->toHex();
+                break;
+            }
+            case ELEMENTMODP_CONST_REF: // reference_wrapper<const ElementModP>
+            {
+                input_string = get<reference_wrapper<const ElementModP>>(a).get().toHex();
+                break;
+            }
+            case ELEMENTMODQ_CONST_REF: // reference_wrapper<const ElementModQ>
+            {
+                input_string = get<reference_wrapper<const ElementModQ>>(a).get().toHex();
                 break;
             }
             case UINT64_T: // uint64_t

@@ -13,8 +13,9 @@ namespace electionguard
     using CryptoHashableType =
       variant<nullptr_t, CryptoHashable *, ElementModP *, ElementModQ *,
               reference_wrapper<CryptoHashable>, reference_wrapper<ElementModP>,
-              reference_wrapper<ElementModQ>, uint64_t, string, vector<CryptoHashable *>,
-              vector<ElementModP *>, vector<ElementModQ *>,
+              reference_wrapper<ElementModQ>, reference_wrapper<const CryptoHashable>,
+              reference_wrapper<const ElementModP>, reference_wrapper<const ElementModQ>, uint64_t,
+              string, vector<CryptoHashable *>, vector<ElementModP *>, vector<ElementModQ *>,
               vector<reference_wrapper<CryptoHashable>>, vector<reference_wrapper<ElementModP>>,
               vector<reference_wrapper<ElementModQ>>, vector<uint64_t>, vector<string>>;
 
