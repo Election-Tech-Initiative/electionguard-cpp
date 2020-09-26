@@ -159,6 +159,7 @@ namespace electionguard
 
     class EG_API PlaintextBallotContest
     {
+      public:
         PlaintextBallotContest(const PlaintextBallotContest &other);
         PlaintextBallotContest(const PlaintextBallotContest &&other);
         PlaintextBallotContest(const string &objectId,
@@ -184,7 +185,7 @@ namespace electionguard
         CiphertextBallotContest(const CiphertextBallotContest &&other);
         CiphertextBallotContest(const string &objectId, const ElementModQ &descriptionHash,
                                 vector<unique_ptr<CiphertextBallotSelection>> selections,
-                                unique_ptr<ElementModQ> cryptoHash, unique_ptr<ElementModQ> nonce,
+                                unique_ptr<ElementModQ> nonce, unique_ptr<ElementModQ> cryptoHash,
                                 unique_ptr<ConstantChaumPedersenProof> proof);
         ~CiphertextBallotContest();
 
@@ -204,9 +205,8 @@ namespace electionguard
              vector<unique_ptr<CiphertextBallotSelection>> selections,
              const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
              const ElementModQ &proofSeed, uint64_t numberElected,
-             unique_ptr<ElementModQ> cryptoHash = nullptr,
-             unique_ptr<ConstantChaumPedersenProof> proof = nullptr,
-             unique_ptr<ElementModQ> nonce = nullptr);
+             unique_ptr<ElementModQ> nonce = nullptr, unique_ptr<ElementModQ> cryptoHash = nullptr,
+             unique_ptr<ConstantChaumPedersenProof> proof = nullptr);
 
         virtual unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) override;
 

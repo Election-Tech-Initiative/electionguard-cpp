@@ -74,4 +74,65 @@ namespace electionguard
         return nullptr;
     }
 
+    unique_ptr<CiphertextBallotContest>
+    encryptContest(const PlaintextBallotContest &contest, const ContestDescription &description,
+                   const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
+                   const ElementModQ &nonceSeed, bool isPlaceholder /* = false */,
+                   bool shouldVerifyProofs /* = true */)
+
+    {
+        // TODO: validate input
+
+        auto descriptionHash = description.crypto_hash();
+        auto nonceSequence =
+          make_unique<Nonces>(*descriptionHash, &const_cast<ElementModQ &>(nonceSeed));
+        auto contestNonce = nonceSequence->get(description.getSequenceOrder());
+        auto proofNonce = nonceSequence->next();
+
+        vector<unique_ptr<CiphertextBallotSelection>> encryptedSelections;
+
+        // TODO: improve performance, complete features
+        // note this is a simplified version of the loop in python
+        // where the caller must supply all values and placeholder selections are not handled
+        for (const auto &selectionDescription : description.getSelections()) {
+            bool hasSelection = false;
+            for (const auto &selection : contest.getSelections()) {
+                if (selection.get().getObjectId() == selectionDescription.get().getObjectId()) {
+                    hasSelection = true;
+                    auto encrypted = encryptSelection(selection.get(), selectionDescription.get(),
+                                                      elgamalPublicKey, cryptoExtendedBaseHash,
+                                                      *contestNonce, false, true);
+                    encryptedSelections.push_back(move(encrypted));
+                    break;
+                }
+            }
+
+            if (!hasSelection) {
+                throw invalid_argument("caller must include all selections");
+            }
+        }
+
+        auto encryptedContest = CiphertextBallotContest::make(
+          contest.getObjectId(), *descriptionHash, move(encryptedSelections), elgamalPublicKey,
+          cryptoExtendedBaseHash, *proofNonce, description.getNumberElected(), move(contestNonce));
+
+        if (encryptedContest == nullptr || encryptedContest->getProof() == nullptr) {
+            throw runtime_error("encryptedContest:: Error constructing encrypted constest");
+        }
+
+        // optionally, skip the verification step
+        if (!shouldVerifyProofs) {
+            return encryptedContest;
+        }
+
+        // verify the selection.
+        if (encryptedContest->isValidEncryption(*descriptionHash, elgamalPublicKey,
+                                                cryptoExtendedBaseHash)) {
+            return encryptedContest;
+        }
+
+        Log::debug("encryptedContest:: failed validity check");
+        return nullptr;
+    }
+
 } // namespace electionguard

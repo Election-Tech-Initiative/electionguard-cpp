@@ -225,16 +225,16 @@ namespace electionguard
     struct CiphertextBallotContest::Impl : ElectionObjectBase {
         unique_ptr<ElementModQ> descriptionHash;
         vector<unique_ptr<CiphertextBallotSelection>> selections;
-        unique_ptr<ElementModQ> cryptoHash;
         unique_ptr<ElementModQ> nonce;
+        unique_ptr<ElementModQ> cryptoHash;
         unique_ptr<ConstantChaumPedersenProof> proof;
 
         Impl(const string &objectId, unique_ptr<ElementModQ> descriptionHash,
              vector<unique_ptr<CiphertextBallotSelection>> selections,
-             unique_ptr<ElementModQ> cryptoHash, unique_ptr<ElementModQ> nonce,
+             unique_ptr<ElementModQ> nonce, unique_ptr<ElementModQ> cryptoHash,
              unique_ptr<ConstantChaumPedersenProof> proof)
             : descriptionHash(move(descriptionHash)), selections(move(selections)),
-              cryptoHash(move(cryptoHash)), nonce(move(nonce)), proof(move(proof))
+              nonce(move(nonce)), cryptoHash(move(cryptoHash)), proof(move(proof))
         {
             this->object_id = objectId;
         }
@@ -244,10 +244,10 @@ namespace electionguard
 
     CiphertextBallotContest::CiphertextBallotContest(
       const string &objectId, const ElementModQ &descriptionHash,
-      vector<unique_ptr<CiphertextBallotSelection>> selections, unique_ptr<ElementModQ> cryptoHash,
-      unique_ptr<ElementModQ> nonce, unique_ptr<ConstantChaumPedersenProof> proof)
+      vector<unique_ptr<CiphertextBallotSelection>> selections, unique_ptr<ElementModQ> nonce,
+      unique_ptr<ElementModQ> cryptoHash, unique_ptr<ConstantChaumPedersenProof> proof)
         : pimpl(new Impl(objectId, make_unique<ElementModQ>(descriptionHash), move(selections),
-                         move(cryptoHash), move(nonce), move(proof)))
+                         move(nonce), move(cryptoHash), move(proof)))
     {
     }
     CiphertextBallotContest::~CiphertextBallotContest() = default;
@@ -288,9 +288,9 @@ namespace electionguard
       const string &objectId, const ElementModQ &descriptionHash,
       vector<unique_ptr<CiphertextBallotSelection>> selections, const ElementModP &elgamalPublicKey,
       const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &proofSeed,
-      uint64_t numberElected, unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
-      unique_ptr<ConstantChaumPedersenProof> proof /* = nullptr */,
-      unique_ptr<ElementModQ> nonce /* = nullptr */)
+      uint64_t numberElected, unique_ptr<ElementModQ> nonce /* = nullptr */,
+      unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
+      unique_ptr<ConstantChaumPedersenProof> proof /* = nullptr */)
     {
         vector<reference_wrapper<CiphertextBallotSelection>> selectionReferences;
         for (const auto &selection : selections) {

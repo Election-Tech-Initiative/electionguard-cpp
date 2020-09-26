@@ -16,7 +16,7 @@ namespace electionguard
         string candidateId;
         uint64_t sequenceOrder;
 
-        Impl(const string &objectId, const string &candidateId, uint64_t sequenceOrder)
+        Impl(const string &objectId, const string &candidateId, const uint64_t sequenceOrder)
             : candidateId(candidateId)
         {
             this->object_id = objectId;
@@ -27,7 +27,7 @@ namespace electionguard
     // Lifecycle Methods
 
     SelectionDescription::SelectionDescription(const string &objectId, const string &candidateId,
-                                               uint64_t sequenceOrder)
+                                               const uint64_t sequenceOrder)
         : pimpl(new Impl(objectId, candidateId, sequenceOrder))
     {
     }
@@ -51,6 +51,88 @@ namespace electionguard
     unique_ptr<ElementModQ> SelectionDescription::crypto_hash() const
     {
         return hash_elems({pimpl->object_id, pimpl->sequenceOrder, pimpl->candidateId});
+    }
+
+#pragma endregion
+
+#pragma region ContestDescription
+
+    struct ContestDescription::Impl : ElectionObjectBase {
+        string electoralDistrictId;
+        uint64_t sequenceOrder;
+        uint64_t voteVariation;
+        uint64_t numberElected;
+        uint64_t votesAllowed;
+        string name;
+        string ballotTitle;
+        string ballotSubtitle;
+        vector<unique_ptr<SelectionDescription>> selections;
+        Impl(const string &objectId, const string &electoralDistrictId,
+             const uint64_t sequenceOrder, const uint64_t voteVariation,
+             const uint64_t numberElected, const uint64_t votesAllowed, const string &name,
+             const string &ballotTitle, const string &ballotSubtitle,
+             vector<unique_ptr<SelectionDescription>> selections)
+            : selections(move(selections))
+        {
+            this->object_id = objectId;
+            this->electoralDistrictId = electoralDistrictId;
+            this->sequenceOrder = sequenceOrder;
+            this->voteVariation = voteVariation;
+            this->numberElected = numberElected;
+            this->votesAllowed = votesAllowed;
+            this->name = name;
+            this->ballotTitle = ballotTitle;
+            this->ballotSubtitle = ballotSubtitle;
+        }
+    };
+
+    ContestDescription::ContestDescription(
+      const string &objectId, const string &electoralDistrictId, const uint64_t sequenceOrder,
+      const uint64_t voteVariation, const uint64_t numberElected, const uint64_t votesAllowed,
+      const string &name, const string &ballotTitle, const string &ballotSubtitle,
+      vector<unique_ptr<SelectionDescription>> selections)
+        : pimpl(new Impl(objectId, electoralDistrictId, sequenceOrder, voteVariation, numberElected,
+                         votesAllowed, name, ballotTitle, ballotSubtitle, move(selections)))
+    {
+    }
+    ContestDescription::~ContestDescription() = default;
+
+    ContestDescription &ContestDescription::operator=(ContestDescription other)
+    {
+        swap(pimpl, other.pimpl);
+        return *this;
+    }
+
+    string ContestDescription::getObjectId() const { return pimpl->object_id; }
+    string ContestDescription::getElectoralDistrictId() const { return pimpl->electoralDistrictId; }
+    uint64_t ContestDescription::getSequenceOrder() const { return pimpl->sequenceOrder; }
+    uint64_t ContestDescription::getVoteVariation() const { return pimpl->voteVariation; }
+    uint64_t ContestDescription::getNumberElected() const { return pimpl->numberElected; }
+    uint64_t ContestDescription::getVotesAllowed() const { return pimpl->votesAllowed; }
+    string ContestDescription::getName() const { return pimpl->name; }
+
+    string ContestDescription::getBallotTitle() const { return pimpl->ballotTitle; }
+    string ContestDescription::getBallotSubtitle() const { return pimpl->ballotSubtitle; }
+
+    vector<reference_wrapper<SelectionDescription>> ContestDescription::getSelections() const
+    {
+        vector<reference_wrapper<SelectionDescription>> selections;
+        for (const auto &selection : pimpl->selections) {
+            selections.push_back(ref(*selection));
+        }
+        return selections;
+    }
+
+    unique_ptr<ElementModQ> ContestDescription::crypto_hash() const
+    {
+        vector<reference_wrapper<CryptoHashable>> selections;
+        for (const auto &selection : pimpl->selections) {
+            selections.push_back(ref<CryptoHashable>(*selection));
+        }
+
+        return hash_elems({pimpl->object_id, pimpl->sequenceOrder, pimpl->electoralDistrictId,
+                           pimpl->voteVariation, pimpl->ballotTitle, pimpl->ballotSubtitle,
+                           pimpl->name, pimpl->numberElected, pimpl->votesAllowed, selections});
     }
 
 #pragma endregion
@@ -127,19 +209,19 @@ namespace electionguard
         return pimpl->numberOfGuardians;
     }
     uint64_t CiphertextElectionContext::getQuorum() const { return pimpl->quorum; }
-    ElementModP *CiphertextElectionContext::getElGamalPublicKey()
+    const ElementModP *CiphertextElectionContext::getElGamalPublicKey() const
     {
         return pimpl->elGamalPublicKey.get();
     }
-    ElementModQ *CiphertextElectionContext::getDescriptionHash()
+    const ElementModQ *CiphertextElectionContext::getDescriptionHash() const
     {
         return pimpl->descriptionHash.get();
     }
-    ElementModQ *CiphertextElectionContext::getCryptoBaseHash()
+    const ElementModQ *CiphertextElectionContext::getCryptoBaseHash() const
     {
         return pimpl->cryptoBaseHash.get();
     }
-    ElementModQ *CiphertextElectionContext::getCryptoExtendedBaseHash()
+    const ElementModQ *CiphertextElectionContext::getCryptoExtendedBaseHash() const
     {
         return pimpl->cryptoExtendedBaseHash.get();
     }

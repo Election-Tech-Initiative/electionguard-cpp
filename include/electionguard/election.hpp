@@ -30,7 +30,7 @@ namespace electionguard
         SelectionDescription(const SelectionDescription &other);
         SelectionDescription(const SelectionDescription &&other);
         SelectionDescription(const string &objectId, const string &candidateId,
-                             uint64_t sequenceOrder);
+                             const uint64_t sequenceOrder);
         ~SelectionDescription();
 
         SelectionDescription &operator=(SelectionDescription other);
@@ -40,7 +40,45 @@ namespace electionguard
         string getCandidateId() const;
         uint64_t getSequenceOrder() const;
 
-        virtual unique_ptr<ElementModQ> crypto_hash() const;
+        virtual unique_ptr<ElementModQ> crypto_hash() const override;
+
+      private:
+        class Impl;
+        unique_ptr<Impl> pimpl;
+    };
+
+    class EG_API ContestDescription : public CryptoHashable
+    {
+      public:
+        ContestDescription(const ContestDescription &other);
+        ContestDescription(const ContestDescription &&other);
+        ContestDescription(const string &objectId, const string &electoralDistrictId,
+                           const uint64_t sequenceOrder, const uint64_t voteVariation,
+                           const uint64_t numberElected, const uint64_t votesAllowed,
+                           const string &name, const string &ballotTitle,
+                           const string &ballotSubtitle,
+                           vector<unique_ptr<SelectionDescription>> selections);
+        ~ContestDescription();
+
+        ContestDescription &operator=(ContestDescription other);
+        ContestDescription &operator=(ContestDescription &&other);
+
+        string getObjectId() const;
+        string getElectoralDistrictId() const;
+        uint64_t getSequenceOrder() const;
+        uint64_t getVoteVariation() const; // TODO: domain type enum
+        uint64_t getNumberElected() const;
+        uint64_t getVotesAllowed() const;
+        string getName() const;
+
+        string getBallotTitle() const; // TODO: domain type
+        string getBallotSubtitle() const;
+
+        vector<reference_wrapper<SelectionDescription>> getSelections() const;
+
+        virtual unique_ptr<ElementModQ> crypto_hash() const override;
+
+        // TODO: isValid() const;
 
       private:
         class Impl;
@@ -52,7 +90,7 @@ namespace electionguard
       public:
         CiphertextElectionContext(const CiphertextElectionContext &other);
         CiphertextElectionContext(const CiphertextElectionContext &&other);
-        CiphertextElectionContext(uint64_t numberOfGuardians, uint64_t quorum,
+        CiphertextElectionContext(const uint64_t numberOfGuardians, const uint64_t quorum,
                                   unique_ptr<ElementModP> elGamalPublicKey,
                                   unique_ptr<ElementModQ> descriptionHash,
                                   unique_ptr<ElementModQ> cryptoBaseHash,
@@ -62,22 +100,22 @@ namespace electionguard
         CiphertextElectionContext &operator=(CiphertextElectionContext other);
         CiphertextElectionContext &operator=(CiphertextElectionContext &&other);
 
-        static unique_ptr<CiphertextElectionContext> make(uint64_t numberOfGuardians,
-                                                          uint64_t quorum,
+        static unique_ptr<CiphertextElectionContext> make(const uint64_t numberOfGuardians,
+                                                          const uint64_t quorum,
                                                           unique_ptr<ElementModP> elGamalPublicKey,
                                                           unique_ptr<ElementModQ> descriptionHash);
 
-        static unique_ptr<CiphertextElectionContext> make(uint64_t numberOfGuardians,
-                                                          uint64_t quorum,
+        static unique_ptr<CiphertextElectionContext> make(const uint64_t numberOfGuardians,
+                                                          const uint64_t quorum,
                                                           const string &elGamalPublicKeyInHex,
                                                           const string &descriptionHashInHex);
 
         uint64_t getNumberOfGuardians() const;
         uint64_t getQuorum() const;
-        ElementModP *getElGamalPublicKey();
-        ElementModQ *getDescriptionHash();
-        ElementModQ *getCryptoBaseHash();
-        ElementModQ *getCryptoExtendedBaseHash();
+        const ElementModP *getElGamalPublicKey() const;
+        const ElementModQ *getDescriptionHash() const;
+        const ElementModQ *getCryptoBaseHash() const;
+        const ElementModQ *getCryptoExtendedBaseHash() const;
 
       private:
         class Impl;

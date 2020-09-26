@@ -66,20 +66,22 @@ namespace electionguard
 
     enum CryptoHashableTypeEnum {
         NULL_PTR = 0,
-        CRYPTOHASHABLE = 1,
+        CRYPTOHASHABLE_PTR = 1,
         ELEMENTMODP_PTR = 2,
         ELEMENTMODQ_PTR = 3,
-        ELEMENTMODP_REF = 4,
-        ELEMENTMODQ_REF = 5,
-        UINT64_T = 6,
-        STRING = 7,
-        VECTOR_CRYPTOHASHABLE_PTR = 8,
-        VECTOR_ELEMENTMODP_PTR = 9,
-        VECTOR_ELEMENTMODQ_PTR = 10,
-        VECTOR_ELEMENTMODP_REF = 11,
-        VECTOR_ELEMENTMODQ_REF = 12,
-        VECTOR_UINT64_T = 13,
-        VECTOR_STRING = 14
+        CRYPTOHASHABLE_REF = 4,
+        ELEMENTMODP_REF = 5,
+        ELEMENTMODQ_REF = 6,
+        UINT64_T = 7,
+        STRING = 8,
+        VECTOR_CRYPTOHASHABLE_PTR = 9,
+        VECTOR_ELEMENTMODP_PTR = 10,
+        VECTOR_ELEMENTMODQ_PTR = 11,
+        VECTOR_CRYPTOHASHABLE_REF = 12,
+        VECTOR_ELEMENTMODP_REF = 13,
+        VECTOR_ELEMENTMODQ_REF = 14,
+        VECTOR_UINT64_T = 15,
+        VECTOR_STRING = 16
     };
 
     void push_hash_update(Hacl_Streaming_Functor_state_s___uint32_t____ *p, CryptoHashableType a)
@@ -91,7 +93,7 @@ namespace electionguard
                 input_string = null_string;
                 break;
             }
-            case CRYPTOHASHABLE: // CryptoHashable *
+            case CRYPTOHASHABLE_PTR: // CryptoHashable *
             {
                 auto hashable = get<CryptoHashable *>(a)->crypto_hash();
                 input_string = hashable->toHex();
@@ -105,6 +107,12 @@ namespace electionguard
             case ELEMENTMODQ_PTR: // ElementModQ *
             {
                 input_string = get<ElementModQ *>(a)->toHex();
+                break;
+            }
+            case CRYPTOHASHABLE_REF: // reference_wrapper<CryptoHashable>
+            {
+                auto hashable = get<reference_wrapper<CryptoHashable>>(a).get().crypto_hash();
+                input_string = hashable->toHex();
                 break;
             }
             case ELEMENTMODP_REF: // reference_wrapper<ElementModP>
@@ -144,6 +152,12 @@ namespace electionguard
             case VECTOR_ELEMENTMODQ_PTR: // vector<ElementModQ *>
             {
                 input_string = hash_inner_vector<ElementModQ *>(get<vector<ElementModQ *>>(a));
+                break;
+            }
+            case VECTOR_CRYPTOHASHABLE_REF: // vector<reference_wrapper<CryptoHashable>>
+            {
+                input_string = hash_inner_vector<reference_wrapper<CryptoHashable>>(
+                  get<vector<reference_wrapper<CryptoHashable>>>(a));
                 break;
             }
             case VECTOR_ELEMENTMODP_REF: // vector<reference_wrapper<ElementModP>>
