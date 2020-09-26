@@ -125,13 +125,74 @@ namespace electionguard
             return encryptedContest;
         }
 
-        // verify the selection.
+        // verify the contest.
         if (encryptedContest->isValidEncryption(*descriptionHash, elgamalPublicKey,
                                                 cryptoExtendedBaseHash)) {
             return encryptedContest;
         }
 
         Log::debug("encryptedContest:: failed validity check");
+        return nullptr;
+    }
+
+    unique_ptr<CiphertextBallot> encryptBallot(const PlaintextBallot &ballot,
+                                               const InternalElectionDescription &metadata,
+                                               const CiphertextElectionContext &context,
+                                               const ElementModQ &seedHash,
+                                               unique_ptr<ElementModQ> nonce /* = nullptr */,
+                                               bool shouldVerifyProofs /* = true */)
+    {
+        // TODO: finish implementation
+        // this implementation currently only works with elections that have one ballot style
+        // (e.g. where all contests in the election are included on every ballot.)
+        // similarly it expects that the fully hydrated representation of the ballot is provided.
+
+        auto randomMasterNonce = nonce ? move(nonce) : rand_q();
+
+        auto nonceSeed = CiphertextBallot::nonceSeed(*metadata.getDescriptionHash(),
+                                                     ballot.getObjectId(), *randomMasterNonce);
+
+        vector<unique_ptr<CiphertextBallotContest>> encryptedContests;
+
+        // TODO: improve performance, complete features
+        for (const auto &contestDescription : metadata.getContests()) {
+            bool hasContest = false;
+            for (const auto &contest : ballot.getContests()) {
+                if (contest.get().getObjectId() == contestDescription.get().getObjectId()) {
+                    hasContest = true;
+                    auto encrypted = encryptContest(
+                      contest.get(), contestDescription.get(), *context.getElGamalPublicKey(),
+                      *context.getCryptoExtendedBaseHash(), *nonceSeed);
+                    encryptedContests.push_back(move(encrypted));
+                    break;
+                }
+            }
+
+            if (!hasContest) {
+                throw invalid_argument("caller must include all contests");
+            }
+        }
+
+        auto encryptedBallot = CiphertextBallot::make(ballot.getObjectId(), ballot.getBallotStyle(),
+                                                      *metadata.getDescriptionHash(),
+                                                      move(encryptedContests), move(nonceSeed));
+
+        if (!encryptedBallot) {
+            throw runtime_error("encryptedBallot:: Error constructing encrypted ballot");
+        }
+
+        if (!shouldVerifyProofs) {
+            return encryptedBallot;
+        }
+
+        // verify the ballot.
+        if (encryptedBallot->isValidEncryption(*metadata.getDescriptionHash(),
+                                               *context.getElGamalPublicKey(),
+                                               *context.getCryptoExtendedBaseHash())) {
+            return encryptedBallot;
+        }
+
+        Log::debug("encryptedBallot:: failed validity check");
         return nullptr;
     }
 

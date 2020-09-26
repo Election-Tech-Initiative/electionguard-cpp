@@ -46,6 +46,11 @@ namespace electionguard
                    const ElementModQ &nonceSeed, bool isPlaceholder = false,
                    bool shouldVerifyProofs = true);
 
+    EG_API unique_ptr<CiphertextBallot>
+    encryptBallot(const PlaintextBallot &ballot, const InternalElectionDescription &metadata,
+                  const CiphertextElectionContext &context, const ElementModQ &seedHash,
+                  unique_ptr<ElementModQ> nonce = nullptr, bool shouldVerifyProofs = true);
+
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD_CORE_ENCRYPT_HPP_INCLUDED__ */

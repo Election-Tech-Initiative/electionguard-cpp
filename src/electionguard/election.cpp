@@ -137,6 +137,53 @@ namespace electionguard
 
 #pragma endregion
 
+#pragma region InternalElectionDescription
+
+    struct InternalElectionDescription::Impl {
+        unique_ptr<ElementModQ> descriptionHash;
+        vector<unique_ptr<ContestDescription>> contests;
+        Impl(unique_ptr<ElementModQ> descriptionHash,
+             vector<unique_ptr<ContestDescription>> contests)
+            : descriptionHash(move(descriptionHash)), contests(move(contests))
+        {
+        }
+    };
+
+    // Lifecycle Methods
+
+    InternalElectionDescription::InternalElectionDescription(
+      const ElementModQ &descriptionHash, vector<unique_ptr<ContestDescription>> contests)
+        : pimpl(new Impl(make_unique<ElementModQ>(descriptionHash), move(contests)))
+    {
+    }
+
+    InternalElectionDescription::~InternalElectionDescription() = default;
+
+    InternalElectionDescription &
+    InternalElectionDescription::operator=(InternalElectionDescription other)
+    {
+        swap(pimpl, other.pimpl);
+        return *this;
+    }
+
+    // Property Getters
+
+    ElementModQ *InternalElectionDescription::getDescriptionHash() const
+    {
+        return pimpl->descriptionHash.get();
+    }
+
+    vector<reference_wrapper<ContestDescription>> InternalElectionDescription::getContests() const
+    {
+        vector<reference_wrapper<ContestDescription>> contests;
+        for (const auto &contest : pimpl->contests) {
+            contests.push_back(ref(*contest.get()));
+        }
+        return contests;
+    }
+
+#pragma endregion
+
 #pragma region CiphertextElectionContext
 
     struct CiphertextElectionContext::Impl {

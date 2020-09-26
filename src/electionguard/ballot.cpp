@@ -536,6 +536,13 @@ namespace electionguard
 
     // Public Methods
 
+    unique_ptr<ElementModQ> CiphertextBallot::nonceSeed(const ElementModQ &descriptionHash,
+                                                        const string &objectId,
+                                                        const ElementModQ &nonce)
+    {
+        return hash_elems({ref(descriptionHash), objectId, ref(nonce)});
+    }
+
     unique_ptr<CiphertextBallot> CiphertextBallot::make(
       const string &objectId, const string &ballotStyle, const ElementModQ &descriptionHash,
       vector<unique_ptr<CiphertextBallotContest>> contests,
@@ -632,13 +639,6 @@ namespace electionguard
             contestHashes.push_back(ref(*contest.get().getCryptoHash()));
         }
         return hash_elems({objectId, ref(seedHash), contestHashes});
-    }
-
-    unique_ptr<ElementModQ> CiphertextBallot::nonceSeed(const ElementModQ &descriptionHash,
-                                                        const string &objectId,
-                                                        const ElementModQ &nonce)
-    {
-        return hash_elems({ref(descriptionHash), objectId, ref(nonce)});
     }
 
 #pragma endregion

@@ -291,6 +291,9 @@ namespace electionguard
 
         unique_ptr<ElementModQ> nonceSeed();
 
+        static unique_ptr<ElementModQ> nonceSeed(const ElementModQ &descriptionHash,
+                                                 const string &objectId, const ElementModQ &nonce);
+
         static unique_ptr<CiphertextBallot>
         make(const string &objectId, const string &ballotStyle, const ElementModQ &descriptionHash,
              vector<unique_ptr<CiphertextBallotContest>> contests,
@@ -311,10 +314,6 @@ namespace electionguard
         makeCryptoHash(string objectId,
                        const vector<reference_wrapper<CiphertextBallotContest>> &contests,
                        const ElementModQ &seedHash);
-
-      protected:
-        static unique_ptr<ElementModQ> nonceSeed(const ElementModQ &descriptionHash,
-                                                 const string &objectId, const ElementModQ &nonce);
 
       private:
         class Impl;

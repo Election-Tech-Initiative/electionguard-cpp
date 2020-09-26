@@ -47,6 +47,7 @@ namespace electionguard
         unique_ptr<Impl> pimpl;
     };
 
+    // Note currently does not support placeholders
     class EG_API ContestDescription : public CryptoHashable
     {
       public:
@@ -79,6 +80,27 @@ namespace electionguard
         virtual unique_ptr<ElementModQ> crypto_hash() const override;
 
         // TODO: isValid() const;
+
+      private:
+        class Impl;
+        unique_ptr<Impl> pimpl;
+    };
+
+    // TODO: complete implementation
+    class EG_API InternalElectionDescription
+    {
+      public:
+        InternalElectionDescription(const InternalElectionDescription &other);
+        InternalElectionDescription(const InternalElectionDescription &&other);
+        InternalElectionDescription(const ElementModQ &descriptionHash,
+                                    vector<unique_ptr<ContestDescription>> contests);
+        ~InternalElectionDescription();
+
+        InternalElectionDescription &operator=(InternalElectionDescription other);
+        InternalElectionDescription &operator=(InternalElectionDescription &&other);
+
+        ElementModQ *getDescriptionHash() const;
+        vector<reference_wrapper<ContestDescription>> getContests() const;
 
       private:
         class Impl;
