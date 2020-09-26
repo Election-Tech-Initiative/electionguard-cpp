@@ -86,7 +86,9 @@ namespace electionguard
     }
 
     ElementModP *ElGamalCiphertext::getPad() { return pimpl->pad.get(); }
+    ElementModP *ElGamalCiphertext::getPad() const { return pimpl->pad.get(); }
     ElementModP *ElGamalCiphertext::getData() { return pimpl->data.get(); }
+    ElementModP *ElGamalCiphertext::getData() const { return pimpl->data.get(); }
 
     uint64_t ElGamalCiphertext::decrypt(const ElementModQ &secretKey)
     {

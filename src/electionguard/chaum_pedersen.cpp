@@ -74,8 +74,8 @@ namespace electionguard
                                                 const ElementModP &k, const ElementModQ &q)
     {
 
-        auto *alpha = const_cast<ElGamalCiphertext &>(message).getPad();
-        auto *beta = const_cast<ElGamalCiphertext &>(message).getData();
+        auto *alpha = message.getPad();
+        auto *beta = message.getData();
 
         auto *a0p = pimpl->proof_zero_pad.get();
         auto *b0p = pimpl->proof_zero_data.get();
@@ -187,8 +187,8 @@ namespace electionguard
                                              const ElementModP &k, const ElementModQ &q,
                                              const ElementModQ &seed)
     {
-        auto *alpha = const_cast<ElGamalCiphertext &>(message).getPad();
-        auto *beta = const_cast<ElGamalCiphertext &>(message).getData();
+        auto *alpha = message.getPad();
+        auto *beta = message.getData();
 
         // Pick three random numbers in Q.
         auto nonces = make_unique<Nonces>(seed, "disjoint-chaum-pedersen-proof");
@@ -217,8 +217,8 @@ namespace electionguard
                                             const ElementModP &k, const ElementModQ &q,
                                             const ElementModQ &seed)
     {
-        auto *alpha = const_cast<ElGamalCiphertext &>(message).getPad();
-        auto *beta = const_cast<ElGamalCiphertext &>(message).getData();
+        auto *alpha = message.getPad();
+        auto *beta = message.getData();
 
         // Pick three random numbers in Q.
         auto nonces = make_unique<Nonces>(seed, "disjoint-chaum-pedersen-proof");
@@ -286,8 +286,8 @@ namespace electionguard
     bool ConstantChaumPedersenProof::isValid(const ElGamalCiphertext &message, const ElementModP &k,
                                              const ElementModQ &q)
     {
-        auto *alpha = const_cast<ElGamalCiphertext &>(message).getPad();
-        auto *beta = const_cast<ElGamalCiphertext &>(message).getData();
+        auto *alpha = message.getPad();
+        auto *beta = message.getData();
 
         auto *a_ptr = pimpl->pad.get();
         auto *b_ptr = pimpl->data.get();
@@ -352,8 +352,8 @@ namespace electionguard
                                      const ElementModP &k, const ElementModQ &seed,
                                      const ElementModQ &hash_header, uint64_t constant)
     {
-        auto *alpha = const_cast<ElGamalCiphertext &>(message).getPad();
-        auto *beta = const_cast<ElGamalCiphertext &>(message).getData();
+        auto *alpha = message.getPad();
+        auto *beta = message.getData();
 
         // Pick a random number in Q.
         auto nonces = make_unique<Nonces>(seed, "disjoint-chaum-pedersen-proof");

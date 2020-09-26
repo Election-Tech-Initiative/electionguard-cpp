@@ -49,7 +49,9 @@ namespace electionguard
         ElGamalCiphertext &operator=(ElGamalCiphertext &&rhs);
 
         ElementModP *getPad();
+        ElementModP *getPad() const;
         ElementModP *getData();
+        ElementModP *getData() const;
 
         uint64_t decrypt(const ElementModQ &secretKey);
 
