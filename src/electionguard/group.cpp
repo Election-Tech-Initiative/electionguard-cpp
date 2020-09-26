@@ -589,6 +589,20 @@ namespace electionguard
         return make_unique<ElementModQ>(result);
     }
 
+    unique_ptr<ElementModQ> add_mod_q(const vector<reference_wrapper<ElementModQ>> &elements)
+    {
+        if (elements.empty()) {
+            throw invalid_argument("must have one or more elements");
+        }
+
+        auto result = ElementModQ::fromUint64(0UL);
+        for (auto element : elements) {
+            auto sum = add_mod_q(*result, element.get());
+            result.swap(sum);
+        }
+        return result;
+    }
+
     unique_ptr<ElementModQ> sub_mod_q(const ElementModQ &a, const ElementModQ &b)
     {
         const auto &q = Q();

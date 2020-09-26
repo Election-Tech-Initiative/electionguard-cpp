@@ -64,32 +64,60 @@ namespace electionguard
         return hash_elems(hashable_vector)->toHex();
     }
 
+    enum CryptoHashableTypeEnum {
+        NULL_PTR = 0,
+        CRYPTOHASHABLE = 1,
+        ELEMENTMODP_PTR = 2,
+        ELEMENTMODQ_PTR = 3,
+        ELEMENTMODP_REF = 4,
+        ELEMENTMODQ_REF = 5,
+        UINT64_T = 6,
+        STRING = 7,
+        VECTOR_CRYPTOHASHABLE_PTR = 8,
+        VECTOR_ELEMENTMODP_PTR = 9,
+        VECTOR_ELEMENTMODQ_PTR = 10,
+        VECTOR_ELEMENTMODP_REF = 11,
+        VECTOR_ELEMENTMODQ_REF = 12,
+        VECTOR_UINT64_T = 13,
+        VECTOR_STRING = 14
+    };
+
     void push_hash_update(Hacl_Streaming_Functor_state_s___uint32_t____ *p, CryptoHashableType a)
     {
         string input_string;
         switch (a.index()) {
-            case 0: // nullptr_t
+            case NULL_PTR: // nullptr_t
             {
                 input_string = null_string;
                 break;
             }
-            case 1: // CryptoHashable *
+            case CRYPTOHASHABLE: // CryptoHashable *
             {
                 auto hashable = get<CryptoHashable *>(a)->crypto_hash();
                 input_string = hashable->toHex();
                 break;
             }
-            case 2: // ElementModP *
+            case ELEMENTMODP_PTR: // ElementModP *
             {
                 input_string = get<ElementModP *>(a)->toHex();
                 break;
             }
-            case 3: // ElementModQ *
+            case ELEMENTMODQ_PTR: // ElementModQ *
             {
                 input_string = get<ElementModQ *>(a)->toHex();
                 break;
             }
-            case 4: // uint64_t
+            case ELEMENTMODP_REF: // reference_wrapper<ElementModP>
+            {
+                input_string = get<reference_wrapper<ElementModP>>(a).get().toHex();
+                break;
+            }
+            case ELEMENTMODQ_REF: // reference_wrapper<ElementModQ>
+            {
+                input_string = get<reference_wrapper<ElementModQ>>(a).get().toHex();
+                break;
+            }
+            case UINT64_T: // uint64_t
             {
                 uint64_t i = get<uint64_t>(a);
                 if (i != 0) {
@@ -97,33 +125,45 @@ namespace electionguard
                 }
                 break;
             }
-            case 5: // string
+            case STRING: // string
             {
                 input_string = get<string>(a);
                 break;
             }
-            case 6: // vector<CryptoHashable *>
+            case VECTOR_CRYPTOHASHABLE_PTR: // vector<CryptoHashable *>
             {
                 input_string =
                   hash_inner_vector<CryptoHashable *>(get<vector<CryptoHashable *>>(a));
                 break;
             }
-            case 7: // vector<ElementModP *>
+            case VECTOR_ELEMENTMODP_PTR: // vector<ElementModP *>
             {
                 input_string = hash_inner_vector<ElementModP *>(get<vector<ElementModP *>>(a));
                 break;
             }
-            case 8: // vector<ElementModQ *>
+            case VECTOR_ELEMENTMODQ_PTR: // vector<ElementModQ *>
             {
                 input_string = hash_inner_vector<ElementModQ *>(get<vector<ElementModQ *>>(a));
                 break;
             }
-            case 9: // vector<uint64_t>
+            case VECTOR_ELEMENTMODP_REF: // vector<reference_wrapper<ElementModP>>
+            {
+                input_string = hash_inner_vector<reference_wrapper<ElementModP>>(
+                  get<vector<reference_wrapper<ElementModP>>>(a));
+                break;
+            }
+            case VECTOR_ELEMENTMODQ_REF: // vector<reference_wrapper<ElementModQ>>
+            {
+                input_string = hash_inner_vector<reference_wrapper<ElementModQ>>(
+                  get<vector<reference_wrapper<ElementModQ>>>(a));
+                break;
+            }
+            case VECTOR_UINT64_T: // vector<uint64_t>
             {
                 input_string = hash_inner_vector<uint64_t>(get<vector<uint64_t>>(a));
                 break;
             }
-            case 10: // vector<string>
+            case VECTOR_STRING: // vector<string>
             {
                 input_string = hash_inner_vector<string>(get<vector<string>>(a));
                 break;

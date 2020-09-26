@@ -99,6 +99,10 @@ namespace electionguard
         /// The encrypted representation of the vote field
         ElGamalCiphertext *getCiphertext() const;
 
+        ElementModQ *getCryptoHash() const;
+
+        ElementModQ *getNonce();
+
         /// The proof that demonstrates the selection is an encryption of 0 or 1, and was encrypted using the `nonce`
         DisjunctiveChaumPedersenProof *getProof() const;
 
@@ -127,7 +131,7 @@ namespace electionguard
         ///
         /// In most cases the seed_hash should match the `description_hash`
         /// </summary>
-        virtual unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash);
+        virtual unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) override;
 
         bool isValidEncryption(const ElementModQ &seedHash, const ElementModP &elgamalPublicKey,
                                const ElementModQ &cryptoExtendedBaseHash);
@@ -153,14 +157,82 @@ namespace electionguard
         //TODO: void setNonce(ElementModQ *nonce);
     };
 
+    class EG_API PlaintextBallotContest
+    {
+        PlaintextBallotContest(const PlaintextBallotContest &other);
+        PlaintextBallotContest(const PlaintextBallotContest &&other);
+        PlaintextBallotContest(const string &objectId,
+                               vector<unique_ptr<PlaintextBallotSelection>> selections);
+        ~PlaintextBallotContest();
+
+        PlaintextBallotContest &operator=(PlaintextBallotContest other);
+        PlaintextBallotContest &operator=(PlaintextBallotContest &&other);
+
+        string getObjectId() const;
+
+        vector<reference_wrapper<PlaintextBallotSelection>> getSelections() const;
+
+      private:
+        class Impl;
+        unique_ptr<Impl> pimpl;
+    };
+
     class EG_API CiphertextBallotContest : public CryptoHashCheckable
     {
       public:
+        CiphertextBallotContest(const CiphertextBallotContest &other);
+        CiphertextBallotContest(const CiphertextBallotContest &&other);
+        CiphertextBallotContest(const string &objectId, const ElementModQ &descriptionHash,
+                                vector<unique_ptr<CiphertextBallotSelection>> selections,
+                                unique_ptr<ElementModQ> cryptoHash, unique_ptr<ElementModQ> nonce,
+                                unique_ptr<ConstantChaumPedersenProof> proof);
+        ~CiphertextBallotContest();
+
+        CiphertextBallotContest &operator=(CiphertextBallotContest other);
+        CiphertextBallotContest &operator=(CiphertextBallotContest &&other);
+
+        string getObjectId() const;
+
+        ElementModQ *getDescriptionHash() const;
+
+        vector<reference_wrapper<CiphertextBallotSelection>> getSelections() const;
+
+        ConstantChaumPedersenProof *getProof() const;
+
+        static unique_ptr<CiphertextBallotContest>
+        make(const string &objectId, const ElementModQ &descriptionHash,
+             vector<unique_ptr<CiphertextBallotSelection>> selections,
+             const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
+             const ElementModQ &proofSeed, uint64_t numberElected,
+             unique_ptr<ElementModQ> cryptoHash = nullptr,
+             unique_ptr<ConstantChaumPedersenProof> proof = nullptr,
+             unique_ptr<ElementModQ> nonce = nullptr);
+
+        virtual unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) override;
+
+        unique_ptr<ElementModQ> aggregateNonce();
+        unique_ptr<ElGamalCiphertext> elgamalAccumulate();
+
+        bool isValidEncryption(const ElementModQ &seedHash, const ElementModP &elgamalPublicKey,
+                               const ElementModQ &cryptoExtendedBaseHash);
+
+        //protected:
         // TODO: ISSUE #36 make this member protected or private
         // once the public api surface supports encrypt_contest
-        static ElementModQ *makeCryptoHash(string object_id,
-                                           vector<CiphertextBallotSelection> selections,
-                                           ElementModQ *seed_hash);
+        static unique_ptr<ElementModQ>
+        makeCryptoHash(string objectId,
+                       const vector<reference_wrapper<CiphertextBallotSelection>> &selections,
+                       const ElementModQ &seedHash);
+
+      protected:
+        static unique_ptr<ElementModQ>
+        aggregateNonce(const vector<reference_wrapper<CiphertextBallotSelection>> &selections);
+        static unique_ptr<ElGamalCiphertext>
+        elgamalAccumulate(const vector<reference_wrapper<CiphertextBallotSelection>> &selections);
+
+      private:
+        class Impl;
+        unique_ptr<Impl> pimpl;
     };
 
 } // namespace electionguard

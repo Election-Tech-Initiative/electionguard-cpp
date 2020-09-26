@@ -11,12 +11,12 @@
 namespace electionguard
 {
     using CryptoHashableType =
-      variant<nullptr_t, CryptoHashable *, ElementModP *, ElementModQ *, uint64_t, string,
+      variant<nullptr_t, CryptoHashable *, ElementModP *, ElementModQ *,
+              reference_wrapper<ElementModP>, reference_wrapper<ElementModQ>, uint64_t, string,
               vector<CryptoHashable *>, vector<ElementModP *>, vector<ElementModQ *>,
+              vector<reference_wrapper<ElementModP>>, vector<reference_wrapper<ElementModQ>>,
               vector<uint64_t>, vector<string>>;
 
-    // TODO: Fold Expressions for Variadic Templates  (iterating with vectors for now)
-    // template <typename... Args> ElementModQ *hash_elems(CryptoHashableType a, Args... args);
     EG_API unique_ptr<ElementModQ> hash_elems(const vector<CryptoHashableType> &a);
     EG_API unique_ptr<ElementModQ> hash_elems(CryptoHashableType a);
 } // namespace electionguard

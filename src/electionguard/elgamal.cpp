@@ -164,6 +164,24 @@ namespace electionguard
         return make_unique<ElGamalCiphertext>(move(pad), move(data));
     }
 
+    unique_ptr<ElGamalCiphertext>
+    elgamalAdd(const vector<reference_wrapper<ElGamalCiphertext>> &ciphertexts)
+    {
+        if (ciphertexts.empty()) {
+            throw invalid_argument("must have one or more ciphertexts");
+        }
+
+        auto resultPad = ElementModP::fromUint64(1UL);
+        auto resultData = ElementModP::fromUint64(1UL);
+        for (auto ciphertext : ciphertexts) {
+            auto pad = mul_mod_p(*resultPad, *ciphertext.get().getPad());
+            resultPad.swap(pad);
+            auto data = mul_mod_p(*resultData, *ciphertext.get().getData());
+            resultData.swap(data);
+        }
+        return make_unique<ElGamalCiphertext>(move(resultPad), move(resultData));
+    }
+
 #pragma endregion
 
 } // namespace electionguard

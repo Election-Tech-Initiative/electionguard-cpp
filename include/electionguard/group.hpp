@@ -165,6 +165,9 @@ namespace electionguard
     /// </summary>
     EG_API unique_ptr<ElementModQ> add_mod_q(const ElementModQ &lhs, const ElementModQ &rhs);
 
+    EG_API unique_ptr<ElementModQ>
+    add_mod_q(const vector<reference_wrapper<ElementModQ>> &elements);
+
     /// <summary>
     /// Computes (a-b) mod q.
     /// </summary>

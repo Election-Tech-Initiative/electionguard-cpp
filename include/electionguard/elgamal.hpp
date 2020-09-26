@@ -70,8 +70,11 @@ namespace electionguard
     /// <param name="publicKey"> ElGamal public key. </param>
     /// <returns>A ciphertext tuple.</returns>
     /// </summary>
-    EG_API unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModQ &nonce,
+    EG_API unique_ptr<ElGamalCiphertext> elgamalEncrypt(const uint64_t m, const ElementModQ &nonce,
                                                         const ElementModP &publicKey);
+
+    EG_API unique_ptr<ElGamalCiphertext>
+    elgamalAdd(const vector<reference_wrapper<ElGamalCiphertext>> &ciphertexts);
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD__CORE_ELGAMAL_HPP_INCLUDED__ */

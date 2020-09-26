@@ -132,3 +132,7 @@ artifacts/
 # Project Specific
 apps/demo_in_swift/ElectionGuardDemo/.idea/
 bindings/netstandard/ElectionGuard/packages/
+
+.idea/
+
+cmake-build-debug/
