@@ -33,7 +33,8 @@ namespace electionguard
 
         Hacl_Streaming_SHA2_finish_256(p, static_cast<uint8_t *>(output));
 
-        auto *bigNum = Hacl_Bignum256_new_bn_from_bytes_be(sizeof(output), output);
+        auto *bigNum =
+          Hacl_Bignum256_new_bn_from_bytes_be(sizeof(output), static_cast<uint8_t *>(output));
         if (bigNum == nullptr) {
             throw out_of_range("bytes_to_p could not allocate");
         }
@@ -229,7 +230,7 @@ namespace electionguard
         }
 
         const uint8_t *input = reinterpret_cast<const uint8_t *>(input_string.c_str());
-        Hacl_Streaming_SHA2_update_256(p, (uint8_t *)input, input_string.size());
+        Hacl_Streaming_SHA2_update_256(p, const_cast<uint8_t *>(input), input_string.size());
         Hacl_Streaming_SHA2_update_256(p, static_cast<uint8_t *>(delimiter), sizeof(delimiter));
     }
 } // namespace electionguard

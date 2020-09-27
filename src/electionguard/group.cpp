@@ -483,7 +483,7 @@ namespace electionguard
                 auto res = mul_mod_p(*product, *elem);
                 product.swap(res);
             } else if (holds_alternative<ElementModP *>(x)) {
-                auto elem = get<ElementModP *>(x);
+                auto *elem = get<ElementModP *>(x);
                 auto res = mul_mod_p(*product, *elem);
                 product.swap(res);
             } else {
@@ -684,7 +684,7 @@ namespace electionguard
             throw runtime_error("a_plus_bc_mod_q mod operation failed");
         }
         uint64_t result[MAX_Q_LEN] = {};
-        memcpy(result, resModQ, MAX_Q_SIZE);
+        memcpy(static_cast<uint64_t *>(result), resModQ, MAX_Q_SIZE);
 
         return make_unique<ElementModQ>(result);
     }

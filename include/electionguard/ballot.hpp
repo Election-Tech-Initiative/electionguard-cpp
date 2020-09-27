@@ -35,8 +35,7 @@ namespace electionguard
       public:
         PlaintextBallotSelection(const PlaintextBallotSelection &other);
         PlaintextBallotSelection(const PlaintextBallotSelection &&other);
-        PlaintextBallotSelection(const string &objectId, const string &vote,
-                                 bool isPlaceholderSelection = false);
+        PlaintextBallotSelection(string objectId, string vote, bool isPlaceholderSelection = false);
         ~PlaintextBallotSelection();
 
         PlaintextBallotSelection &operator=(PlaintextBallotSelection other);

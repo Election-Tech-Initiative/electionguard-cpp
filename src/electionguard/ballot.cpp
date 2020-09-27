@@ -20,10 +20,10 @@ namespace electionguard
         string vote;
         bool isPlaceholderSelection;
 
-        Impl(const string &objectId, const string &vote, bool isPlaceholderSelection /* = false */)
-            : vote(vote), isPlaceholderSelection(isPlaceholderSelection)
+        Impl(string objectId, string vote, bool isPlaceholderSelection /* = false */)
+            : vote(move(vote)), isPlaceholderSelection(isPlaceholderSelection)
         {
-            this->object_id = objectId;
+            this->object_id = move(objectId);
         }
 
         // TODO: secure erase the vote
@@ -31,9 +31,9 @@ namespace electionguard
 
     // Public Members
 
-    PlaintextBallotSelection::PlaintextBallotSelection(const string &objectId, const string &vote,
+    PlaintextBallotSelection::PlaintextBallotSelection(string objectId, string vote,
                                                        bool isPlaceholderSelection /* = false */)
-        : pimpl(new Impl(objectId, vote, isPlaceholderSelection))
+        : pimpl(new Impl(move(objectId), move(vote), isPlaceholderSelection))
     {
     }
 
@@ -227,6 +227,7 @@ namespace electionguard
     PlaintextBallotContest::getSelections() const
     {
         vector<reference_wrapper<PlaintextBallotSelection>> selections;
+        selections.reserve(pimpl->selections.size());
         for (auto &selection : pimpl->selections) {
             selections.push_back(ref(*selection));
         }
@@ -286,6 +287,7 @@ namespace electionguard
     CiphertextBallotContest::getSelections() const
     {
         vector<reference_wrapper<CiphertextBallotSelection>> selections;
+        selections.reserve(pimpl->selections.size());
         for (const auto &selection : pimpl->selections) {
             selections.push_back(ref(*selection));
         }
@@ -310,6 +312,7 @@ namespace electionguard
       unique_ptr<ConstantChaumPedersenProof> proof /* = nullptr */)
     {
         vector<reference_wrapper<CiphertextBallotSelection>> selectionReferences;
+        selectionReferences.reserve(selections.size());
         for (const auto &selection : selections) {
             selectionReferences.push_back(ref(*selection));
         }
@@ -380,6 +383,7 @@ namespace electionguard
       const vector<reference_wrapper<CiphertextBallotSelection>> &selections)
     {
         vector<reference_wrapper<ElementModQ>> elements;
+        elements.reserve(selections.size());
         for (const auto &selection : selections) {
             elements.push_back(ref(*selection.get().getNonce()));
         }
@@ -390,6 +394,7 @@ namespace electionguard
       const vector<reference_wrapper<CiphertextBallotSelection>> &selections)
     {
         vector<reference_wrapper<ElGamalCiphertext>> ciphertexts;
+        ciphertexts.reserve(selections.size());
         for (const auto &selection : selections) {
             ciphertexts.push_back(ref(*selection.get().getCiphertext()));
         }
@@ -406,6 +411,7 @@ namespace electionguard
         }
 
         vector<reference_wrapper<ElementModQ>> selectionHashes;
+        selectionHashes.reserve(selections.size());
         for (const auto &selection : selections) {
             selectionHashes.push_back(ref(*selection.get().getCryptoHash()));
         }
@@ -453,8 +459,9 @@ namespace electionguard
     vector<reference_wrapper<PlaintextBallotContest>> PlaintextBallot::getContests() const
     {
         vector<reference_wrapper<PlaintextBallotContest>> contests;
+        contests.reserve(pimpl->contests.size());
         for (const auto &contest : pimpl->contests) {
-            contests.push_back(ref(*contest.get()));
+            contests.push_back(ref(*contest));
         }
         return contests;
     }
@@ -527,8 +534,9 @@ namespace electionguard
     {
         // TODO: templatize this pattern
         vector<reference_wrapper<CiphertextBallotContest>> contests;
+        contests.reserve(pimpl->contests.size());
         for (const auto &contest : pimpl->contests) {
-            contests.push_back(ref(*contest.get()));
+            contests.push_back(ref(*contest));
         }
         return contests;
     }
@@ -567,8 +575,9 @@ namespace electionguard
         }
 
         vector<reference_wrapper<CiphertextBallotContest>> contestsRefs;
+        contestsRefs.reserve(contests.size());
         for (const auto &contest : contests) {
-            contestsRefs.push_back(ref(*contest.get()));
+            contestsRefs.push_back(ref(*contest));
         }
 
         auto cryptoHash = makeCryptoHash(objectId, contestsRefs, descriptionHash);
@@ -626,7 +635,7 @@ namespace electionguard
         }
 
         bool isValid = true;
-        for (auto item : validProofs) {
+        for (const auto &item : validProofs) {
             if (!item.second) {
                 Log::debug(": CiphertextBallot found invalid proof for: " + item.first);
                 isValid = false;
@@ -648,6 +657,7 @@ namespace electionguard
         }
 
         vector<reference_wrapper<ElementModQ>> contestHashes;
+        contestHashes.reserve(contests.size());
         for (const auto &contest : contests) {
             contestHashes.push_back(ref(*contest.get().getCryptoHash()));
         }

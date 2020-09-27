@@ -33,8 +33,9 @@ namespace electionguard
       public:
         EncryptionMediator(const EncryptionMediator &other);
         EncryptionMediator(const EncryptionMediator &&other);
-        EncryptionMediator(InternalElectionDescription &metadata,
-                           CiphertextElectionContext &context, EncryptionDevice &encryptionDevice);
+        EncryptionMediator(const InternalElectionDescription &metadata,
+                           const CiphertextElectionContext &context,
+                           const EncryptionDevice &encryptionDevice);
         ~EncryptionMediator();
 
         EncryptionMediator &operator=(EncryptionMediator other);

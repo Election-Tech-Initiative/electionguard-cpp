@@ -55,9 +55,9 @@ eg_encryption_mediator_create(eg_internal_election_description_t *metadata,
                               eg_ciphertext_election_context_t *context,
                               eg_encryption_device_t *encryption_device)
 {
-    auto metadata_ = AS_TYPE(InternalElectionDescription, metadata);
-    auto context_ = AS_TYPE(CiphertextElectionContext, context);
-    auto device_ = AS_TYPE(EncryptionDevice, encryption_device);
+    auto *metadata_ = AS_TYPE(InternalElectionDescription, metadata);
+    auto *context_ = AS_TYPE(CiphertextElectionContext, context);
+    auto *device_ = AS_TYPE(EncryptionDevice, encryption_device);
     auto mediator = make_unique<EncryptionMediator>(*metadata_, *context_, *device_);
 
     auto *reference = cache_encryption_mediator.retain(move(mediator));
@@ -67,7 +67,7 @@ eg_encryption_mediator_create(eg_internal_election_description_t *metadata,
 eg_ciphertext_ballot_t *eg_encryption_mediator_encrypt(eg_encryption_mediator_t *mediator,
                                                        eg_plaintext_ballot_t *ballot)
 {
-    auto plaintext = AS_TYPE(PlaintextBallot, ballot);
+    auto *plaintext = AS_TYPE(PlaintextBallot, ballot);
     auto ciphertext = AS_TYPE(EncryptionMediator, mediator)->encrypt(*plaintext);
 
     auto *reference = cache_ciphertext_ballot.retain(move(ciphertext));

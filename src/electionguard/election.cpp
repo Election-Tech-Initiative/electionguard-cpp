@@ -93,14 +93,15 @@ namespace electionguard
 
         unique_ptr<ElementModQ> crypto_hash() const
         {
-            vector<reference_wrapper<CryptoHashable>> selections;
+            vector<reference_wrapper<CryptoHashable>> selectionRefs;
+            selectionRefs.reserve(selections.size());
             for (const auto &selection : selections) {
-                selections.push_back(ref<CryptoHashable>(selection));
+                selectionRefs.push_back(ref<CryptoHashable>(*selection));
             }
 
             return hash_elems({object_id, sequenceOrder, electoralDistrictId, voteVariation,
                                ballotTitle, ballotSubtitle, name, numberElected, votesAllowed,
-                               selections});
+                               selectionRefs});
         }
     };
 
@@ -135,6 +136,7 @@ namespace electionguard
     vector<reference_wrapper<SelectionDescription>> ContestDescription::getSelections() const
     {
         vector<reference_wrapper<SelectionDescription>> selections;
+        selections.reserve(pimpl->selections.size());
         for (const auto &selection : pimpl->selections) {
             selections.push_back(ref(*selection));
         }
@@ -186,6 +188,7 @@ namespace electionguard
     vector<reference_wrapper<ContestDescription>> InternalElectionDescription::getContests() const
     {
         vector<reference_wrapper<ContestDescription>> contests;
+        contests.reserve(pimpl->contests.size());
         for (auto &contest : pimpl->contests) {
             contests.push_back(ref(*contest));
         }
@@ -211,6 +214,8 @@ namespace electionguard
               cryptoBaseHash(move(cryptoBaseHash)),
               cryptoExtendedBaseHash(move(cryptoExtendedBaseHash))
         {
+            this->numberOfGuardians = numberOfGuardians;
+            this->quorum = quorum;
         }
     };
 

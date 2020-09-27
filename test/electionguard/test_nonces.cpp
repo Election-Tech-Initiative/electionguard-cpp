@@ -31,6 +31,7 @@ TEST_CASE("Nonces slices produce same output as iterating for each index")
     auto aModQ = make_unique<ElementModQ>(a);
     auto n = make_unique<Nonces>(*aModQ);
     vector<unique_ptr<ElementModQ>> l1;
+    l1.reserve(10);
     for (int i(0); i < 10; ++i) {
         l1.push_back(n->get(i));
     }

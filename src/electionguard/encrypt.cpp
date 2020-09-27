@@ -48,22 +48,22 @@ namespace electionguard
 #pragma region EncryptionMediator
 
     struct EncryptionMediator::Impl {
-        InternalElectionDescription &metadata;
-        CiphertextElectionContext &context;
-        EncryptionDevice &encryptionDevice;
+        const InternalElectionDescription &metadata;
+        const CiphertextElectionContext &context;
+        const EncryptionDevice &encryptionDevice;
         unique_ptr<ElementModQ> trackerHashSeed;
 
-        Impl(InternalElectionDescription &metadata, CiphertextElectionContext &context,
-             EncryptionDevice &encryptionDevice)
+        Impl(const InternalElectionDescription &metadata, const CiphertextElectionContext &context,
+             const EncryptionDevice &encryptionDevice)
             : metadata(metadata), context(context), encryptionDevice(encryptionDevice)
 
         {
         }
     };
 
-    EncryptionMediator::EncryptionMediator(InternalElectionDescription &metadata,
-                                           CiphertextElectionContext &context,
-                                           EncryptionDevice &encryptionDevice)
+    EncryptionMediator::EncryptionMediator(const InternalElectionDescription &metadata,
+                                           const CiphertextElectionContext &context,
+                                           const EncryptionDevice &encryptionDevice)
         : pimpl(new Impl(metadata, context, encryptionDevice))
     {
     }
@@ -234,9 +234,11 @@ namespace electionguard
             }
         }
 
+        const uint64_t defaultTimestamp = 0;
         auto encryptedBallot = CiphertextBallot::make(
           plaintext.getObjectId(), plaintext.getBallotStyle(), metadata.getDescriptionHash(),
-          move(encryptedContests), move(nonceSeed));
+          move(encryptedContests), move(nonceSeed), defaultTimestamp,
+          make_unique<ElementModQ>(seedHash));
 
         if (!encryptedBallot) {
             throw runtime_error("encryptedBallot:: Error constructing encrypted ballot");
