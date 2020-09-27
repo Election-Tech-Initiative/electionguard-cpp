@@ -55,7 +55,8 @@ namespace electionguard
 
         uint64_t decrypt(const ElementModQ &secretKey);
 
-        virtual unique_ptr<ElementModQ> crypto_hash() const;
+        virtual unique_ptr<ElementModQ> crypto_hash() override;
+        virtual unique_ptr<ElementModQ> crypto_hash() const override;
 
       private:
         class Impl;

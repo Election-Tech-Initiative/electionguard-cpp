@@ -83,8 +83,11 @@ namespace electionguard
         VECTOR_CRYPTOHASHABLE_REF = 15,
         VECTOR_ELEMENTMODP_REF = 16,
         VECTOR_ELEMENTMODQ_REF = 17,
-        VECTOR_UINT64_T = 18,
-        VECTOR_STRING = 19
+        VECTOR_CRYPTOHASHABLE_CONST_REF = 18,
+        VECTOR_ELEMENTMODP_CONST_REF = 19,
+        VECTOR_ELEMENTMODQ_CONST_REF = 20,
+        VECTOR_UINT64_T = 21,
+        VECTOR_STRING = 22
     };
 
     void push_hash_update(Hacl_Streaming_Functor_state_s___uint32_t____ *p, CryptoHashableType a)
@@ -189,6 +192,24 @@ namespace electionguard
             {
                 input_string = hash_inner_vector<reference_wrapper<ElementModQ>>(
                   get<vector<reference_wrapper<ElementModQ>>>(a));
+                break;
+            }
+            case VECTOR_CRYPTOHASHABLE_CONST_REF: // vector<reference_wrapper<const CryptoHashable>>
+            {
+                input_string = hash_inner_vector<reference_wrapper<const CryptoHashable>>(
+                  get<vector<reference_wrapper<const CryptoHashable>>>(a));
+                break;
+            }
+            case VECTOR_ELEMENTMODP_CONST_REF: // vector<reference_wrapper<const ElementModP>>
+            {
+                input_string = hash_inner_vector<reference_wrapper<const ElementModP>>(
+                  get<vector<reference_wrapper<const ElementModP>>>(a));
+                break;
+            }
+            case VECTOR_ELEMENTMODQ_CONST_REF: // vector<reference_wrapper<const ElementModQ>>
+            {
+                input_string = hash_inner_vector<reference_wrapper<const ElementModQ>>(
+                  get<vector<reference_wrapper<const ElementModQ>>>(a));
                 break;
             }
             case VECTOR_UINT64_T: // vector<uint64_t>

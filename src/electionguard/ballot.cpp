@@ -74,6 +74,11 @@ namespace electionguard
         {
             this->isPlaceholder = isPlaceholder;
         }
+
+        unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) const
+        {
+            return makeCryptoHash(objectId, seedHash, *ciphertext);
+        }
     };
 
     // Lifecycle Methods
@@ -148,10 +153,15 @@ namespace electionguard
                                                       move(proof), move(extendedData));
     }
 
+    unique_ptr<ElementModQ> CiphertextBallotSelection::crypto_hash_with(const ElementModQ &seedHash)
+    {
+        return pimpl->crypto_hash_with(seedHash);
+    }
+
     unique_ptr<ElementModQ>
     CiphertextBallotSelection::crypto_hash_with(const ElementModQ &seedHash) const
     {
-        return makeCryptoHash(pimpl->objectId, seedHash, *pimpl->ciphertext);
+        return pimpl->crypto_hash_with(seedHash);
     }
 
     bool CiphertextBallotSelection::isValidEncryption(const ElementModQ &seedHash,
@@ -159,7 +169,7 @@ namespace electionguard
                                                       const ElementModQ &cryptoExtendedBaseHash)
     {
         if ((const_cast<ElementModQ &>(seedHash) != *pimpl->descriptionHash)) {
-            Log::debug(": mismatching selection hash: ");
+            Log::debug(": CiphertextBallotSelection mismatching selection hash: ");
             Log::debugHex(": expected: ", seedHash.toHex());
             Log::debugHex(": actual: ", pimpl->descriptionHash->toHex());
             return false;
@@ -167,7 +177,7 @@ namespace electionguard
 
         auto recalculatedCryptoHash = crypto_hash_with(seedHash);
         if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
-            Log::debug(": mismatching crypto hash: ");
+            Log::debug(": CiphertextBallotSelection mismatching crypto hash: ");
             Log::debugHex(": expected: ", recalculatedCryptoHash->toHex());
             Log::debugHex(": actual: ", pimpl->cryptoHash->toHex());
             return false;
@@ -317,7 +327,7 @@ namespace electionguard
             proof = move(owned_proof);
         }
         return make_unique<CiphertextBallotContest>(objectId, descriptionHash, move(selections),
-                                                    move(cryptoHash), move(nonce), move(proof));
+                                                    move(nonce), move(cryptoHash), move(proof));
     }
 
     unique_ptr<ElementModQ>
@@ -341,7 +351,7 @@ namespace electionguard
                                                     const ElementModQ &cryptoExtendedBaseHash)
     {
         if ((const_cast<ElementModQ &>(seedHash) != *pimpl->descriptionHash)) {
-            Log::debug(": mismatching constest hash: ");
+            Log::debug(": CiphertextBallotContest mismatching constest hash: ");
             Log::debugHex(": expected: ", seedHash.toHex());
             Log::debugHex(": actual: ", pimpl->descriptionHash->toHex());
             return false;
@@ -349,7 +359,7 @@ namespace electionguard
 
         auto recalculatedCryptoHash = crypto_hash_with(seedHash);
         if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
-            Log::debug(": mismatching crypto hash: ");
+            Log::debug(": CiphertextBallotContest mismatching crypto hash: ");
             Log::debugHex(": expected: ", recalculatedCryptoHash->toHex());
             Log::debugHex(": actual: ", pimpl->cryptoHash->toHex());
             return false;
@@ -399,7 +409,9 @@ namespace electionguard
         for (const auto &selection : selections) {
             selectionHashes.push_back(ref(*selection.get().getCryptoHash()));
         }
-        return hash_elems({objectId, &const_cast<ElementModQ &>(seedHash), selectionHashes});
+        auto contestHash =
+          hash_elems({objectId, &const_cast<ElementModQ &>(seedHash), selectionHashes});
+        return contestHash;
     }
 
 #pragma endregion
@@ -569,6 +581,7 @@ namespace electionguard
         if (!trackingHash) {
             auto tracking =
               Tracker::getRotatingTrackerHash(*previousTrackingHash, ballotTimestamp, *cryptoHash);
+            trackingHash.swap(tracking);
         }
 
         return make_unique<CiphertextBallot>(
@@ -586,7 +599,7 @@ namespace electionguard
                                              const ElementModQ &cryptoExtendedBaseHash)
     {
         if ((const_cast<ElementModQ &>(seedHash) != *pimpl->descriptionHash)) {
-            Log::debug(": mismatching ballot hash: ");
+            Log::debug(": CiphertextBallot mismatching ballot hash: ");
             Log::debugHex(": expected: ", seedHash.toHex());
             Log::debugHex(": actual: ", pimpl->descriptionHash->toHex());
             return false;
@@ -594,7 +607,7 @@ namespace electionguard
 
         auto recalculatedCryptoHash = crypto_hash_with(seedHash);
         if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
-            Log::debug(": mismatching crypto hash: ");
+            Log::debug(": CiphertextBallot mismatching crypto hash: ");
             Log::debugHex(": expected: ", recalculatedCryptoHash->toHex());
             Log::debugHex(": actual: ", pimpl->cryptoHash->toHex());
             return false;
@@ -615,7 +628,7 @@ namespace electionguard
         bool isValid = true;
         for (auto item : validProofs) {
             if (!item.second) {
-                Log::debug(": found invalid proof for: " + item.first);
+                Log::debug(": CiphertextBallot found invalid proof for: " + item.first);
                 isValid = false;
             }
         }

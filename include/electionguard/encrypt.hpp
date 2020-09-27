@@ -10,13 +10,41 @@
 
 namespace electionguard
 {
+    class EG_API EncryptionDevice
+    {
+      public:
+        EncryptionDevice(const EncryptionDevice &other);
+        EncryptionDevice(const EncryptionDevice &&other);
+        EncryptionDevice(const uint64_t uuid, const string &location);
+        ~EncryptionDevice();
+
+        EncryptionDevice &operator=(EncryptionDevice other);
+        EncryptionDevice &operator=(EncryptionDevice &&other);
+
+        unique_ptr<ElementModQ> getHash() const;
+
+      private:
+        class Impl;
+        unique_ptr<Impl> pimpl;
+    };
+
     class EG_API EncryptionMediator
     {
       public:
-        EncryptionMediator();
+        EncryptionMediator(const EncryptionMediator &other);
+        EncryptionMediator(const EncryptionMediator &&other);
+        EncryptionMediator(InternalElectionDescription &metadata,
+                           CiphertextElectionContext &context, EncryptionDevice &encryptionDevice);
         ~EncryptionMediator();
 
-        int encrypt();
+        EncryptionMediator &operator=(EncryptionMediator other);
+        EncryptionMediator &operator=(EncryptionMediator &&other);
+
+        unique_ptr<CiphertextBallot> encrypt(const PlaintextBallot &ballot) const;
+
+      private:
+        class Impl;
+        unique_ptr<Impl> pimpl;
     };
 
     /// <summary>

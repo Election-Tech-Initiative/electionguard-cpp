@@ -40,6 +40,7 @@ namespace electionguard
         string getCandidateId() const;
         uint64_t getSequenceOrder() const;
 
+        virtual unique_ptr<ElementModQ> crypto_hash() override;
         virtual unique_ptr<ElementModQ> crypto_hash() const override;
 
       private:
@@ -77,6 +78,7 @@ namespace electionguard
 
         vector<reference_wrapper<SelectionDescription>> getSelections() const;
 
+        virtual unique_ptr<ElementModQ> crypto_hash() override;
         virtual unique_ptr<ElementModQ> crypto_hash() const override;
 
         // TODO: isValid() const;
@@ -99,7 +101,7 @@ namespace electionguard
         InternalElectionDescription &operator=(InternalElectionDescription other);
         InternalElectionDescription &operator=(InternalElectionDescription &&other);
 
-        ElementModQ *getDescriptionHash() const;
+        const ElementModQ &getDescriptionHash() const;
         vector<reference_wrapper<ContestDescription>> getContests() const;
 
       private:

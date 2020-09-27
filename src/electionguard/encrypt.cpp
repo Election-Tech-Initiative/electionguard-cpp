@@ -2,6 +2,7 @@
 
 #include "electionguard/elgamal.hpp"
 #include "electionguard/hash.hpp"
+#include "electionguard/tracker.hpp"
 #include "log.hpp"
 #include "nonces.hpp"
 
@@ -13,18 +14,84 @@ extern "C" {
 
 namespace electionguard
 {
-    // TODO: implement
-    EncryptionMediator::EncryptionMediator() { Log::debug(" : Creating EncryptionCompositor[]"); }
-    EncryptionMediator::~EncryptionMediator()
+#pragma region EncryptionDevice
+
+    struct EncryptionDevice::Impl {
+        uint64_t uuid;
+        string location;
+        Impl(const uint64_t uuid, const string &location)
+        {
+            this->uuid = uuid;
+            this->location = location;
+        }
+    };
+
+    EncryptionDevice::EncryptionDevice(const uint64_t uuid, const string &location)
+        : pimpl(new Impl(uuid, location))
     {
-        Log::debug(" : Destroying EncryptionCompositor[]");
+    }
+    EncryptionDevice::~EncryptionDevice() = default;
+
+    EncryptionDevice &EncryptionDevice::operator=(EncryptionDevice other)
+    {
+        swap(pimpl, other.pimpl);
+        return *this;
     }
 
-    int EncryptionMediator::encrypt()
+    unique_ptr<ElementModQ> EncryptionDevice::getHash() const
     {
-        Log::debug(" : encrypting by instance");
-        return 9;
+        return Tracker::getHashForDevice(pimpl->uuid, pimpl->location);
     }
+
+#pragma endregion
+
+#pragma region EncryptionMediator
+
+    struct EncryptionMediator::Impl {
+        InternalElectionDescription &metadata;
+        CiphertextElectionContext &context;
+        EncryptionDevice &encryptionDevice;
+        unique_ptr<ElementModQ> trackerHashSeed;
+
+        Impl(InternalElectionDescription &metadata, CiphertextElectionContext &context,
+             EncryptionDevice &encryptionDevice)
+            : metadata(metadata), context(context), encryptionDevice(encryptionDevice)
+
+        {
+        }
+    };
+
+    EncryptionMediator::EncryptionMediator(InternalElectionDescription &metadata,
+                                           CiphertextElectionContext &context,
+                                           EncryptionDevice &encryptionDevice)
+        : pimpl(new Impl(metadata, context, encryptionDevice))
+    {
+    }
+
+    EncryptionMediator::~EncryptionMediator() = default;
+
+    EncryptionMediator &EncryptionMediator::operator=(EncryptionMediator other)
+    {
+        swap(pimpl, other.pimpl);
+        return *this;
+    }
+
+    unique_ptr<CiphertextBallot> EncryptionMediator::encrypt(const PlaintextBallot &ballot) const
+    {
+
+        if (!pimpl->trackerHashSeed) {
+            auto trackerHashSeed = pimpl->encryptionDevice.getHash();
+            pimpl->trackerHashSeed.swap(trackerHashSeed);
+        }
+
+        auto encryptedBallot =
+          encryptBallot(ballot, pimpl->metadata, pimpl->context, *pimpl->trackerHashSeed);
+
+        pimpl->trackerHashSeed = make_unique<ElementModQ>(*encryptedBallot->getTrackingHash());
+        return encryptedBallot;
+    }
+
+#pragma endregion
 
     //todo: renmame using the cpp style, and maybe move into a class as static
     unique_ptr<CiphertextBallotSelection>
@@ -69,9 +136,7 @@ namespace electionguard
                                                   cryptoExtendedBaseHash)) {
             return encryptedSelection;
         }
-
-        Log::debug("encryptSelection:: failed validity check");
-        return nullptr;
+        throw "encryptSelection failed validity check";
     }
 
     unique_ptr<CiphertextBallotContest>
@@ -131,8 +196,7 @@ namespace electionguard
             return encryptedContest;
         }
 
-        Log::debug("encryptedContest:: failed validity check");
-        return nullptr;
+        throw "encryptContest failed validity check";
     }
 
     unique_ptr<CiphertextBallot> encryptBallot(const PlaintextBallot &ballot,
@@ -148,8 +212,7 @@ namespace electionguard
         // similarly it expects that the fully hydrated representation of the ballot is provided.
 
         auto randomMasterNonce = nonce ? move(nonce) : rand_q();
-
-        auto nonceSeed = CiphertextBallot::nonceSeed(*metadata.getDescriptionHash(),
+        auto nonceSeed = CiphertextBallot::nonceSeed(metadata.getDescriptionHash(),
                                                      ballot.getObjectId(), *randomMasterNonce);
 
         vector<unique_ptr<CiphertextBallotContest>> encryptedContests;
@@ -163,18 +226,18 @@ namespace electionguard
                     auto encrypted = encryptContest(
                       contest.get(), contestDescription.get(), *context.getElGamalPublicKey(),
                       *context.getCryptoExtendedBaseHash(), *nonceSeed);
+
                     encryptedContests.push_back(move(encrypted));
                     break;
                 }
             }
-
             if (!hasContest) {
                 throw invalid_argument("caller must include all contests");
             }
         }
 
         auto encryptedBallot = CiphertextBallot::make(ballot.getObjectId(), ballot.getBallotStyle(),
-                                                      *metadata.getDescriptionHash(),
+                                                      metadata.getDescriptionHash(),
                                                       move(encryptedContests), move(nonceSeed));
 
         if (!encryptedBallot) {
@@ -186,14 +249,13 @@ namespace electionguard
         }
 
         // verify the ballot.
-        if (encryptedBallot->isValidEncryption(*metadata.getDescriptionHash(),
+        if (encryptedBallot->isValidEncryption(metadata.getDescriptionHash(),
                                                *context.getElGamalPublicKey(),
                                                *context.getCryptoExtendedBaseHash())) {
             return encryptedBallot;
         }
 
-        Log::debug("encryptedBallot:: failed validity check");
-        return nullptr;
+        throw "encryptedBallot failed validity check";
     }
 
 } // namespace electionguard

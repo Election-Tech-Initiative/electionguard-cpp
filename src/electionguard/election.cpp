@@ -22,6 +22,11 @@ namespace electionguard
             this->object_id = objectId;
             this->sequenceOrder = sequenceOrder;
         }
+
+        unique_ptr<ElementModQ> crypto_hash()
+        {
+            return hash_elems({object_id, sequenceOrder, candidateId});
+        }
     };
 
     // Lifecycle Methods
@@ -48,9 +53,10 @@ namespace electionguard
 
     // Public Methods
 
+    unique_ptr<ElementModQ> SelectionDescription::crypto_hash() { return pimpl->crypto_hash(); }
     unique_ptr<ElementModQ> SelectionDescription::crypto_hash() const
     {
-        return hash_elems({pimpl->object_id, pimpl->sequenceOrder, pimpl->candidateId});
+        return pimpl->crypto_hash();
     }
 
 #pragma endregion
@@ -83,6 +89,18 @@ namespace electionguard
             this->name = name;
             this->ballotTitle = ballotTitle;
             this->ballotSubtitle = ballotSubtitle;
+        }
+
+        unique_ptr<ElementModQ> crypto_hash() const
+        {
+            vector<reference_wrapper<CryptoHashable>> selections;
+            for (const auto &selection : selections) {
+                selections.push_back(ref<CryptoHashable>(selection));
+            }
+
+            return hash_elems({object_id, sequenceOrder, electoralDistrictId, voteVariation,
+                               ballotTitle, ballotSubtitle, name, numberElected, votesAllowed,
+                               selections});
         }
     };
 
@@ -123,17 +141,9 @@ namespace electionguard
         return selections;
     }
 
-    unique_ptr<ElementModQ> ContestDescription::crypto_hash() const
-    {
-        vector<reference_wrapper<CryptoHashable>> selections;
-        for (const auto &selection : pimpl->selections) {
-            selections.push_back(ref<CryptoHashable>(*selection));
-        }
+    unique_ptr<ElementModQ> ContestDescription::crypto_hash() { return pimpl->crypto_hash(); }
 
-        return hash_elems({pimpl->object_id, pimpl->sequenceOrder, pimpl->electoralDistrictId,
-                           pimpl->voteVariation, pimpl->ballotTitle, pimpl->ballotSubtitle,
-                           pimpl->name, pimpl->numberElected, pimpl->votesAllowed, selections});
-    }
+    unique_ptr<ElementModQ> ContestDescription::crypto_hash() const { return pimpl->crypto_hash(); }
 
 #pragma endregion
 
@@ -168,16 +178,16 @@ namespace electionguard
 
     // Property Getters
 
-    ElementModQ *InternalElectionDescription::getDescriptionHash() const
+    const ElementModQ &InternalElectionDescription::getDescriptionHash() const
     {
-        return pimpl->descriptionHash.get();
+        return *pimpl->descriptionHash;
     }
 
     vector<reference_wrapper<ContestDescription>> InternalElectionDescription::getContests() const
     {
         vector<reference_wrapper<ContestDescription>> contests;
-        for (const auto &contest : pimpl->contests) {
-            contests.push_back(ref(*contest.get()));
+        for (auto &contest : pimpl->contests) {
+            contests.push_back(ref(*contest));
         }
         return contests;
     }

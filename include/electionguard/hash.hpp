@@ -10,14 +10,15 @@
 
 namespace electionguard
 {
-    using CryptoHashableType =
-      variant<nullptr_t, CryptoHashable *, ElementModP *, ElementModQ *,
-              reference_wrapper<CryptoHashable>, reference_wrapper<ElementModP>,
-              reference_wrapper<ElementModQ>, reference_wrapper<const CryptoHashable>,
-              reference_wrapper<const ElementModP>, reference_wrapper<const ElementModQ>, uint64_t,
-              string, vector<CryptoHashable *>, vector<ElementModP *>, vector<ElementModQ *>,
-              vector<reference_wrapper<CryptoHashable>>, vector<reference_wrapper<ElementModP>>,
-              vector<reference_wrapper<ElementModQ>>, vector<uint64_t>, vector<string>>;
+    using CryptoHashableType = variant<
+      nullptr_t, CryptoHashable *, ElementModP *, ElementModQ *, reference_wrapper<CryptoHashable>,
+      reference_wrapper<ElementModP>, reference_wrapper<ElementModQ>,
+      reference_wrapper<const CryptoHashable>, reference_wrapper<const ElementModP>,
+      reference_wrapper<const ElementModQ>, uint64_t, string, vector<CryptoHashable *>,
+      vector<ElementModP *>, vector<ElementModQ *>, vector<reference_wrapper<CryptoHashable>>,
+      vector<reference_wrapper<ElementModP>>, vector<reference_wrapper<ElementModQ>>,
+      vector<reference_wrapper<const CryptoHashable>>, vector<reference_wrapper<const ElementModP>>,
+      vector<reference_wrapper<const ElementModQ>>, vector<uint64_t>, vector<string>>;
 
     EG_API unique_ptr<ElementModQ> hash_elems(const vector<CryptoHashableType> &a);
     EG_API unique_ptr<ElementModQ> hash_elems(CryptoHashableType a);

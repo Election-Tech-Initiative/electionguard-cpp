@@ -16,8 +16,14 @@ namespace electionguard
         /// <summary>
         /// Generates a hash given the fields on the implementing instance.
         /// </summary>
-        virtual unique_ptr<ElementModQ> crypto_hash() { return nullptr; };
-        virtual unique_ptr<ElementModQ> crypto_hash() const { return nullptr; };
+        virtual unique_ptr<ElementModQ> crypto_hash()
+        {
+            throw "CryptoHashable crypto_hash not implemented";
+        };
+        virtual unique_ptr<ElementModQ> crypto_hash() const
+        {
+            throw "CryptoHashable const crypto_hash not implemented";
+        };
     };
 
     class EG_API CryptoHashCheckable
@@ -29,12 +35,12 @@ namespace electionguard
         /// </summary>
         virtual unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash)
         {
-            return nullptr;
+            throw "CryptoHashCheckable crypto_hash_with not implemented";
         };
 
         virtual unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) const
         {
-            return nullptr;
+            throw "CryptoHashCheckable const crypto_hash_with not implemented";
         };
     };
 } // namespace electionguard

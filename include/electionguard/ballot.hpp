@@ -131,6 +131,7 @@ namespace electionguard
         ///
         /// In most cases the seed_hash should match the `description_hash`
         /// </summary>
+        virtual unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) override;
         virtual unique_ptr<ElementModQ>
         crypto_hash_with(const ElementModQ &seedHash) const override;
 
