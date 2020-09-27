@@ -69,13 +69,12 @@ namespace electionguard
                      bool isPlaceholder = false, bool shouldVerifyProofs = true);
 
     EG_API unique_ptr<CiphertextBallotContest>
-    encryptContest(const PlaintextBallotContest &contest, const ContestDescription &description,
+    encryptContest(const PlaintextBallotContest &plaintext, const ContestDescription &description,
                    const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
-                   const ElementModQ &nonceSeed, bool isPlaceholder = false,
-                   bool shouldVerifyProofs = true);
+                   const ElementModQ &nonceSeed, bool shouldVerifyProofs = true);
 
     EG_API unique_ptr<CiphertextBallot>
-    encryptBallot(const PlaintextBallot &ballot, const InternalElectionDescription &metadata,
+    encryptBallot(const PlaintextBallot &plaintext, const InternalElectionDescription &metadata,
                   const CiphertextElectionContext &context, const ElementModQ &seedHash,
                   unique_ptr<ElementModQ> nonce = nullptr, bool shouldVerifyProofs = true);
 

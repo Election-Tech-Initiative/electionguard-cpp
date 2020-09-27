@@ -93,7 +93,6 @@ namespace electionguard
 
 #pragma endregion
 
-    //todo: renmame using the cpp style, and maybe move into a class as static
     unique_ptr<CiphertextBallotSelection>
     encryptSelection(const PlaintextBallotSelection &plaintext,
                      const SelectionDescription &description, const ElementModP &elgamalPublicKey,
@@ -140,10 +139,9 @@ namespace electionguard
     }
 
     unique_ptr<CiphertextBallotContest>
-    encryptContest(const PlaintextBallotContest &contest, const ContestDescription &description,
+    encryptContest(const PlaintextBallotContest &plaintext, const ContestDescription &description,
                    const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
-                   const ElementModQ &nonceSeed, bool isPlaceholder /* = false */,
-                   bool shouldVerifyProofs /* = true */)
+                   const ElementModQ &nonceSeed, bool shouldVerifyProofs /* = true */)
 
     {
         // TODO: validate input
@@ -161,12 +159,12 @@ namespace electionguard
         // where the caller must supply all values and placeholder selections are not handled
         for (const auto &selectionDescription : description.getSelections()) {
             bool hasSelection = false;
-            for (const auto &selection : contest.getSelections()) {
+            for (const auto &selection : plaintext.getSelections()) {
                 if (selection.get().getObjectId() == selectionDescription.get().getObjectId()) {
                     hasSelection = true;
                     auto encrypted = encryptSelection(selection.get(), selectionDescription.get(),
                                                       elgamalPublicKey, cryptoExtendedBaseHash,
-                                                      *contestNonce, false, true);
+                                                      *contestNonce, false, shouldVerifyProofs);
                     encryptedSelections.push_back(move(encrypted));
                     break;
                 }
@@ -178,7 +176,7 @@ namespace electionguard
         }
 
         auto encryptedContest = CiphertextBallotContest::make(
-          contest.getObjectId(), *descriptionHash, move(encryptedSelections), elgamalPublicKey,
+          plaintext.getObjectId(), *descriptionHash, move(encryptedSelections), elgamalPublicKey,
           cryptoExtendedBaseHash, *proofNonce, description.getNumberElected(), move(contestNonce));
 
         if (encryptedContest == nullptr || encryptedContest->getProof() == nullptr) {
@@ -199,7 +197,7 @@ namespace electionguard
         throw "encryptContest failed validity check";
     }
 
-    unique_ptr<CiphertextBallot> encryptBallot(const PlaintextBallot &ballot,
+    unique_ptr<CiphertextBallot> encryptBallot(const PlaintextBallot &plaintext,
                                                const InternalElectionDescription &metadata,
                                                const CiphertextElectionContext &context,
                                                const ElementModQ &seedHash,
@@ -213,19 +211,19 @@ namespace electionguard
 
         auto randomMasterNonce = nonce ? move(nonce) : rand_q();
         auto nonceSeed = CiphertextBallot::nonceSeed(metadata.getDescriptionHash(),
-                                                     ballot.getObjectId(), *randomMasterNonce);
+                                                     plaintext.getObjectId(), *randomMasterNonce);
 
         vector<unique_ptr<CiphertextBallotContest>> encryptedContests;
 
         // TODO: improve performance, complete features
         for (const auto &contestDescription : metadata.getContests()) {
             bool hasContest = false;
-            for (const auto &contest : ballot.getContests()) {
+            for (const auto &contest : plaintext.getContests()) {
                 if (contest.get().getObjectId() == contestDescription.get().getObjectId()) {
                     hasContest = true;
                     auto encrypted = encryptContest(
                       contest.get(), contestDescription.get(), *context.getElGamalPublicKey(),
-                      *context.getCryptoExtendedBaseHash(), *nonceSeed);
+                      *context.getCryptoExtendedBaseHash(), *nonceSeed, shouldVerifyProofs);
 
                     encryptedContests.push_back(move(encrypted));
                     break;
@@ -236,9 +234,9 @@ namespace electionguard
             }
         }
 
-        auto encryptedBallot = CiphertextBallot::make(ballot.getObjectId(), ballot.getBallotStyle(),
-                                                      metadata.getDescriptionHash(),
-                                                      move(encryptedContests), move(nonceSeed));
+        auto encryptedBallot = CiphertextBallot::make(
+          plaintext.getObjectId(), plaintext.getBallotStyle(), metadata.getDescriptionHash(),
+          move(encryptedContests), move(nonceSeed));
 
         if (!encryptedBallot) {
             throw runtime_error("encryptedBallot:: Error constructing encrypted ballot");

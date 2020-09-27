@@ -11,12 +11,28 @@
 extern "C" {
 #endif
 
+// EncryptionDevice
+
+struct eg_encryption_device_s;
+typedef struct eg_encryption_device_s eg_encryption_device_t;
+
+EG_API eg_encryption_device_t *eg_encryption_device_create(const uint64_t uuid,
+                                                           const char *location);
+
+EG_API eg_element_mod_q_t *eg_encryption_device_get_hash(eg_encryption_device_t *device);
+
+// EncryptionMediator
+
 struct eg_encryption_mediator_s;
 typedef struct eg_encryption_mediator_s eg_encryption_mediator_t;
 
-EG_API eg_encryption_mediator_t *eg_encryption_mediator_new();
-EG_API void eg_encryption_mediator_free(eg_encryption_mediator_t *mediator);
-EG_API int eg_encryption_mediator_encrypt(eg_encryption_mediator_t *mediator);
+EG_API eg_encryption_mediator_t *
+eg_encryption_mediator_create(eg_internal_election_description_t *metadata,
+                              eg_ciphertext_election_context_t *context,
+                              eg_encryption_device_t *encryption_device);
+
+EG_API eg_ciphertext_ballot_t *eg_encryption_mediator_encrypt(eg_encryption_mediator_t *mediator,
+                                                              eg_plaintext_ballot_t *ballot);
 
 /// <summary>
 /// Encrypt a specific `BallotSelection` in the context of a specific `BallotContest`
@@ -38,6 +54,22 @@ eg_encrypt_selection(eg_plaintext_ballot_selection_t *plaintext,
                      eg_selection_description_t *description, eg_element_mod_p_t *public_key,
                      eg_element_mod_q_t *crypto_extended_base_hash, eg_element_mod_q_t *nonce_seed,
                      bool is_placeholder, bool should_verify_proofs);
+
+EG_API eg_ciphertext_ballot_contest_t *
+eg_encrypt_contest(eg_plaintext_ballot_contest_t *plaintext, eg_contest_description_t *description,
+                   eg_element_mod_p_t *public_key, eg_element_mod_q_t *crypto_extended_base_hash,
+                   eg_element_mod_q_t *nonce_seed, bool should_verify_proofs);
+
+EG_API eg_ciphertext_ballot_t *eg_encrypt_ballot(eg_plaintext_ballot_contest_t *plaintext,
+                                                 eg_internal_election_description_t *metadata,
+                                                 eg_ciphertext_election_context_t *context,
+                                                 eg_element_mod_q_t *seed_hash,
+                                                 bool should_verify_proofs);
+
+EG_API eg_ciphertext_ballot_t *eg_encrypt_ballot_with_nonce(
+  eg_plaintext_ballot_contest_t *plaintext, eg_internal_election_description_t *metadata,
+  eg_ciphertext_election_context_t *context, eg_element_mod_q_t *seed_hash,
+  eg_element_mod_q_t *nonce, bool should_verify_proofs);
 
 #ifdef __cplusplus
 }

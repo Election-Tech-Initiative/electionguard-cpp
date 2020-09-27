@@ -26,6 +26,20 @@ EG_API uint64_t eg_selection_description_get_sequence_order(eg_selection_descrip
 EG_API eg_element_mod_q_t *
 eg_selection_description_crypto_hash(eg_selection_description_t *selection);
 
+// ConstestDescription
+
+struct eg_contest_description_s;
+typedef struct eg_contest_description_s eg_contest_description_t;
+
+// TODO: implement
+
+// InternalElectionDescription
+
+struct eg_internal_election_description_s;
+typedef struct eg_internal_election_description_s eg_internal_election_description_t;
+
+// TODO: implement
+
 // CiphertextElectionContext
 
 struct eg_ciphertext_election_context_s;
