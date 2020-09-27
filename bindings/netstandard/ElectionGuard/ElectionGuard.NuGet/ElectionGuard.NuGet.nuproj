@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(NuGetAuthoringPath)\NuGet.Packaging.Authoring.props" Condition="Exists('$(NuGetAuthoringPath)\NuGet.Packaging.Authoring.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B327EC46-948E-4756-BF81-152B07BB2134}</ProjectGuid>
+    <Description>ElectionGuard version from Nuget Project</Description>
+    <PackageId>Microsoft.ElectionGuard.Core</PackageId>
+    <PackageVersion>0.0.1-alpha</PackageVersion>
+    <Authors>Microsoft</Authors>
+    <DevelopmentDependency>false</DevelopmentDependency>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ElectionGuard</RootNamespace>
+    <UsePartialTypes>false</UsePartialTypes>
+    <AssemblyName>ElectionGuard.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <ReleaseVersion>0.0.1</ReleaseVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <OutputPath>bin\Debug</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ElectionGuard.Android\ElectionGuard.Android.csproj">
+      <Project>{893438E6-22EC-4A9C-B6AD-24BE545171B6}</Project>
+      <Name>ElectionGuard.Android</Name>
+      <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+    </ProjectReference>
+    <ProjectReference Include="..\ElectionGuard.iOS\ElectionGuard.iOS.csproj">
+      <Project>{57BF1F50-4963-4E0F-8B81-10C3E9981F25}</Project>
+      <Name>ElectionGuard.iOS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ElectionGuard.Standard\ElectionGuard.Standard.csproj">
+      <Project>{7BC16153-D7CF-4BC4-88A6-A230ACD910D0}</Project>
+      <Name>ElectionGuard.Standard</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NuGet.Build.Packaging">
+      <Version>0.2.2</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.Common.targets" />
+  <Import Project="$(NuGetAuthoringPath)\NuGet.Packaging.Authoring.targets" Condition="Exists('$(NuGetAuthoringPath)\NuGet.Packaging.Authoring.targets')" />
+</Project>

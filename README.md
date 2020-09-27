@@ -44,15 +44,26 @@ Outline the file contents of the repository. It helps users navigate the codebas
 
 ### C++17
 
-This code builds against the [C++17](https://isocpp.org/get-started) standard.  a `C++17` compliant compiler is required to build the core library.
+- [C++17](https://isocpp.org/get-started) standard.  a `C++17` compliant compiler is required to build the core library.
 
 ### CMake 
 
-This code uses [CMake 3.14](https://cmake.org/) as it's build system.
+- [CMake 3.14](https://cmake.org/) as it's build system.
 
-### GMP
+### Android (optional)
 
-This code depends on [The GNU Multiple Precision Arithmetic Library](https://gmplib.org/#DOWNLOAD) to calculate large integers.
+- [Android SDK](https://developer.android.com/studio/#downloads)
+- [NDK 21](https://developer.android.com/ndk/downloads/)
+
+### iOS (optional)
+
+- [XCode](https://developer.apple.com/xcode/resources/)
+- [Command Line Tools for XCode](#)
+
+### Xamarin (optional)
+
+- [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/)
+- [NuGet Command Line (CLI)](https://docs.microsoft.com/en-us/nuget/reference/nuget-exe-cli-reference#macoslinux)
 
 ### make (optional)
 
@@ -68,19 +79,43 @@ Using **make**,
 make environment
 ```
 
-### Build the Library (Release)
+### Build the Library for the current host (Release)
 
 ```sh
 make build
 ```
 
-### Build the Library (Debug)
+### Build the Library for the current host (Debug)
 
 ```sh
 export BUILD_DEBUG=true && make build
 ```
 
-### Run the Tests
+### Build for android
+
+Set the path to the NDK, replacing the version with your own
+
+```sh
+export NDK_PATH=/Users/$USER/Library/Android/sdk/ndk/21.3.6528147 && make build-android
+```
+
+### Build for iOS
+
+Creates a fat binary for the simulator and targets a recent version of ios
+
+```sh
+make build-ios
+```
+
+### Build for Xamarin
+
+Wraps the android and ios build artifacts in a NuGet packge to be consumed from a Xamarin application (classic or forms)
+
+```sh
+make build-netstandard
+```
+
+## Test
 
 ```sh
 make test
@@ -100,16 +135,29 @@ make demo-c
 make demo-cpp
 ```
 
+### Execute the Demo in Xamarin Forms
+
+```sh
+make build-netstandard
+```
+
+To consume the local .nupkg, you must configure Visual Studio to load packages from a local repository.
+1. [Add a Local NuGet Feed to Visual Studio](https://docs.microsoft.com/en-us/xamarin/cross-platform/cpp/#adding-the-local-nuget-feed-to-the-nuget-configuration)
+2. specify the nuget output directory as the package feed: (`./build/bindings/netstandard/`)
+
+Open `Visual Studio` and open the Xamarin Forms demo at `./apps/demo_in_xamarin/ElectionGuardCore.sln`
+
+Then, build.
+
 ### Execute the Demo in Swift
 
 ```sh
 make build-ios
 ```
-Depending if you are building for the simulator or the phone you need to copy the resulting binary to the swift demo folder.
-For instance, for the simulator:
+You need to copy the resulting binary to the swift demo folder.
 
 ```sh
-cp ./build/electionguard-core/src/Release-iphonesimulator/libelectionguard.a ./apps/demo_in_swift/ElectionGuardDemo/ElectionGuardDemo/libelectionguard.a
+cp ./build/electionguard-core/libs/ios/lib/libelectionguard.a ./apps/demo_in_swift/ElectionGuardDemo/ElectionGuardDemo/libelectionguard.a
 ```
 
 Then, open `./apps/demo_in_swift/ElectionGuardDemo.xcodeproj` in xcode and run.
