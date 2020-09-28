@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using ElectionGuardCore.Elections;
 
 namespace ElectionGuardCore.Ui.Elections
@@ -15,8 +16,15 @@ namespace ElectionGuardCore.Ui.Elections
             {
                 _electionDescription = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(ElectionName));
+                OnPropertyChanged(nameof(ActiveContest));
+                OnPropertyChanged(nameof(ActiveContestName));
             }
         }
+
+        public string ElectionName => ElectionDescription?.Name?.Text?.FirstOrDefault()?.Value;
+        public ContestDescription ActiveContest => ElectionDescription?.Contests?.FirstOrDefault();
+        public string ActiveContestName => ActiveContest?.Name ?? "There is currently not an active contest available";
 
         public ActiveContestViewModel(IElectionService electionService)
         {

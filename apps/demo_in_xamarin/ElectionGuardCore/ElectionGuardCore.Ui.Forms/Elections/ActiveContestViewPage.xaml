@@ -1,14 +1,57 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<src:PageBase xmlns="http://xamarin.com/schemas/2014/forms"
+<ui:PageBase xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:src="clr-namespace:ElectionGuardCore.Ui.Forms"
+             xmlns:ui="clr-namespace:ElectionGuardCore.Ui.Forms"
              x:Class="ElectionGuardCore.Ui.Forms.Elections.ActiveContestViewPage"
-             Title="{Binding Title}">
+             Title="{Binding Title}"
+             BackgroundColor="#f3f2f7"
+>
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+				<RowDefinition Height="340" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+			<Label
+				Grid.Row="0"
+				Text="{Binding ElectionName}"
+				HorizontalOptions="CenterAndExpand"
+				VerticalOptions="EndAndExpand"
+				Margin="0,0,0,60"
+				FontAttributes="Bold"
+				FontSize="16"
+				LineBreakMode="WordWrap"
+				MaxLines="2"
+			/>
+			<BoxView
+				Grid.Row="1"
+				BackgroundColor="White"
+				CornerRadius="36"
+				WidthRequest="300"
+				HeightRequest="340"
+				HorizontalOptions="CenterAndExpand"
+				VerticalOptions="CenterAndExpand"
+			/>
+			<StackLayout
+				Grid.Row="1"
+				Spacing="0"
+				WidthRequest="300"
+				HorizontalOptions="Center"
+			>
+				<Label
+					Text="Active Contest"
+					Margin="30,40,30,0"
+				/>
+				<Label
+					Text="{Binding ActiveContestName}"
+					FontAttributes="Bold"
+					FontSize="24"
+					LineBreakMode="WordWrap"
+					MaxLines="3"
+					Margin="30,12,30,0"
+				/>
+			</StackLayout>
+		</Grid>
     </ContentPage.Content>
-</src:PageBase>
+</ui:PageBase>
