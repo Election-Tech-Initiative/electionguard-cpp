@@ -1,5 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Application xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="ElectionGuardCore.Ui.Forms.App">
     <Application.Resources>
+		<ResourceDictionary>
+			<Style TargetType="Button">
+				<Setter
+					Property="BackgroundColor"
+					Value="#26423D"
+				/>
+				<Setter
+					Property="TextColor"
+					Value="White"
+				/>
+				<Setter
+					Property="FontAttributes"
+					Value="Bold"
+				/>
+				<Setter
+					Property="FontSize"
+					Value="18"
+				/>
+				<Setter
+					Property="CornerRadius"
+					Value="30"
+				/>
+			</Style>
+		</ResourceDictionary>
     </Application.Resources>
 </Application>

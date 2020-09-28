@@ -51,6 +51,15 @@
 					MaxLines="3"
 					Margin="30,12,30,0"
 				/>
+				<Button
+					Text="Begin"
+					IsVisible="{Binding CanVote}"
+					HorizontalOptions="CenterAndExpand"
+					VerticalOptions="EndAndExpand"
+					WidthRequest="200"
+					HeightRequest="60"
+					Margin="30,0,30,20"
+				/>
 				<Label
 					Text="Your vote has already been counted for this contest"
 					IsVisible="{Binding CannotVote}"
