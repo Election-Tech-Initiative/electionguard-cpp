@@ -2,6 +2,7 @@
 using Autofac.Features.ResolveAnything;
 using ElectionGuardCore.Elections;
 using ElectionGuardCore.Ui.Forms.Services;
+using Xamarin.Forms;
 
 namespace ElectionGuardCore.Ui.Forms
 {
@@ -13,7 +14,7 @@ namespace ElectionGuardCore.Ui.Forms
 
             var navigationService = new NavigationService(CreateContainer());
 
-            MainPage = navigationService.GetDefaultPage();
+            MainPage = new NavigationPage(navigationService.GetDefaultPage());
         }
 
         private IContainer CreateContainer()

@@ -9,6 +9,7 @@ namespace ElectionGuardCore.Ui.Forms
         protected PageBase(ViewModelBase viewModel)
         {
             _viewModel = viewModel;
+            BindingContext = _viewModel;
         }
 
         protected override async void OnAppearing()

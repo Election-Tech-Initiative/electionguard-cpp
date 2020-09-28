@@ -23,6 +23,8 @@ namespace ElectionGuardCore.Ui.Elections
             _electionService = electionService;
         }
 
+        public override string Title => "Election Guard Demo";
+
         public override async Task Load()
         {
             ElectionDescription = await _electionService.GetElectionDescription();
