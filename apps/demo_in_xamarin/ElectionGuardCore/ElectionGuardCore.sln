@@ -10,7 +10,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuardCore.Ui.Forms"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuardCore.Ui", "ElectionGuardCore.Ui\ElectionGuardCore.Ui.csproj", "{361529CA-4E38-461D-8366-79268921CECF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuardCore", "ElectionGuardCore\ElectionGuardCore.csproj", "{7BFA01C0-0525-4CF3-BA4E-3FA52F6D9F43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuardCore", "ElectionGuardCore\ElectionGuardCore.csproj", "{7BFA01C0-0525-4CF3-BA4E-3FA52F6D9F43}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A0DA22A2-4323-447B-81D8-552EA0BF9A7C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{00E0BEF4-10BB-4C3B-97A5-65DEF563E04E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuardCore.Ui.Tests", "ElectionGuardCore.Ui.Tests\ElectionGuardCore.Ui.Tests.csproj", "{F20D08DA-5171-4136-AA65-2E5A47A8E6AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -82,9 +88,29 @@ Global
 		{7BFA01C0-0525-4CF3-BA4E-3FA52F6D9F43}.Release|iPhone.Build.0 = Release|Any CPU
 		{7BFA01C0-0525-4CF3-BA4E-3FA52F6D9F43}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{7BFA01C0-0525-4CF3-BA4E-3FA52F6D9F43}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{F20D08DA-5171-4136-AA65-2E5A47A8E6AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F20D08DA-5171-4136-AA65-2E5A47A8E6AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F20D08DA-5171-4136-AA65-2E5A47A8E6AB}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{F20D08DA-5171-4136-AA65-2E5A47A8E6AB}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{F20D08DA-5171-4136-AA65-2E5A47A8E6AB}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{F20D08DA-5171-4136-AA65-2E5A47A8E6AB}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{F20D08DA-5171-4136-AA65-2E5A47A8E6AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F20D08DA-5171-4136-AA65-2E5A47A8E6AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F20D08DA-5171-4136-AA65-2E5A47A8E6AB}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{F20D08DA-5171-4136-AA65-2E5A47A8E6AB}.Release|iPhone.Build.0 = Release|Any CPU
+		{F20D08DA-5171-4136-AA65-2E5A47A8E6AB}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{F20D08DA-5171-4136-AA65-2E5A47A8E6AB}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AAA12DB0-18D7-443F-BC0A-359A9C638427} = {A0DA22A2-4323-447B-81D8-552EA0BF9A7C}
+		{36CA66CC-05A2-47AB-9E49-5CE267945097} = {A0DA22A2-4323-447B-81D8-552EA0BF9A7C}
+		{15A45C17-4DC1-406B-9E3E-C89DBABC9615} = {A0DA22A2-4323-447B-81D8-552EA0BF9A7C}
+		{361529CA-4E38-461D-8366-79268921CECF} = {A0DA22A2-4323-447B-81D8-552EA0BF9A7C}
+		{7BFA01C0-0525-4CF3-BA4E-3FA52F6D9F43} = {A0DA22A2-4323-447B-81D8-552EA0BF9A7C}
+		{F20D08DA-5171-4136-AA65-2E5A47A8E6AB} = {00E0BEF4-10BB-4C3B-97A5-65DEF563E04E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B08D2A6A-BAD7-4E0E-8819-7BE5CEA8E5C9}

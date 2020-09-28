@@ -8,6 +8,19 @@ namespace ElectionGuardCore.Ui.Elections
     {
         private readonly IElectionService _electionService;
 
+        public ActiveContestViewModel(IElectionService electionService)
+        {
+            _electionService = electionService;
+        }
+
+        public override string Title => "Election Guard Demo";
+
+        public override async Task Load()
+        {
+            // TODO show loading indicator
+            ElectionDescription = await _electionService.GetElectionDescription();
+        }
+
         private ElectionDescription _electionDescription;
         public ElectionDescription ElectionDescription
         {
@@ -26,7 +39,8 @@ namespace ElectionGuardCore.Ui.Elections
         }
 
         public string ElectionName => ElectionDescription?.Name?.Text?.FirstOrDefault()?.Value;
-        public ContestDescription ActiveContest => ElectionDescription?.Contests?.FirstOrDefault();
+
+        private ContestDescription ActiveContest => ElectionDescription?.Contests?.FirstOrDefault();
         public string ActiveContestName => ActiveContest?.Name ?? "There is currently not an active contest available";
 
         public bool HasVotedInActiveContest
@@ -34,7 +48,9 @@ namespace ElectionGuardCore.Ui.Elections
             get
             {
                 var voted = false;
-                if (ActiveContest?.ObjectId != null && _electionService.Votes.ContainsKey(ActiveContest.ObjectId))
+                if (ActiveContest?.ObjectId != null &&
+                    _electionService.Votes != null &&
+                    _electionService.Votes.ContainsKey(ActiveContest.ObjectId))
                 {
                     voted = _electionService.Votes[ActiveContest.ObjectId];
                 }
@@ -45,17 +61,5 @@ namespace ElectionGuardCore.Ui.Elections
 
         public bool CanVote => !HasVotedInActiveContest;
         public bool CannotVote => !CanVote;
-
-        public ActiveContestViewModel(IElectionService electionService)
-        {
-            _electionService = electionService;
-        }
-
-        public override string Title => "Election Guard Demo";
-
-        public override async Task Load()
-        {
-            ElectionDescription = await _electionService.GetElectionDescription();
-        }
     }
 }
