@@ -51,6 +51,16 @@
 					MaxLines="3"
 					Margin="30,12,30,0"
 				/>
+				<Label
+					Text="Your vote has already been counted for this contest"
+					IsVisible="{Binding CannotVote}"
+					HorizontalOptions="CenterAndExpand"
+					VerticalOptions="EndAndExpand"
+					HorizontalTextAlignment="Center"
+					LineBreakMode="WordWrap"
+					MaxLines="4"
+					Margin="30,0,30,40"
+				/>
 			</StackLayout>
 		</Grid>
     </ContentPage.Content>

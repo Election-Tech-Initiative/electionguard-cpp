@@ -19,12 +19,32 @@ namespace ElectionGuardCore.Ui.Elections
                 OnPropertyChanged(nameof(ElectionName));
                 OnPropertyChanged(nameof(ActiveContest));
                 OnPropertyChanged(nameof(ActiveContestName));
+                OnPropertyChanged(nameof(HasVotedInActiveContest));
+                OnPropertyChanged(nameof(CanVote));
+                OnPropertyChanged(nameof(CannotVote));
             }
         }
 
         public string ElectionName => ElectionDescription?.Name?.Text?.FirstOrDefault()?.Value;
         public ContestDescription ActiveContest => ElectionDescription?.Contests?.FirstOrDefault();
         public string ActiveContestName => ActiveContest?.Name ?? "There is currently not an active contest available";
+
+        public bool HasVotedInActiveContest
+        {
+            get
+            {
+                var voted = false;
+                if (ActiveContest?.ObjectId != null && _electionService.Votes.ContainsKey(ActiveContest.ObjectId))
+                {
+                    voted = _electionService.Votes[ActiveContest.ObjectId];
+                }
+
+                return voted;
+            }
+        }
+
+        public bool CanVote => !HasVotedInActiveContest;
+        public bool CannotVote => !CanVote;
 
         public ActiveContestViewModel(IElectionService electionService)
         {

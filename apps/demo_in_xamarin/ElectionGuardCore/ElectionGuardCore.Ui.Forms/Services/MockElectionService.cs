@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using ElectionGuardCore.Elections;
 using Newtonsoft.Json;
 
@@ -267,5 +268,7 @@ namespace ElectionGuardCore.Ui.Forms.Services
             var electionDescription = JsonConvert.DeserializeObject<ElectionDescription>(SampleElectionDescriptionJson);
             return Task.FromResult(electionDescription);
         }
+
+        public IDictionary<string, bool> Votes => new Dictionary<string, bool>();   // TODO for demo purposes only
     }
 }
