@@ -5992,7 +5992,7 @@ namespace electionguard
       "zucchini",
     };
 
-    const string getWord(uint16_t index) { return WORDS[index & 0xfff]; }
+    string getWord(uint16_t index) { return WORDS[index & 0xfff]; }
 
     int16_t getIndex(const char *word) { return getIndex(string(word)); }
 

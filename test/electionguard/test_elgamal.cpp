@@ -9,8 +9,8 @@ using namespace electionguard;
 
 TEST_CASE("elgamalEncrypt simple encrypt 0, with nonce 1 then publickey is g_pow_p(2)")
 {
-    auto &nonce = ONE_MOD_Q();
-    auto &secret = TWO_MOD_Q();
+    const auto &nonce = ONE_MOD_Q();
+    const auto &secret = TWO_MOD_Q();
     auto keypair = ElGamalKeyPair::fromSecret(secret);
     auto *publicKey = keypair->getPublicKey();
 
@@ -35,8 +35,8 @@ TEST_CASE("elgamalEncrypt simple encrypt 0, with nonce 1 then publickey is g_pow
 
 TEST_CASE("elgamalEncrypt simple encrypt 1 decrypts with secret")
 {
-    auto &nonce = ONE_MOD_Q();
-    auto &secret = TWO_MOD_Q();
+    const auto &nonce = ONE_MOD_Q();
+    const auto &secret = TWO_MOD_Q();
     auto keypair = ElGamalKeyPair::fromSecret(secret);
     auto *publicKey = keypair->getPublicKey();
 

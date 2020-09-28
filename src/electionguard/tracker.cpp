@@ -9,10 +9,7 @@
 #include <string>
 #include <vector>
 
-using std::distance;
-using std::find;
 using std::string;
-using std::vector;
 
 namespace electionguard
 {
@@ -34,7 +31,7 @@ namespace electionguard
         auto bytes = trackerHash.toBytes();
         stringstream stream;
         for (auto byte : bytes) {
-            auto word = getWord((uint16_t)byte);
+            auto word = getWord(static_cast<uint16_t>(byte));
             if (byte == bytes.back()) {
                 separator = "";
             }

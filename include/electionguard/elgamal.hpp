@@ -49,11 +49,14 @@ namespace electionguard
         ElGamalCiphertext &operator=(ElGamalCiphertext &&rhs);
 
         ElementModP *getPad();
+        ElementModP *getPad() const;
         ElementModP *getData();
+        ElementModP *getData() const;
 
         uint64_t decrypt(const ElementModQ &secretKey);
 
-        virtual unique_ptr<ElementModQ> crypto_hash() const;
+        virtual unique_ptr<ElementModQ> crypto_hash() override;
+        virtual unique_ptr<ElementModQ> crypto_hash() const override;
 
       private:
         class Impl;
@@ -68,8 +71,11 @@ namespace electionguard
     /// <param name="publicKey"> ElGamal public key. </param>
     /// <returns>A ciphertext tuple.</returns>
     /// </summary>
-    EG_API unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModQ &nonce,
+    EG_API unique_ptr<ElGamalCiphertext> elgamalEncrypt(const uint64_t m, const ElementModQ &nonce,
                                                         const ElementModP &publicKey);
+
+    EG_API unique_ptr<ElGamalCiphertext>
+    elgamalAdd(const vector<reference_wrapper<ElGamalCiphertext>> &ciphertexts);
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD__CORE_ELGAMAL_HPP_INCLUDED__ */

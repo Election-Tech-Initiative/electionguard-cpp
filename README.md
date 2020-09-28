@@ -8,14 +8,6 @@ urlFragment: "https://github.com/microsoft/electionguard-core"
 
 # ElectionGuard Core
 
-<!-- 
-Guidelines on README format: https://review.docs.microsoft.com/help/onboard/admin/samples/concepts/readme-template?branch=master
-
-Guidance on onboarding samples to docs.microsoft.com/samples: https://review.docs.microsoft.com/help/onboard/admin/samples/process/onboarding?branch=master
-
-Taxonomies for products and languages: https://review.docs.microsoft.com/new-hope/information-architecture/metadata/taxonomies?branch=master
--->
-
 This repository is a "reference implementation" of an ElectionGuard ballot encryption device written in c++.  This core SDK performs ballot encryption and verification functions and is suitable for execution on voting system hardware.  It is designed to be integrated into existing (or new) voting system software.  The `ElectionGuard Core` SDK is written in C++ and includes a C-compatible API for referencing the library from pure-c applications.
 
 This repository is `pre-release` software to showcase the ElectionGuard API implemented in a native language.
@@ -53,6 +45,8 @@ Outline the file contents of the repository. It helps users navigate the codebas
 ### Android (optional)
 
 - [Android SDK](https://developer.android.com/studio/#downloads)
+- [SDK 21](https://developer.android.com/studio/releases/platforms#5.0)
+- [SDK 26](https://developer.android.com/studio/releases/platforms#8.0)
 - [NDK 21](https://developer.android.com/ndk/downloads/)
 
 ### iOS (optional)
@@ -93,6 +87,8 @@ export BUILD_DEBUG=true && make build
 
 ### Build for android
 
+The Android Build currently Targets API Level 26 but can be configured by modifying the Makefile
+
 Set the path to the NDK, replacing the version with your own
 
 ```sh
@@ -100,6 +96,8 @@ export NDK_PATH=/Users/$USER/Library/Android/sdk/ndk/21.3.6528147 && make build-
 ```
 
 ### Build for iOS
+
+The iOS build currently targets iPhone OS 12 but can be configured by modifying the Makefile
 
 Creates a fat binary for the simulator and targets a recent version of ios
 
@@ -110,6 +108,8 @@ make build-ios
 ### Build for Xamarin
 
 Wraps the android and ios build artifacts in a NuGet packge to be consumed from a Xamarin application (classic or forms)
+
+Must be executed on OSX to successfully built the iOS project.
 
 ```sh
 make build-netstandard

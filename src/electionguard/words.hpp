@@ -8,7 +8,7 @@ using std::string;
 
 namespace electionguard
 {
-    EG_INTERNAL_API const string getWord(uint16_t index);
+    EG_INTERNAL_API string getWord(uint16_t index);
 
     EG_INTERNAL_API int16_t getIndex(const char *word);
     EG_INTERNAL_API int16_t getIndex(const string &word);

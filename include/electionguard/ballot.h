@@ -27,7 +27,7 @@ eg_plaintext_ballot_selection_get_object_id(eg_plaintext_ballot_selection_t *sel
 struct eg_ciphertext_ballot_selection_s;
 typedef struct eg_ciphertext_ballot_selection_s eg_ciphertext_ballot_selection_t;
 
-// no constructors defined.  use `eg_encrypt_selection`
+// no constructors defined.  use `eg_encrypt_selection` in encrypt.h
 
 EG_API const char *
 eg_ciphertext_ballot_selection_get_object_id(eg_ciphertext_ballot_selection_t *selection);
@@ -37,6 +37,9 @@ eg_ciphertext_ballot_selection_get_description_hash(eg_ciphertext_ballot_selecti
 EG_API eg_elgamal_ciphertext_t *
 eg_ciphertext_ballot_selection_get_ciphertext(eg_ciphertext_ballot_selection_t *selection);
 
+EG_API eg_element_mod_q_t *
+eg_ciphertext_ballot_selection_get_crypto_hash(eg_ciphertext_ballot_selection_t *selection);
+
 EG_API eg_disjunctive_chaum_pedersen_proof_t *
 eg_ciphertext_ballot_selection_get_proof(eg_ciphertext_ballot_selection_t *selection);
 
@@ -45,8 +48,39 @@ EG_API bool eg_ciphertext_ballot_selection_is_valid_encryption(
   eg_element_mod_p_t *public_key, eg_element_mod_q_t *crypto_extended_base_hash);
 
 // CiphertextBallotSelection::crypto_hash_with not provided
-
 // static CiphertextBallotSelection::make not provided
+
+// PlaintextBallotContest
+
+// TODO: implement
+
+struct eg_plaintext_ballot_contest_s;
+typedef struct eg_plaintext_ballot_contest_s eg_plaintext_ballot_contest_t;
+
+// CiphertextBallotContest
+
+// TODO: implement
+
+struct eg_ciphertext_ballot_contest_s;
+typedef struct eg_ciphertext_ballot_contest_s eg_ciphertext_ballot_contest_t;
+
+// no constructors defined.  use `eg_encrypt_contest` in encrypt.h
+
+// PlaintextBallot
+
+// TODO: implement
+
+struct eg_plaintext_ballot_s;
+typedef struct eg_plaintext_ballot_s eg_plaintext_ballot_t;
+
+// CiphertextBallot
+
+// TODO: implement
+
+struct eg_ciphertext_ballot_s;
+typedef struct eg_ciphertext_ballot_s eg_ciphertext_ballot_t;
+
+// no constructors defined.  use `eg_encrypt_ballot` in encrypt.h
 
 #ifdef __cplusplus
 }

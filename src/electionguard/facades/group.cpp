@@ -85,7 +85,7 @@ uint8_t eg_element_mod_q_get(eg_element_mod_q_t *elem, uint64_t **data)
 eg_element_mod_q_t *eg_rand_q()
 {
     auto random = rand_q();
-    auto reference = cache_element_mod_q.retain(move(random));
+    auto *reference = cache_element_mod_q.retain(move(random));
     return AS_TYPE(eg_element_mod_q_t, reference);
 }
 

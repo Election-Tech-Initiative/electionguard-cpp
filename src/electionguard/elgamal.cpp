@@ -50,8 +50,7 @@ namespace electionguard
     unique_ptr<ElGamalKeyPair> ElGamalKeyPair::fromSecret(const ElementModQ &secretKey)
     {
         if (const_cast<ElementModQ &>(secretKey) < TWO_MOD_Q()) {
-            Log::debug(" ElGamal secret key needs to be in [2,Q).");
-            return nullptr;
+            throw "ElGamalKeyPair fromSecret secret key needs to be in [2,Q).";
         }
         auto privateKey = make_unique<ElementModQ>(secretKey);
         auto publicKey = g_pow_p(secretKey);
@@ -63,13 +62,15 @@ namespace electionguard
 #pragma region ElGamalCiphertext
 
     struct ElGamalCiphertext::Impl {
+        unique_ptr<ElementModP> pad;
+        unique_ptr<ElementModP> data;
+
         Impl(unique_ptr<ElementModP> pad, unique_ptr<ElementModP> data)
             : pad(move(pad)), data(move(data))
         {
         }
 
-        unique_ptr<ElementModP> pad;
-        unique_ptr<ElementModP> data;
+        unique_ptr<ElementModQ> crypto_hash() const { return hash_elems({pad.get(), data.get()}); }
     };
 
     ElGamalCiphertext::ElGamalCiphertext(unique_ptr<ElementModP> pad, unique_ptr<ElementModP> data)
@@ -86,7 +87,9 @@ namespace electionguard
     }
 
     ElementModP *ElGamalCiphertext::getPad() { return pimpl->pad.get(); }
+    ElementModP *ElGamalCiphertext::getPad() const { return pimpl->pad.get(); }
     ElementModP *ElGamalCiphertext::getData() { return pimpl->data.get(); }
+    ElementModP *ElGamalCiphertext::getData() const { return pimpl->data.get(); }
 
     uint64_t ElGamalCiphertext::decrypt(const ElementModQ &secretKey)
     {
@@ -139,17 +142,14 @@ namespace electionguard
         return retval;
     }
 
-    unique_ptr<ElementModQ> ElGamalCiphertext::crypto_hash() const
-    {
-        return hash_elems({pimpl->pad.get(), pimpl->data.get()});
-    }
+    unique_ptr<ElementModQ> ElGamalCiphertext::crypto_hash() { return pimpl->crypto_hash(); }
+    unique_ptr<ElementModQ> ElGamalCiphertext::crypto_hash() const { return pimpl->crypto_hash(); }
 
     unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModQ &nonce,
                                                  const ElementModP &publicKey)
     {
         if ((const_cast<ElementModQ &>(nonce) == ZERO_MOD_Q())) {
-            Log::debug("ElGamal encryption requires a non-zero nonce");
-            return nullptr;
+            throw "elgamalEncrypt encryption requires a non-zero nonce";
         }
 
         const auto nonce4096 = nonce.toElementModP();
@@ -160,6 +160,24 @@ namespace electionguard
         auto data = mul_mod_p(*gpowp_m, *pubkey_pow_n);
 
         return make_unique<ElGamalCiphertext>(move(pad), move(data));
+    }
+
+    unique_ptr<ElGamalCiphertext>
+    elgamalAdd(const vector<reference_wrapper<ElGamalCiphertext>> &ciphertexts)
+    {
+        if (ciphertexts.empty()) {
+            throw invalid_argument("must have one or more ciphertexts");
+        }
+
+        auto resultPad = ElementModP::fromUint64(1UL);
+        auto resultData = ElementModP::fromUint64(1UL);
+        for (auto ciphertext : ciphertexts) {
+            auto pad = mul_mod_p(*resultPad, *ciphertext.get().getPad());
+            resultPad.swap(pad);
+            auto data = mul_mod_p(*resultData, *ciphertext.get().getData());
+            resultData.swap(data);
+        }
+        return make_unique<ElGamalCiphertext>(move(resultPad), move(resultData));
     }
 
 #pragma endregion
