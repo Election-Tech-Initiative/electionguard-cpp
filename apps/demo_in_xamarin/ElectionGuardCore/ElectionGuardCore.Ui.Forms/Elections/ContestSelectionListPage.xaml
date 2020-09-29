@@ -9,7 +9,7 @@
 >
     <ContentPage.Content>
 		<ListView
-			ItemsSource="{Binding ActiveContest.BallotSelections}"
+			ItemsSource="{Binding Candidates}"
 			SeparatorVisibility="None"
 			BackgroundColor="Transparent"
 			RowHeight="80"
@@ -28,7 +28,7 @@
 								HeightRequest="80"
 							/>
 							<Label
-								Text="{Binding CandidateId}"
+								Text="{Binding BallotName}"
 								LineBreakMode="WordWrap"
 								MaxLines="2"
 								Margin="14,0"

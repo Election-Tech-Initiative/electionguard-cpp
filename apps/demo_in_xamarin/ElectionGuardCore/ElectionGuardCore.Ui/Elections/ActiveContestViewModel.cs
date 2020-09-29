@@ -35,7 +35,6 @@ namespace ElectionGuardCore.Ui.Elections
                 _electionDescription = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(ElectionName));
-                OnPropertyChanged(nameof(ActiveContest));
                 OnPropertyChanged(nameof(ActiveContestName));
                 OnPropertyChanged(nameof(HasVotedInActiveContest));
                 OnPropertyChanged(nameof(CanVote));
@@ -45,19 +44,19 @@ namespace ElectionGuardCore.Ui.Elections
 
         public string ElectionName => ElectionDescription?.Name?.Text?.FirstOrDefault()?.Value;
 
-        private ContestDescription ActiveContest => ElectionDescription?.Contests?.FirstOrDefault();
-        public string ActiveContestName => ActiveContest?.Name ?? "There is currently not an active contest available";
+        public string ActiveContestName => ElectionDescription?.ActiveContest?.Name ??
+                                           "There is currently not an active contest available";
 
         public bool HasVotedInActiveContest
         {
             get
             {
                 var voted = false;
-                if (ActiveContest?.ObjectId != null &&
+                if (ElectionDescription?.ActiveContest?.ObjectId != null &&
                     _electionService.Votes != null &&
-                    _electionService.Votes.ContainsKey(ActiveContest.ObjectId))
+                    _electionService.Votes.ContainsKey(ElectionDescription.ActiveContest.ObjectId))
                 {
-                    voted = _electionService.Votes[ActiveContest.ObjectId];
+                    voted = _electionService.Votes[ElectionDescription.ActiveContest.ObjectId];
                 }
 
                 return voted;
@@ -71,7 +70,7 @@ namespace ElectionGuardCore.Ui.Elections
 
         private async void BeginVote(object parameter)
         {
-            await _navigationService.Push(NavigationPaths.ContestSelectionListPage, ActiveContest);
+            await _navigationService.Push(NavigationPaths.ContestSelectionListPage, ElectionDescription);
         }
     }
 }
