@@ -12,6 +12,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
     public class ActiveContestViewModelTest
     {
         private Mock<IElectionService> _electionServiceMock;
+        private Mock<INavigationService> _navigationServiceMock;
 
         private readonly ElectionDescription _electionDescription = new ElectionDescription
         {
@@ -51,12 +52,14 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         {
             _electionServiceMock = new Mock<IElectionService>();
             _electionServiceMock.Setup(x => x.GetElectionDescription()).ReturnsAsync(_electionDescription);
+
+            _navigationServiceMock = new Mock<INavigationService>();
         }
 
         [Test]
         public async Task OnLoad_LoadsElectionDescriptionFromService()
         {
-            var viewModel = new ActiveContestViewModel(_electionServiceMock.Object);
+            var viewModel = new ActiveContestViewModel(_electionServiceMock.Object, _navigationServiceMock.Object);
             await viewModel.Load();
 
             viewModel.ElectionDescription.Should().Be(_electionDescription);
@@ -65,7 +68,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         [Test]
         public async Task ElectionName_ShouldBeFirstElectionDescriptionName()
         {
-            var viewModel = new ActiveContestViewModel(_electionServiceMock.Object);
+            var viewModel = new ActiveContestViewModel(_electionServiceMock.Object, _navigationServiceMock.Object);
             await viewModel.Load();
 
             viewModel.ElectionName.Should().Be("Hello");
@@ -74,7 +77,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         [Test]
         public async Task ActiveContestName_ShouldBeFirstContestName()
         {
-            var viewModel = new ActiveContestViewModel(_electionServiceMock.Object);
+            var viewModel = new ActiveContestViewModel(_electionServiceMock.Object, _navigationServiceMock.Object);
             await viewModel.Load();
 
             viewModel.ActiveContestName.Should().Be("Contest1");
@@ -91,7 +94,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
                 _electionServiceMock.Setup(x => x.Votes).Returns(new Dictionary<string, bool> {{contestId, hasVoted}});
             }
 
-            var viewModel = new ActiveContestViewModel(_electionServiceMock.Object);
+            var viewModel = new ActiveContestViewModel(_electionServiceMock.Object, _navigationServiceMock.Object);
             await viewModel.Load();
 
             viewModel.HasVotedInActiveContest.Should().Be(hasVoted);

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using ElectionGuardCore.Elections;
 
 namespace ElectionGuardCore.Ui.Elections
@@ -7,10 +8,14 @@ namespace ElectionGuardCore.Ui.Elections
     public class ActiveContestViewModel : ViewModelBase
     {
         private readonly IElectionService _electionService;
+        private readonly INavigationService _navigationService;
 
-        public ActiveContestViewModel(IElectionService electionService)
+        public ActiveContestViewModel(IElectionService electionService, INavigationService navigationService)
         {
             _electionService = electionService;
+            _navigationService = navigationService;
+
+            BeginVoteCommand = new RelayCommand(_ => _navigationService.Push(NavigationPaths.VoteOptionListPage));
         }
 
         public override string Title => "Election Guard Demo";
@@ -61,5 +66,7 @@ namespace ElectionGuardCore.Ui.Elections
 
         public bool CanVote => !HasVotedInActiveContest;
         public bool CannotVote => !CanVote;
+
+        public ICommand BeginVoteCommand { get; }
     }
 }

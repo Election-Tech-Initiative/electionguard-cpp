@@ -54,6 +54,7 @@
 				<Button
 					Text="Begin"
 					IsVisible="{Binding CanVote}"
+					Command="{Binding BeginVoteCommand}"
 					HorizontalOptions="CenterAndExpand"
 					VerticalOptions="EndAndExpand"
 					WidthRequest="200"

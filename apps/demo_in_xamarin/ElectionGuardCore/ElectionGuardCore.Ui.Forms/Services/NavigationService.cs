@@ -1,34 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Autofac;
 using ElectionGuardCore.Ui.Forms.Elections;
+using Xamarin.Forms;
 
 namespace ElectionGuardCore.Ui.Forms.Services
 {
-    internal class NavigationService
+    public class NavigationService : INavigationService
     {
-        public static readonly string RootPage = "/";
+        private INavigation _navigation;
+        private IContainer _container;
 
-        private readonly IContainer _container;
         private readonly Dictionary<string, Type> _pageMappings = new Dictionary<string, Type>
         {
-            { RootPage, typeof(ActiveContestViewPage) }
+            { NavigationPaths.RootPage, typeof(ActiveContestViewPage) },
+            { NavigationPaths.VoteOptionListPage, typeof(VoteOptionListPage) }
         };
 
-        public NavigationService(IContainer container)
+        public async Task Push(string path)
+        {
+            await _navigation.PushAsync(ResolvePage(path));
+        }
+
+        internal void SetNavigation(INavigation navigation)
+        {
+            _navigation = navigation;
+        }
+
+        internal void SetContainer(IContainer container)
         {
             _container = container;
         }
 
-        public PageBase GetDefaultPage()
+        internal PageBase GetDefaultPage()
         {
-            return ResolvePage(RootPage);
+            return ResolvePage(NavigationPaths.RootPage);
         }
 
         private PageBase ResolvePage(string path)
         {
             var pageType = _pageMappings[path];
-            return (PageBase) _container.Resolve(pageType);
+            return (PageBase)_container.Resolve(pageType);
         }
     }
 }

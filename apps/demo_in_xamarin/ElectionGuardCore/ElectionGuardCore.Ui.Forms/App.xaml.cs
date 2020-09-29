@@ -12,15 +12,19 @@ namespace ElectionGuardCore.Ui.Forms
         {
             InitializeComponent();
 
-            var navigationService = new NavigationService(CreateContainer());
+            var navigationService = new NavigationService();
+            var container = CreateContainer(navigationService);
+            navigationService.SetContainer(container);  // need to set nav service dependencies after creating container
 
             MainPage = new NavigationPage(navigationService.GetDefaultPage());
+            navigationService.SetNavigation(MainPage.Navigation);
         }
 
-        private IContainer CreateContainer()
+        private IContainer CreateContainer(INavigationService navigationService)
         {
             var builder = new ContainerBuilder();
-            builder.RegisterType<MockElectionService>().As<IElectionService>().InstancePerLifetimeScope();
+            builder.RegisterInstance(navigationService).As<INavigationService>().SingleInstance();
+            builder.RegisterType<MockElectionService>().As<IElectionService>().SingleInstance();
 
             builder.RegisterSource(new AnyConcreteTypeNotAlreadyRegisteredSource());
 
