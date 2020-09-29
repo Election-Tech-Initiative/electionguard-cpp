@@ -4,5 +4,6 @@
     {
         public static readonly string DarkGreen = "#26423D";
         public static readonly string LightGreen = "#217A68";
+        public static readonly string White = "#FFFFFF";
     }
 }

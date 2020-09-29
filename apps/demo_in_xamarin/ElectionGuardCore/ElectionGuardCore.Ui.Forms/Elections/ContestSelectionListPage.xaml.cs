@@ -1,4 +1,5 @@
 ﻿using ElectionGuardCore.Ui.Elections;
+using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace ElectionGuardCore.Ui.Forms.Elections
@@ -10,6 +11,15 @@ namespace ElectionGuardCore.Ui.Forms.Elections
             :base(viewModel)
         {
             InitializeComponent();
+        }
+
+        private ContestSelectionListViewModel ContestSelectionListViewModel =>
+            ViewModel as ContestSelectionListViewModel;
+
+        private void ListView_OnItemTapped(object sender, ItemTappedEventArgs e)
+        {
+            var tappedCandidate = (ContestSelectionListViewModel.CandidateViewModel)e.Item;
+            ContestSelectionListViewModel?.SelectCandidateCommand.Execute(tappedCandidate);
         }
     }
 }

@@ -5,7 +5,7 @@ using ElectionGuardCore.Elections;
 
 namespace ElectionGuardCore.Ui.Elections
 {
-    public class ActiveContestViewModel : ViewModelBase
+    public class ActiveContestViewModel : PageViewModelBase
     {
         private readonly IElectionService _electionService;
         private readonly INavigationService _navigationService;

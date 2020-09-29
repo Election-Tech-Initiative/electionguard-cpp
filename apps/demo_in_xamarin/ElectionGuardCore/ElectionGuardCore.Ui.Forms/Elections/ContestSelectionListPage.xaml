@@ -26,6 +26,8 @@
 				SeparatorVisibility="None"
 				BackgroundColor="Transparent"
 				RowHeight="80"
+				SelectionMode="None"
+				ItemTapped="ListView_OnItemTapped"
 			>
 				<ListView.ItemTemplate>
 					<DataTemplate>
@@ -35,7 +37,7 @@
 								Margin="0,5"
 							>
 								<BoxView
-									BackgroundColor="White"
+									BackgroundColor="{Binding BackgroundColor}"
 									CornerRadius="16"
 									WidthRequest="300"
 									HeightRequest="80"

@@ -1,13 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using ElectionGuardCore.Elections;
 
 namespace ElectionGuardCore.Ui.Elections
 {
-    public class ContestSelectionListViewModel : ViewModelBase
+    public class ContestSelectionListViewModel : PageViewModelBase
     {
         public override string Title => "Vote";
+
+        public ContestSelectionListViewModel()
+        {
+            SelectCandidateCommand = new RelayCommand(SelectCandidate);
+        }
 
         public override Task Load()
         {
@@ -64,7 +70,25 @@ namespace ElectionGuardCore.Ui.Elections
             Candidates = candidates;
         }
 
-        public class CandidateViewModel
+        public ICommand SelectCandidateCommand { get; }
+
+        private void SelectCandidate(object parameter)
+        {
+            var candidate = (CandidateViewModel)parameter;
+
+            var selectedCandidate = Candidates.FirstOrDefault(c => c.IsSelected);
+            if (selectedCandidate != null)
+            {
+                selectedCandidate.IsSelected = false;
+            }
+
+            if (candidate != selectedCandidate)
+            {
+                candidate.IsSelected = true;
+            }
+        }
+
+        public class CandidateViewModel : ViewModelBase
         {
             private readonly Candidate _candidate;
 
@@ -74,6 +98,20 @@ namespace ElectionGuardCore.Ui.Elections
             }
 
             public string BallotName => _candidate.BallotName.Text.FirstOrDefault()?.Value;
+
+            private bool _isSelected;
+            public bool IsSelected
+            {
+                get => _isSelected;
+                set
+                {
+                    _isSelected = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(BackgroundColor));
+                }
+            }
+
+            public string BackgroundColor => IsSelected ? Colors.LightGreen : Colors.White;
         }
     }
 }
