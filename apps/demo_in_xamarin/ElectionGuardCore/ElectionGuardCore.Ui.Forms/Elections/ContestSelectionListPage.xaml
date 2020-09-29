@@ -1,8 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ui:PageBase xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:ui="clr-namespace:ElectionGuardCore.Ui.Forms"
-             x:Class="ElectionGuardCore.Ui.Forms.Elections.ContestSelectionListPage">
+<uiforms:PageBase
+	xmlns="http://xamarin.com/schemas/2014/forms"
+	xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+	xmlns:uiforms="clr-namespace:ElectionGuardCore.Ui.Forms"
+	x:Class="ElectionGuardCore.Ui.Forms.Elections.ContestSelectionListPage"
+	Title="{Binding Title}"
+	BackgroundColor="#F3F2F7"
+>
     <ContentPage.Content>
         <StackLayout>
             <Label Text="Welcome to Xamarin.Forms!"
@@ -10,4 +14,4 @@
                 HorizontalOptions="CenterAndExpand" />
         </StackLayout>
     </ContentPage.Content>
-</ui:PageBase>
+</uiforms:PageBase>
