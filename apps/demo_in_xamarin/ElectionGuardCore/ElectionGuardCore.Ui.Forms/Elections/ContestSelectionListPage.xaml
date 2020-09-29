@@ -8,10 +8,36 @@
 	BackgroundColor="#F3F2F7"
 >
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
+		<ListView
+			ItemsSource="{Binding ActiveContest.BallotSelections}"
+			SeparatorVisibility="None"
+			BackgroundColor="Transparent"
+			RowHeight="80"
+		>
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<ViewCell>
+						<Grid
+							HorizontalOptions="CenterAndExpand"
+							Margin="0,5"
+						>
+							<BoxView
+								BackgroundColor="White"
+								CornerRadius="16"
+								WidthRequest="300"
+								HeightRequest="80"
+							/>
+							<Label
+								Text="{Binding CandidateId}"
+								LineBreakMode="WordWrap"
+								MaxLines="2"
+								Margin="14,0"
+								VerticalOptions="CenterAndExpand"
+							/>
+						</Grid>
+					</ViewCell>
+				</DataTemplate>
+			</ListView.ItemTemplate>
+		</ListView>
     </ContentPage.Content>
 </uiforms:PageBase>
