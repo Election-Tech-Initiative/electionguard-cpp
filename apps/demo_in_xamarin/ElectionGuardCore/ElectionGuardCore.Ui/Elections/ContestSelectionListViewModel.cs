@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -13,11 +14,14 @@ namespace ElectionGuardCore.Ui.Elections
         public ContestSelectionListViewModel()
         {
             SelectCandidateCommand = new RelayCommand(SelectCandidate);
+            _reviewSelectionCommand = new RelayCommand(ReviewSelection, CanReviewSelection);
         }
 
         public override Task Load()
         {
             ElectionDescription = (ElectionDescription)Parameter;
+            _reviewSelectionCommand.OnCanExecuteChanged();  // prevent button from staying enabled when 
+                                                            // reloading view and selection is lost
             return Task.CompletedTask;
         }
 
@@ -70,22 +74,36 @@ namespace ElectionGuardCore.Ui.Elections
             Candidates = candidates;
         }
 
+        private CandidateViewModel SelectedCandidate => Candidates?.FirstOrDefault(c => c.IsSelected);
+
         public ICommand SelectCandidateCommand { get; }
 
         private void SelectCandidate(object parameter)
         {
             var candidate = (CandidateViewModel)parameter;
 
-            var selectedCandidate = Candidates.FirstOrDefault(c => c.IsSelected);
+            var selectedCandidate = SelectedCandidate;
             if (selectedCandidate != null)
             {
                 selectedCandidate.IsSelected = false;
             }
 
-            if (candidate != selectedCandidate)
+            if (candidate.ObjectId != selectedCandidate?.ObjectId)
             {
                 candidate.IsSelected = true;
             }
+
+            _reviewSelectionCommand.OnCanExecuteChanged();
+        }
+
+        private RelayCommand _reviewSelectionCommand;
+        public ICommand ReviewSelectionCommand => _reviewSelectionCommand;
+
+        private bool CanReviewSelection(object parameter) => SelectedCandidate != null;
+
+        private void ReviewSelection(object parameter)
+        {
+
         }
 
         public class CandidateViewModel : ViewModelBase
@@ -94,9 +112,15 @@ namespace ElectionGuardCore.Ui.Elections
 
             public CandidateViewModel(Candidate candidate)
             {
+                if (candidate == null)
+                {
+                    throw new ArgumentNullException(nameof(candidate));
+                }
+
                 _candidate = candidate;
             }
 
+            public string ObjectId => _candidate.ObjectId;
             public string BallotName => _candidate.BallotName.Text.FirstOrDefault()?.Value;
 
             private bool _isSelected;

@@ -8,8 +8,8 @@
 	BackgroundColor="#F3F2F7"
 >
     <ContentPage.Content>
-		<StackLayout>
-			<StackLayout>
+		<StackLayout Spacing="0">
+			<StackLayout Spacing="0">
 				<Label
 					Text="{Binding ContestTitle}"
 					LineBreakMode="WordWrap"
@@ -54,6 +54,14 @@
 					</DataTemplate>
 				</ListView.ItemTemplate>
 			</ListView>
+			<Button
+				Text="Review"
+				Command="{Binding ReviewSelectionCommand}"
+				WidthRequest="300"
+				HeightRequest="60"
+				HorizontalOptions="Center"
+				Margin="0,20,0,12"
+			/>
 		</StackLayout>
     </ContentPage.Content>
 </uiforms:PageBase>
