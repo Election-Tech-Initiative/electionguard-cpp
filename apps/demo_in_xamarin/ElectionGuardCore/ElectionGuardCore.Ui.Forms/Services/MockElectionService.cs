@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using ElectionGuardCore.Elections;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace ElectionGuardCore.Ui.Forms.Services
 {
@@ -265,7 +266,14 @@ namespace ElectionGuardCore.Ui.Forms.Services
 
         public Task<ElectionDescription> GetElectionDescription()
         {
-            var electionDescription = JsonConvert.DeserializeObject<ElectionDescription>(SampleElectionDescriptionJson);
+            var electionDescription = JsonConvert.DeserializeObject<ElectionDescription>(SampleElectionDescriptionJson,
+                new JsonSerializerSettings
+                {
+                    ContractResolver = new DefaultContractResolver
+                    {
+                        NamingStrategy = new SnakeCaseNamingStrategy()
+                    }
+                });
             return Task.FromResult(electionDescription);
         }
 
