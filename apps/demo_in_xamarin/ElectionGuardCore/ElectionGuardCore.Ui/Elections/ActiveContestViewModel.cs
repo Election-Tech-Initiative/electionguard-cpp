@@ -15,7 +15,7 @@ namespace ElectionGuardCore.Ui.Elections
             _electionService = electionService;
             _navigationService = navigationService;
 
-            BeginVoteCommand = new RelayCommand(_ => _navigationService.Push(NavigationPaths.VoteOptionListPage));
+            BeginVoteCommand = new RelayCommand(BeginVote);
         }
 
         public override string Title => "Election Guard Demo";
@@ -68,5 +68,10 @@ namespace ElectionGuardCore.Ui.Elections
         public bool CannotVote => !CanVote;
 
         public ICommand BeginVoteCommand { get; }
+
+        private async void BeginVote(object parameter)
+        {
+            await _navigationService.Push(NavigationPaths.VoteOptionListPage, ActiveContest);
+        }
     }
 }

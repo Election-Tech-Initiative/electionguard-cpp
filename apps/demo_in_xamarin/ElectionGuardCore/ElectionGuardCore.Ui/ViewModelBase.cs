@@ -9,6 +9,9 @@ namespace ElectionGuardCore.Ui
         public event PropertyChangedEventHandler PropertyChanged;
 
         public abstract string Title { get; }
+
+        public object Parameter { get; set; }
+
         public abstract Task Load();
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)

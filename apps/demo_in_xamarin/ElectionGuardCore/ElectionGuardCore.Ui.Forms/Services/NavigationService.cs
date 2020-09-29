@@ -18,9 +18,9 @@ namespace ElectionGuardCore.Ui.Forms.Services
             { NavigationPaths.VoteOptionListPage, typeof(VoteOptionListPage) }
         };
 
-        public async Task Push(string path)
+        public async Task Push(string path, object parameter)
         {
-            await _navigation.PushAsync(ResolvePage(path));
+            await _navigation.PushAsync(ResolvePage(path, parameter));
         }
 
         internal void SetNavigation(INavigation navigation)
@@ -35,13 +35,16 @@ namespace ElectionGuardCore.Ui.Forms.Services
 
         internal PageBase GetDefaultPage()
         {
-            return ResolvePage(NavigationPaths.RootPage);
+            return ResolvePage(NavigationPaths.RootPage, null);
         }
 
-        private PageBase ResolvePage(string path)
+        private PageBase ResolvePage(string path, object parameter)
         {
             var pageType = _pageMappings[path];
-            return (PageBase)_container.Resolve(pageType);
+            var page = (PageBase)_container.Resolve(pageType);
+            page.ViewModel.Parameter = parameter;
+
+            return page;
         }
     }
 }
