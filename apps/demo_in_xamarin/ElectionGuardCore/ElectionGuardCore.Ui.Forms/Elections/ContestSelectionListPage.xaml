@@ -2,7 +2,7 @@
 <ui:PageBase xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:ui="clr-namespace:ElectionGuardCore.Ui.Forms"
-             x:Class="ElectionGuardCore.Ui.Forms.Elections.VoteOptionListPage">
+             x:Class="ElectionGuardCore.Ui.Forms.Elections.ContestSelectionListPage">
     <ContentPage.Content>
         <StackLayout>
             <Label Text="Welcome to Xamarin.Forms!"

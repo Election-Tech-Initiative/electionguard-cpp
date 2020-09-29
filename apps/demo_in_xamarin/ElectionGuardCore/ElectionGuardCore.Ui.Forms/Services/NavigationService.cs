@@ -14,8 +14,8 @@ namespace ElectionGuardCore.Ui.Forms.Services
 
         private readonly Dictionary<string, Type> _pageMappings = new Dictionary<string, Type>
         {
-            { NavigationPaths.RootPage, typeof(ActiveContestViewPage) },
-            { NavigationPaths.VoteOptionListPage, typeof(VoteOptionListPage) }
+            { NavigationPaths.RootPage, typeof(ActiveContestPage) },
+            { NavigationPaths.ContestSelectionListPage, typeof(ContestSelectionListPage) }
         };
 
         public async Task Push(string path, object parameter)

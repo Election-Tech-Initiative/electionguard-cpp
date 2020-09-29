@@ -2,7 +2,7 @@
 
 namespace ElectionGuardCore.Ui.Elections
 {
-    public class VoteOptionListViewModel : ViewModelBase
+    public class ContestSelectionListViewModel : ViewModelBase
     {
         public override string Title => "Vote";
 

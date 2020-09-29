@@ -111,7 +111,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
             viewModel.BeginVoteCommand.Execute(null);
 
             _navigationServiceMock.Verify(x =>
-                x.Push(NavigationPaths.VoteOptionListPage, _electionDescription.Contests.First()));
+                x.Push(NavigationPaths.ContestSelectionListPage, _electionDescription.Contests.First()));
         }
     }
 }

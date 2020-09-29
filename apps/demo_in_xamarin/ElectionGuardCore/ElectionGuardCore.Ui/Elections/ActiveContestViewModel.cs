@@ -71,7 +71,7 @@ namespace ElectionGuardCore.Ui.Elections
 
         private async void BeginVote(object parameter)
         {
-            await _navigationService.Push(NavigationPaths.VoteOptionListPage, ActiveContest);
+            await _navigationService.Push(NavigationPaths.ContestSelectionListPage, ActiveContest);
         }
     }
 }

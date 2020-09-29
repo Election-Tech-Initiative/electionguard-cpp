@@ -3,6 +3,6 @@
     public static class NavigationPaths
     {
         public static readonly string RootPage = "/";
-        public static readonly string VoteOptionListPage = "/VoteOptionList";
+        public static readonly string ContestSelectionListPage = "/VoteOptionList";
     }
 }
