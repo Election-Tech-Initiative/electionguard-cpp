@@ -9,13 +9,17 @@ namespace ElectionGuardCore.Ui.Elections
 {
     public class ContestSelectionListViewModel : PageViewModelBase
     {
-        public override string Title => "Vote";
+        private readonly INavigationService _navigationService;
 
-        public ContestSelectionListViewModel()
+        public ContestSelectionListViewModel(INavigationService navigationService)
         {
+            _navigationService = navigationService;
+
             SelectCandidateCommand = new RelayCommand(SelectCandidate);
             _reviewSelectionCommand = new RelayCommand(ReviewSelection, CanReviewSelection);
         }
+
+        public override string Title => "Vote";
 
         public override Task Load()
         {
@@ -101,15 +105,13 @@ namespace ElectionGuardCore.Ui.Elections
 
         private bool CanReviewSelection(object parameter) => SelectedCandidate != null;
 
-        private void ReviewSelection(object parameter)
+        private async void ReviewSelection(object parameter)
         {
-
+            await _navigationService.Push(NavigationPaths.ReviewSelectionPage, SelectedCandidate.Candidate);
         }
 
         public class CandidateViewModel : ViewModelBase
         {
-            private readonly Candidate _candidate;
-
             public CandidateViewModel(Candidate candidate)
             {
                 if (candidate == null)
@@ -117,11 +119,13 @@ namespace ElectionGuardCore.Ui.Elections
                     throw new ArgumentNullException(nameof(candidate));
                 }
 
-                _candidate = candidate;
+                Candidate = candidate;
             }
 
-            public string ObjectId => _candidate.ObjectId;
-            public string BallotName => _candidate.BallotName.Text.FirstOrDefault()?.Value;
+            public Candidate Candidate { get; }
+
+            public string ObjectId => Candidate.ObjectId;
+            public string BallotName => Candidate.BallotName.Text.FirstOrDefault()?.Value;
 
             private bool _isSelected;
             public bool IsSelected
