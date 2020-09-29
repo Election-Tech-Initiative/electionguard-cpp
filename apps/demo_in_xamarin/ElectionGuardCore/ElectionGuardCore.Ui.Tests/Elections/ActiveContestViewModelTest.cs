@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ElectionGuardCore.Elections;
 using ElectionGuardCore.Ui.Elections;
@@ -100,6 +101,17 @@ namespace ElectionGuardCore.Ui.Tests.Elections
             viewModel.HasVotedInActiveContest.Should().Be(hasVoted);
             viewModel.CanVote.Should().Be(!hasVoted);
             viewModel.CannotVote.Should().Be(hasVoted);
+        }
+
+        [Test]
+        public async Task OnBeginVoteCommand_NavigatesToVoteOptionListPage()
+        {
+            var viewModel = new ActiveContestViewModel(_electionServiceMock.Object, _navigationServiceMock.Object);
+            await viewModel.Load();
+            viewModel.BeginVoteCommand.Execute(null);
+
+            _navigationServiceMock.Verify(x =>
+                x.Push(NavigationPaths.VoteOptionListPage, _electionDescription.Contests.First()));
         }
     }
 }
