@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using ElectionGuardCore.Elections;
 
 namespace ElectionGuardCore.Ui.Elections
 {
@@ -8,7 +9,19 @@ namespace ElectionGuardCore.Ui.Elections
 
         public override Task Load()
         {
-            return Task.CompletedTask;  // TODO implement
+            ActiveContest = (ContestDescription)Parameter;
+            return Task.CompletedTask;
+        }
+
+        private ContestDescription _activeContest;
+        public ContestDescription ActiveContest
+        {
+            get => _activeContest;
+            private set
+            {
+                _activeContest = value;
+                OnPropertyChanged();
+            }
         }
     }
 }
