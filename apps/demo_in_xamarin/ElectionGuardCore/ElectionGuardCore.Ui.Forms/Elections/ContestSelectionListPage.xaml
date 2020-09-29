@@ -8,36 +8,50 @@
 	BackgroundColor="#F3F2F7"
 >
     <ContentPage.Content>
-		<ListView
-			ItemsSource="{Binding Candidates}"
-			SeparatorVisibility="None"
-			BackgroundColor="Transparent"
-			RowHeight="80"
-		>
-			<ListView.ItemTemplate>
-				<DataTemplate>
-					<ViewCell>
-						<Grid
-							HorizontalOptions="CenterAndExpand"
-							Margin="0,5"
-						>
-							<BoxView
-								BackgroundColor="White"
-								CornerRadius="16"
-								WidthRequest="300"
-								HeightRequest="80"
-							/>
-							<Label
-								Text="{Binding BallotName}"
-								LineBreakMode="WordWrap"
-								MaxLines="2"
-								Margin="14,0"
-								VerticalOptions="CenterAndExpand"
-							/>
-						</Grid>
-					</ViewCell>
-				</DataTemplate>
-			</ListView.ItemTemplate>
-		</ListView>
+		<StackLayout>
+			<StackLayout>
+				<Label
+					Text="{Binding ContestTitle}"
+					LineBreakMode="WordWrap"
+					MaxLines="2"
+					Margin="20"
+				/>
+				<Label 
+					Text="Vote for one"
+					Margin="20,0,20,12"
+				/>
+			</StackLayout>
+			<ListView
+				ItemsSource="{Binding Candidates}"
+				SeparatorVisibility="None"
+				BackgroundColor="Transparent"
+				RowHeight="80"
+			>
+				<ListView.ItemTemplate>
+					<DataTemplate>
+						<ViewCell>
+							<Grid
+								HorizontalOptions="CenterAndExpand"
+								Margin="0,5"
+							>
+								<BoxView
+									BackgroundColor="White"
+									CornerRadius="16"
+									WidthRequest="300"
+									HeightRequest="80"
+								/>
+								<Label
+									Text="{Binding BallotName}"
+									LineBreakMode="WordWrap"
+									MaxLines="2"
+									Margin="14,0"
+									VerticalOptions="CenterAndExpand"
+								/>
+							</Grid>
+						</ViewCell>
+					</DataTemplate>
+				</ListView.ItemTemplate>
+			</ListView>
+		</StackLayout>
     </ContentPage.Content>
 </uiforms:PageBase>

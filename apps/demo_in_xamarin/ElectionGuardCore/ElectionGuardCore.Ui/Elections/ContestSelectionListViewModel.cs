@@ -16,17 +16,20 @@ namespace ElectionGuardCore.Ui.Elections
         }
 
         private ElectionDescription _electionDescription;
-        public ElectionDescription ElectionDescription
+        private ElectionDescription ElectionDescription
         {
             get => _electionDescription;
-            private set
+            set
             {
                 _electionDescription = value;
-                OnPropertyChanged();
 
+                OnPropertyChanged(nameof(ContestTitle));
                 RefreshCandidates();
             }
         }
+
+        public string ContestTitle => ElectionDescription?.ActiveContest.BallotTitle.Text
+            .FirstOrDefault(t => t.Language == "en")?.Value;
 
         private List<CandidateViewModel> _candidates;
         public List<CandidateViewModel> Candidates
