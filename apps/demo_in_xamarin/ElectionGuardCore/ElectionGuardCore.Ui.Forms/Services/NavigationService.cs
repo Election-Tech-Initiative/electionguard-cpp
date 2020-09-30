@@ -24,6 +24,19 @@ namespace ElectionGuardCore.Ui.Forms.Services
             await _navigation.PushAsync(ResolvePage(path, parameter));
         }
 
+        public async Task ShowBusy(string label, Action action)
+        {
+            try
+            {
+                await _navigation.PushModalAsync(new BusyModal(label));
+                action();
+            }
+            finally
+            {
+                await _navigation.PopModalAsync();
+            }
+        }
+
         internal void SetNavigation(INavigation navigation)
         {
             _navigation = navigation;

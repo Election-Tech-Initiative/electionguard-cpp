@@ -9,11 +9,14 @@ namespace ElectionGuardCore.Ui.Elections
     {
         private readonly IAlertService _alertService;
         private readonly IEncryptionService _encryptionService;
+        private readonly INavigationService _navigationService;
 
-        public ReviewSelectionViewModel(IAlertService alertService, IEncryptionService encryptionService)
+        public ReviewSelectionViewModel(IAlertService alertService, IEncryptionService encryptionService,
+            INavigationService navigationService)
         {
             _encryptionService = encryptionService;
             _alertService = alertService;
+            _navigationService = navigationService;
 
             EncryptSelectionCommand = new RelayCommand(EncryptSelecton);
         }
@@ -55,10 +58,11 @@ namespace ElectionGuardCore.Ui.Elections
 
         private async void EncryptSelecton(object parameter)
         {
-            if (await _alertService.Prompt("Encrypt ballot",
+            if (await _alertService.Alert("Encrypt ballot",
                 "You are about to encrypt your ballot. This cannot be undone. Do you wish to continue?", "Yes", "No"))
             {
-                _encryptionService.EncryptBallot(Args.Election, Args.Selection.ObjectId);
+                await _navigationService.ShowBusy("Encrypting ballot…",
+                    () => _encryptionService.EncryptBallot(Args.Election, Args.Selection.ObjectId));
             }
         }
     }

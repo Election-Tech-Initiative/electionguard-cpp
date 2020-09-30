@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Threading;
 using ElectionGuardCore.Elections;
 using ElectionGuardCore.Encryption;
 
@@ -8,7 +8,9 @@ namespace ElectionGuardCore.Ui.Forms.Services
     {
         public EncryptionResult EncryptBallot(ElectionDescription election, string candidateId)
         {
-            throw new NotImplementedException();
+            // TODO implement
+            Thread.Sleep(5000);
+            return new EncryptionResult();
         }
     }
 }

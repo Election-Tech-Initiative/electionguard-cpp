@@ -27,6 +27,9 @@
     <Compile Update="Elections\ContestSelectionListPage.xaml.cs">
       <DependentUpon>ContestSelectionListPage.xaml</DependentUpon>
     </Compile>
+    <Compile Update="BusyModal.xaml.cs">
+      <DependentUpon>BusyModal.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -37,6 +40,9 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Elections\ReviewSelectionPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="BusyModal.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>
