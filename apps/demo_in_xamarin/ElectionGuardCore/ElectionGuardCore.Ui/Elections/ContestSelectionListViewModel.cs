@@ -125,7 +125,7 @@ namespace ElectionGuardCore.Ui.Elections
             public Candidate Candidate { get; }
 
             public string ObjectId => Candidate.ObjectId;
-            public string BallotName => Candidate.BallotName.Text.FirstOrDefault()?.Value;
+            public string BallotName => Candidate.BallotName.Text.FirstOrDefault(t => t.Language == "en")?.Value;
 
             private bool _isSelected;
             public bool IsSelected
