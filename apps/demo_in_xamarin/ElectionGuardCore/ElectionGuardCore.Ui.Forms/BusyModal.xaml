@@ -4,21 +4,21 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
 	x:Class="ElectionGuardCore.Ui.Forms.BusyModal"
 >
-    <ContentPage.Content>
-        <StackLayout VerticalOptions="CenterAndExpand">
+	<ContentPage.Content>
+		<StackLayout VerticalOptions="CenterAndExpand">
 			<ActivityIndicator
 				HorizontalOptions="Center"
-                VerticalOptions="Center"
+				VerticalOptions="Center"
 				IsRunning="True"
 			/>
-            <Label
-	            x:Name="Label"
+			<Label
+				x:Name="Label"
 				FontAttributes="Bold"
-                VerticalOptions="Center" 
-                HorizontalOptions="CenterAndExpand"
+				VerticalOptions="Center" 
+				HorizontalOptions="CenterAndExpand"
 				HorizontalTextAlignment="Center"
 				LineBreakMode="WordWrap"
-	        />
-        </StackLayout>
-    </ContentPage.Content>
+			/>
+		</StackLayout>
+	</ContentPage.Content>
 </ContentPage>

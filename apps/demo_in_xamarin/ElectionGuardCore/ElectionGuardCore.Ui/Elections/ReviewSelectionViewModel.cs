@@ -42,18 +42,6 @@ namespace ElectionGuardCore.Ui.Elections
 
         public string CandidateName => Args?.Selection.BallotName.GetTextValue("en");
 
-        public class ReviewSelectionArgs
-        {
-            public readonly Candidate Selection;
-            public readonly ElectionDescription Election;
-
-            public ReviewSelectionArgs(Candidate selection, ElectionDescription election)
-            {
-                Selection = selection;
-                Election = election;
-            }
-        }
-
         public ICommand EncryptSelectionCommand { get; }
 
         private async void EncryptSelecton(object parameter)
@@ -66,6 +54,18 @@ namespace ElectionGuardCore.Ui.Elections
                     () => result = _encryptionService.EncryptBallot(Args.Election, Args.Selection.ObjectId),
                     async () => await _navigationService.PushModal(NavigationPaths.SelectionVerificationPage, result)
                 );
+            }
+        }
+
+        public class ReviewSelectionArgs
+        {
+            public readonly Candidate Selection;
+            public readonly ElectionDescription Election;
+
+            public ReviewSelectionArgs(Candidate selection, ElectionDescription election)
+            {
+                Selection = selection;
+                Election = election;
             }
         }
     }
