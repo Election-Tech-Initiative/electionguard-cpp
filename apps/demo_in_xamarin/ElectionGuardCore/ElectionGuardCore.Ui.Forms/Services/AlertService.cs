@@ -6,6 +6,11 @@ namespace ElectionGuardCore.Ui.Forms.Services
 {
     public class AlertService : IAlertService
     {
+        public async Task Alert(string title, string message, string close)
+        {
+            await Application.Current.MainPage.DisplayAlert(title, message, close);
+        }
+
         public async Task<bool> Alert(string title, string message, string accept, string cancel)
         {
             return await Application.Current.MainPage.DisplayAlert(title, message, accept, cancel);

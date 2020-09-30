@@ -7,10 +7,12 @@ namespace ElectionGuardCore.Ui.Elections
     public class SelectionVerificationViewModel : PageViewModelBase
     {
         private readonly IClipboardService _clipboardService;
+        private readonly IAlertService _alertService;
 
-        public SelectionVerificationViewModel(IClipboardService clipboardService)
+        public SelectionVerificationViewModel(IClipboardService clipboardService, IAlertService alertService)
         {
             _clipboardService = clipboardService;
+            _alertService = alertService;
 
             CopyTrackingCodeCommand = new RelayCommand(CopyTrackingCode);
         }
@@ -39,6 +41,7 @@ namespace ElectionGuardCore.Ui.Elections
         private async void CopyTrackingCode(object parameter)
         {
             await _clipboardService.Copy(EncryptionResult.TrackingCode);
+            await _alertService.Alert("Copied to clipboard", null, "OK");
         }
     }
 }
