@@ -16,7 +16,8 @@ namespace ElectionGuardCore.Ui.Forms.Services
         {
             { NavigationPaths.RootPage, typeof(ActiveContestPage) },
             { NavigationPaths.ContestSelectionListPage, typeof(ContestSelectionListPage) },
-            { NavigationPaths.ReviewSelectionPage, typeof(ReviewSelectionPage) }
+            { NavigationPaths.ReviewSelectionPage, typeof(ReviewSelectionPage) },
+            { NavigationPaths.SelectionVerificationPage, typeof(SelectionVerificationPage) }
         };
 
         public async Task Push(string path, object parameter)
@@ -24,16 +25,22 @@ namespace ElectionGuardCore.Ui.Forms.Services
             await _navigation.PushAsync(ResolvePage(path, parameter));
         }
 
-        public async Task ShowBusy(string label, Action action)
+        public async Task PushModal(string path, object parameter = null)
+        {
+            await _navigation.PushModalAsync(ResolvePage(path, parameter));
+        }
+
+        public async Task ShowBusy(string label, Action busyAction, Action onComplete)
         {
             try
             {
                 await _navigation.PushModalAsync(new BusyModal(label));
-                action();
+                busyAction();
             }
             finally
             {
                 await _navigation.PopModalAsync();
+                onComplete();
             }
         }
 

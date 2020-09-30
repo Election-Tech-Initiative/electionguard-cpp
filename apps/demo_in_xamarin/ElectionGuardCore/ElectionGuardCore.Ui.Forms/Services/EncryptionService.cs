@@ -10,7 +10,7 @@ namespace ElectionGuardCore.Ui.Forms.Services
         {
             // TODO implement
             Thread.Sleep(5000);
-            return new EncryptionResult();
+            return new EncryptionResult { TrackingCode = "12345" };
         }
     }
 }
