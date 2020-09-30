@@ -3,12 +3,29 @@
 	xmlns="http://xamarin.com/schemas/2014/forms"
 	xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
 	xmlns:uiforms="clr-namespace:ElectionGuardCore.Ui.Forms"
-	x:Class="ElectionGuardCore.Ui.Forms.Elections.SelectionVerificationPage">
-    <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
-    </ContentPage.Content>
+	x:Class="ElectionGuardCore.Ui.Forms.Elections.SelectionVerificationPage"
+	Title="{Binding Title}"
+	BackgroundColor="#F3F2F7"
+>
+	<ContentPage.Content>
+		<StackLayout Spacing="0">
+			<Label
+				Text="Below is your tracking ID. You can use this to verify your ballot was successfully included in the election."
+				LineBreakMode="WordWrap"
+				MaxLines="4"
+				Margin="20,20,20,0"
+			/>
+			<Label
+				Text="{Binding EncryptionResult.TrackingCode}"
+				FontAttributes="Bold"
+				FontSize="20"
+				HorizontalOptions="CenterAndExpand"
+				VerticalOptions="CenterAndExpand"
+				HorizontalTextAlignment="Center"
+				WidthRequest="250"
+				LineBreakMode="WordWrap"
+				MaxLines="6"
+			/>
+		</StackLayout>
+	</ContentPage.Content>
 </uiforms:PageBase>
