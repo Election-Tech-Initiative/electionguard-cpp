@@ -18,7 +18,6 @@ namespace ElectionGuardCore.Ui.Forms
 
             var navigationPage = new NavigationPage(navigationService.GetDefaultPage());
             navigationPage.BarTextColor = Color.FromHex(Colors.LightGreen);
-            NavigationPage.SetBackButtonTitle(this, "Back");
             navigationService.SetNavigation(navigationPage.Navigation);
 
             MainPage = navigationPage;

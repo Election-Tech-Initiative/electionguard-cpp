@@ -42,7 +42,7 @@ namespace ElectionGuardCore.Ui.Elections
             }
         }
 
-        public string ElectionName => ElectionDescription?.Name?.Text?.FirstOrDefault()?.Value;
+        public string ElectionName => ElectionDescription?.Name?.GetTextValue("en");
 
         public string ActiveContestName => ElectionDescription?.ActiveContest?.Name ??
                                            "There is currently not an active contest available";

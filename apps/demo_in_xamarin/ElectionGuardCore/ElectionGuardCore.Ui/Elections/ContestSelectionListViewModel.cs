@@ -42,8 +42,7 @@ namespace ElectionGuardCore.Ui.Elections
             }
         }
 
-        public string ContestTitle => ElectionDescription?.ActiveContest.BallotTitle.Text
-            .FirstOrDefault(t => t.Language == "en")?.Value;
+        public string ContestTitle => ElectionDescription?.ActiveContest.BallotTitle.GetTextValue("en");
 
         private List<CandidateViewModel> _candidates;
         public List<CandidateViewModel> Candidates
@@ -100,14 +99,16 @@ namespace ElectionGuardCore.Ui.Elections
             _reviewSelectionCommand.OnCanExecuteChanged();
         }
 
-        private RelayCommand _reviewSelectionCommand;
+        private readonly RelayCommand _reviewSelectionCommand;
         public ICommand ReviewSelectionCommand => _reviewSelectionCommand;
 
         private bool CanReviewSelection(object parameter) => SelectedCandidate != null;
 
         private async void ReviewSelection(object parameter)
         {
-            await _navigationService.Push(NavigationPaths.ReviewSelectionPage, SelectedCandidate.Candidate);
+            await _navigationService.Push(NavigationPaths.ReviewSelectionPage,
+                new ReviewSelectionViewModel.ReviewSelectionArgs(SelectedCandidate.Candidate,
+                    ElectionDescription.ActiveContest));
         }
 
         public class CandidateViewModel : ViewModelBase
@@ -125,7 +126,7 @@ namespace ElectionGuardCore.Ui.Elections
             public Candidate Candidate { get; }
 
             public string ObjectId => Candidate.ObjectId;
-            public string BallotName => Candidate.BallotName.Text.FirstOrDefault(t => t.Language == "en")?.Value;
+            public string BallotName => Candidate.BallotName.GetTextValue("en");
 
             private bool _isSelected;
             public bool IsSelected
