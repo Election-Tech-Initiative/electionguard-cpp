@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Autofac.Features.ResolveAnything;
 using ElectionGuardCore.Elections;
+using ElectionGuardCore.Encryption;
 using ElectionGuardCore.Ui.Forms.Services;
 using Xamarin.Forms;
 
@@ -28,6 +29,7 @@ namespace ElectionGuardCore.Ui.Forms
             var builder = new ContainerBuilder();
             builder.RegisterInstance(navigationService).As<INavigationService>().SingleInstance();
             builder.RegisterType<MockElectionService>().As<IElectionService>().SingleInstance();
+            builder.RegisterType<EncryptionService>().As<IEncryptionService>().SingleInstance();
 
             builder.RegisterSource(new AnyConcreteTypeNotAlreadyRegisteredSource());
 

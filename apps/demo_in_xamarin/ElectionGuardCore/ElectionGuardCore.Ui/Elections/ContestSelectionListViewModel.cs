@@ -107,8 +107,7 @@ namespace ElectionGuardCore.Ui.Elections
         private async void ReviewSelection(object parameter)
         {
             await _navigationService.Push(NavigationPaths.ReviewSelectionPage,
-                new ReviewSelectionViewModel.ReviewSelectionArgs(SelectedCandidate.Candidate,
-                    ElectionDescription.ActiveContest));
+                new ReviewSelectionViewModel.ReviewSelectionArgs(SelectedCandidate.Candidate, ElectionDescription));
         }
 
         public class CandidateViewModel : ViewModelBase

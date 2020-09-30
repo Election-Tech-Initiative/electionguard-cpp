@@ -26,6 +26,14 @@
 				HorizontalTextAlignment="Center"
 				Margin="20,0"
 			/>
+			<Button
+				Text="Encrypt &amp; Submit"
+				Command="{Binding EncryptSelectionCommand}"
+				WidthRequest="300"
+				HeightRequest="60"
+				HorizontalOptions="Center"
+				Margin="0,20,0,12"
+			/>
         </StackLayout>
     </ContentPage.Content>
 </uiforms:PageBase>

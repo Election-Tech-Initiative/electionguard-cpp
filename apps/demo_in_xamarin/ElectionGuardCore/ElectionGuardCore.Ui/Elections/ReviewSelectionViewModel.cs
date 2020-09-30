@@ -1,10 +1,21 @@
 ﻿using System.Threading.Tasks;
+using System.Windows.Input;
 using ElectionGuardCore.Elections;
+using ElectionGuardCore.Encryption;
 
 namespace ElectionGuardCore.Ui.Elections
 {
     public class ReviewSelectionViewModel : PageViewModelBase
     {
+        private readonly IEncryptionService _encryptionService;
+
+        public ReviewSelectionViewModel(IEncryptionService encryptionService)
+        {
+            _encryptionService = encryptionService;
+
+            EncryptSelectionCommand = new RelayCommand(EncryptSelecton);
+        }
+
         public override string Title => "Review";
 
         public override Task Load()
@@ -29,13 +40,21 @@ namespace ElectionGuardCore.Ui.Elections
         public class ReviewSelectionArgs
         {
             public readonly Candidate Selection;
-            public readonly ContestDescription Contest;
+            public readonly ElectionDescription Election;
 
-            public ReviewSelectionArgs(Candidate selection, ContestDescription contest)
+            public ReviewSelectionArgs(Candidate selection, ElectionDescription election)
             {
                 Selection = selection;
-                Contest = contest;
+                Election = election;
             }
+        }
+
+        public ICommand EncryptSelectionCommand { get; }
+
+        private void EncryptSelecton(object parameter)
+        {
+            _encryptionService.EncryptBallot(Args.Election, Args.Selection.ObjectId);
+
         }
     }
 }
