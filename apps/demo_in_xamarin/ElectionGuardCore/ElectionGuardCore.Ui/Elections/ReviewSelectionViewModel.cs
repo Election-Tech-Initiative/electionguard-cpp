@@ -7,11 +7,13 @@ namespace ElectionGuardCore.Ui.Elections
 {
     public class ReviewSelectionViewModel : PageViewModelBase
     {
+        private readonly IAlertService _alertService;
         private readonly IEncryptionService _encryptionService;
 
-        public ReviewSelectionViewModel(IEncryptionService encryptionService)
+        public ReviewSelectionViewModel(IAlertService alertService, IEncryptionService encryptionService)
         {
             _encryptionService = encryptionService;
+            _alertService = alertService;
 
             EncryptSelectionCommand = new RelayCommand(EncryptSelecton);
         }
@@ -51,10 +53,13 @@ namespace ElectionGuardCore.Ui.Elections
 
         public ICommand EncryptSelectionCommand { get; }
 
-        private void EncryptSelecton(object parameter)
+        private async void EncryptSelecton(object parameter)
         {
-            _encryptionService.EncryptBallot(Args.Election, Args.Selection.ObjectId);
-
+            if (await _alertService.Prompt("Encrypt ballot",
+                "You are about to encrypt your ballot. This cannot be undone. Do you wish to continue?", "Yes", "No"))
+            {
+                _encryptionService.EncryptBallot(Args.Election, Args.Selection.ObjectId);
+            }
         }
     }
 }

@@ -28,6 +28,7 @@ namespace ElectionGuardCore.Ui.Forms
         {
             var builder = new ContainerBuilder();
             builder.RegisterInstance(navigationService).As<INavigationService>().SingleInstance();
+            builder.RegisterType<AlertService>().As<IAlertService>().SingleInstance();
             builder.RegisterType<MockElectionService>().As<IElectionService>().SingleInstance();
             builder.RegisterType<EncryptionService>().As<IEncryptionService>().SingleInstance();
 
