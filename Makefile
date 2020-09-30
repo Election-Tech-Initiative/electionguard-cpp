@@ -133,7 +133,7 @@ clean:
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/android/x86_64" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/x86_64; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/ios" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/ios; fi
 	
-demo-c: build
+demo-c: build-debug
 ifeq ($(OPERATING_SYSTEM),Windows)
 	CMAKE_PREFIX_PATH=".$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64" cmake -S apps/demo_in_c \
 		-B $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c -G "MSYS Makefiles"
@@ -146,7 +146,7 @@ else
 	$(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_c/DemoInC
 endif
 
-demo-cpp: build
+demo-cpp: build-debug
 ifeq ($(OPERATING_SYSTEM),Windows)
 	CMAKE_PREFIX_PATH=".$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64" cmake -S apps/demo_in_cpp \
 		-B $(ELECTIONGUARD_BUILD_APPS_DIR)/demo_in_cpp -G "MSYS Makefiles"
