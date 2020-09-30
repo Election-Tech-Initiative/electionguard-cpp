@@ -104,6 +104,11 @@ namespace electionguard
         const ElementModQ &getDescriptionHash() const;
         vector<reference_wrapper<ContestDescription>> getContests() const;
 
+        vector<uint8_t> toBson() const;
+        string toJson() const;
+        static unique_ptr<InternalElectionDescription> fromJson(string data);
+        static unique_ptr<InternalElectionDescription> fromBson(vector<uint8_t> data);
+
       private:
         class Impl;
         unique_ptr<Impl> pimpl;
@@ -124,6 +129,13 @@ namespace electionguard
         CiphertextElectionContext &operator=(CiphertextElectionContext other);
         CiphertextElectionContext &operator=(CiphertextElectionContext &&other);
 
+        uint64_t getNumberOfGuardians() const;
+        uint64_t getQuorum() const;
+        const ElementModP *getElGamalPublicKey() const;
+        const ElementModQ *getDescriptionHash() const;
+        const ElementModQ *getCryptoBaseHash() const;
+        const ElementModQ *getCryptoExtendedBaseHash() const;
+
         static unique_ptr<CiphertextElectionContext> make(const uint64_t numberOfGuardians,
                                                           const uint64_t quorum,
                                                           unique_ptr<ElementModP> elGamalPublicKey,
@@ -134,12 +146,10 @@ namespace electionguard
                                                           const string &elGamalPublicKeyInHex,
                                                           const string &descriptionHashInHex);
 
-        uint64_t getNumberOfGuardians() const;
-        uint64_t getQuorum() const;
-        const ElementModP *getElGamalPublicKey() const;
-        const ElementModQ *getDescriptionHash() const;
-        const ElementModQ *getCryptoBaseHash() const;
-        const ElementModQ *getCryptoExtendedBaseHash() const;
+        vector<uint8_t> toBson() const;
+        string toJson() const;
+        static unique_ptr<CiphertextElectionContext> fromJson(string data);
+        static unique_ptr<CiphertextElectionContext> fromBson(vector<uint8_t> data);
 
       private:
         class Impl;

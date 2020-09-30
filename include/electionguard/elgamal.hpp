@@ -53,10 +53,12 @@ namespace electionguard
         ElementModP *getData();
         ElementModP *getData() const;
 
-        uint64_t decrypt(const ElementModQ &secretKey);
-
         virtual unique_ptr<ElementModQ> crypto_hash() override;
         virtual unique_ptr<ElementModQ> crypto_hash() const override;
+
+        static unique_ptr<ElGamalCiphertext> make(const ElementModP &pad, const ElementModP &data);
+
+        uint64_t decrypt(const ElementModQ &secretKey);
 
       private:
         class Impl;

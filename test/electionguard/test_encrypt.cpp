@@ -122,4 +122,61 @@ TEST_CASE("Encrypt Ballot with mediator succeeds")
     // Assert
     CHECK(ciphertext->isValidEncryption(metadata->getDescriptionHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
+
+    // Can Serialize CiphertextBallot
+    auto json = ciphertext->toJson();
+    auto fromJson = CiphertextBallot::fromJson(json);
+
+    CHECK(plaintext->getObjectId() == plaintext->getObjectId());
+
+    auto bson = ciphertext->toBson();
+    auto fromBson = CiphertextBallot::fromBson(bson);
+}
+
+TEST_CASE("Can serialize InternalElectionDescription")
+{
+    // Arrange
+    auto metadata = getFakeMetadata(TWO_MOD_Q());
+    auto json = metadata->toJson();
+    auto bson = metadata->toBson();
+
+    // Act
+    auto fromJson = InternalElectionDescription::fromJson(json);
+    auto fromBson = InternalElectionDescription::fromBson(bson);
+
+    // Assert
+    CHECK(metadata->getDescriptionHash().toHex() == fromJson->getDescriptionHash().toHex());
+}
+
+TEST_CASE("Can serialize CiphertextElectionContext")
+{
+    // Arrange
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto metadata = getFakeMetadata(TWO_MOD_Q());
+    auto context = getFakeContext(*metadata, *keypair->getPublicKey());
+    auto json = context->toJson();
+    auto bson = context->toBson();
+
+    // Act
+    auto fromJson = CiphertextElectionContext::fromJson(json);
+    auto fromBson = CiphertextElectionContext::fromBson(bson);
+
+    // Assert
+    CHECK(context->getDescriptionHash()->toHex() == context->getDescriptionHash()->toHex());
+}
+
+TEST_CASE("Can serialize PlaintextBallot")
+{
+    // Arrange
+    auto metadata = getFakeMetadata(TWO_MOD_Q());
+    auto plaintext = getFakeBallot(*metadata);
+    auto json = plaintext->toJson();
+    auto bson = plaintext->toBson();
+
+    // Act
+    auto fromJson = PlaintextBallot::fromJson(json);
+    auto fromBson = PlaintextBallot::fromBson(bson);
+
+    // Assert
+    CHECK(plaintext->getObjectId() == plaintext->getObjectId());
 }

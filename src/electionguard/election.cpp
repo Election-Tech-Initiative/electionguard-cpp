@@ -2,10 +2,14 @@
 
 #include "electionguard/hash.hpp"
 #include "log.hpp"
+#include "serialize.hpp"
 
 #include <cstring>
 
 using std::string;
+
+using DescriptionSerializer = electionguard::Serialize::InternalElectionDescription;
+using ContextSerializer = electionguard::Serialize::CiphertextelectionContext;
 
 namespace electionguard
 {
@@ -16,8 +20,8 @@ namespace electionguard
         string candidateId;
         uint64_t sequenceOrder;
 
-        Impl(const string &objectId, const string &candidateId, const uint64_t sequenceOrder)
-            : candidateId(candidateId)
+        Impl(const string &objectId, string candidateId, const uint64_t sequenceOrder)
+            : candidateId(move(candidateId))
         {
             this->object_id = objectId;
             this->sequenceOrder = sequenceOrder;
@@ -51,7 +55,7 @@ namespace electionguard
     string SelectionDescription::getCandidateId() const { return pimpl->candidateId; }
     uint64_t SelectionDescription::getSequenceOrder() const { return pimpl->sequenceOrder; }
 
-    // Public Methods
+    // Interface Overrides
 
     unique_ptr<ElementModQ> SelectionDescription::crypto_hash() { return pimpl->crypto_hash(); }
     unique_ptr<ElementModQ> SelectionDescription::crypto_hash() const
@@ -105,6 +109,8 @@ namespace electionguard
         }
     };
 
+    // Lifecycle Methods
+
     ContestDescription::ContestDescription(
       const string &objectId, const string &electoralDistrictId, const uint64_t sequenceOrder,
       const uint64_t voteVariation, const uint64_t numberElected, const uint64_t votesAllowed,
@@ -121,6 +127,8 @@ namespace electionguard
         swap(pimpl, other.pimpl);
         return *this;
     }
+
+    //Property Getters
 
     string ContestDescription::getObjectId() const { return pimpl->object_id; }
     string ContestDescription::getElectoralDistrictId() const { return pimpl->electoralDistrictId; }
@@ -142,6 +150,8 @@ namespace electionguard
         }
         return selections;
     }
+
+    // Interface Overrides
 
     unique_ptr<ElementModQ> ContestDescription::crypto_hash() { return pimpl->crypto_hash(); }
 
@@ -195,6 +205,29 @@ namespace electionguard
         return contests;
     }
 
+    // Public Methods
+
+    vector<uint8_t> InternalElectionDescription::toBson() const
+    {
+        return DescriptionSerializer::toBson(*this);
+    }
+
+    string InternalElectionDescription::toJson() const
+    {
+        return DescriptionSerializer::toJson(*this);
+    }
+
+    unique_ptr<InternalElectionDescription> InternalElectionDescription::fromJson(string data)
+    {
+        return DescriptionSerializer::fromJson(move(data));
+    }
+
+    unique_ptr<InternalElectionDescription>
+    InternalElectionDescription::fromBson(vector<uint8_t> data)
+    {
+        return DescriptionSerializer::fromBson(move(data));
+    }
+
 #pragma endregion
 
 #pragma region CiphertextElectionContext
@@ -237,7 +270,50 @@ namespace electionguard
         return *this;
     }
 
+    // Property Getters
+
+    uint64_t CiphertextElectionContext::getNumberOfGuardians() const
+    {
+        return pimpl->numberOfGuardians;
+    }
+    uint64_t CiphertextElectionContext::getQuorum() const { return pimpl->quorum; }
+    const ElementModP *CiphertextElectionContext::getElGamalPublicKey() const
+    {
+        return pimpl->elGamalPublicKey.get();
+    }
+    const ElementModQ *CiphertextElectionContext::getDescriptionHash() const
+    {
+        return pimpl->descriptionHash.get();
+    }
+    const ElementModQ *CiphertextElectionContext::getCryptoBaseHash() const
+    {
+        return pimpl->cryptoBaseHash.get();
+    }
+    const ElementModQ *CiphertextElectionContext::getCryptoExtendedBaseHash() const
+    {
+        return pimpl->cryptoExtendedBaseHash.get();
+    }
+
     // Public Methods
+
+    vector<uint8_t> CiphertextElectionContext::toBson() const
+    {
+        return ContextSerializer::toBson(*this);
+    }
+
+    string CiphertextElectionContext::toJson() const { return ContextSerializer::toJson(*this); }
+
+    unique_ptr<CiphertextElectionContext> CiphertextElectionContext::fromJson(string data)
+    {
+        return ContextSerializer::fromJson(move(data));
+    }
+
+    unique_ptr<CiphertextElectionContext> CiphertextElectionContext::fromBson(vector<uint8_t> data)
+    {
+        return ContextSerializer::fromBson(move(data));
+    }
+
+    // Public Static Methods
 
     unique_ptr<CiphertextElectionContext>
     CiphertextElectionContext::make(uint64_t numberOfGuardians, uint64_t quorum,
@@ -264,28 +340,6 @@ namespace electionguard
         auto descriptionHash = ElementModQ::fromHex(descriptionHashInHex);
 
         return make(numberOfGuardians, quorum, move(elGamalPublicKey), move(descriptionHash));
-    }
-
-    uint64_t CiphertextElectionContext::getNumberOfGuardians() const
-    {
-        return pimpl->numberOfGuardians;
-    }
-    uint64_t CiphertextElectionContext::getQuorum() const { return pimpl->quorum; }
-    const ElementModP *CiphertextElectionContext::getElGamalPublicKey() const
-    {
-        return pimpl->elGamalPublicKey.get();
-    }
-    const ElementModQ *CiphertextElectionContext::getDescriptionHash() const
-    {
-        return pimpl->descriptionHash.get();
-    }
-    const ElementModQ *CiphertextElectionContext::getCryptoBaseHash() const
-    {
-        return pimpl->cryptoBaseHash.get();
-    }
-    const ElementModQ *CiphertextElectionContext::getCryptoExtendedBaseHash() const
-    {
-        return pimpl->cryptoExtendedBaseHash.get();
     }
 
 #pragma endregion

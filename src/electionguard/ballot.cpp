@@ -4,6 +4,7 @@
 #include "electionguard/hash.hpp"
 #include "electionguard/tracker.hpp"
 #include "log.hpp"
+#include "serialize.hpp"
 
 #include <cstdlib>
 #include <ctime>
@@ -12,6 +13,10 @@
 
 using std::string;
 using std::time;
+
+using PlaintextBallotSerializer = electionguard::Serialize::PlaintextBallot;
+using CiphertextBallotSerializer = electionguard::Serialize::CiphertextBallot;
+
 namespace electionguard
 {
 #pragma region PlaintextBallotSelection
@@ -29,7 +34,7 @@ namespace electionguard
         // TODO: secure erase the vote
     };
 
-    // Public Members
+    // Lifecycle Methods
 
     PlaintextBallotSelection::PlaintextBallotSelection(string objectId, string vote,
                                                        bool isPlaceholderSelection /* = false */)
@@ -45,8 +50,9 @@ namespace electionguard
         return *this;
     }
 
-    uint64_t PlaintextBallotSelection::toInt() const { return stoul(pimpl->vote); }
+    // Property Getters
 
+    uint64_t PlaintextBallotSelection::toInt() const { return stoul(pimpl->vote); }
     string PlaintextBallotSelection::getObjectId() const { return pimpl->object_id; }
 
 #pragma endregion
@@ -63,12 +69,12 @@ namespace electionguard
         unique_ptr<DisjunctiveChaumPedersenProof> proof;
         unique_ptr<ElGamalCiphertext> extendedData;
 
-        Impl(const string &objectId, unique_ptr<ElementModQ> descriptionHash,
+        Impl(string objectId, unique_ptr<ElementModQ> descriptionHash,
              unique_ptr<ElGamalCiphertext> ciphertext, bool isPlaceholder,
              unique_ptr<ElementModQ> nonce, unique_ptr<ElementModQ> cryptoHash,
              unique_ptr<DisjunctiveChaumPedersenProof> proof,
              unique_ptr<ElGamalCiphertext> extendedData)
-            : objectId(objectId), descriptionHash(move(descriptionHash)),
+            : objectId(move(objectId)), descriptionHash(move(descriptionHash)),
               ciphertext(move(ciphertext)), nonce(move(nonce)), cryptoHash(move(cryptoHash)),
               proof(move(proof)), extendedData(move(extendedData))
         {
@@ -117,11 +123,6 @@ namespace electionguard
         return pimpl->ciphertext.get();
     }
 
-    DisjunctiveChaumPedersenProof *CiphertextBallotSelection::getProof() const
-    {
-        return pimpl->proof.get();
-    }
-
     ElementModQ *CiphertextBallotSelection::getCryptoHash() const
     {
         return pimpl->cryptoHash.get();
@@ -129,7 +130,20 @@ namespace electionguard
 
     ElementModQ *CiphertextBallotSelection::getNonce() { return pimpl->nonce.get(); }
 
-    // public Members
+    DisjunctiveChaumPedersenProof *CiphertextBallotSelection::getProof() const
+    {
+        return pimpl->proof.get();
+    }
+
+    // Interface Overrides
+
+    unique_ptr<ElementModQ>
+    CiphertextBallotSelection::crypto_hash_with(const ElementModQ &seedHash) const
+    {
+        return pimpl->crypto_hash_with(seedHash);
+    }
+
+    // public Static Members
 
     unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make(
       const string &objectId, const ElementModQ &descriptionHash,
@@ -158,11 +172,7 @@ namespace electionguard
         return pimpl->crypto_hash_with(seedHash);
     }
 
-    unique_ptr<ElementModQ>
-    CiphertextBallotSelection::crypto_hash_with(const ElementModQ &seedHash) const
-    {
-        return pimpl->crypto_hash_with(seedHash);
-    }
+    // Public Methods
 
     bool CiphertextBallotSelection::isValidEncryption(const ElementModQ &seedHash,
                                                       const ElementModP &elgamalPublicKey,
@@ -208,6 +218,8 @@ namespace electionguard
         }
     };
 
+    // Lifecycle Methods
+
     PlaintextBallotContest::PlaintextBallotContest(
       const string &objectId, vector<unique_ptr<PlaintextBallotSelection>> selections)
         : pimpl(new Impl(objectId, move(selections)))
@@ -220,6 +232,8 @@ namespace electionguard
         swap(pimpl, other.pimpl);
         return *this;
     }
+
+    // Property Getters
 
     string PlaintextBallotContest::getObjectId() const { return pimpl->object_id; }
 
@@ -294,6 +308,8 @@ namespace electionguard
         return selections;
     }
 
+    ElementModQ *CiphertextBallotContest::getNonce() const { return pimpl->nonce.get(); }
+
     ElementModQ *CiphertextBallotContest::getCryptoHash() const { return pimpl->cryptoHash.get(); }
 
     ConstantChaumPedersenProof *CiphertextBallotContest::getProof() const
@@ -301,7 +317,15 @@ namespace electionguard
         return pimpl->proof.get();
     }
 
-    // Public Methods
+    // Interface Overrides
+
+    unique_ptr<ElementModQ>
+    CiphertextBallotContest::crypto_hash_with(const ElementModQ &seedHash) const
+    {
+        return makeCryptoHash(pimpl->object_id, this->getSelections(), seedHash);
+    }
+
+    // Public Static Methods
 
     unique_ptr<CiphertextBallotContest> CiphertextBallotContest::make(
       const string &objectId, const ElementModQ &descriptionHash,
@@ -333,11 +357,7 @@ namespace electionguard
                                                     move(nonce), move(cryptoHash), move(proof));
     }
 
-    unique_ptr<ElementModQ>
-    CiphertextBallotContest::crypto_hash_with(const ElementModQ &seedHash) const
-    {
-        return makeCryptoHash(pimpl->object_id, this->getSelections(), seedHash);
-    }
+    // Public Methods
 
     unique_ptr<ElementModQ> CiphertextBallotContest::aggregateNonce()
     {
@@ -466,6 +486,25 @@ namespace electionguard
         return contests;
     }
 
+    // Public Methods
+
+    vector<uint8_t> PlaintextBallot::toBson() const
+    {
+        return PlaintextBallotSerializer::toBson(*this);
+    }
+
+    string PlaintextBallot::toJson() const { return PlaintextBallotSerializer::toJson(*this); }
+
+    unique_ptr<PlaintextBallot> PlaintextBallot::fromJson(string data)
+    {
+        return PlaintextBallotSerializer::fromJson(move(data));
+    }
+
+    unique_ptr<PlaintextBallot> PlaintextBallot::fromBson(vector<uint8_t> data)
+    {
+        return PlaintextBallotSerializer::fromBson(move(data));
+    }
+
 #pragma endregion
 
 #pragma region CiphertextBallot
@@ -547,21 +586,20 @@ namespace electionguard
         return Tracker::hashToWords(*pimpl->trackingHash);
     }
 
-    uint64_t CiphertextBallot::getTimestamp() { return pimpl->timestamp; }
+    uint64_t CiphertextBallot::getTimestamp() const { return pimpl->timestamp; }
 
-    unique_ptr<ElementModQ> CiphertextBallot::nonceSeed()
+    ElementModQ *CiphertextBallot::getNonce() const { return pimpl->nonce.get(); }
+
+    ElementModQ *CiphertextBallot::getCryptoHash() const { return pimpl->cryptoHash.get(); }
+
+    // Interface Overrides
+
+    unique_ptr<ElementModQ> CiphertextBallot::crypto_hash_with(const ElementModQ &seedHash) const
     {
-        return nonceSeed(*pimpl->descriptionHash, pimpl->object_id, *pimpl->nonce);
+        return makeCryptoHash(pimpl->object_id, this->getContests(), seedHash);
     }
 
-    // Public Methods
-
-    unique_ptr<ElementModQ> CiphertextBallot::nonceSeed(const ElementModQ &descriptionHash,
-                                                        const string &objectId,
-                                                        const ElementModQ &nonce)
-    {
-        return hash_elems({ref(descriptionHash), objectId, ref(nonce)});
-    }
+    // Public Static Methods
 
     unique_ptr<CiphertextBallot> CiphertextBallot::make(
       const string &objectId, const string &ballotStyle, const ElementModQ &descriptionHash,
@@ -598,10 +636,14 @@ namespace electionguard
           move(trackingHash), ballotTimestamp, move(nonce), move(cryptoHash));
     }
 
-    unique_ptr<ElementModQ> CiphertextBallot::crypto_hash_with(const ElementModQ &seedHash) const
+    unique_ptr<ElementModQ> CiphertextBallot::nonceSeed(const ElementModQ &descriptionHash,
+                                                        const string &objectId,
+                                                        const ElementModQ &nonce)
     {
-        return makeCryptoHash(pimpl->object_id, this->getContests(), seedHash);
+        return hash_elems({ref(descriptionHash), objectId, ref(nonce)});
     }
+
+    // Public Methods
 
     bool CiphertextBallot::isValidEncryption(const ElementModQ &seedHash,
                                              const ElementModP &elgamalPublicKey,
@@ -635,14 +677,36 @@ namespace electionguard
         }
 
         bool isValid = true;
-        for (const auto &item : validProofs) {
-            if (!item.second) {
-                Log::debug(": CiphertextBallot found invalid proof for: " + item.first);
+        for (const auto &[key, value] : validProofs) {
+            if (!value) {
+                Log::debug(": CiphertextBallot found invalid proof for: " + key);
                 isValid = false;
             }
         }
 
         return isValid;
+    }
+
+    unique_ptr<ElementModQ> CiphertextBallot::nonceSeed()
+    {
+        return nonceSeed(*pimpl->descriptionHash, pimpl->object_id, *pimpl->nonce);
+    }
+
+    vector<uint8_t> CiphertextBallot::toBson() const
+    {
+        return CiphertextBallotSerializer::toBson(*this);
+    }
+
+    string CiphertextBallot::toJson() const { return CiphertextBallotSerializer::toJson(*this); }
+
+    unique_ptr<CiphertextBallot> CiphertextBallot::fromJson(string data)
+    {
+        return CiphertextBallotSerializer::fromJson(move(data));
+    }
+
+    unique_ptr<CiphertextBallot> CiphertextBallot::fromBson(vector<uint8_t> data)
+    {
+        return CiphertextBallotSerializer::fromBson(move(data));
     }
 
     // Protected Methods

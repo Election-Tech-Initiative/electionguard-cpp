@@ -57,7 +57,7 @@ namespace electionguard
 
     unique_ptr<ElementModQ> Nonces::get(uint64_t item, string headers)
     {
-        return pimpl->get(item, headers);
+        return pimpl->get(item, move(headers));
     }
 
     vector<unique_ptr<ElementModQ>> Nonces::get(uint64_t startItem, uint64_t count)

@@ -42,7 +42,6 @@ namespace electionguard
         PlaintextBallotSelection &operator=(PlaintextBallotSelection &&other);
 
         uint64_t toInt() const;
-
         string getObjectId() const;
 
       private:
@@ -78,7 +77,7 @@ namespace electionguard
       public:
         CiphertextBallotSelection(const CiphertextBallotSelection &other);
         CiphertextBallotSelection(const CiphertextBallotSelection &&other);
-        CiphertextBallotSelection(const string &objectId, const ElementModQ &descriptionHash,
+        CiphertextBallotSelection(string objectId, const ElementModQ &descriptionHash,
                                   unique_ptr<ElGamalCiphertext> ciphertext, bool isPlaceholder,
                                   unique_ptr<ElementModQ> nonce, unique_ptr<ElementModQ> cryptoHash,
                                   unique_ptr<DisjunctiveChaumPedersenProof> proof,
@@ -106,6 +105,20 @@ namespace electionguard
         DisjunctiveChaumPedersenProof *getProof() const;
 
         /// <summary>
+        /// Given an encrypted BallotSelection, generates a hash, suitable for rolling up
+        /// into a hash / tracking code for an entire ballot. Of note, this particular hash examines
+        /// the `seed_hash` and `message`, but not the proof.
+        /// This is deliberate, allowing for the possibility of ElectionGuard variants running on
+        /// much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed
+        /// later on.
+        ///
+        /// In most cases the seed_hash should match the `description_hash`
+        /// </summary>
+        virtual unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) override;
+        virtual unique_ptr<ElementModQ>
+        crypto_hash_with(const ElementModQ &seedHash) const override;
+
+        /// <summary>
         /// Constructs a `CipherTextBallotSelection` object. Most of the parameters here match up to fields
         /// in the class, but this helper function will optionally compute a Chaum-Pedersen proof if the
         /// given nonce isn't `None`. Likewise, if a crypto_hash is not provided, it will be derived from
@@ -119,20 +132,6 @@ namespace electionguard
              unique_ptr<ElementModQ> nonce = nullptr, unique_ptr<ElementModQ> cryptoHash = nullptr,
              unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr,
              unique_ptr<ElGamalCiphertext> extendedData = nullptr);
-
-        /// <summary>
-        /// Given an encrypted BallotSelection, generates a hash, suitable for rolling up
-        /// into a hash / tracking code for an entire ballot. Of note, this particular hash examines
-        /// the `seed_hash` and `message`, but not the proof.
-        /// This is deliberate, allowing for the possibility of ElectionGuard variants running on
-        /// much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed
-        /// later on.
-        ///
-        /// In most cases the seed_hash should match the `description_hash`
-        /// </summary>
-        virtual unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) override;
-        virtual unique_ptr<ElementModQ>
-        crypto_hash_with(const ElementModQ &seedHash) const override;
 
         bool isValidEncryption(const ElementModQ &seedHash, const ElementModP &elgamalPublicKey,
                                const ElementModQ &cryptoExtendedBaseHash);
@@ -171,7 +170,6 @@ namespace electionguard
         PlaintextBallotContest &operator=(PlaintextBallotContest &&other);
 
         string getObjectId() const;
-
         vector<reference_wrapper<PlaintextBallotSelection>> getSelections() const;
 
       private:
@@ -194,14 +192,14 @@ namespace electionguard
         CiphertextBallotContest &operator=(CiphertextBallotContest &&other);
 
         string getObjectId() const;
-
         ElementModQ *getDescriptionHash() const;
-
         vector<reference_wrapper<CiphertextBallotSelection>> getSelections() const;
-
+        ElementModQ *getNonce() const;
         ElementModQ *getCryptoHash() const;
-
         ConstantChaumPedersenProof *getProof() const;
+
+        virtual unique_ptr<ElementModQ>
+        crypto_hash_with(const ElementModQ &seedHash) const override;
 
         static unique_ptr<CiphertextBallotContest>
         make(const string &objectId, const ElementModQ &descriptionHash,
@@ -211,11 +209,8 @@ namespace electionguard
              unique_ptr<ElementModQ> nonce = nullptr, unique_ptr<ElementModQ> cryptoHash = nullptr,
              unique_ptr<ConstantChaumPedersenProof> proof = nullptr);
 
-        virtual unique_ptr<ElementModQ>
-        crypto_hash_with(const ElementModQ &seedHash) const override;
-
-        unique_ptr<ElementModQ> aggregateNonce();
-        unique_ptr<ElGamalCiphertext> elgamalAccumulate();
+        unique_ptr<ElementModQ> aggregateNonce() const;
+        unique_ptr<ElGamalCiphertext> elgamalAccumulate() const;
 
         bool isValidEncryption(const ElementModQ &seedHash, const ElementModP &elgamalPublicKey,
                                const ElementModQ &cryptoExtendedBaseHash);
@@ -256,6 +251,11 @@ namespace electionguard
 
         vector<reference_wrapper<PlaintextBallotContest>> getContests() const;
 
+        vector<uint8_t> toBson() const;
+        string toJson() const;
+        static unique_ptr<PlaintextBallot> fromJson(string data);
+        static unique_ptr<PlaintextBallot> fromBson(vector<uint8_t> data);
+
       private:
         class Impl;
         unique_ptr<Impl> pimpl;
@@ -286,13 +286,12 @@ namespace electionguard
 
         ElementModQ *getTrackingHash() const;
         string getTrackingCode() const;
+        uint64_t getTimestamp() const;
+        ElementModQ *getNonce() const;
+        ElementModQ *getCryptoHash() const;
 
-        uint64_t getTimestamp();
-
-        unique_ptr<ElementModQ> nonceSeed();
-
-        static unique_ptr<ElementModQ> nonceSeed(const ElementModQ &descriptionHash,
-                                                 const string &objectId, const ElementModQ &nonce);
+        virtual unique_ptr<ElementModQ>
+        crypto_hash_with(const ElementModQ &seedHash) const override;
 
         static unique_ptr<CiphertextBallot>
         make(const string &objectId, const string &ballotStyle, const ElementModQ &descriptionHash,
@@ -301,11 +300,18 @@ namespace electionguard
              unique_ptr<ElementModQ> previousTrackingHash = nullptr,
              unique_ptr<ElementModQ> trackingHash = nullptr);
 
-        virtual unique_ptr<ElementModQ>
-        crypto_hash_with(const ElementModQ &seedHash) const override;
+        static unique_ptr<ElementModQ> nonceSeed(const ElementModQ &descriptionHash,
+                                                 const string &objectId, const ElementModQ &nonce);
 
         bool isValidEncryption(const ElementModQ &seedHash, const ElementModP &elgamalPublicKey,
                                const ElementModQ &cryptoExtendedBaseHash);
+
+        unique_ptr<ElementModQ> nonceSeed();
+
+        vector<uint8_t> toBson() const;
+        string toJson() const;
+        static unique_ptr<CiphertextBallot> fromJson(string data);
+        static unique_ptr<CiphertextBallot> fromBson(vector<uint8_t> data);
 
         //protected:
         // TODO: ISSUE #36 make this member protected or private
