@@ -27,7 +27,9 @@ namespace ElectionGuardCore.Ui.Forms.Services
 
         public async Task PushModal(string path, object parameter = null)
         {
-            await _navigation.PushModalAsync(ResolvePage(path, parameter));
+            PageBase contentPage = ResolvePage(path, parameter);
+            Page page = _navigation.ModalStack.Count == 0 ? new NavigationPage(contentPage) as Page : contentPage;
+            await _navigation.PushModalAsync(page);
         }
 
         internal void SetNavigation(INavigation navigation)
