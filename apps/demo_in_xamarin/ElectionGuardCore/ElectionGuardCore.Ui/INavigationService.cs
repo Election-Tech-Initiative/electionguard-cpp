@@ -7,6 +7,5 @@ namespace ElectionGuardCore.Ui
     {
         Task Push(string path, object parameter = null);
         Task PushModal(string path, object parameter = null);
-        Task ShowBusy(string label, Action busyAction, Action onComplete);
     }
 }

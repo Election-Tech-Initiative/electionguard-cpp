@@ -62,7 +62,7 @@ namespace ElectionGuardCore.Ui.Elections
                 "You are about to encrypt your ballot. This cannot be undone. Do you wish to continue?", "Yes", "No"))
             {
                 EncryptionResult result = null;
-                await _navigationService.ShowBusy("Encrypting ballot…",
+                await _alertService.ShowBusy("Encrypting ballot…",
                     () => result = _encryptionService.EncryptBallot(Args.Election, Args.Selection.ObjectId),
                     async () => await _navigationService.PushModal(NavigationPaths.SelectionVerificationPage, result)
                 );
