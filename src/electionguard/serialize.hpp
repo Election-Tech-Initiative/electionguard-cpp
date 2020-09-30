@@ -188,7 +188,7 @@ namespace electionguard
                 }
 
                 json result = {{"object_id", serializable.getObjectId()},
-                               {"balolot_style", serializable.getBallotStyle()},
+                               {"ballot_style", serializable.getBallotStyle()},
                                {"contests", contests}};
                 return result;
             }
@@ -196,7 +196,7 @@ namespace electionguard
             {
 
                 auto object_id = j["object_id"].get<string>();
-                auto balolot_style = j["balolot_style"].get<string>();
+                auto balolot_style = j["ballot_style"].get<string>();
 
                 auto contests = j["contests"];
 
