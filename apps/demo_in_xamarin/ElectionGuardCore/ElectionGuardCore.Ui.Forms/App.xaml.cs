@@ -31,6 +31,7 @@ namespace ElectionGuardCore.Ui.Forms
             builder.RegisterType<AlertService>().As<IAlertService>().SingleInstance();
             builder.RegisterType<MockElectionService>().As<IElectionService>().SingleInstance();
             builder.RegisterType<EncryptionService>().As<IEncryptionService>().SingleInstance();
+            builder.RegisterType<ClipboardService>().As<IClipboardService>().SingleInstance();
 
             builder.RegisterSource(new AnyConcreteTypeNotAlreadyRegisteredSource());
 
