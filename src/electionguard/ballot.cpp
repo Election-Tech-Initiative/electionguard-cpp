@@ -359,12 +359,12 @@ namespace electionguard
 
     // Public Methods
 
-    unique_ptr<ElementModQ> CiphertextBallotContest::aggregateNonce()
+    unique_ptr<ElementModQ> CiphertextBallotContest::aggregateNonce() const
     {
         return aggregateNonce(this->getSelections());
     }
 
-    unique_ptr<ElGamalCiphertext> CiphertextBallotContest::elgamalAccumulate()
+    unique_ptr<ElGamalCiphertext> CiphertextBallotContest::elgamalAccumulate() const
     {
         return elgamalAccumulate(this->getSelections());
     }

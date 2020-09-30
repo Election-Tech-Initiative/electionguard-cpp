@@ -73,6 +73,14 @@ typedef struct eg_ciphertext_ballot_contest_s eg_ciphertext_ballot_contest_t;
 struct eg_plaintext_ballot_s;
 typedef struct eg_plaintext_ballot_s eg_plaintext_ballot_t;
 
+eg_plaintext_ballot_t *eg_plaintext_ballot_from_json(char *data);
+eg_plaintext_ballot_t *eg_plaintext_ballot_from_bson(uint8_t *data, uint64_t length);
+
+// returns the size and fills out_data, caller is responsible for freeing the out_data
+uint64_t eg_plaintext_ballot_to_json(eg_plaintext_ballot_t *plaintext, char **out_data);
+// returns the size and fills out_data, caller is responsible for freeing the out_data
+uint64_t eg_plaintext_ballot_to_bson(eg_plaintext_ballot_t *plaintext, uint8_t **out_data);
+
 // CiphertextBallot
 
 // TODO: implement
@@ -81,6 +89,14 @@ struct eg_ciphertext_ballot_s;
 typedef struct eg_ciphertext_ballot_s eg_ciphertext_ballot_t;
 
 // no constructors defined.  use `eg_encrypt_ballot` in encrypt.h
+
+eg_ciphertext_ballot_t *eg_ciphertext_ballot_from_json(char *data);
+eg_ciphertext_ballot_t *eg_ciphertext_ballot_from_bson(uint8_t *data, uint64_t length);
+
+// returns the size and fills out_data, caller is responsible for freeing the out_data
+uint64_t eg_ciphertext_ballot_to_json(eg_ciphertext_ballot_t *ciphertext, char **out_data);
+// returns the size and fills out_data, caller is responsible for freeing the out_data
+uint64_t eg_ciphertext_ballot_to_bson(eg_ciphertext_ballot_t *ciphertext, uint8_t **out_data);
 
 #ifdef __cplusplus
 }

@@ -4,6 +4,8 @@
 #include "variant_cast.hpp"
 
 #include <memory>
+#include <string>
+#include <vector>
 
 extern "C" {
 
@@ -14,11 +16,16 @@ using electionguard::Cache;
 using electionguard::CiphertextElectionContext;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
+using electionguard::InternalElectionDescription;
 using electionguard::SelectionDescription;
+
+using std::string;
+using std::vector;
 
 // TODO: safe initialization
 static Cache<ElementModQ> cache_element_mod_q;
 static Cache<SelectionDescription> cache_selection_description;
+static Cache<InternalElectionDescription> cache_internal_election_description;
 static Cache<CiphertextElectionContext> cache_ciphertext_election_context;
 
 #pragma region SelectionDescription
@@ -62,6 +69,53 @@ eg_element_mod_q_t *eg_selection_description_crypto_hash(eg_selection_descriptio
 
 #pragma endregion
 
+#pragma region InternalElectionDescription
+
+eg_internal_election_description_t *eg_internal_election_description_from_json(char *data)
+{
+    auto data_string = string(data);
+    auto serialized = InternalElectionDescription::fromJson(data_string);
+    auto *reference = cache_internal_election_description.retain(move(serialized));
+    return AS_TYPE(eg_internal_election_description_t, reference);
+}
+
+eg_internal_election_description_t *eg_internal_election_description_from_bson(uint8_t *data,
+                                                                               uint64_t length)
+{
+    auto data_bytes = vector<uint8_t>(data, data + length);
+    auto serialized = InternalElectionDescription::fromBson(data_bytes);
+    auto *reference = cache_internal_election_description.retain(move(serialized));
+    return AS_TYPE(eg_internal_election_description_t, reference);
+}
+
+// returns the size and fills out_data
+uint64_t eg_internal_election_description_to_json(eg_internal_election_description_t *metadata,
+                                                  char **out_data)
+{
+    auto domain_type = AS_TYPE(InternalElectionDescription, metadata);
+    auto data_string = domain_type->toJson();
+
+    auto data_size = data_string.length() + 1;
+    auto data_array = new char[data_size];
+    strncpy(data_array, data_string.c_str(), data_size);
+    *out_data = data_array;
+    return data_size;
+}
+
+uint64_t eg_internal_election_description_to_bson(eg_internal_election_description_t *metadata,
+                                                  uint8_t **out_data)
+{
+    auto domain_type = AS_TYPE(InternalElectionDescription, metadata);
+    auto data_bytes = domain_type->toBson();
+
+    auto *data_array = new uint8_t[data_bytes.size()];
+    copy(data_bytes.begin(), data_bytes.end(), data_array);
+    *out_data = data_array;
+    return data_bytes.size();
+}
+
+#pragma endregion
+
 #pragma region CiphertextElectionContext
 
 eg_ciphertext_election_context_t *
@@ -94,6 +148,48 @@ eg_ciphertext_election_context_make_from_hex(uint64_t number_of_guardians, uint6
                                                    descriptionHash);
     auto *reference = cache_ciphertext_election_context.retain(move(context));
     return AS_TYPE(eg_ciphertext_election_context_t, reference);
+}
+
+eg_ciphertext_election_context_t *eg_ciphertext_election_context_from_json(char *data)
+{
+    auto data_string = string(data);
+    auto serialized = CiphertextElectionContext::fromJson(data_string);
+    auto *reference = cache_ciphertext_election_context.retain(move(serialized));
+    return AS_TYPE(eg_ciphertext_election_context_t, reference);
+}
+eg_ciphertext_election_context_t *eg_ciphertext_election_context_from_bson(uint8_t *data,
+                                                                           uint64_t length)
+{
+    auto data_bytes = vector<uint8_t>(data, data + length);
+    auto serialized = CiphertextElectionContext::fromBson(data_bytes);
+    auto *reference = cache_ciphertext_election_context.retain(move(serialized));
+    return AS_TYPE(eg_ciphertext_election_context_t, reference);
+}
+
+// returns the size and fills out_data
+uint64_t eg_ciphertext_election_context_to_json(eg_ciphertext_election_context_t *context,
+                                                char **out_data)
+{
+    auto domain_type = AS_TYPE(CiphertextElectionContext, context);
+    auto data_string = domain_type->toJson();
+
+    auto data_size = data_string.length() + 1;
+    auto data_array = new char[data_size];
+    strncpy(data_array, data_string.c_str(), data_size);
+    *out_data = data_array;
+    return data_size;
+}
+
+uint64_t eg_ciphertext_election_context_to_bson(eg_ciphertext_election_context_t *context,
+                                                uint8_t **out_data)
+{
+    auto domain_type = AS_TYPE(CiphertextElectionContext, context);
+    auto data_bytes = domain_type->toBson();
+
+    auto *data_array = new uint8_t[data_bytes.size()];
+    copy(data_bytes.begin(), data_bytes.end(), data_array);
+    *out_data = data_array;
+    return data_bytes.size();
 }
 
 #pragma endregion

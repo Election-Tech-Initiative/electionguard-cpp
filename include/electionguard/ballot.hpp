@@ -77,7 +77,7 @@ namespace electionguard
       public:
         CiphertextBallotSelection(const CiphertextBallotSelection &other);
         CiphertextBallotSelection(const CiphertextBallotSelection &&other);
-        CiphertextBallotSelection(string objectId, const ElementModQ &descriptionHash,
+        CiphertextBallotSelection(const string &objectId, const ElementModQ &descriptionHash,
                                   unique_ptr<ElGamalCiphertext> ciphertext, bool isPlaceholder,
                                   unique_ptr<ElementModQ> nonce, unique_ptr<ElementModQ> cryptoHash,
                                   unique_ptr<DisjunctiveChaumPedersenProof> proof,
