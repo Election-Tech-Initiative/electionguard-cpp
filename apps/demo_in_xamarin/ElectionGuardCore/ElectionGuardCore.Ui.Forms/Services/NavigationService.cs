@@ -17,7 +17,8 @@ namespace ElectionGuardCore.Ui.Forms.Services
             { NavigationPaths.RootPage, typeof(ActiveContestPage) },
             { NavigationPaths.ContestSelectionListPage, typeof(ContestSelectionListPage) },
             { NavigationPaths.ReviewSelectionPage, typeof(ReviewSelectionPage) },
-            { NavigationPaths.SelectionVerificationPage, typeof(SelectionVerificationPage) }
+            { NavigationPaths.SelectionVerificationPage, typeof(SelectionVerificationPage) },
+            { NavigationPaths.SelectionSubmittedPage, typeof(SelectionSubmittedPage) }
         };
 
         public async Task Push(string path, object parameter)
@@ -25,11 +26,22 @@ namespace ElectionGuardCore.Ui.Forms.Services
             await _navigation.PushAsync(ResolvePage(path, parameter));
         }
 
+        public async Task PopToRoot()
+        {
+            await _navigation.PopToRootAsync();
+        }
+
         public async Task PushModal(string path, object parameter = null)
         {
             PageBase contentPage = ResolvePage(path, parameter);
-            Page page = _navigation.ModalStack.Count == 0 ? new NavigationPage(contentPage) as Page : contentPage;
+
+            Page page = new NavigationPage(contentPage);
             await _navigation.PushModalAsync(page);
+        }
+
+        public async Task PopModal()
+        {
+            await _navigation.PopModalAsync();
         }
 
         internal void SetNavigation(INavigation navigation)
