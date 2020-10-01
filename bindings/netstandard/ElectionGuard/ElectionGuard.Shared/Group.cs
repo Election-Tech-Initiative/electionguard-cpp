@@ -13,7 +13,7 @@ namespace ElectionGuard
 
         public ulong[] Data { get { return Get(); } set { CreateNative(value); } }
 
-        private unsafe NaiveElementModP* handle;
+        internal unsafe NaiveElementModP* Handle;
 
         public ElementModP(ulong[] data)
         {
@@ -27,6 +27,11 @@ namespace ElectionGuard
             }
         }
 
+        unsafe internal ElementModP(NaiveElementModP* handle)
+        {
+            Handle = handle;
+        }
+
         private unsafe void CreateNative(ulong[] data)
         {
             fixed (ulong* pointer = new ulong[MAX_SIZE])
@@ -36,7 +41,7 @@ namespace ElectionGuard
                     pointer[i] = data[i];
                 }
 
-                handle = NativeInterface.ElementModP.Create(pointer);
+                Handle = NativeInterface.ElementModP.Create(pointer);
             }
         }
 
@@ -45,7 +50,7 @@ namespace ElectionGuard
             var data = new ulong[MAX_SIZE];
             fixed (ulong* element = new ulong[MAX_SIZE])
             {
-                var dhSize = NativeInterface.ElementModP.Get(handle, &element);
+                var dhSize = NativeInterface.ElementModP.Get(Handle, &element);
                 if (dhSize != MAX_SIZE)
                 {
                     Console.WriteLine("wrong size");
@@ -72,7 +77,7 @@ namespace ElectionGuard
         public static readonly int MAX_SIZE = 4;
 
         public ulong[] Data { get { return Get(); } set { createNative(value); } }
-        internal unsafe NaiveElementModQ* handle;
+        internal unsafe NaiveElementModQ* Handle;
 
         public ElementModQ(ulong[] data)
         {
@@ -86,6 +91,11 @@ namespace ElectionGuard
             }
         }
 
+        unsafe internal ElementModQ(NaiveElementModQ* handle)
+        {
+            Handle = handle;
+        }
+
         private unsafe void createNative(ulong[] data)
         {
             fixed (ulong* pointer = new ulong[MAX_SIZE])
@@ -95,7 +105,7 @@ namespace ElectionGuard
                     pointer[i] = data[i];
                 }
 
-                handle = NativeInterface.ElementModQ.Create(pointer);
+                Handle = NativeInterface.ElementModQ.Create(pointer);
             }
         }
 
@@ -104,7 +114,7 @@ namespace ElectionGuard
             var data = new ulong[MAX_SIZE];
             fixed (ulong* element = new ulong[MAX_SIZE])
             {
-                var dhSize = NativeInterface.ElementModQ.Get(handle, &element);
+                var dhSize = NativeInterface.ElementModQ.Get(Handle, &element);
                 if (dhSize != MAX_SIZE)
                 {
                     Console.WriteLine("wrong size");

@@ -29,6 +29,19 @@ namespace ElectionGuard
     {
         internal unsafe NativeCiphertextBallot* Handle;
 
+        public string ObjectId { get; }
+        public unsafe ElementModQ TrackingHash { get {
+                var val = NativeInterface.CiphertextBallot.GetTrackingHash(Handle);
+                return new ElementModQ(val);
+            }
+        }
+        public string TrackingCode { get; }
+
+        public unsafe ulong Timestamp { get {
+                return NativeInterface.CiphertextBallot.GetTimestamp(Handle);
+            }
+        }
+
         public unsafe CiphertextBallot(string json)
         {
             Handle = NativeInterface.CiphertextBallot.FromJson(json);
@@ -37,6 +50,13 @@ namespace ElectionGuard
         unsafe internal CiphertextBallot(NativeCiphertextBallot* handle)
         {
             Handle = handle;
+        }
+
+        public unsafe bool IsValidEncryption(
+            ElementModQ seedHash, ElementModP elGamalPublicKey, ElementModQ cryptoExtendedBaseHash)
+        {
+            return NativeInterface.CiphertextBallot.IsValidencryption(
+                Handle, seedHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
         }
 
         public unsafe string ToJson()

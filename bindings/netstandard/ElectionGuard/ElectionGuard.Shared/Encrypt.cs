@@ -43,14 +43,14 @@ namespace ElectionGuard
             if (nonce == null)
             {
                 var ciphertext = NativeInterface.Encrypt.Ballot(
-                    ballot.Handle, metadata.Handle, context.Handle, seedHash.handle, true);
+                    ballot.Handle, metadata.Handle, context.Handle, seedHash.Handle, true);
 
                 return new CiphertextBallot(ciphertext);
             }
             else
             {
                 var ciphertext = NativeInterface.Encrypt.Ballot(
-                    ballot.Handle, metadata.Handle, context.Handle, seedHash.handle, nonce.handle, true);
+                    ballot.Handle, metadata.Handle, context.Handle, seedHash.Handle, nonce.Handle, true);
 
                 return new CiphertextBallot(ciphertext);
             }
