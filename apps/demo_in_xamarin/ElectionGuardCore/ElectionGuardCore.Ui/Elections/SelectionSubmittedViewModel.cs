@@ -19,15 +19,45 @@ namespace ElectionGuardCore.Ui.Elections
 
         public override Task Load()
         {
+            Args = (SelectionSubmittedArgs)Parameter;
             return Task.CompletedTask;
         }
 
-        private new SelectionSubmittedArgs Parameter => base.Parameter as SelectionSubmittedArgs;
+        private SelectionSubmittedArgs _args;
+        private SelectionSubmittedArgs Args
+        {
+            get => _args;
+            set
+            {
+                _args = value;
+                OnPropertyChanged(nameof(Message));
+                OnPropertyChanged(nameof(CanReVote));
+            }
+        }
 
-        public string Message =>
-            Parameter?.VoteCast ?? false ? "Your vote has been counted!" : "Your vote has been spoiled.";
+        public string Message
+        {
+            get
+            {
+                if (Args == null)
+                {
+                    return null;
+                }
+                return Args.VoteCast ? "Your vote has been counted!" : "Your vote has been spoiled.";
+            }
+        }
 
-        public bool CanReVote => !(Parameter?.VoteCast ?? false);
+        public bool CanReVote
+        {
+            get
+            {
+                if (Args == null)
+                {
+                    return false;
+                }
+                return !Args.VoteCast;
+            }
+        }
 
         public ICommand CloseCommand { get; }
 
