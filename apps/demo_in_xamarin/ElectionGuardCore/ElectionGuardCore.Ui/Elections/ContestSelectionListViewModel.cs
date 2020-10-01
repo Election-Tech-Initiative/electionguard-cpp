@@ -23,10 +23,21 @@ namespace ElectionGuardCore.Ui.Elections
 
         public override Task Load()
         {
-            ElectionDescription = (ElectionDescription)Parameter;
+            Args = (ContestSelectionListArgs)Parameter;
             _reviewSelectionCommand.OnCanExecuteChanged();  // prevent button from staying enabled when 
                                                             // reloading view and selection is lost
             return Task.CompletedTask;
+        }
+
+        private ContestSelectionListArgs _args;
+        private ContestSelectionListArgs Args
+        {
+            get => _args;
+            set
+            {
+                _args = value;
+                ElectionDescription = _args.ElectionDescription;
+            }
         }
 
         private ElectionDescription _electionDescription;
@@ -36,7 +47,6 @@ namespace ElectionGuardCore.Ui.Elections
             set
             {
                 _electionDescription = value;
-
                 OnPropertyChanged(nameof(ContestTitle));
                 RefreshCandidates();
             }
@@ -68,7 +78,8 @@ namespace ElectionGuardCore.Ui.Elections
                 b.SequenceOrder))
             {
                 var candidate =
-                    ElectionDescription.Candidates.FirstOrDefault(c => c.ObjectId == ballotSelection.CandidateId);
+                    Args.ElectionDescription.Candidates
+                    .FirstOrDefault(c => c.ObjectId == ballotSelection.CandidateId);
                 if (candidate != null)
                 {
                     candidates.Add(new CandidateViewModel(candidate));
@@ -107,7 +118,20 @@ namespace ElectionGuardCore.Ui.Elections
         private async void ReviewSelection(object parameter)
         {
             await _navigationService.Push(NavigationPaths.ReviewSelectionPage,
-                new ReviewSelectionViewModel.ReviewSelectionArgs(SelectedCandidate.Candidate, ElectionDescription));
+                new ReviewSelectionViewModel.ReviewSelectionArgs(
+                    SelectedCandidate.Candidate, Args.ElectionDescription, Args.ElectionContext));
+        }
+
+        public class ContestSelectionListArgs
+        {
+            public readonly ElectionDescription ElectionDescription;
+            public readonly CiphertextElectionContext ElectionContext;
+
+            public ContestSelectionListArgs(ElectionDescription metadata, CiphertextElectionContext context)
+            {
+                ElectionDescription = metadata;
+                ElectionContext = context;
+            }
         }
 
         public class CandidateViewModel : ViewModelBase

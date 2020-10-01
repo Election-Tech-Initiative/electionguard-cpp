@@ -18,7 +18,7 @@
 				VerticalOptions="StartAndExpand"
 			/>
 			<Label
-				Text="{Binding EncryptionResult.TrackingCode}"
+				Text="{Binding CiphertextBallot.TrackingCode}"
 				FontAttributes="Bold"
 				FontSize="20"
 				HorizontalOptions="Center"

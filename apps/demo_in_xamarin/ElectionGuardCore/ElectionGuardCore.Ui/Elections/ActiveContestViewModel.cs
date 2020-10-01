@@ -23,6 +23,7 @@ namespace ElectionGuardCore.Ui.Elections
         {
             // TODO show loading indicator
             ElectionDescription = await _electionService.GetElectionDescription();
+            ElectionContext = await _electionService.GetCiphertextElectionContext();
         }
 
         private ElectionDescription _electionDescription;
@@ -38,6 +39,17 @@ namespace ElectionGuardCore.Ui.Elections
                 OnPropertyChanged(nameof(HasVotedInActiveContest));
                 OnPropertyChanged(nameof(CanVote));
                 OnPropertyChanged(nameof(CannotVote));
+            }
+        }
+
+        private CiphertextElectionContext _electionContext;
+        public CiphertextElectionContext ElectionContext
+        {
+            get => _electionContext;
+            private set
+            {
+                _electionContext = value;
+                OnPropertyChanged();
             }
         }
 
@@ -69,7 +81,8 @@ namespace ElectionGuardCore.Ui.Elections
 
         private async void BeginVote(object parameter)
         {
-            await _navigationService.Push(NavigationPaths.ContestSelectionListPage, ElectionDescription);
+            await _navigationService.Push(NavigationPaths.ContestSelectionListPage,
+                new ContestSelectionListViewModel.ContestSelectionListArgs(ElectionDescription, ElectionContext));
         }
     }
 }

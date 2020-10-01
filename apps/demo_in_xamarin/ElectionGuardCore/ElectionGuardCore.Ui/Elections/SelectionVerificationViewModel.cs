@@ -40,17 +40,17 @@ namespace ElectionGuardCore.Ui.Elections
             set
             {
                 _args = value;
-                EncryptionResult = _args.EncryptionResult;
+                CiphertextBallot = _args.CiphertextBallot;
             }
         }
 
-        private EncryptionResult _encryptionResult;
-        public EncryptionResult EncryptionResult
+        private CiphertextBallot _ciphertextBallot;
+        public CiphertextBallot CiphertextBallot
         {
-            get => _encryptionResult;
+            get => _ciphertextBallot;
             set
             {
-                _encryptionResult = value;
+                _ciphertextBallot = value;
                 OnPropertyChanged();
             }
         }
@@ -59,7 +59,7 @@ namespace ElectionGuardCore.Ui.Elections
 
         private async void CopyTrackingCode(object parameter)
         {
-            await _clipboardService.Copy(EncryptionResult.TrackingCode);
+            await _clipboardService.Copy(CiphertextBallot.TrackingCode);
             await _alertService.Alert("Copied to clipboard", null, "OK");
         }
 
@@ -88,12 +88,15 @@ namespace ElectionGuardCore.Ui.Elections
         public class SelectionVerificationArgs
         {
             public readonly ElectionDescription ElectionDescription;
-            public readonly EncryptionResult EncryptionResult;
+            public readonly CiphertextElectionContext CiphertextElectionContext;
+            public readonly CiphertextBallot CiphertextBallot;
 
-            public SelectionVerificationArgs(ElectionDescription electionDescription, EncryptionResult encryptionResult)
+            public SelectionVerificationArgs(
+                ElectionDescription metadata, CiphertextElectionContext context, CiphertextBallot ciphertextBallot)
             {
-                ElectionDescription = electionDescription;
-                EncryptionResult = encryptionResult;
+                ElectionDescription = metadata;
+                CiphertextElectionContext = context;
+                CiphertextBallot = ciphertextBallot;
             }
         }
     }

@@ -6,11 +6,13 @@ namespace ElectionGuardCore.Ui.Forms.Services
 {
     public class EncryptionService : IEncryptionService
     {
-        public EncryptionResult EncryptBallot(ElectionDescription election, string candidateId)
+        public CiphertextBallot EncryptBallot(
+            ElectionDescription metadata, CiphertextElectionContext context, Candidate candidate)
         {
+
             // TODO implement
             Thread.Sleep(5000);
-            return new EncryptionResult { TrackingCode = "checker ACND2 sorry K2JJD connect 9ANDK four 8C372 unreal G338F blizzard FGG1J super 4RR81 tornado J7BCA" };
+            return new CiphertextBallot { TrackingCode = "checker ACND2 sorry K2JJD connect 9ANDK four 8C372 unreal G338F blizzard FGG1J super 4RR81 tornado J7BCA" };
         }
     }
 }
