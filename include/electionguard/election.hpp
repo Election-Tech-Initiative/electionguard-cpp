@@ -101,6 +101,9 @@ namespace electionguard
         InternalElectionDescription &operator=(InternalElectionDescription other);
         InternalElectionDescription &operator=(InternalElectionDescription &&other);
 
+        // TODO: If the Election Manifest is used to populate, calculate this value
+        // temporarily, it may be null.
+        // Use CiphertextElectionContext.getDescriptionHash()
         const ElementModQ &getDescriptionHash() const;
         vector<reference_wrapper<ContestDescription>> getContests() const;
 
