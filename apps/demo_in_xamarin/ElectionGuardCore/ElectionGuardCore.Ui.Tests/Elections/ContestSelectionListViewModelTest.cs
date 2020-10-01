@@ -65,6 +65,16 @@ namespace ElectionGuardCore.Ui.Tests.Elections
             }
         };
 
+        private readonly CiphertextElectionContext _electionContext = new CiphertextElectionContext
+        {
+            NumberOfGuardians = 5,
+            Quorum = 3,
+            ElgamalPublicKey = "12345",
+            DescriptionHash = "23456",
+            CryptoBaseHash = "34567",
+            CryptoExtendedBaseHash = "45678"
+        };
+
         [SetUp]
         public void SetUp()
         {
@@ -191,7 +201,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         {
             var viewModel = new ContestSelectionListViewModel(_navigationServiceMock.Object)
             {
-                Parameter = _electionDescription
+                Parameter = new ContestSelectionListViewModel.ContestSelectionListArgs(_electionDescription, _electionContext)
             };
             await viewModel.Load();
 
