@@ -1,13 +1,13 @@
 .PHONY: build build-debug build-debug-all build-release build-android build-ios clean demo-c demo-cpp format memcheck sanitize sanitize-asan sanitize-tsan test
 
 TARGET?=Release
+NDK_PATH?=/Users/$$USER/Library/Android/sdk/ndk/21.3.6528147
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_BUILD_DIR=$(realpath .)/build
 ELECTIONGUARD_BUILD_APPS_DIR=$(ELECTIONGUARD_BUILD_DIR)/apps
 ELECTIONGUARD_BUILD_BINDING_DIR=$(ELECTIONGUARD_BUILD_DIR)/bindings
 ELECTIONGUARD_BUILD_LIBS_DIR=$(ELECTIONGUARD_BUILD_DIR)/libs
-NDK_PATH=/Users/$$USER/Library/Android/sdk/ndk/21.3.6528147
 CPM_SOURCE_CACHE=$(realpath .)/.cache/CPM
 
 # Detect operating system

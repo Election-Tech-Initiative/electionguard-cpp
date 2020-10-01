@@ -9,9 +9,11 @@
     <Import_RootNamespace>ElectionGuard</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)ElectionGuard.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ElectionguardSafeHandle.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ElementModQ.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Group.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NativeInterface.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Ballot.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Encrypt.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Election.cs" />
   </ItemGroup>
 </Project>

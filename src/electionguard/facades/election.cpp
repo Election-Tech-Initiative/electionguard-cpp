@@ -24,6 +24,7 @@ using std::vector;
 
 // TODO: safe initialization
 static Cache<ElementModQ> cache_element_mod_q;
+static Cache<ElementModP> cache_element_mod_p;
 static Cache<SelectionDescription> cache_selection_description;
 static Cache<InternalElectionDescription> cache_internal_election_description;
 static Cache<CiphertextElectionContext> cache_ciphertext_election_context;
@@ -71,6 +72,16 @@ eg_element_mod_q_t *eg_selection_description_crypto_hash(eg_selection_descriptio
 
 #pragma region InternalElectionDescription
 
+eg_element_mod_q_t *
+eg_internal_election_description_get_description_hash(eg_internal_election_description_t *metadata)
+{
+    auto const_ref = AS_TYPE(InternalElectionDescription, metadata)->getDescriptionHash();
+
+    auto pointer = make_unique<ElementModQ>(const_ref);
+    auto *reference = cache_element_mod_q.retain(move(pointer));
+    return AS_TYPE(eg_element_mod_q_t, reference);
+}
+
 eg_internal_election_description_t *eg_internal_election_description_from_json(char *data)
 {
     auto data_string = string(data);
@@ -111,12 +122,50 @@ uint64_t eg_internal_election_description_to_bson(eg_internal_election_descripti
     auto *data_array = new uint8_t[data_bytes.size()];
     copy(data_bytes.begin(), data_bytes.end(), data_array);
     *out_data = data_array;
+
+    // TODO: cleanup data_array
     return data_bytes.size();
 }
 
 #pragma endregion
 
 #pragma region CiphertextElectionContext
+
+eg_element_mod_p_t *
+eg_ciphertext_election_context_get_elgamal_public_key(eg_ciphertext_election_context_t *context)
+{
+    auto *pointer = AS_TYPE(CiphertextElectionContext, context)->getElGamalPublicKey();
+    unique_ptr<ElementModP> local_reference{const_cast<ElementModP *>(pointer)};
+    auto *reference = cache_element_mod_p.retain(move(local_reference));
+    return AS_TYPE(eg_element_mod_p_t, reference);
+}
+
+eg_element_mod_q_t *
+eg_ciphertext_election_context_get_description_hash(eg_ciphertext_election_context_t *context)
+{
+    auto *pointer = AS_TYPE(CiphertextElectionContext, context)->getDescriptionHash();
+    unique_ptr<ElementModQ> local_reference{const_cast<ElementModQ *>(pointer)};
+    auto *reference = cache_element_mod_q.retain(move(local_reference));
+    return AS_TYPE(eg_element_mod_q_t, reference);
+}
+
+eg_element_mod_q_t *
+eg_ciphertext_election_context_get_crypto_base_hash(eg_ciphertext_election_context_t *context)
+{
+    auto *pointer = AS_TYPE(CiphertextElectionContext, context)->getCryptoBaseHash();
+    unique_ptr<ElementModQ> local_reference{const_cast<ElementModQ *>(pointer)};
+    auto *reference = cache_element_mod_q.retain(move(local_reference));
+    return AS_TYPE(eg_element_mod_q_t, reference);
+}
+
+eg_element_mod_q_t *eg_ciphertext_election_context_get_crypto_extended_base_hash(
+  eg_ciphertext_election_context_t *context)
+{
+    auto *pointer = AS_TYPE(CiphertextElectionContext, context)->getCryptoExtendedBaseHash();
+    unique_ptr<ElementModQ> local_reference{const_cast<ElementModQ *>(pointer)};
+    auto *reference = cache_element_mod_q.retain(move(local_reference));
+    return AS_TYPE(eg_element_mod_q_t, reference);
+}
 
 eg_ciphertext_election_context_t *
 eg_ciphertext_election_context_make(uint64_t number_of_guardians, uint64_t quorum,

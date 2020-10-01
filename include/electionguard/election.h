@@ -38,17 +38,20 @@ typedef struct eg_contest_description_s eg_contest_description_t;
 struct eg_internal_election_description_s;
 typedef struct eg_internal_election_description_s eg_internal_election_description_t;
 
-eg_internal_election_description_t *eg_internal_election_description_from_json(char *data);
-eg_internal_election_description_t *eg_internal_election_description_from_bson(uint8_t *data,
-                                                                               uint64_t length);
+EG_API eg_element_mod_q_t *
+eg_internal_election_description_get_description_hash(eg_internal_election_description_t *metadata);
+
+EG_API eg_internal_election_description_t *eg_internal_election_description_from_json(char *data);
+EG_API eg_internal_election_description_t *
+eg_internal_election_description_from_bson(uint8_t *data, uint64_t length);
 
 // returns the size and fills out_data, caller is responsible for freeing the out_data
-uint64_t eg_internal_election_description_to_json(eg_internal_election_description_t *metadata,
-                                                  char **out_data);
+EG_API uint64_t eg_internal_election_description_to_json(
+  eg_internal_election_description_t *metadata, char **out_data);
 
 // returns the size and fills out_data, caller is responsible for freeing the out_data
-uint64_t eg_internal_election_description_to_bson(eg_internal_election_description_t *metadata,
-                                                  uint8_t **out_data);
+EG_API uint64_t eg_internal_election_description_to_bson(
+  eg_internal_election_description_t *metadata, uint8_t **out_data);
 
 // TODO: implement
 
@@ -56,6 +59,18 @@ uint64_t eg_internal_election_description_to_bson(eg_internal_election_descripti
 
 struct eg_ciphertext_election_context_s;
 typedef struct eg_ciphertext_election_context_s eg_ciphertext_election_context_t;
+
+EG_API eg_element_mod_p_t *
+eg_ciphertext_election_context_get_elgamal_public_key(eg_ciphertext_election_context_t *context);
+
+EG_API eg_element_mod_q_t *
+eg_ciphertext_election_context_get_description_hash(eg_ciphertext_election_context_t *context);
+
+EG_API eg_element_mod_q_t *
+eg_ciphertext_election_context_get_crypto_base_hash(eg_ciphertext_election_context_t *context);
+
+EG_API eg_element_mod_q_t *eg_ciphertext_election_context_get_crypto_extended_base_hash(
+  eg_ciphertext_election_context_t *context);
 
 EG_API eg_ciphertext_election_context_t *
 eg_ciphertext_election_context_make(uint64_t number_of_guardians, uint64_t quorum,
@@ -67,17 +82,17 @@ eg_ciphertext_election_context_make_from_hex(uint64_t number_of_guardians, uint6
                                              const char *elgamal_public_key,
                                              const char *description_hash);
 
-eg_ciphertext_election_context_t *eg_ciphertext_election_context_from_json(char *data);
-eg_ciphertext_election_context_t *eg_ciphertext_election_context_from_bson(uint8_t *data,
-                                                                           uint64_t length);
+EG_API eg_ciphertext_election_context_t *eg_ciphertext_election_context_from_json(char *data);
+EG_API eg_ciphertext_election_context_t *eg_ciphertext_election_context_from_bson(uint8_t *data,
+                                                                                  uint64_t length);
 
 // returns the size and fills out_data, caller is responsible for freeing the out_data
-uint64_t eg_ciphertext_election_context_to_json(eg_ciphertext_election_context_t *context,
-                                                char **out_data);
+EG_API uint64_t eg_ciphertext_election_context_to_json(eg_ciphertext_election_context_t *context,
+                                                       char **out_data);
 
 // returns the size and fills out_data, caller is responsible for freeing the out_data
-uint64_t eg_ciphertext_election_context_to_bson(eg_ciphertext_election_context_t *context,
-                                                uint8_t **out_data);
+EG_API uint64_t eg_ciphertext_election_context_to_bson(eg_ciphertext_election_context_t *context,
+                                                       uint8_t **out_data);
 
 #ifdef __cplusplus
 }
