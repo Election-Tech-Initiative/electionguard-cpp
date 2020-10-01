@@ -3,8 +3,8 @@
 #include "../kremlin/Hacl_Bignum256.h"
 #include "../kremlin/Hacl_Bignum4096.h"
 #include "../kremlin/Lib_Memzero0.h"
+#include "convert.hpp"
 #include "log.hpp"
-#include "serialize.hpp"
 
 #include <cstdint>
 #include <iomanip>
@@ -238,6 +238,20 @@ namespace electionguard
 
     ElementModP::~ElementModP() = default;
 
+    // Operator Overloads
+
+    ElementModP &ElementModP::operator=(ElementModP other)
+    {
+        swap(pimpl, other.pimpl);
+        return *this;
+    }
+
+    bool ElementModP::operator==(const ElementModP &other) { return *pimpl == *other.pimpl; }
+
+    bool ElementModP::operator!=(const ElementModP &other) { return !(*this == other); }
+
+    bool ElementModP::operator<(const ElementModP &other) { return *pimpl < *other.pimpl; }
+
     // Property Getters
 
     uint64_t *ElementModP::get() const { return static_cast<uint64_t *>(pimpl->data); }
@@ -253,8 +267,6 @@ namespace electionguard
         return this->isInBounds() && residue;
     }
 
-    // Methods
-
     string ElementModP::toHex() const
     {
         // Returned bytes array from Hacl needs to be pre-allocated to 512 bytes
@@ -264,6 +276,8 @@ namespace electionguard
                                        static_cast<uint8_t *>(byteResult));
         return bytes_to_hex(byteResult);
     }
+
+    // Static Methods
 
     unique_ptr<ElementModP> ElementModP::fromHex(const string &representation)
     {
@@ -281,32 +295,20 @@ namespace electionguard
         return bytes_to_p(reinterpret_cast<uint8_t *>(&bigEndian), bitWidth);
     }
 
-    // Operator Overloads
-
-    ElementModP &ElementModP::operator=(ElementModP other)
-    {
-        swap(pimpl, other.pimpl);
-        return *this;
-    }
-
-    bool ElementModP::operator==(const ElementModP &other) { return *pimpl == *other.pimpl; }
-
-    bool ElementModP::operator!=(const ElementModP &other) { return !(*this == other); }
-
-    bool ElementModP::operator<(const ElementModP &other) { return *pimpl < *other.pimpl; }
-
 #pragma endregion
 
 #pragma region ElementModQ
 
     struct ElementModQ::Impl {
 
+        uint64_t data[MAX_Q_LEN] = {};
+
         Impl(const vector<uint64_t> &elem, bool unchecked)
         {
             uint64_t array[MAX_Q_LEN] = {};
             copy(elem.begin(), elem.end(), static_cast<uint64_t *>(array));
-            if (!unchecked && Hacl_Bignum4096_lt_mask(const_cast<uint64_t *>(Q_ARRAY_REVERSE),
-                                                      static_cast<uint64_t *>(array)) > 0) {
+            if (!unchecked && Hacl_Bignum256_lt_mask(const_cast<uint64_t *>(Q_ARRAY_REVERSE),
+                                                     static_cast<uint64_t *>(array)) > 0) {
                 throw out_of_range("Value for ElementModQ is greater than allowed");
             }
             memcpy(static_cast<uint64_t *>(data), static_cast<uint64_t *>(array), MAX_Q_SIZE);
@@ -343,8 +345,6 @@ namespace electionguard
             return Hacl_Bignum256_lt_mask(static_cast<uint64_t *>(data),
                                           static_cast<uint64_t *>(other_.data)) > 0;
         }
-
-        uint64_t data[MAX_Q_LEN] = {};
     };
 
     // Lifecycle Methods
@@ -362,11 +362,23 @@ namespace electionguard
     }
     ElementModQ::~ElementModQ() = default;
 
+    // Operator Overloads
+
+    ElementModQ &ElementModQ::operator=(ElementModQ other)
+    {
+        swap(pimpl, other.pimpl);
+        return *this;
+    }
+
+    bool ElementModQ::operator==(const ElementModQ &other) { return *pimpl == *other.pimpl; }
+
+    bool ElementModQ::operator!=(const ElementModQ &other) { return !(*this == other); }
+
+    bool ElementModQ::operator<(const ElementModQ &other) { return *pimpl < *other.pimpl; }
+
     // Property Getters
 
     uint64_t *ElementModQ::get() const { return static_cast<uint64_t *>(pimpl->data); }
-
-    // Public Methods
 
     bool ElementModQ::isInBounds() const
     {
@@ -393,12 +405,7 @@ namespace electionguard
         return bytes_to_hex(byteResult);
     }
 
-    unique_ptr<ElementModP> ElementModQ::toElementModP() const
-    {
-        uint64_t p4096[MAX_P_LEN] = {};
-        memcpy(static_cast<uint64_t *>(p4096), static_cast<uint64_t *>(pimpl->data), MAX_Q_SIZE);
-        return make_unique<ElementModP>(p4096, true);
-    }
+    // Static Methods
 
     unique_ptr<ElementModQ> ElementModQ::fromHex(const string &representation)
     {
@@ -416,19 +423,14 @@ namespace electionguard
         return bytes_to_q(reinterpret_cast<uint8_t *>(&bigEndian), bitWidth);
     }
 
-    // Operator Overloads
+    // Public Methods
 
-    ElementModQ &ElementModQ::operator=(ElementModQ other)
+    unique_ptr<ElementModP> ElementModQ::toElementModP() const
     {
-        swap(pimpl, other.pimpl);
-        return *this;
+        uint64_t p4096[MAX_P_LEN] = {};
+        memcpy(static_cast<uint64_t *>(p4096), static_cast<uint64_t *>(pimpl->data), MAX_Q_SIZE);
+        return make_unique<ElementModP>(p4096, true);
     }
-
-    bool ElementModQ::operator==(const ElementModQ &other) { return *pimpl == *other.pimpl; }
-
-    bool ElementModQ::operator!=(const ElementModQ &other) { return !(*this == other); }
-
-    bool ElementModQ::operator<(const ElementModQ &other) { return *pimpl < *other.pimpl; }
 
 #pragma endregion
 

@@ -14,11 +14,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-//static bool strings_are_equal(char *expected, char *actual);
+static bool strings_are_equal(char *expected, char *actual);
 
 static bool test_crypto_hashing();
 static bool test_constant_chaum_pedersen_proof();
 static bool test_encrypt_selection();
+static bool test_encrypt_ballot();
 static bool test_generate_tracking_code();
 
 int main()
@@ -29,6 +30,7 @@ int main()
     assert(test_crypto_hashing() == true);
     assert(test_constant_chaum_pedersen_proof() == true);
     assert(test_encrypt_selection() == true);
+    assert(test_encrypt_ballot() == true);
     assert(test_generate_tracking_code() == true);
 
     printf("TEST STATUS SUCCESS!");
@@ -130,6 +132,26 @@ bool test_encrypt_selection()
     return true;
 }
 
+bool test_encrypt_ballot()
+{
+    // Arrange
+    char *json = "{\"ballot_style\":\"ballot-style-1\",\"contests\":[{\"object_id\":\"contest-1-"
+                 "id\",\"selections\":[{\"object_id\":\"contest-1-selection-1-id\",\"vote\":1},{"
+                 "\"object_id\":\"contest-1-selection-2-id\",\"vote\":1},{\"object_id\":\"contest-"
+                 "1-selection-3-id\",\"vote\":0}]},{\"object_id\":\"contest-2-id\",\"selections\":["
+                 "{\"object_id\":\"contest-2-selection-1-id\",\"vote\":1},{\"object_id\":\"contest-"
+                 "2-selection-2-id\",\"vote\":1}]}],\"object_id\":\"ballot-id-123\"}";
+
+    eg_plaintext_ballot_t *fromJson = eg_plaintext_ballot_from_json(json);
+
+    char *derived;
+    uint64_t size = eg_plaintext_ballot_to_json(fromJson, &derived);
+
+    assert(strings_are_equal(json, derived) == true);
+    free(derived);
+    return true;
+}
+
 bool test_generate_tracking_code()
 {
     // Arrange
@@ -170,4 +192,21 @@ bool test_generate_tracking_code()
     assert(rotating_hash_1_data[0] != device_hash_data[0]);
 
     return true;
+}
+
+bool strings_are_equal(char *expected, char *actual)
+{
+    while (*expected == *actual) {
+        if (*expected == '\0' || *actual == '\0') {
+            break;
+        }
+        expected++;
+        actual++;
+    }
+
+    if (*expected == '\0' && *actual == '\0') {
+        return true;
+    } else {
+        return false;
+    }
 }

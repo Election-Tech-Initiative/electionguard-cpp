@@ -1,5 +1,19 @@
 cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 
+# --- Import tools ----
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
+
+# ---- Dependencies ----
+
+include(../cmake/CPM.cmake)
+
+CPMAddPackage(
+    NAME nlohmann_json
+    VERSION 3.9.1
+    URL https://github.com/nlohmann/json/releases/download/v3.9.1/include.zip
+    URL_HASH SHA256=6bea5877b1541d353bd77bdfbdb2696333ae5ed8f9e8cc22df657192218cad91
+)
 
 # ---- Library Sources ----
 
@@ -23,7 +37,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/log.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/serialize.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/convert.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/tracker.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/variant_cast.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/words.cpp
@@ -108,8 +122,9 @@ target_include_directories(${META_PROJECT_TARGET}
 
 # ---- Dependencies ----
 
-# find_package(GMP REQUIRED)
-# target_link_libraries(${META_PROJECT_TARGET} PRIVATE ${GMP_LIBRARY})
+add_library(nlohmann_json INTERFACE IMPORTED)
+target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
+target_link_libraries(${META_PROJECT_TARGET} PRIVATE nlohmann_json)
 
 # ---- Install ----
 

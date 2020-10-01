@@ -55,7 +55,7 @@ namespace electionguard
         ContestDescription(const ContestDescription &other);
         ContestDescription(const ContestDescription &&other);
         ContestDescription(const string &objectId, const string &electoralDistrictId,
-                           const uint64_t sequenceOrder, const uint64_t voteVariation,
+                           const uint64_t sequenceOrder, const string &voteVariation,
                            const uint64_t numberElected, const uint64_t votesAllowed,
                            const string &name, const string &ballotTitle,
                            const string &ballotSubtitle,
@@ -68,7 +68,7 @@ namespace electionguard
         string getObjectId() const;
         string getElectoralDistrictId() const;
         uint64_t getSequenceOrder() const;
-        uint64_t getVoteVariation() const; // TODO: domain type enum
+        string getVoteVariation() const; // TODO: domain type enum
         uint64_t getNumberElected() const;
         uint64_t getVotesAllowed() const;
         string getName() const;
@@ -101,8 +101,18 @@ namespace electionguard
         InternalElectionDescription &operator=(InternalElectionDescription other);
         InternalElectionDescription &operator=(InternalElectionDescription &&other);
 
+        // TODO: If the Election Manifest is used to populate, calculate this value
+        // temporarily, it may be null.
+        // Use CiphertextElectionContext.getDescriptionHash()
         const ElementModQ &getDescriptionHash() const;
         vector<reference_wrapper<ContestDescription>> getContests() const;
+
+        vector<uint8_t> toBson() const;
+        string toJson();
+        string toJson() const;
+        // can accept either the InternalElectionDescription or the Election Manifest
+        static unique_ptr<InternalElectionDescription> fromJson(string data);
+        static unique_ptr<InternalElectionDescription> fromBson(vector<uint8_t> data);
 
       private:
         class Impl;
@@ -124,6 +134,13 @@ namespace electionguard
         CiphertextElectionContext &operator=(CiphertextElectionContext other);
         CiphertextElectionContext &operator=(CiphertextElectionContext &&other);
 
+        uint64_t getNumberOfGuardians() const;
+        uint64_t getQuorum() const;
+        const ElementModP *getElGamalPublicKey() const;
+        const ElementModQ *getDescriptionHash() const;
+        const ElementModQ *getCryptoBaseHash() const;
+        const ElementModQ *getCryptoExtendedBaseHash() const;
+
         static unique_ptr<CiphertextElectionContext> make(const uint64_t numberOfGuardians,
                                                           const uint64_t quorum,
                                                           unique_ptr<ElementModP> elGamalPublicKey,
@@ -134,12 +151,10 @@ namespace electionguard
                                                           const string &elGamalPublicKeyInHex,
                                                           const string &descriptionHashInHex);
 
-        uint64_t getNumberOfGuardians() const;
-        uint64_t getQuorum() const;
-        const ElementModP *getElGamalPublicKey() const;
-        const ElementModQ *getDescriptionHash() const;
-        const ElementModQ *getCryptoBaseHash() const;
-        const ElementModQ *getCryptoExtendedBaseHash() const;
+        vector<uint8_t> toBson() const;
+        string toJson() const;
+        static unique_ptr<CiphertextElectionContext> fromJson(string data);
+        static unique_ptr<CiphertextElectionContext> fromBson(vector<uint8_t> data);
 
       private:
         class Impl;

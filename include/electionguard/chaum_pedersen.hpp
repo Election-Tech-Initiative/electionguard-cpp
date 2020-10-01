@@ -26,11 +26,21 @@ namespace electionguard
         DisjunctiveChaumPedersenProof &operator=(DisjunctiveChaumPedersenProof other);
         DisjunctiveChaumPedersenProof &operator=(DisjunctiveChaumPedersenProof &&other);
 
-        bool isValid(const ElGamalCiphertext &message, const ElementModP &k, const ElementModQ &q);
+        ElementModP *getProofZeroPad() const;
+        ElementModP *getProofZeroData() const;
+        ElementModP *getProofOnePad() const;
+        ElementModP *getProofOneData() const;
+        ElementModQ *getProofZeroChallenge() const;
+        ElementModQ *getProofOneChallenge() const;
+        ElementModQ *getChallenge() const;
+        ElementModQ *getProofZeroResponse() const;
+        ElementModQ *getProofOneResponse() const;
 
         static unique_ptr<DisjunctiveChaumPedersenProof>
         make(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
              const ElementModQ &q, const ElementModQ &seed, uint64_t plaintext);
+
+        bool isValid(const ElGamalCiphertext &message, const ElementModP &k, const ElementModQ &q);
 
       protected:
         static unique_ptr<DisjunctiveChaumPedersenProof>
@@ -58,11 +68,17 @@ namespace electionguard
         ConstantChaumPedersenProof &operator=(ConstantChaumPedersenProof other);
         ConstantChaumPedersenProof &operator=(ConstantChaumPedersenProof &&other);
 
-        bool isValid(const ElGamalCiphertext &message, const ElementModP &k, const ElementModQ &q);
+        ElementModP *getPad() const;
+        ElementModP *getData() const;
+        ElementModQ *getChallenge() const;
+        ElementModQ *getResponse() const;
+        uint64_t getConstant() const;
 
         static unique_ptr<ConstantChaumPedersenProof>
         make(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
              const ElementModQ &seed, const ElementModQ &hash_header, uint64_t constant);
+
+        bool isValid(const ElGamalCiphertext &message, const ElementModP &k, const ElementModQ &q);
 
       private:
         class Impl;

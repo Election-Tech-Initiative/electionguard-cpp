@@ -16,6 +16,7 @@ using electionguard::CiphertextBallotSelection;
 using electionguard::CiphertextElectionContext;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
+using electionguard::encryptBallot;
 using electionguard::EncryptionDevice;
 using electionguard::EncryptionMediator;
 using electionguard::InternalElectionDescription;
@@ -25,10 +26,10 @@ using electionguard::SelectionDescription;
 
 // TODO: safe initialization
 static Cache<CiphertextBallotSelection> cache_ciphertext_ballot_selection;
+static Cache<CiphertextBallot> cache_ciphertext_ballot;
 static Cache<EncryptionDevice> cache_encryption_device;
 static Cache<EncryptionMediator> cache_encryption_mediator;
 static Cache<ElementModQ> cache_element_mod_q;
-static Cache<CiphertextBallot> cache_ciphertext_ballot;
 
 #pragma region EncryptionDevice
 
@@ -121,24 +122,41 @@ eg_encrypt_contest(eg_plaintext_ballot_contest_t *plaintext, eg_contest_descript
 
 #pragma region EncryptBallot
 
-eg_ciphertext_ballot_t *eg_encrypt_ballot(eg_plaintext_ballot_contest_t *plaintext,
+eg_ciphertext_ballot_t *eg_encrypt_ballot(eg_plaintext_ballot_t *plaintext,
                                           eg_internal_election_description_t *metadata,
                                           eg_ciphertext_election_context_t *context,
                                           eg_element_mod_q_t *seed_hash, bool should_verify_proofs)
 {
-    // TODO: Implement
-    return nullptr;
+    auto *plaintext_ = AS_TYPE(PlaintextBallot, plaintext);
+    auto *metadata_ = AS_TYPE(InternalElectionDescription, metadata);
+    auto *context_ = AS_TYPE(CiphertextElectionContext, context);
+    auto *seed_hash_ = AS_TYPE(ElementModQ, seed_hash);
+
+    auto ciphertext =
+      encryptBallot(*plaintext_, *metadata_, *context_, *seed_hash_, nullptr, should_verify_proofs);
+    auto *reference = cache_ciphertext_ballot.retain(move(ciphertext));
+    return AS_TYPE(eg_ciphertext_ballot_t, reference);
 }
 
-eg_ciphertext_ballot_t *eg_encrypt_ballot_with_nonce(eg_plaintext_ballot_contest_t *plaintext,
+eg_ciphertext_ballot_t *eg_encrypt_ballot_with_nonce(eg_plaintext_ballot_t *plaintext,
                                                      eg_internal_election_description_t *metadata,
                                                      eg_ciphertext_election_context_t *context,
                                                      eg_element_mod_q_t *seed_hash,
                                                      eg_element_mod_q_t *nonce,
                                                      bool should_verify_proofs)
 {
-    // TODO: Implement
-    return nullptr;
+    auto *plaintext_ = AS_TYPE(PlaintextBallot, plaintext);
+    auto *metadata_ = AS_TYPE(InternalElectionDescription, metadata);
+    auto *context_ = AS_TYPE(CiphertextElectionContext, context);
+    auto *seed_hash_ = AS_TYPE(ElementModQ, seed_hash);
+    auto *nonce_ = AS_TYPE(ElementModQ, nonce);
+
+    unique_ptr<ElementModQ> nonce_ptr{nonce_};
+
+    auto ciphertext = encryptBallot(*plaintext_, *metadata_, *context_, *seed_hash_,
+                                    move(nonce_ptr), should_verify_proofs);
+    auto *reference = cache_ciphertext_ballot.retain(move(ciphertext));
+    return AS_TYPE(eg_ciphertext_ballot_t, reference);
 }
 
 #pragma endregion

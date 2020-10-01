@@ -27,6 +27,15 @@ namespace electionguard
         ElementModP(const uint64_t (&elem)[MAX_P_LEN], bool unchecked = false);
         ~ElementModP();
 
+        ElementModP &operator=(ElementModP other);
+        ElementModP &operator=(ElementModP &&other);
+        bool operator==(const ElementModP &other);
+        bool operator!=(const ElementModP &other);
+
+        bool operator<(const ElementModP &other);
+
+        // TODO: math operators
+
         uint64_t *get() const;
         bool isInBounds() const;
         bool isValidResidue() const;
@@ -45,15 +54,6 @@ namespace electionguard
         /// </summary>
         static unique_ptr<ElementModP> fromUint64(uint64_t representation);
 
-        ElementModP &operator=(ElementModP other);
-        ElementModP &operator=(ElementModP &&other);
-        bool operator==(const ElementModP &other);
-        bool operator!=(const ElementModP &other);
-
-        bool operator<(const ElementModP &other);
-
-        // TODO: math operators
-
       private:
         class Impl;
         unique_ptr<Impl> pimpl;
@@ -71,13 +71,19 @@ namespace electionguard
         ElementModQ(const uint64_t (&elem)[MAX_Q_LEN], bool unchecked = false);
         ~ElementModQ();
 
+        ElementModQ &operator=(ElementModQ other);
+        ElementModQ &operator=(ElementModQ &&other);
+        bool operator==(const ElementModQ &other);
+        bool operator!=(const ElementModQ &other);
+
+        bool operator<(const ElementModQ &other);
+
+        // TODO: overload math operators and redirect to functions
+
         uint64_t *get() const;
-
         bool isInBounds() const;
-
         vector<uint8_t> toBytes() const;
         string toHex() const;
-        unique_ptr<ElementModP> toElementModP() const;
 
         /// <summary>
         /// Converts the binary value stored by the hex string
@@ -92,14 +98,7 @@ namespace electionguard
         /// </summary>
         static unique_ptr<ElementModQ> fromUint64(uint64_t representation);
 
-        ElementModQ &operator=(ElementModQ other);
-        ElementModQ &operator=(ElementModQ &&other);
-        bool operator==(const ElementModQ &other);
-        bool operator!=(const ElementModQ &other);
-
-        bool operator<(const ElementModQ &other);
-
-        // TODO: overload math operators and redirect to functions
+        unique_ptr<ElementModP> toElementModP() const;
 
       private:
         class Impl;
@@ -109,21 +108,13 @@ namespace electionguard
     // Common constants
 
     const ElementModP &G();
-
     const ElementModP &P();
-
     const ElementModP &ZERO_MOD_P();
-
     const ElementModP &ONE_MOD_P();
-
     const ElementModP &TWO_MOD_P();
-
     const ElementModQ &Q();
-
     const ElementModQ &ZERO_MOD_Q();
-
     const ElementModQ &ONE_MOD_Q();
-
     const ElementModQ &TWO_MOD_Q();
 
     /// <summary>

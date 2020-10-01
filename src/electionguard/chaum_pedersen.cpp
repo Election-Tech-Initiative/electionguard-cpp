@@ -10,6 +10,7 @@
 
 using std::map;
 using std::string;
+
 namespace electionguard
 {
 #pragma region DisjunctiveChaumPedersenProof
@@ -59,6 +60,8 @@ namespace electionguard
 
     DisjunctiveChaumPedersenProof::~DisjunctiveChaumPedersenProof() = default;
 
+    // Operator Overloads
+
     DisjunctiveChaumPedersenProof &
     DisjunctiveChaumPedersenProof::operator=(DisjunctiveChaumPedersenProof other)
     {
@@ -68,7 +71,61 @@ namespace electionguard
 
     // Property Getters
 
-    // Public Members
+    ElementModP *DisjunctiveChaumPedersenProof::getProofZeroPad() const
+    {
+        return pimpl->proof_zero_pad.get();
+    }
+    ElementModP *DisjunctiveChaumPedersenProof::getProofZeroData() const
+    {
+        return pimpl->proof_zero_data.get();
+    }
+    ElementModP *DisjunctiveChaumPedersenProof::getProofOnePad() const
+    {
+        return pimpl->proof_one_pad.get();
+    }
+    ElementModP *DisjunctiveChaumPedersenProof::getProofOneData() const
+    {
+        return pimpl->proof_one_data.get();
+    }
+    ElementModQ *DisjunctiveChaumPedersenProof::getProofZeroChallenge() const
+    {
+        return pimpl->proof_zero_challenge.get();
+    }
+    ElementModQ *DisjunctiveChaumPedersenProof::getProofOneChallenge() const
+    {
+        return pimpl->proof_one_challenge.get();
+    }
+    ElementModQ *DisjunctiveChaumPedersenProof::getChallenge() const
+    {
+        return pimpl->challenge.get();
+    }
+    ElementModQ *DisjunctiveChaumPedersenProof::getProofZeroResponse() const
+    {
+        return pimpl->proof_zero_response.get();
+    }
+    ElementModQ *DisjunctiveChaumPedersenProof::getProofOneResponse() const
+    {
+        return pimpl->proof_one_response.get();
+    }
+
+    // Public Static Methods
+
+    unique_ptr<DisjunctiveChaumPedersenProof>
+    DisjunctiveChaumPedersenProof::make(const ElGamalCiphertext &message, const ElementModQ &r,
+                                        const ElementModP &k, const ElementModQ &q,
+                                        const ElementModQ &seed, uint64_t plaintext)
+    {
+        if (plaintext > 1) {
+            throw invalid_argument(
+              "DisjunctiveChaumPedersenProof::make:: only supports plaintexts of 0 or 1");
+        }
+        if (plaintext == 1) {
+            return make_one(message, r, k, q, seed);
+        }
+        return make_zero(message, r, k, q, seed);
+    }
+
+    // Public Methods
 
     bool DisjunctiveChaumPedersenProof::isValid(const ElGamalCiphertext &message,
                                                 const ElementModP &k, const ElementModQ &q)
@@ -165,22 +222,7 @@ namespace electionguard
         return success;
     }
 
-    unique_ptr<DisjunctiveChaumPedersenProof>
-    DisjunctiveChaumPedersenProof::make(const ElGamalCiphertext &message, const ElementModQ &r,
-                                        const ElementModP &k, const ElementModQ &q,
-                                        const ElementModQ &seed, uint64_t plaintext)
-    {
-        if (plaintext > 1) {
-            throw invalid_argument(
-              "DisjunctiveChaumPedersenProof::make:: only supports plaintexts of 0 or 1");
-        }
-        if (plaintext == 1) {
-            return make_one(message, r, k, q, seed);
-        }
-        return make_zero(message, r, k, q, seed);
-    }
-
-    // Protected Members
+    // Protected Methods
 
     unique_ptr<DisjunctiveChaumPedersenProof>
     DisjunctiveChaumPedersenProof::make_zero(const ElGamalCiphertext &message, const ElementModQ &r,
@@ -272,6 +314,8 @@ namespace electionguard
 
     ConstantChaumPedersenProof::~ConstantChaumPedersenProof() = default;
 
+    // Operator Overloads
+
     ConstantChaumPedersenProof &
     ConstantChaumPedersenProof::operator=(ConstantChaumPedersenProof other)
     {
@@ -281,7 +325,40 @@ namespace electionguard
 
     // Property Getters
 
-    // Public Members
+    ElementModP *ConstantChaumPedersenProof::getPad() const { return pimpl->pad.get(); }
+    ElementModP *ConstantChaumPedersenProof::getData() const { return pimpl->data.get(); }
+    ElementModQ *ConstantChaumPedersenProof::getChallenge() const { return pimpl->challenge.get(); }
+    ElementModQ *ConstantChaumPedersenProof::getResponse() const { return pimpl->response.get(); }
+    uint64_t ConstantChaumPedersenProof::getConstant() const { return pimpl->constant; }
+
+    // Public Static Methods
+
+    unique_ptr<ConstantChaumPedersenProof>
+    ConstantChaumPedersenProof::make(const ElGamalCiphertext &message, const ElementModQ &r,
+                                     const ElementModP &k, const ElementModQ &seed,
+                                     const ElementModQ &hash_header, uint64_t constant)
+    {
+        auto *alpha = message.getPad();
+        auto *beta = message.getData();
+
+        // Pick a random number in Q.
+        auto nonces = make_unique<Nonces>(seed, "disjoint-chaum-pedersen-proof");
+        auto u = nonces->get(0);
+
+        // Compute the NIZKP
+        auto a = g_pow_p(*u);      //𝑔^𝑢 mod 𝑝
+        auto b = pow_mod_p(k, *u); // 𝐾^𝑢 mod 𝑝
+
+        // sha256(𝑄', A, B, a, b)
+        auto c =
+          hash_elems({&const_cast<ElementModQ &>(hash_header), alpha, beta, a.get(), b.get()});
+        auto v = a_plus_bc_mod_q(*u, *c, r);
+
+        return make_unique<ConstantChaumPedersenProof>(move(a), move(b), move(c), move(v),
+                                                       constant);
+    }
+
+    // Public Methods
 
     bool ConstantChaumPedersenProof::isValid(const ElGamalCiphertext &message, const ElementModP &k,
                                              const ElementModQ &q)
@@ -346,31 +423,5 @@ namespace electionguard
 
         return success;
     }
-
-    unique_ptr<ConstantChaumPedersenProof>
-    ConstantChaumPedersenProof::make(const ElGamalCiphertext &message, const ElementModQ &r,
-                                     const ElementModP &k, const ElementModQ &seed,
-                                     const ElementModQ &hash_header, uint64_t constant)
-    {
-        auto *alpha = message.getPad();
-        auto *beta = message.getData();
-
-        // Pick a random number in Q.
-        auto nonces = make_unique<Nonces>(seed, "disjoint-chaum-pedersen-proof");
-        auto u = nonces->get(0);
-
-        // Compute the NIZKP
-        auto a = g_pow_p(*u);      //𝑔^𝑢 mod 𝑝
-        auto b = pow_mod_p(k, *u); // 𝐾^𝑢 mod 𝑝
-
-        // sha256(𝑄', A, B, a, b)
-        auto c =
-          hash_elems({&const_cast<ElementModQ &>(hash_header), alpha, beta, a.get(), b.get()});
-        auto v = a_plus_bc_mod_q(*u, *c, r);
-
-        return make_unique<ConstantChaumPedersenProof>(move(a), move(b), move(c), move(v),
-                                                       constant);
-    }
-
 #pragma endregion
 } // namespace electionguard

@@ -73,6 +73,8 @@ namespace electionguard
         unique_ptr<ElementModQ> crypto_hash() const { return hash_elems({pad.get(), data.get()}); }
     };
 
+    // Lifecycle Methods
+
     ElGamalCiphertext::ElGamalCiphertext(unique_ptr<ElementModP> pad, unique_ptr<ElementModP> data)
         : pimpl(new Impl(move(pad), move(data)))
     {
@@ -80,16 +82,34 @@ namespace electionguard
 
     ElGamalCiphertext::~ElGamalCiphertext() = default;
 
+    // Operator Overloads
+
     ElGamalCiphertext &ElGamalCiphertext::operator=(ElGamalCiphertext rhs)
     {
         swap(pimpl, rhs.pimpl);
         return *this;
     }
 
+    // Property Getters
+
     ElementModP *ElGamalCiphertext::getPad() { return pimpl->pad.get(); }
     ElementModP *ElGamalCiphertext::getPad() const { return pimpl->pad.get(); }
     ElementModP *ElGamalCiphertext::getData() { return pimpl->data.get(); }
     ElementModP *ElGamalCiphertext::getData() const { return pimpl->data.get(); }
+
+    // Interface Overrides
+
+    unique_ptr<ElementModQ> ElGamalCiphertext::crypto_hash() { return pimpl->crypto_hash(); }
+    unique_ptr<ElementModQ> ElGamalCiphertext::crypto_hash() const { return pimpl->crypto_hash(); }
+
+    unique_ptr<ElGamalCiphertext> ElGamalCiphertext::make(const ElementModP &pad,
+                                                          const ElementModP &data)
+    {
+        return make_unique<ElGamalCiphertext>(make_unique<ElementModP>(pad),
+                                              make_unique<ElementModP>(data));
+    }
+
+    // Public Methods
 
     uint64_t ElGamalCiphertext::decrypt(const ElementModQ &secretKey)
     {
@@ -142,8 +162,7 @@ namespace electionguard
         return retval;
     }
 
-    unique_ptr<ElementModQ> ElGamalCiphertext::crypto_hash() { return pimpl->crypto_hash(); }
-    unique_ptr<ElementModQ> ElGamalCiphertext::crypto_hash() const { return pimpl->crypto_hash(); }
+#pragma endregion
 
     unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModQ &nonce,
                                                  const ElementModP &publicKey)
@@ -179,7 +198,5 @@ namespace electionguard
         }
         return make_unique<ElGamalCiphertext>(move(resultPad), move(resultData));
     }
-
-#pragma endregion
 
 } // namespace electionguard

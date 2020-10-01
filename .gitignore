@@ -134,8 +134,7 @@ apps/demo_in_swift/ElectionGuardDemo/.idea/
 bindings/netstandard/ElectionGuard/packages/
 
 .idea/
-
+.cache/
 cmake-build-debug/
-
 *.csproj.user
 *.sln.DotSettings.user

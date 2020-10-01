@@ -60,14 +60,14 @@ eg_encrypt_contest(eg_plaintext_ballot_contest_t *plaintext, eg_contest_descript
                    eg_element_mod_p_t *public_key, eg_element_mod_q_t *crypto_extended_base_hash,
                    eg_element_mod_q_t *nonce_seed, bool should_verify_proofs);
 
-EG_API eg_ciphertext_ballot_t *eg_encrypt_ballot(eg_plaintext_ballot_contest_t *plaintext,
+EG_API eg_ciphertext_ballot_t *eg_encrypt_ballot(eg_plaintext_ballot_t *plaintext,
                                                  eg_internal_election_description_t *metadata,
                                                  eg_ciphertext_election_context_t *context,
                                                  eg_element_mod_q_t *seed_hash,
                                                  bool should_verify_proofs);
 
 EG_API eg_ciphertext_ballot_t *eg_encrypt_ballot_with_nonce(
-  eg_plaintext_ballot_contest_t *plaintext, eg_internal_election_description_t *metadata,
+  eg_plaintext_ballot_t *plaintext, eg_internal_election_description_t *metadata,
   eg_ciphertext_election_context_t *context, eg_element_mod_q_t *seed_hash,
   eg_element_mod_q_t *nonce, bool should_verify_proofs);
 

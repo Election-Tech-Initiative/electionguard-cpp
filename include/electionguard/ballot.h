@@ -68,19 +68,52 @@ typedef struct eg_ciphertext_ballot_contest_s eg_ciphertext_ballot_contest_t;
 
 // PlaintextBallot
 
-// TODO: implement
+// TODO: implement missing methods
 
 struct eg_plaintext_ballot_s;
 typedef struct eg_plaintext_ballot_s eg_plaintext_ballot_t;
 
+EG_API const char *eg_plaintext_ballot_get_object_id(eg_plaintext_ballot_t *plaintext);
+
+EG_API eg_plaintext_ballot_t *eg_plaintext_ballot_from_json(char *data);
+EG_API eg_plaintext_ballot_t *eg_plaintext_ballot_from_bson(uint8_t *data, uint64_t length);
+
+// returns the size and fills out_data, caller is responsible for freeing the out_data
+EG_API uint64_t eg_plaintext_ballot_to_json(eg_plaintext_ballot_t *plaintext, char **out_data);
+// returns the size and fills out_data, caller is responsible for freeing the out_data
+EG_API uint64_t eg_plaintext_ballot_to_bson(eg_plaintext_ballot_t *plaintext, uint8_t **out_data);
+
 // CiphertextBallot
 
-// TODO: implement
+// TODO: implement missing methods
 
 struct eg_ciphertext_ballot_s;
 typedef struct eg_ciphertext_ballot_s eg_ciphertext_ballot_t;
 
 // no constructors defined.  use `eg_encrypt_ballot` in encrypt.h
+
+EG_API const char *eg_ciphertext_ballot_get_object_id(eg_ciphertext_ballot_t *ciphertext);
+
+EG_API eg_element_mod_q_t *
+eg_ciphertext_ballot_get_tracking_hash(eg_ciphertext_ballot_t *ciphertext);
+
+EG_API const char *eg_ciphertext_ballot_get_tracking_code(eg_ciphertext_ballot_t *ciphertext);
+
+EG_API uint64_t eg_ciphertext_ballot_get_timestamp(eg_ciphertext_ballot_t *ciphertext);
+
+EG_API bool eg_ciphertext_ballot_is_valid_encryption(eg_ciphertext_ballot_t *ciphertext,
+                                                     eg_element_mod_q_t *seed_hash,
+                                                     eg_element_mod_p_t *public_key,
+                                                     eg_element_mod_q_t *crypto_extended_base_hash);
+
+EG_API eg_ciphertext_ballot_t *eg_ciphertext_ballot_from_json(char *data);
+EG_API eg_ciphertext_ballot_t *eg_ciphertext_ballot_from_bson(uint8_t *data, uint64_t length);
+
+// returns the size and fills out_data, caller is responsible for freeing the out_data
+EG_API uint64_t eg_ciphertext_ballot_to_json(eg_ciphertext_ballot_t *ciphertext, char **out_data);
+// returns the size and fills out_data, caller is responsible for freeing the out_data
+EG_API uint64_t eg_ciphertext_ballot_to_bson(eg_ciphertext_ballot_t *ciphertext,
+                                             uint8_t **out_data);
 
 #ifdef __cplusplus
 }
