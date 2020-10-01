@@ -110,6 +110,8 @@ uint64_t eg_internal_election_description_to_json(eg_internal_election_descripti
     auto data_array = new char[data_size];
     strncpy(data_array, data_string.c_str(), data_size);
     *out_data = data_array;
+
+    // TODO: cleanup data_array
     return data_size;
 }
 
@@ -226,6 +228,8 @@ uint64_t eg_ciphertext_election_context_to_json(eg_ciphertext_election_context_t
     auto data_array = new char[data_size];
     strncpy(data_array, data_string.c_str(), data_size);
     *out_data = data_array;
+
+    // TODO: cleanup data_array
     return data_size;
 }
 
@@ -238,6 +242,8 @@ uint64_t eg_ciphertext_election_context_to_bson(eg_ciphertext_election_context_t
     auto *data_array = new uint8_t[data_bytes.size()];
     copy(data_bytes.begin(), data_bytes.end(), data_array);
     *out_data = data_array;
+
+    // TODO: cleanup data_array
     return data_bytes.size();
 }
 
