@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows.Input;
 using ElectionGuardCore.Elections;
 
@@ -65,25 +64,15 @@ namespace ElectionGuardCore.Ui.Elections
 
         private async void Close(object parameter)
         {
-            var tasks = new List<Task>
-            {
-                _navigationService.PopModal(),
-                _navigationService.PopToRoot()
-            };
-            await Task.WhenAll(tasks);
+            await _navigationService.PopToRoot();
         }
 
         public ICommand ReVoteCommand { get; }
 
         private async void ReVote(object parameter)
         {
-            var tasks = new List<Task>
-            {
-                _navigationService.PopModal(),
-                _navigationService.PopToRoot(),
-                _navigationService.Push(NavigationPaths.ContestSelectionListPage, Args.ElectionDescription)
-            };
-            await Task.WhenAll(tasks);
+            await _navigationService.PopToRoot();
+            await _navigationService.Push(NavigationPaths.ContestSelectionListPage, Args.ElectionDescription);
         }
 
         public class SelectionSubmittedArgs

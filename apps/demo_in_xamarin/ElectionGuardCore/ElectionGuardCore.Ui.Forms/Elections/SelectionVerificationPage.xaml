@@ -6,6 +6,7 @@
 	x:Class="ElectionGuardCore.Ui.Forms.Elections.SelectionVerificationPage"
 	Title="{Binding Title}"
 	BackgroundColor="#F3F2F7"
+	NavigationPage.HasBackButton="False"
 >
 	<ContentPage.Content>
 		<StackLayout Spacing="0">

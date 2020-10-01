@@ -31,17 +31,6 @@ namespace ElectionGuardCore.Ui.Forms.Services
             await _navigation.PopToRootAsync();
         }
 
-        public async Task PushModal(string path, object parameter = null)
-        {
-            var page = ResolvePage(path, parameter);
-            await _navigation.PushModalAsync(new NavigationPage(page));
-        }
-
-        public async Task PopModal()
-        {
-            await _navigation.PopModalAsync();
-        }
-
         internal void SetNavigation(INavigation navigation)
         {
             _navigation = navigation;

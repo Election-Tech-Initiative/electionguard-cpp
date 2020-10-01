@@ -6,7 +6,5 @@ namespace ElectionGuardCore.Ui
     {
         Task Push(string path, object parameter = null);
         Task PopToRoot();
-        Task PushModal(string path, object parameter = null);
-        Task PopModal();
     }
 }

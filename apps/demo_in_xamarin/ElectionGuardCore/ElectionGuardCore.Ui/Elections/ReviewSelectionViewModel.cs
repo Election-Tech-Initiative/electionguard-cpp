@@ -52,7 +52,7 @@ namespace ElectionGuardCore.Ui.Elections
                 EncryptionResult result = null;
                 await _alertService.ShowBusy("Encrypting ballot…",
                     () => result = _encryptionService.EncryptBallot(Args.ElectionDescription, Args.Selection.ObjectId),
-                    async () => await _navigationService.PushModal(NavigationPaths.SelectionVerificationPage,
+                    async () => await _navigationService.Push(NavigationPaths.SelectionVerificationPage,
                         new SelectionVerificationViewModel.SelectionVerificationArgs(Args.ElectionDescription, result))
                 );
             }

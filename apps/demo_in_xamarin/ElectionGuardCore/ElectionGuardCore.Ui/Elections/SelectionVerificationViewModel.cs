@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows.Input;
 using ElectionGuardCore.Elections;
 using ElectionGuardCore.Encryption;
@@ -78,13 +77,8 @@ namespace ElectionGuardCore.Ui.Elections
 
         private async Task Submit(bool voted)
         {
-            var tasks = new List<Task>
-            {
-                _navigationService.PopModal(),
-                _navigationService.PushModal(NavigationPaths.SelectionSubmittedPage,
-                    new SelectionSubmittedViewModel.SelectionSubmittedArgs(voted, Args.ElectionDescription))
-            };
-            await Task.WhenAll(tasks);
+            await _navigationService.Push(NavigationPaths.SelectionSubmittedPage,
+                new SelectionSubmittedViewModel.SelectionSubmittedArgs(voted, Args.ElectionDescription));
         }
 
         public class SelectionVerificationArgs
