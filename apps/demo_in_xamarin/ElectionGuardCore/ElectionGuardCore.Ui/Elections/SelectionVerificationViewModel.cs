@@ -9,13 +9,15 @@ namespace ElectionGuardCore.Ui.Elections
     {
         private readonly IClipboardService _clipboardService;
         private readonly IAlertService _alertService;
+        private readonly IElectionService _electionService;
         private readonly INavigationService _navigationService;
 
         public SelectionVerificationViewModel(IClipboardService clipboardService, IAlertService alertService,
-            INavigationService navigationService)
+            IElectionService electionService, INavigationService navigationService)
         {
             _clipboardService = clipboardService;
             _alertService = alertService;
+            _electionService = electionService;
             _navigationService = navigationService;
 
             CopyTrackingCodeCommand = new RelayCommand(CopyTrackingCode);
@@ -77,6 +79,8 @@ namespace ElectionGuardCore.Ui.Elections
 
         private async Task Submit(bool voted)
         {
+            // TODO submit result to API
+            _electionService.Votes[Args.ElectionDescription.ActiveContest.ObjectId] = voted;
             await _navigationService.Push(NavigationPaths.SelectionSubmittedPage,
                 new SelectionSubmittedViewModel.SelectionSubmittedArgs(voted, Args.ElectionDescription));
         }
