@@ -4,9 +4,9 @@ namespace ElectionGuardCore.Ui.Forms
 {
     public abstract class PageBase : ContentPage
     {
-        public ViewModelBase ViewModel { get; }
+        public PageViewModelBase ViewModel { get; }
 
-        protected PageBase(ViewModelBase viewModel)
+        protected PageBase(PageViewModelBase viewModel)
         {
             ViewModel = viewModel;
             BindingContext = ViewModel;

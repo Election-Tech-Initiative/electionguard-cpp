@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using ElectionGuardCore.Elections;
 using ElectionGuardCore.Ui.Elections;
@@ -58,29 +57,23 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         }
 
         [Test]
-        public async Task OnLoad_LoadsElectionDescriptionFromService()
+        public async Task Load_LoadsElectionDescriptionFromService()
         {
-            var viewModel = new ActiveContestViewModel(_electionServiceMock.Object, _navigationServiceMock.Object);
-            await viewModel.Load();
-
+            var viewModel = await CreateViewModel();
             viewModel.ElectionDescription.Should().Be(_electionDescription);
         }
 
         [Test]
         public async Task ElectionName_ShouldBeFirstElectionDescriptionName()
         {
-            var viewModel = new ActiveContestViewModel(_electionServiceMock.Object, _navigationServiceMock.Object);
-            await viewModel.Load();
-
+            var viewModel = await CreateViewModel();
             viewModel.ElectionName.Should().Be("Hello");
         }
 
         [Test]
         public async Task ActiveContestName_ShouldBeFirstContestName()
         {
-            var viewModel = new ActiveContestViewModel(_electionServiceMock.Object, _navigationServiceMock.Object);
-            await viewModel.Load();
-
+            var viewModel = await CreateViewModel();
             viewModel.ActiveContestName.Should().Be("Contest1");
         }
 
@@ -95,8 +88,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
                 _electionServiceMock.Setup(x => x.Votes).Returns(new Dictionary<string, bool> {{contestId, hasVoted}});
             }
 
-            var viewModel = new ActiveContestViewModel(_electionServiceMock.Object, _navigationServiceMock.Object);
-            await viewModel.Load();
+            var viewModel = await CreateViewModel();
 
             viewModel.HasVotedInActiveContest.Should().Be(hasVoted);
             viewModel.CanVote.Should().Be(!hasVoted);
@@ -104,14 +96,21 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         }
 
         [Test]
-        public async Task OnBeginVoteCommand_NavigatesToVoteOptionListPage()
+        public async Task BeginVoteCommand_PassesElectionToVoteOptionListPage()
         {
-            var viewModel = new ActiveContestViewModel(_electionServiceMock.Object, _navigationServiceMock.Object);
-            await viewModel.Load();
+            var viewModel = await CreateViewModel();
             viewModel.BeginVoteCommand.Execute(null);
 
             _navigationServiceMock.Verify(x =>
-                x.Push(NavigationPaths.VoteOptionListPage, _electionDescription.Contests.First()));
+                x.Push(NavigationPaths.ContestSelectionListPage, _electionDescription));
+        }
+
+        private async Task<ActiveContestViewModel> CreateViewModel()
+        {
+            var viewModel = new ActiveContestViewModel(_electionServiceMock.Object, _navigationServiceMock.Object);
+            await viewModel.Load();
+
+            return viewModel;
         }
     }
 }

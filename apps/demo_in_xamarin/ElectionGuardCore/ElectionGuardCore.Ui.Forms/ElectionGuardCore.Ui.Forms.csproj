@@ -21,10 +21,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Elections\ActiveContestViewPage.xaml">
+    <Compile Update="Elections\ActiveContestPage.xaml.cs">
+      <DependentUpon>ActiveContestPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Elections\ContestSelectionListPage.xaml.cs">
+      <DependentUpon>ContestSelectionListPage.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Elections\ActiveContestPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Elections\VoteOptionListPage.xaml">
+    <EmbeddedResource Update="Elections\ContestSelectionListPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>

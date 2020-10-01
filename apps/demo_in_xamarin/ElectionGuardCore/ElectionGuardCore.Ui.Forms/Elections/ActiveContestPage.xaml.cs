@@ -4,9 +4,9 @@ using Xamarin.Forms.Xaml;
 namespace ElectionGuardCore.Ui.Forms.Elections
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ActiveContestViewPage
+    public partial class ActiveContestPage
     {
-        public ActiveContestViewPage(ActiveContestViewModel viewModel)
+        public ActiveContestPage(ActiveContestViewModel viewModel)
             : base(viewModel)
         {
             InitializeComponent();

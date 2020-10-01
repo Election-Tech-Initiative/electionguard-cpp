@@ -27,5 +27,10 @@ namespace ElectionGuardCore.Ui
         {
             _execute(parameter);    // TODO handle async actions
         }
+
+        public void OnCanExecuteChanged()
+        {
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 }

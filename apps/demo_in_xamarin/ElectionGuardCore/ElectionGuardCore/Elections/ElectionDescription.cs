@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ElectionGuardCore.Elections
 {
@@ -15,5 +16,7 @@ namespace ElectionGuardCore.Elections
         public List<Party> Parties { get; set; }
         public List<ContestDescription> Contests { get; set; }
         public List<BallotStyle> BallotStyles { get; set; }
+
+        public ContestDescription ActiveContest => Contests?.FirstOrDefault();
     }
 }
