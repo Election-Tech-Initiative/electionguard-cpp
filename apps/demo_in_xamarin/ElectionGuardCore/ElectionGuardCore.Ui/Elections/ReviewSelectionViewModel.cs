@@ -18,7 +18,7 @@ namespace ElectionGuardCore.Ui.Elections
             _alertService = alertService;
             _navigationService = navigationService;
 
-            EncryptSelectionCommand = new RelayCommand(EncryptSelecton);
+            EncryptSelectionCommand = new RelayCommand(EncryptSelection);
         }
 
         public override string Title => "Review";
@@ -44,7 +44,7 @@ namespace ElectionGuardCore.Ui.Elections
 
         public ICommand EncryptSelectionCommand { get; }
 
-        private async void EncryptSelecton(object parameter)
+        private async void EncryptSelection(object parameter)
         {
             if (await _alertService.Alert("Encrypt ballot",
                 "You are about to encrypt your ballot. This cannot be undone. Do you wish to continue?", "Yes", "No"))
