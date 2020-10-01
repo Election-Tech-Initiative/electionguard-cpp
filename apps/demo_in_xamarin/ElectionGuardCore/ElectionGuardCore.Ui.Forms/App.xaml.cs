@@ -16,8 +16,12 @@ namespace ElectionGuardCore.Ui.Forms
             var container = CreateContainer(navigationService);
             navigationService.SetContainer(container);  // need to set nav service dependencies after creating container
 
-            MainPage = new NavigationPage(navigationService.GetDefaultPage());
-            navigationService.SetNavigation(MainPage.Navigation);
+            var navigationPage = new NavigationPage(navigationService.GetDefaultPage());
+            navigationPage.BarTextColor = Color.FromHex(Colors.LightGreen);
+            NavigationPage.SetBackButtonTitle(this, "Back");
+            navigationService.SetNavigation(navigationPage.Navigation);
+
+            MainPage = navigationPage;
         }
 
         private IContainer CreateContainer(INavigationService navigationService)
