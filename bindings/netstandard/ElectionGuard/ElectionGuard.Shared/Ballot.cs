@@ -55,7 +55,7 @@ namespace ElectionGuard
         public unsafe bool IsValidEncryption(
             ElementModQ seedHash, ElementModP elGamalPublicKey, ElementModQ cryptoExtendedBaseHash)
         {
-            return NativeInterface.CiphertextBallot.IsValidencryption(
+            return NativeInterface.CiphertextBallot.IsValidEncryption(
                 Handle, seedHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
         }
 

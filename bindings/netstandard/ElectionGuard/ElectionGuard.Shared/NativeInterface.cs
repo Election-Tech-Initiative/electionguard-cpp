@@ -109,7 +109,7 @@ namespace ElectionGuard
             internal static extern ulong GetTimestamp(CiphertextBallotType* ciphertext);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_is_valid_encryption")]
-            internal static extern bool IsValidencryption(CiphertextBallotType* ciphertext,
+            internal static extern bool IsValidEncryption(CiphertextBallotType* ciphertext,
                 ElementModQ.ElementModQType* seed_hash,
                 ElementModP.ElementModPType* public_key,
                 ElementModQ.ElementModQType* crypto_extended_base_hash);
@@ -158,7 +158,7 @@ namespace ElectionGuard
                  CiphertextElectionContext.CiphertextElectionType* context,
                  ElementModQ.ElementModQType* seedHash, bool shouldVerifyProofs);
 
-            [DllImport(DllName, EntryPoint = "eg_encrypt_ballot")]
+            [DllImport(DllName, EntryPoint = "eg_encrypt_ballot_with_nonce")]
             internal static extern CiphertextBallot.CiphertextBallotType* Ballot(
                 PlaintextBallot.PlaintextBallotType* plaintext,
                  InternalElectionDescription.InternalElectionDescriptionType* metadata,
