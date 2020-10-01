@@ -26,12 +26,12 @@ unique_ptr<InternalElectionDescription> getFakeMetadata(const ElementModQ &descr
     vector<unique_ptr<ContestDescription>> contests;
     const auto numElected = 2UL;
     contests.push_back(make_unique<ContestDescription>(
-      "contest-1-id", "district-1-id", 1UL, 1UL, numElected, numElected, "contest-1-name",
+      "contest-1-id", "district-1-id", 1UL, "n_of_m", numElected, numElected, "contest-1-name",
       "contest-1-title", "contest-1-sub", move(selections1)));
 
     const auto numElected2 = 1UL;
     contests.push_back(make_unique<ContestDescription>(
-      "contest-2-id", "district-1-id", 1UL, 1UL, numElected, numElected, "contest-2-name",
+      "contest-2-id", "district-1-id", 1UL, "n_of_m", numElected, numElected, "contest-2-name",
       "contest-2-title", "contest-1-sub", move(selections2)));
 
     auto metadata = make_unique<InternalElectionDescription>(descriptionHash, move(contests));
@@ -120,7 +120,7 @@ TEST_CASE("Encrypt Ballot with mediator succeeds")
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert
-    CHECK(ciphertext->isValidEncryption(metadata->getDescriptionHash(), *keypair->getPublicKey(),
+    CHECK(ciphertext->isValidEncryption(*context->getDescriptionHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
 
     // Can Serialize CiphertextBallot
@@ -162,7 +162,8 @@ TEST_CASE("Can serialize CiphertextElectionContext")
     auto fromBson = CiphertextElectionContext::fromBson(bson);
 
     // Assert
-    CHECK(context->getDescriptionHash()->toHex() == context->getDescriptionHash()->toHex());
+    CHECK(fromJson->getDescriptionHash()->toHex() == context->getDescriptionHash()->toHex());
+    CHECK(fromBson->getDescriptionHash()->toHex() == context->getDescriptionHash()->toHex());
 }
 
 TEST_CASE("Can serialize PlaintextBallot")

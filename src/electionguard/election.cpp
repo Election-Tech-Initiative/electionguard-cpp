@@ -70,7 +70,7 @@ namespace electionguard
     struct ContestDescription::Impl : ElectionObjectBase {
         string electoralDistrictId;
         uint64_t sequenceOrder;
-        uint64_t voteVariation;
+        string voteVariation;
         uint64_t numberElected;
         uint64_t votesAllowed;
         string name;
@@ -78,7 +78,7 @@ namespace electionguard
         string ballotSubtitle;
         vector<unique_ptr<SelectionDescription>> selections;
         Impl(const string &objectId, const string &electoralDistrictId,
-             const uint64_t sequenceOrder, const uint64_t voteVariation,
+             const uint64_t sequenceOrder, const string &voteVariation,
              const uint64_t numberElected, const uint64_t votesAllowed, const string &name,
              const string &ballotTitle, const string &ballotSubtitle,
              vector<unique_ptr<SelectionDescription>> selections)
@@ -113,7 +113,7 @@ namespace electionguard
 
     ContestDescription::ContestDescription(
       const string &objectId, const string &electoralDistrictId, const uint64_t sequenceOrder,
-      const uint64_t voteVariation, const uint64_t numberElected, const uint64_t votesAllowed,
+      const string &voteVariation, const uint64_t numberElected, const uint64_t votesAllowed,
       const string &name, const string &ballotTitle, const string &ballotSubtitle,
       vector<unique_ptr<SelectionDescription>> selections)
         : pimpl(new Impl(objectId, electoralDistrictId, sequenceOrder, voteVariation, numberElected,
@@ -133,7 +133,7 @@ namespace electionguard
     string ContestDescription::getObjectId() const { return pimpl->object_id; }
     string ContestDescription::getElectoralDistrictId() const { return pimpl->electoralDistrictId; }
     uint64_t ContestDescription::getSequenceOrder() const { return pimpl->sequenceOrder; }
-    uint64_t ContestDescription::getVoteVariation() const { return pimpl->voteVariation; }
+    string ContestDescription::getVoteVariation() const { return pimpl->voteVariation; }
     uint64_t ContestDescription::getNumberElected() const { return pimpl->numberElected; }
     uint64_t ContestDescription::getVotesAllowed() const { return pimpl->votesAllowed; }
     string ContestDescription::getName() const { return pimpl->name; }
@@ -211,6 +211,8 @@ namespace electionguard
     {
         return DescriptionSerializer::toBson(*this);
     }
+
+    string InternalElectionDescription::toJson() { return DescriptionSerializer::toJson(*this); }
 
     string InternalElectionDescription::toJson() const
     {

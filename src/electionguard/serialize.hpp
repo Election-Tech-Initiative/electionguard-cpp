@@ -4,6 +4,7 @@
 #include "electionguard/ballot.hpp"
 #include "electionguard/election.hpp"
 #include "electionguard/export.h"
+#include "electionguard/group.hpp"
 #include "log.hpp"
 
 #include <cstdint>
@@ -57,9 +58,6 @@ namespace electionguard
             }
             static unique_ptr<electionguard::InternalElectionDescription> toObject(json j)
             {
-                auto description_hash = j["description_hash"].get<string>();
-                auto descriptionHash = ElementModQ::fromHex(description_hash);
-
                 auto contests = j["contests"];
 
                 vector<unique_ptr<ContestDescription>> contestDescriptions;
@@ -68,12 +66,16 @@ namespace electionguard
                     auto contest_object_id = contest["object_id"].get<string>();
                     auto electoral_district_id = contest["electoral_district_id"].get<string>();
                     auto contest_sequence_order = contest["sequence_order"].get<uint64_t>();
-                    auto vote_variation = contest["vote_variation"].get<uint64_t>();
+                    auto vote_variation = contest["vote_variation"].get<string>();
                     auto number_elected = contest["number_elected"].get<uint64_t>();
                     auto votes_allowed = contest["votes_allowed"].get<uint64_t>();
                     auto name = contest["name"].get<string>();
-                    auto ballot_title = contest["ballot_title"].get<string>();
-                    auto ballot_subtitle = contest["ballot_subtitle"].get<string>();
+                    auto ballot_title = contest["ballot_title"].is_object()
+                                          ? contest["ballot_title"].dump()
+                                          : contest["ballot_title"].get<string>();
+                    auto ballot_subtitle = contest["ballot_subtitle"].is_object()
+                                             ? contest["ballot_subtitle"].dump()
+                                             : contest["ballot_subtitle"].get<string>();
 
                     auto selections = contest["ballot_selections"];
                     vector<unique_ptr<SelectionDescription>> selectionDescriptions;
@@ -92,8 +94,16 @@ namespace electionguard
                       ballot_subtitle, move(selectionDescriptions)));
                 }
 
-                return make_unique<electionguard::InternalElectionDescription>(
-                  *descriptionHash, move(contestDescriptions));
+                if (j["description_hash"] != nullptr) {
+                    auto description_hash = j["description_hash"].get<string>();
+                    auto descriptionHash = ElementModQ::fromHex(description_hash);
+
+                    return make_unique<electionguard::InternalElectionDescription>(
+                      *descriptionHash, move(contestDescriptions));
+                } else {
+                    return make_unique<electionguard::InternalElectionDescription>(
+                      ZERO_MOD_Q(), move(contestDescriptions));
+                }
             }
 
           public:

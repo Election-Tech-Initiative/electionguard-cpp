@@ -55,7 +55,7 @@ namespace electionguard
         ContestDescription(const ContestDescription &other);
         ContestDescription(const ContestDescription &&other);
         ContestDescription(const string &objectId, const string &electoralDistrictId,
-                           const uint64_t sequenceOrder, const uint64_t voteVariation,
+                           const uint64_t sequenceOrder, const string &voteVariation,
                            const uint64_t numberElected, const uint64_t votesAllowed,
                            const string &name, const string &ballotTitle,
                            const string &ballotSubtitle,
@@ -68,7 +68,7 @@ namespace electionguard
         string getObjectId() const;
         string getElectoralDistrictId() const;
         uint64_t getSequenceOrder() const;
-        uint64_t getVoteVariation() const; // TODO: domain type enum
+        string getVoteVariation() const; // TODO: domain type enum
         uint64_t getNumberElected() const;
         uint64_t getVotesAllowed() const;
         string getName() const;
@@ -105,7 +105,9 @@ namespace electionguard
         vector<reference_wrapper<ContestDescription>> getContests() const;
 
         vector<uint8_t> toBson() const;
+        string toJson();
         string toJson() const;
+        // can accept either the InternalElectionDescription or the Election Manifest
         static unique_ptr<InternalElectionDescription> fromJson(string data);
         static unique_ptr<InternalElectionDescription> fromBson(vector<uint8_t> data);
 
