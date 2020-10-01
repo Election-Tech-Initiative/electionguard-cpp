@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ElectionGuardCore.Elections;
 
 namespace ElectionGuardCore.Ui.Elections
 {
@@ -13,6 +14,7 @@ namespace ElectionGuardCore.Ui.Elections
             _navigationService = navigationService;
 
             CloseCommand = new RelayCommand(Close);
+            ReVoteCommand = new RelayCommand(ReVote);
         }
 
         public override string Title => "Thank You";
@@ -71,13 +73,28 @@ namespace ElectionGuardCore.Ui.Elections
             await Task.WhenAll(tasks);
         }
 
+        public ICommand ReVoteCommand { get; }
+
+        private async void ReVote(object parameter)
+        {
+            var tasks = new List<Task>
+            {
+                _navigationService.PopModal(),
+                _navigationService.PopToRoot(),
+                _navigationService.Push(NavigationPaths.ContestSelectionListPage, Args.ElectionDescription)
+            };
+            await Task.WhenAll(tasks);
+        }
+
         public class SelectionSubmittedArgs
         {
             public readonly bool VoteCast;
+            public readonly ElectionDescription ElectionDescription;
 
-            public SelectionSubmittedArgs(bool voteCast)
+            public SelectionSubmittedArgs(bool voteCast, ElectionDescription electionDescription)
             {
                 VoteCast = voteCast;
+                ElectionDescription = electionDescription;
             }
         }
     }

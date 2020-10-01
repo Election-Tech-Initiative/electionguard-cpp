@@ -51,8 +51,9 @@ namespace ElectionGuardCore.Ui.Elections
             {
                 EncryptionResult result = null;
                 await _alertService.ShowBusy("Encrypting ballot…",
-                    () => result = _encryptionService.EncryptBallot(Args.Election, Args.Selection.ObjectId),
-                    async () => await _navigationService.PushModal(NavigationPaths.SelectionVerificationPage, result)
+                    () => result = _encryptionService.EncryptBallot(Args.ElectionDescription, Args.Selection.ObjectId),
+                    async () => await _navigationService.PushModal(NavigationPaths.SelectionVerificationPage,
+                        new SelectionVerificationViewModel.SelectionVerificationArgs(Args.ElectionDescription, result))
                 );
             }
         }
@@ -60,12 +61,12 @@ namespace ElectionGuardCore.Ui.Elections
         public class ReviewSelectionArgs
         {
             public readonly Candidate Selection;
-            public readonly ElectionDescription Election;
+            public readonly ElectionDescription ElectionDescription;
 
-            public ReviewSelectionArgs(Candidate selection, ElectionDescription election)
+            public ReviewSelectionArgs(Candidate selection, ElectionDescription electionDescription)
             {
                 Selection = selection;
-                Election = election;
+                ElectionDescription = electionDescription;
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ElectionGuardCore.Elections;
 using ElectionGuardCore.Encryption;
 
 namespace ElectionGuardCore.Ui.Elections
@@ -27,8 +28,19 @@ namespace ElectionGuardCore.Ui.Elections
 
         public override Task Load()
         {
-            EncryptionResult = (EncryptionResult)Parameter;
+            Args = (SelectionVerificationArgs)Parameter;
             return Task.CompletedTask;
+        }
+
+        private SelectionVerificationArgs _args;
+        private SelectionVerificationArgs Args
+        {
+            get => _args;
+            set
+            {
+                _args = value;
+                EncryptionResult = _args.EncryptionResult;
+            }
         }
 
         private EncryptionResult _encryptionResult;
@@ -70,9 +82,21 @@ namespace ElectionGuardCore.Ui.Elections
             {
                 _navigationService.PopModal(),
                 _navigationService.PushModal(NavigationPaths.SelectionSubmittedPage,
-                    new SelectionSubmittedViewModel.SelectionSubmittedArgs(voted))
+                    new SelectionSubmittedViewModel.SelectionSubmittedArgs(voted, Args.ElectionDescription))
             };
             await Task.WhenAll(tasks);
+        }
+
+        public class SelectionVerificationArgs
+        {
+            public readonly ElectionDescription ElectionDescription;
+            public readonly EncryptionResult EncryptionResult;
+
+            public SelectionVerificationArgs(ElectionDescription electionDescription, EncryptionResult encryptionResult)
+            {
+                ElectionDescription = electionDescription;
+                EncryptionResult = encryptionResult;
+            }
         }
     }
 }
