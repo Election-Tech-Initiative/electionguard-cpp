@@ -2,12 +2,30 @@
 using System.Threading.Tasks;
 using ElectionGuardCore.Elections;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
 namespace ElectionGuardCore.Ui.Forms.Services
 {
     internal class MockElectionService : IElectionService
     {
+        private readonly JsonSerializerSettings _serializerSettings;
+
+        public MockElectionService()
+        {
+            _serializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new SnakeCaseNamingStrategy()
+                },
+                Converters = new List<JsonConverter>
+                {
+                    new StringEnumConverter(typeof(SnakeCaseNamingStrategy))
+                }
+            };
+        }
+
         private static readonly string SampleElectionDescriptionJson = @"
 {
   ""ballot_styles"": [
@@ -268,27 +286,16 @@ namespace ElectionGuardCore.Ui.Forms.Services
 
         public Task<ElectionDescription> GetElectionDescription()
         {
-            var electionDescription = JsonConvert.DeserializeObject<ElectionDescription>(SampleElectionDescriptionJson,
-                new JsonSerializerSettings
-                {
-                    ContractResolver = new DefaultContractResolver
-                    {
-                        NamingStrategy = new SnakeCaseNamingStrategy()
-                    }
-                });
+            var electionDescription =
+                JsonConvert.DeserializeObject<ElectionDescription>(SampleElectionDescriptionJson, _serializerSettings);
             return Task.FromResult(electionDescription);
         }
 
         public Task<CiphertextElectionContext> GetCiphertextElectionContext()
         {
-            var ciphertextelectionContext = JsonConvert.DeserializeObject<CiphertextElectionContext>(SampleCiphertextelectionContextJson,
-                new JsonSerializerSettings
-                {
-                    ContractResolver = new DefaultContractResolver
-                    {
-                        NamingStrategy = new SnakeCaseNamingStrategy()
-                    }
-                });
+            var ciphertextelectionContext =
+                JsonConvert.DeserializeObject<CiphertextElectionContext>(SampleCiphertextelectionContextJson,
+                    _serializerSettings);
             return Task.FromResult(ciphertextelectionContext);
         }
 
