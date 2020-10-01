@@ -7,19 +7,29 @@
 	Title="{Binding Title}"
 	BackgroundColor="#F3F2F7"
 >
-    <ContentPage.Content>
-        <StackLayout Spacing="0">
-            <Label
-	            Text="Your vote has been counted!"
+	<ContentPage.Content>
+		<StackLayout Spacing="0">
+			<Label
+				Text="{Binding Message}"
 				FontAttributes="Bold"
 				FontSize="20"
 				WidthRequest="250"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand"
+				VerticalOptions="CenterAndExpand"
+				HorizontalOptions="CenterAndExpand"
 				HorizontalTextAlignment="Center"
 				LineBreakMode="WordWrap"
 				MaxLines="2"
-	        />
+			/>
+			<Button
+				Style="{StaticResource ButtonPrimary}"
+				Text="Re Vote"
+				Command="{Binding ReVoteCommand}"
+				IsVisible="{Binding CanReVote}"
+				WidthRequest="300"
+				VerticalOptions="End"
+				HorizontalOptions="CenterAndExpand"
+				Margin="0,0,0,12"
+			/>
 			<Button
 				Style="{StaticResource ButtonPrimary}"
 				Text="Close"
@@ -29,6 +39,6 @@
 				HorizontalOptions="CenterAndExpand"
 				Margin="0,0,0,12"
 			/>
-        </StackLayout>
-    </ContentPage.Content>
+		</StackLayout>
+	</ContentPage.Content>
 </uiforms:PageBase>

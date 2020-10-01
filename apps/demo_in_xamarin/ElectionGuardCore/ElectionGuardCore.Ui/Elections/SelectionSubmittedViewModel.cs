@@ -22,6 +22,13 @@ namespace ElectionGuardCore.Ui.Elections
             return Task.CompletedTask;
         }
 
+        private new SelectionSubmittedArgs Parameter => base.Parameter as SelectionSubmittedArgs;
+
+        public string Message =>
+            Parameter?.VoteCast ?? false ? "Your vote has been counted!" : "Your vote has been spoiled.";
+
+        public bool CanReVote => !(Parameter?.VoteCast ?? false);
+
         public ICommand CloseCommand { get; }
 
         private async void Close(object parameter)
@@ -32,6 +39,16 @@ namespace ElectionGuardCore.Ui.Elections
                 _navigationService.PopToRoot()
             };
             await Task.WhenAll(tasks);
+        }
+
+        public class SelectionSubmittedArgs
+        {
+            public readonly bool VoteCast;
+
+            public SelectionSubmittedArgs(bool voteCast)
+            {
+                VoteCast = voteCast;
+            }
         }
     }
 }

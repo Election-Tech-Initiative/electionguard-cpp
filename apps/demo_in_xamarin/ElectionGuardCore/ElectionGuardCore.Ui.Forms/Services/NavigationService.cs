@@ -33,10 +33,8 @@ namespace ElectionGuardCore.Ui.Forms.Services
 
         public async Task PushModal(string path, object parameter = null)
         {
-            PageBase contentPage = ResolvePage(path, parameter);
-
-            Page page = new NavigationPage(contentPage);
-            await _navigation.PushModalAsync(page);
+            var page = ResolvePage(path, parameter);
+            await _navigation.PushModalAsync(new NavigationPage(page));
         }
 
         public async Task PopModal()

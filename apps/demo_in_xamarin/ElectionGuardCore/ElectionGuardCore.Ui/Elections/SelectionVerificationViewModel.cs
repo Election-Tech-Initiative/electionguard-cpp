@@ -20,6 +20,7 @@ namespace ElectionGuardCore.Ui.Elections
 
             CopyTrackingCodeCommand = new RelayCommand(CopyTrackingCode);
             CastCommand = new RelayCommand(Cast);
+            SpoilCommand = new RelayCommand(Spoil);
         }
 
         public override string Title => "Verification";
@@ -53,10 +54,23 @@ namespace ElectionGuardCore.Ui.Elections
 
         private async void Cast(object parameter)
         {
+            await Submit(true);
+        }
+
+        public ICommand SpoilCommand { get; }
+
+        private async void Spoil(object parameter)
+        {
+            await Submit(false);
+        }
+
+        private async Task Submit(bool voted)
+        {
             var tasks = new List<Task>
             {
                 _navigationService.PopModal(),
-                _navigationService.PushModal(NavigationPaths.SelectionSubmittedPage)
+                _navigationService.PushModal(NavigationPaths.SelectionSubmittedPage,
+                    new SelectionSubmittedViewModel.SelectionSubmittedArgs(voted))
             };
             await Task.WhenAll(tasks);
         }
