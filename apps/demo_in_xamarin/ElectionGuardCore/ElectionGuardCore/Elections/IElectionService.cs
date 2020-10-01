@@ -6,6 +6,6 @@ namespace ElectionGuardCore.Elections
     public interface IElectionService
     {
         Task<ElectionDescription> GetElectionDescription();
-        IDictionary<string, bool> Votes { get; }
+        IDictionary<string, bool> Votes { get; }    // TODO replace w/ real API operation
     }
 }

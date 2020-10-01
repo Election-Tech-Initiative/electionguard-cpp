@@ -15,12 +15,20 @@ namespace ElectionGuardCore.Ui.Forms.Services
         private readonly Dictionary<string, Type> _pageMappings = new Dictionary<string, Type>
         {
             { NavigationPaths.RootPage, typeof(ActiveContestPage) },
-            { NavigationPaths.ContestSelectionListPage, typeof(ContestSelectionListPage) }
+            { NavigationPaths.ContestSelectionListPage, typeof(ContestSelectionListPage) },
+            { NavigationPaths.ReviewSelectionPage, typeof(ReviewSelectionPage) },
+            { NavigationPaths.SelectionVerificationPage, typeof(SelectionVerificationPage) },
+            { NavigationPaths.SelectionSubmittedPage, typeof(SelectionSubmittedPage) }
         };
 
         public async Task Push(string path, object parameter)
         {
             await _navigation.PushAsync(ResolvePage(path, parameter));
+        }
+
+        public async Task PopToRoot()
+        {
+            await _navigation.PopToRootAsync();
         }
 
         internal void SetNavigation(INavigation navigation)

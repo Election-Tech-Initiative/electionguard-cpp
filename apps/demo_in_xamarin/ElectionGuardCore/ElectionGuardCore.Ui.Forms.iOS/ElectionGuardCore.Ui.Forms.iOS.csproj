@@ -62,6 +62,9 @@
     <CodesignKey>iPhone Developer</CodesignKey>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
   </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
@@ -131,6 +134,10 @@
     <ProjectReference Include="..\ElectionGuardCore.Ui.Forms\ElectionGuardCore.Ui.Forms.csproj">
       <Project>{15A45C17-4DC1-406B-9E3E-C89DBABC9615}</Project>
       <Name>ElectionGuardCore.Ui.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ElectionGuardCore.Ui\ElectionGuardCore.Ui.csproj">
+      <Project>{361529ca-4e38-461d-8366-79268921cecf}</Project>
+      <Name>ElectionGuardCore.Ui</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
