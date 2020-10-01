@@ -277,6 +277,6 @@ namespace ElectionGuardCore.Ui.Forms.Services
             return Task.FromResult(electionDescription);
         }
 
-        public IDictionary<string, bool> Votes => new Dictionary<string, bool>();   // TODO for demo purposes only
+        public IDictionary<string, bool> Votes { get; } = new Dictionary<string, bool>();   // TODO for demo purposes only
     }
 }

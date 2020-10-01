@@ -134,7 +134,9 @@ namespace ElectionGuardCore.Ui.Tests.Elections
 
             viewModel.ReviewSelectionCommand.Execute(null);
 
-            _navigationServiceMock.Verify(x => x.Push(NavigationPaths.ReviewSelectionPage, candidate.Candidate));
+            _navigationServiceMock.Verify(x => x.Push(NavigationPaths.ReviewSelectionPage,
+                It.Is<ReviewSelectionViewModel.ReviewSelectionArgs>(a =>
+                    a.Selection == candidate.Candidate && a.ElectionDescription == _electionDescription)));
         }
 
         [Test]

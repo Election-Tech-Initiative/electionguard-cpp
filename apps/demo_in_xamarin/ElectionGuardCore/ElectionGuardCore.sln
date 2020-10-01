@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuardCore.Ui.Forms.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuardCore.Ui.Forms.iOS", "ElectionGuardCore.Ui.Forms.iOS\ElectionGuardCore.Ui.Forms.iOS.csproj", "{36CA66CC-05A2-47AB-9E49-5CE267945097}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuardCore.Ui.Forms", "ElectionGuardCore.Ui.Forms\ElectionGuardCore.Ui.Forms.csproj", "{15A45C17-4DC1-406B-9E3E-C89DBABC9615}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuardCore.Ui.Forms", "ElectionGuardCore.Ui.Forms\ElectionGuardCore.Ui.Forms.csproj", "{15A45C17-4DC1-406B-9E3E-C89DBABC9615}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuardCore.Ui", "ElectionGuardCore.Ui\ElectionGuardCore.Ui.csproj", "{361529CA-4E38-461D-8366-79268921CECF}"
 EndProject

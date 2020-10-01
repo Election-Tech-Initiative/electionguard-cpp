@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Autofac.Features.ResolveAnything;
 using ElectionGuardCore.Elections;
+using ElectionGuardCore.Encryption;
 using ElectionGuardCore.Ui.Forms.Services;
 using Xamarin.Forms;
 
@@ -18,7 +19,6 @@ namespace ElectionGuardCore.Ui.Forms
 
             var navigationPage = new NavigationPage(navigationService.GetDefaultPage());
             navigationPage.BarTextColor = Color.FromHex(Colors.LightGreen);
-            NavigationPage.SetBackButtonTitle(this, "Back");
             navigationService.SetNavigation(navigationPage.Navigation);
 
             MainPage = navigationPage;
@@ -28,7 +28,10 @@ namespace ElectionGuardCore.Ui.Forms
         {
             var builder = new ContainerBuilder();
             builder.RegisterInstance(navigationService).As<INavigationService>().SingleInstance();
+            builder.RegisterType<AlertService>().As<IAlertService>().SingleInstance();
             builder.RegisterType<MockElectionService>().As<IElectionService>().SingleInstance();
+            builder.RegisterType<EncryptionService>().As<IEncryptionService>().SingleInstance();
+            builder.RegisterType<ClipboardService>().As<IClipboardService>().SingleInstance();
 
             builder.RegisterSource(new AnyConcreteTypeNotAlreadyRegisteredSource());
 

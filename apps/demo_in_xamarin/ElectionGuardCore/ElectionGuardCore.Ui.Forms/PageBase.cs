@@ -10,6 +10,8 @@ namespace ElectionGuardCore.Ui.Forms
         {
             ViewModel = viewModel;
             BindingContext = ViewModel;
+
+            NavigationPage.SetBackButtonTitle(this, "Back");
         }
 
         protected override async void OnAppearing()

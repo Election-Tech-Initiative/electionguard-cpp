@@ -8,6 +8,15 @@
 		<ResourceDictionary>
 			<Style TargetType="Button">
 				<Setter
+					Property="TextColor"
+					Value="{x:Static ui:Colors.LightGreen}"
+				/>
+			</Style>
+			<Style
+				x:Key="ButtonPrimary"
+				TargetType="Button"
+			>
+				<Setter
 					Property="BackgroundColor"
 					Value="{x:Static ui:Colors.DarkGreen}"
 				/>
@@ -26,6 +35,10 @@
 				<Setter
 					Property="CornerRadius"
 					Value="30"
+				/>
+				<Setter
+					Property="HeightRequest"
+					Value="60"
 				/>
 			</Style>
 		</ResourceDictionary>

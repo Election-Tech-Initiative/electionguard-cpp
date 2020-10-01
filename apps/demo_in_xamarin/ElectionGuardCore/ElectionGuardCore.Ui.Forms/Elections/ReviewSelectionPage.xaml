@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<uiforms:PageBase
+	xmlns="http://xamarin.com/schemas/2014/forms"
+	xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+	xmlns:uiforms="clr-namespace:ElectionGuardCore.Ui.Forms"
+	x:Class="ElectionGuardCore.Ui.Forms.Elections.ReviewSelectionPage"
+	Title="{Binding Title}"
+	BackgroundColor="#F3F2F7"
+>
+    <ContentPage.Content>
+        <StackLayout Spacing="0">
+			<Label
+				Text="Please confirm your selection. If this is not correct, tap the Back button to change your selection."
+				LineBreakMode="WordWrap"
+				MaxLines="4"
+				Margin="20,20,20,0"
+			/>
+			<Label
+				Text="{Binding CandidateName}"
+				FontAttributes="Bold"
+				FontSize="32"
+				LineBreakMode="WordWrap"
+				MaxLines="4"
+				HorizontalOptions="CenterAndExpand"
+				VerticalOptions="CenterAndExpand"
+				HorizontalTextAlignment="Center"
+				Margin="20,0"
+			/>
+			<Button
+				Style="{StaticResource ButtonPrimary}"
+				Text="Encrypt &amp; Submit"
+				Command="{Binding EncryptSelectionCommand}"
+				WidthRequest="300"
+				HorizontalOptions="Center"
+				Margin="0,20,0,12"
+			/>
+        </StackLayout>
+    </ContentPage.Content>
+</uiforms:PageBase>
