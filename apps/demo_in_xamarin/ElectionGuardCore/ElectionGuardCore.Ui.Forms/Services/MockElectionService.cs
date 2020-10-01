@@ -132,7 +132,7 @@ namespace ElectionGuardCore.Ui.Forms.Services
   ],
   ""contests"": [
     {
-      ""@type"": ""CandidateContest"",
+      ""type"": ""CandidateContest"",
       ""ballot_selections"": [
         {
           ""candidate_id"": ""barchi"",
@@ -214,7 +214,7 @@ namespace ElectionGuardCore.Ui.Forms.Services
       ""number_elected"": 1,
       ""object_id"": ""school-board-contest"",
       ""sequence_order"": 0,
-      ""vote_variation"": 1,
+      ""vote_variation"": ""one_of_m"",
       ""votes_allowed"": 1
     }
   ],
@@ -243,7 +243,7 @@ namespace ElectionGuardCore.Ui.Forms.Services
       },
       ""name"": ""Hamilton County"",
       ""object_id"": ""hamilton-county"",
-      ""type"": 9
+      ""type"": ""county""
     }
   ],
   ""name"": {
@@ -260,7 +260,7 @@ namespace ElectionGuardCore.Ui.Forms.Services
   },
   ""parties"": [],
   ""start_date"": ""2020-03-01T08:00:00-05:00"",
-  ""type"": 1
+  ""type"": ""general""
 }
 ";
 

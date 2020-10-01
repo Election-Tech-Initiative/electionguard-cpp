@@ -1,5 +1,10 @@
-﻿namespace ElectionGuardCore.Elections
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
+
+namespace ElectionGuardCore.Elections
 {
+    [JsonConverter(typeof(StringEnumConverter), typeof(SnakeCaseNamingStrategy))]
     public enum ReportingUnitType
     {
         Unknown = 0,

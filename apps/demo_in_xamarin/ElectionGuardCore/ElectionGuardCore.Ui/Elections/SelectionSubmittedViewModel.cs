@@ -72,18 +72,22 @@ namespace ElectionGuardCore.Ui.Elections
         private async void ReVote(object parameter)
         {
             await _navigationService.PopToRoot();
-            await _navigationService.Push(NavigationPaths.ContestSelectionListPage, Args.ElectionDescription);
+            await _navigationService.Push(NavigationPaths.ContestSelectionListPage,
+                new ContestSelectionListViewModel.ContestSelectionListArgs(Args.ElectionDescription,
+                    Args.CiphertextElectionContext));
         }
 
         public class SelectionSubmittedArgs
         {
             public readonly bool VoteCast;
             public readonly ElectionDescription ElectionDescription;
+            public readonly CiphertextElectionContext CiphertextElectionContext;
 
-            public SelectionSubmittedArgs(bool voteCast, ElectionDescription electionDescription)
+            public SelectionSubmittedArgs(bool voteCast, ElectionDescription electionDescription, CiphertextElectionContext context)
             {
                 VoteCast = voteCast;
                 ElectionDescription = electionDescription;
+                CiphertextElectionContext = context;
             }
         }
     }

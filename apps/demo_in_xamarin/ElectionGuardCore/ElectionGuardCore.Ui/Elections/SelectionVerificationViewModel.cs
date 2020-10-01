@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.Windows.Input;
 using ElectionGuardCore.Elections;
-using ElectionGuardCore.Encryption;
 
 namespace ElectionGuardCore.Ui.Elections
 {
@@ -82,7 +81,8 @@ namespace ElectionGuardCore.Ui.Elections
             // TODO submit result to API
             _electionService.Votes[Args.ElectionDescription.ActiveContest.ObjectId] = voted;
             await _navigationService.Push(NavigationPaths.SelectionSubmittedPage,
-                new SelectionSubmittedViewModel.SelectionSubmittedArgs(voted, Args.ElectionDescription));
+                new SelectionSubmittedViewModel.SelectionSubmittedArgs(voted, Args.ElectionDescription,
+                    Args.CiphertextElectionContext));
         }
 
         public class SelectionVerificationArgs
