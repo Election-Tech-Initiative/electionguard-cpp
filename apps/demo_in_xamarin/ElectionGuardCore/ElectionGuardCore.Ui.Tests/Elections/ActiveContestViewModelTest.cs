@@ -47,11 +47,22 @@ namespace ElectionGuardCore.Ui.Tests.Elections
             }
         };
 
+        private readonly CiphertextElectionContext _electionContext = new CiphertextElectionContext
+        {
+            NumberOfGuardians = 5,
+            Quorum = 3,
+            ElgamalPublicKey = "12345",
+            DescriptionHash = "23456",
+            CryptoBaseHash = "34567",
+            CryptoExtendedBaseHash = "45678"
+        };
+
         [SetUp]
         public void SetUp()
         {
             _electionServiceMock = new Mock<IElectionService>();
             _electionServiceMock.Setup(x => x.GetElectionDescription()).ReturnsAsync(_electionDescription);
+            _electionServiceMock.Setup(x => x.GetCiphertextElectionContext()).ReturnsAsync(_electionContext);
 
             _navigationServiceMock = new Mock<INavigationService>();
         }
@@ -102,7 +113,10 @@ namespace ElectionGuardCore.Ui.Tests.Elections
             viewModel.BeginVoteCommand.Execute(null);
 
             _navigationServiceMock.Verify(x =>
-                x.Push(NavigationPaths.ContestSelectionListPage, _electionDescription));
+                x.Push(NavigationPaths.ContestSelectionListPage,
+                It.Is<ContestSelectionListViewModel.ContestSelectionListArgs>(a =>
+                    a.ElectionDescription == _electionDescription
+                    && a.ElectionContext == _electionContext)));
         }
 
         private async Task<ActiveContestViewModel> CreateViewModel()
