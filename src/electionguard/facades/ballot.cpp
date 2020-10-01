@@ -5,6 +5,7 @@
 #include "memory_cache.hpp"
 #include "variant_cast.hpp"
 
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 
