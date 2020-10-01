@@ -49,11 +49,11 @@ namespace ElectionGuardCore.Ui.Elections
             if (await _alertService.Alert("Encrypt ballot",
                 "You are about to encrypt your ballot. This cannot be undone. Do you wish to continue?", "Yes", "No"))
             {
-                EncryptionResult result = null;
+                CiphertextBallot result = null;
                 await _alertService.ShowBusy("Encrypting ballot…",
-                    () => result = _encryptionService.EncryptBallot(Args.ElectionDescription, Args.Selection.ObjectId),
+                    () => result = _encryptionService.EncryptBallot(Args.ElectionDescription, Args.ElectionContext, Args.Selection),
                     async () => await _navigationService.Push(NavigationPaths.SelectionVerificationPage,
-                        new SelectionVerificationViewModel.SelectionVerificationArgs(Args.ElectionDescription, result))
+                        new SelectionVerificationViewModel.SelectionVerificationArgs(Args.ElectionDescription, Args.ElectionContext, result))
                 );
             }
         }
@@ -62,11 +62,13 @@ namespace ElectionGuardCore.Ui.Elections
         {
             public readonly Candidate Selection;
             public readonly ElectionDescription ElectionDescription;
+            public readonly CiphertextElectionContext ElectionContext; 
 
-            public ReviewSelectionArgs(Candidate selection, ElectionDescription electionDescription)
+            public ReviewSelectionArgs(Candidate selection, ElectionDescription metadata, CiphertextElectionContext context)
             {
                 Selection = selection;
-                ElectionDescription = electionDescription;
+                ElectionDescription = metadata;
+                ElectionContext = context;
             }
         }
     }
