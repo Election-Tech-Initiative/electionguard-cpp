@@ -120,6 +120,7 @@ TEST_CASE("Encrypt Ballot with mediator succeeds")
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert
+    // TODO: validate against metadata->getDescriptionHash()
     CHECK(ciphertext->isValidEncryption(*context->getDescriptionHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
 
@@ -162,6 +163,7 @@ TEST_CASE("Can serialize CiphertextElectionContext")
     auto fromBson = CiphertextElectionContext::fromBson(bson);
 
     // Assert
+    // TODO: validate against metadata->getDescriptionHash()
     CHECK(fromJson->getDescriptionHash()->toHex() == context->getDescriptionHash()->toHex());
     CHECK(fromBson->getDescriptionHash()->toHex() == context->getDescriptionHash()->toHex());
 }
