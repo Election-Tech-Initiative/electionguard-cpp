@@ -5,6 +5,9 @@ namespace ElectionGuardCore.Encryption
     public interface IEncryptionService
     {
         CiphertextBallot EncryptBallot(
-            ElectionDescription metadata, CiphertextElectionContext context, Candidate selection);
+            ElectionDescription metadata,
+            CiphertextElectionContext context,
+            SelectionDescription selection,
+            Candidate candidate);
     }
 }

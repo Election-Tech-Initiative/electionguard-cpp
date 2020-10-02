@@ -4,6 +4,7 @@ using System.Numerics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace ElectionGuardCore.Elections
 {
@@ -36,11 +37,11 @@ namespace ElectionGuardCore.Elections
         {
             if (objectType == typeof(ElementModP))
             {
-                return new ElementModP { Data = BigInteger.Parse((string)reader.Value) };
+                return new ElementModP { Data = BigInteger.Parse((string)reader.Value, NumberStyles.AllowHexSpecifier) };
             }
             else
             {
-                return new ElementModQ { Data = BigInteger.Parse((string)reader.Value) };
+                return new ElementModQ { Data = BigInteger.Parse((string)reader.Value, NumberStyles.AllowHexSpecifier) };
             }
         }
 

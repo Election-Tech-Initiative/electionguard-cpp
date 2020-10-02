@@ -18,6 +18,9 @@ namespace ElectionGuardCore.Ui.Forms.Services
     {
         private readonly JsonSerializerSettings _serializerSettings;
 
+        // TODO: generate securely & deterministically
+        private ulong DeviceId = BitConverter.ToUInt64(Guid.NewGuid().ToByteArray(), 0);
+
         public EncryptionService()
         {
             _serializerSettings = new JsonSerializerSettings
@@ -40,16 +43,19 @@ namespace ElectionGuardCore.Ui.Forms.Services
             public string DescriptionHash { get; set; }
         }
 
-        // TODO: generate securely & deterministically
-        private ulong DeviceId = BitConverter.ToUInt64(Guid.NewGuid().ToByteArray(), 0);
-
         public CiphertextBallot EncryptBallot(
-            ElectionDescription metadata, CiphertextElectionContext context, Candidate candidate)
+            ElectionDescription metadata, CiphertextElectionContext context,
+            SelectionDescription selection, Candidate candidate)
         {
             // Only supports elections with a single contest
 
+            if (selection.CandidateId != candidate.ObjectId)
+            {
+                throw new ArgumentException("Candidate must match selection");
+            }
+
             // Fill in a ciphertext ballot
-            PlaintextBallot plaintext = FillPlaintextBallotFromSingleSelection(metadata, candidate);
+            PlaintextBallot plaintext = FillPlaintextBallotFromSingleSelection(metadata, selection);
 
             // serialize all the things into the SDK
             var hexContext = ToHex(context);
@@ -68,18 +74,10 @@ namespace ElectionGuardCore.Ui.Forms.Services
             var context_ = new SDK.CiphertextElectionContext(context_json);
             var device = new SDK.EncryptionDevice(DeviceId, "Some-Location-String");
             var mediator = new SDK.EncryptionMediator(metadata_, context_, device);
-            Debug.WriteLine($"metadata_json: {metadata_json}");
-            Debug.WriteLine($"metadata_json: {metadata_.ToJson()}");
-            Debug.WriteLine("");
-            Debug.WriteLine($"context_json: {context_json}");
-            Debug.WriteLine($"context_json: {context_.ToJson()}");
 
             // create an SDK representation of the plaintext ballot
             var json = JsonConvert.SerializeObject(plaintext, _serializerSettings);
             var plaintext_ = new SDK.PlaintextBallot(json);
-            Debug.WriteLine("");
-            Debug.WriteLine($"plaintext_json: {json}");
-            Debug.WriteLine($"plaintext_json: {plaintext_.ToJson()}");
 
             // encrypt
             var ciphertext_ = mediator.Encrypt(plaintext_);
@@ -100,14 +98,10 @@ namespace ElectionGuardCore.Ui.Forms.Services
             };
         }
 
-        //private CiphertextBallot FromHex(SDK.CiphertextBallot hexCiphertext)
-        //{
-
-        //}
-
-        private PlaintextBallot FillPlaintextBallotFromSingleSelection(ElectionDescription metadata, Candidate candidate)
+        private PlaintextBallot FillPlaintextBallotFromSingleSelection(
+            ElectionDescription metadata, SelectionDescription selection)
         {
-            Debug.WriteLine($"selection: {candidate.ObjectId}");
+            Debug.WriteLine($"selection: {selection.ObjectId}");
             PlaintextBallot plaintext = new PlaintextBallot
             {
                 ObjectId = Guid.NewGuid().ToString(),
@@ -126,14 +120,14 @@ namespace ElectionGuardCore.Ui.Forms.Services
             foreach (var ballotSelection in metadata.ActiveContest.BallotSelections.OrderBy(b =>
                 b.SequenceOrder))
             {
-                var selection = new PlaintextBallotSelection
+                var option = new PlaintextBallotSelection
                 {
                     ObjectId = ballotSelection.ObjectId,
-                    Vote = ballotSelection.ObjectId == candidate.ObjectId ? "1" : "0",
+                    Vote = ballotSelection.ObjectId == selection.ObjectId ? "1" : "0",
                     IsPlaceholderSelection = false
                 };
-                Debug.WriteLine($"selection: {selection.ObjectId} vote: {selection.Vote}");
-                plaintext.Contests.First().BallotSelections.Add(selection);
+                Debug.WriteLine($"selection: {selection.ObjectId} vote: {option.Vote}");
+                plaintext.Contests.First().BallotSelections.Add(option);
             }
 
             return plaintext;

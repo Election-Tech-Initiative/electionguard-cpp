@@ -581,6 +581,7 @@ namespace electionguard
     }
 
     ElementModQ *CiphertextBallot::getTrackingHash() const { return pimpl->trackingHash.get(); }
+
     string CiphertextBallot::getTrackingCode() const
     {
         return Tracker::hashToWords(*pimpl->trackingHash);
