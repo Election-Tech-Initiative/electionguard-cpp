@@ -17,7 +17,12 @@ namespace ElectionGuardCore.Ui.Tests.Elections
 
         private readonly Candidate _candidate = new Candidate();
         private readonly SelectionDescription _selection = new SelectionDescription();
-        private readonly ElectionDescription _electionDescription = new ElectionDescription();
+
+        private readonly Election _election = new Election
+        {
+            ElectionDescription = new ElectionDescription()
+        };
+
         private readonly CiphertextElectionContext _context = new CiphertextElectionContext();
         private readonly CiphertextBallot _ciphertextBallot = new CiphertextBallot();
 
@@ -51,7 +56,8 @@ namespace ElectionGuardCore.Ui.Tests.Elections
             var viewModel = await CreateViewModel();
             viewModel.EncryptSelectionCommand.Execute(null);
 
-            _encryptionServiceMock.Verify(x => x.EncryptBallot(_electionDescription, _context, _selection, _candidate));
+            _encryptionServiceMock.Verify(x =>
+                x.EncryptBallot(_election.ElectionDescription, _context, _selection, _candidate));
         }
 
         [Test]
@@ -62,7 +68,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
 
             _navigationServiceMock.Verify(x => x.Push(NavigationPaths.SelectionVerificationPage,
                 It.Is<SelectionVerificationViewModel.SelectionVerificationArgs>(a =>
-                    a.ElectionDescription == _electionDescription && a.CiphertextElectionContext == _context &&
+                    a.Election == _election && a.CiphertextElectionContext == _context &&
                     a.CiphertextBallot == _ciphertextBallot)));
         }
 
@@ -72,7 +78,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
                 _navigationServiceMock.Object)
             {
                 Parameter = new ReviewSelectionViewModel.ReviewSelectionArgs(
-                    _electionDescription, _context, _selection, _candidate)
+                    _election, _context, _selection, _candidate)
             };
             await viewModel.Load();
 

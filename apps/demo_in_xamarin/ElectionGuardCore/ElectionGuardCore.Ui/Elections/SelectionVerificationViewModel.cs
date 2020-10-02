@@ -79,22 +79,22 @@ namespace ElectionGuardCore.Ui.Elections
         private async Task Submit(bool voted)
         {
             // TODO submit result to API
-            _electionService.Votes[Args.ElectionDescription.ActiveContest.ObjectId] = voted;
+            _electionService.Votes[Args.Election.ElectionDescription.ActiveContest.ObjectId] = voted;
             await _navigationService.Push(NavigationPaths.SelectionSubmittedPage,
-                new SelectionSubmittedViewModel.SelectionSubmittedArgs(voted, Args.ElectionDescription,
+                new SelectionSubmittedViewModel.SelectionSubmittedArgs(voted, Args.Election,
                     Args.CiphertextElectionContext));
         }
 
         public class SelectionVerificationArgs
         {
-            public readonly ElectionDescription ElectionDescription;
+            public readonly Election Election;
             public readonly CiphertextElectionContext CiphertextElectionContext;
             public readonly CiphertextBallot CiphertextBallot;
 
             public SelectionVerificationArgs(
-                ElectionDescription metadata, CiphertextElectionContext context, CiphertextBallot ciphertextBallot)
+                Election election, CiphertextElectionContext context, CiphertextBallot ciphertextBallot)
             {
-                ElectionDescription = metadata;
+                Election = election;
                 CiphertextElectionContext = context;
                 CiphertextBallot = ciphertextBallot;
             }

@@ -15,13 +15,16 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         private Mock<IElectionService> _electionServiceMock;
         private Mock<INavigationService> _navigationServiceMock;
 
-        private readonly ElectionDescription _electionDescription = new ElectionDescription
+        private readonly Election _election = new Election
         {
-            Contests = new List<ContestDescription>
+            ElectionDescription = new ElectionDescription
             {
-                new ContestDescription
+                Contests = new List<ContestDescription>
                 {
-                    ObjectId = "contest1"
+                    new ContestDescription
+                    {
+                        ObjectId = "contest1"
+                    }
                 }
             }
         };
@@ -60,7 +63,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
 
             _navigationServiceMock.Verify(x => x.Push(NavigationPaths.SelectionSubmittedPage,
                 It.Is<SelectionSubmittedViewModel.SelectionSubmittedArgs>(a =>
-                    a.VoteCast && a.ElectionDescription == _electionDescription &&
+                    a.VoteCast && a.Election == _election &&
                     a.CiphertextElectionContext == _context)));
         }
 
@@ -72,7 +75,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
 
             _navigationServiceMock.Verify(x => x.Push(NavigationPaths.SelectionSubmittedPage,
                 It.Is<SelectionSubmittedViewModel.SelectionSubmittedArgs>(a =>
-                    !a.VoteCast && a.ElectionDescription == _electionDescription &&
+                    !a.VoteCast && a.Election == _election &&
                     a.CiphertextElectionContext == _context)));
         }
 
@@ -81,7 +84,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
             var viewModel = new SelectionVerificationViewModel(_clipboardServiceMock.Object, _alertServiceMock.Object,
                 _electionServiceMock.Object, _navigationServiceMock.Object)
             {
-                Parameter = new SelectionVerificationViewModel.SelectionVerificationArgs(_electionDescription, _context,
+                Parameter = new SelectionVerificationViewModel.SelectionVerificationArgs(_election, _context,
                     _ciphertextBallot)
             };
             await viewModel.Load();
