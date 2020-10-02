@@ -5,7 +5,7 @@ namespace ElectionGuardCore.Elections
     public interface IElectionService
     {
         Task<Election> GetElection();
-        Task<CiphertextElectionContext> GetCiphertextElectionContext();
+        Task<CiphertextElectionContext> GetCiphertextElectionContext(string electionId);
         Task CastBallot(string electionId, CiphertextBallot ballot);
         Task SpoilBallot(string electionId, CiphertextBallot ballot);
 

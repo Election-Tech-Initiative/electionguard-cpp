@@ -66,7 +66,8 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         {
             _electionServiceMock = new Mock<IElectionService>();
             _electionServiceMock.Setup(x => x.GetElection()).ReturnsAsync(_election);
-            _electionServiceMock.Setup(x => x.GetCiphertextElectionContext()).ReturnsAsync(_electionContext);
+            _electionServiceMock.Setup(x => x.GetCiphertextElectionContext(_election.Id))
+                .ReturnsAsync(_electionContext);
 
             _navigationServiceMock = new Mock<INavigationService>();
         }

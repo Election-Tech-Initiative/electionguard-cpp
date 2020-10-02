@@ -298,7 +298,7 @@ namespace ElectionGuardCore.Ui.Forms.Services
             return Task.FromResult(election);
         }
 
-        public Task<CiphertextElectionContext> GetCiphertextElectionContext()
+        public Task<CiphertextElectionContext> GetCiphertextElectionContext(string electionId)
         {
             var ciphertextelectionContext =
                 JsonConvert.DeserializeObject<CiphertextElectionContext>(SampleCiphertextelectionContextJson,

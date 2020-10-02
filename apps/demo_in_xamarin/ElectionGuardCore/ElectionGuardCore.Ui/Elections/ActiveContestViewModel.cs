@@ -23,7 +23,7 @@ namespace ElectionGuardCore.Ui.Elections
         {
             // TODO show loading indicator
             Election = await _electionService.GetElection();
-            ElectionContext = await _electionService.GetCiphertextElectionContext();
+            ElectionContext = await _electionService.GetCiphertextElectionContext(Election.Id);
 
             HasVotedInActiveContest = await _electionService.HasVoted(Election.Id);
         }
