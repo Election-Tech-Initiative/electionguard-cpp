@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Microsoft.ElectionGuard.Core" Version="0.0.1-alpha" />
   </ItemGroup>
 
 </Project>

@@ -7,13 +7,11 @@ using System.Linq;
 using System;
 using Newtonsoft.Json;
 using System.Numerics;
-using System.Diagnostics;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Converters;
 
 namespace ElectionGuardCore.Ui.Forms.Services
 {
-    using local = ElectionGuardCore.Elections;
     public class EncryptionService : IEncryptionService
     {
         private readonly JsonSerializerSettings _serializerSettings;
@@ -66,9 +64,7 @@ namespace ElectionGuardCore.Ui.Forms.Services
             };
 
             var metadata_json = JsonConvert.SerializeObject(internalMetadata, _serializerSettings);
-            
-            var context_json = JsonConvert.SerializeObject(hexContext, _serializerSettings);
-            
+            var context_json = JsonConvert.SerializeObject(hexContext, _serializerSettings);      
 
             var metadata_ = new SDK.InternalElectionDescription(metadata_json);
             var context_ = new SDK.CiphertextElectionContext(context_json);
@@ -101,7 +97,6 @@ namespace ElectionGuardCore.Ui.Forms.Services
         private PlaintextBallot FillPlaintextBallotFromSingleSelection(
             ElectionDescription metadata, SelectionDescription selection)
         {
-            Debug.WriteLine($"selection: {selection.ObjectId}");
             PlaintextBallot plaintext = new PlaintextBallot
             {
                 ObjectId = Guid.NewGuid().ToString(),
@@ -126,7 +121,6 @@ namespace ElectionGuardCore.Ui.Forms.Services
                     Vote = ballotSelection.ObjectId == selection.ObjectId ? "1" : "0",
                     IsPlaceholderSelection = false
                 };
-                Debug.WriteLine($"selection: {selection.ObjectId} vote: {option.Vote}");
                 plaintext.Contests.First().BallotSelections.Add(option);
             }
 
