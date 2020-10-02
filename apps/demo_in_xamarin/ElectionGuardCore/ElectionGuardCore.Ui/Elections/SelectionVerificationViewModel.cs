@@ -66,20 +66,20 @@ namespace ElectionGuardCore.Ui.Elections
 
         private async void Cast(object parameter)
         {
-            await Submit(true);
+            await _electionService.CastBallot(Args.Election.Id, CiphertextBallot);
+            await OnSubmit(true);
         }
 
         public ICommand SpoilCommand { get; }
 
         private async void Spoil(object parameter)
         {
-            await Submit(false);
+            await _electionService.SpoilBallot(Args.Election.Id, CiphertextBallot);
+            await OnSubmit(false);
         }
 
-        private async Task Submit(bool voted)
+        private async Task OnSubmit(bool voted)
         {
-            // TODO submit result to API
-            _electionService.Votes[Args.Election.ElectionDescription.ActiveContest.ObjectId] = voted;
             await _navigationService.Push(NavigationPaths.SelectionSubmittedPage,
                 new SelectionSubmittedViewModel.SelectionSubmittedArgs(voted, Args.Election,
                     Args.CiphertextElectionContext));

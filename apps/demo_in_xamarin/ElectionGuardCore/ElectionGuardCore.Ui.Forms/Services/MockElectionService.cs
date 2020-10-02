@@ -10,6 +10,7 @@ namespace ElectionGuardCore.Ui.Forms.Services
     internal class MockElectionService : IElectionService
     {
         private readonly JsonSerializerSettings _serializerSettings;
+        private readonly Dictionary<string, bool> _votes = new Dictionary<string, bool>();
 
         public MockElectionService()
         {
@@ -307,14 +308,20 @@ namespace ElectionGuardCore.Ui.Forms.Services
 
         public Task CastBallot(string electionId, CiphertextBallot ballot)
         {
+            _votes[electionId] = true;
             return Task.CompletedTask;
         }
 
         public Task SpoilBallot(string electionId, CiphertextBallot ballot)
         {
+            _votes[electionId] = false;
             return Task.CompletedTask;
         }
 
-        public IDictionary<string, bool> Votes { get; } = new Dictionary<string, bool>();   // TODO for demo purposes only
+        public Task<bool> HasVoted(string electionId)
+        {
+            var hasVoted = _votes.ContainsKey(electionId) && _votes[electionId];
+            return Task.FromResult(hasVoted);
+        }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace ElectionGuardCore.Elections
 {
@@ -10,6 +9,6 @@ namespace ElectionGuardCore.Elections
         Task CastBallot(string electionId, CiphertextBallot ballot);
         Task SpoilBallot(string electionId, CiphertextBallot ballot);
 
-        IDictionary<string, bool> Votes { get; }    // TODO replace w/ real API operation
+        Task<bool> HasVoted(string electionId);     // TODO replace w/ real API operation
     }
 }

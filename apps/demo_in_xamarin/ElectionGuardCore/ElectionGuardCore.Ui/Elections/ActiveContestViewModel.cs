@@ -24,6 +24,8 @@ namespace ElectionGuardCore.Ui.Elections
             // TODO show loading indicator
             Election = await _electionService.GetElection();
             ElectionContext = await _electionService.GetCiphertextElectionContext();
+
+            HasVotedInActiveContest = await _electionService.HasVoted(Election.Id);
         }
 
         private Election _election;
@@ -36,9 +38,6 @@ namespace ElectionGuardCore.Ui.Elections
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(ElectionName));
                 OnPropertyChanged(nameof(ActiveContestName));
-                OnPropertyChanged(nameof(HasVotedInActiveContest));
-                OnPropertyChanged(nameof(CanVote));
-                OnPropertyChanged(nameof(CannotVote));
             }
         }
 
@@ -58,19 +57,16 @@ namespace ElectionGuardCore.Ui.Elections
         public string ActiveContestName => Election?.ElectionDescription.ActiveContest?.Name ??
                                            "There is currently not an active contest available";
 
+        private bool _hasVotedInActiveContest;
         public bool HasVotedInActiveContest
         {
-            get
+            get => _hasVotedInActiveContest;
+            private set
             {
-                var voted = false;
-                if (Election?.ElectionDescription.ActiveContest?.ObjectId != null &&
-                    _electionService.Votes != null &&
-                    _electionService.Votes.ContainsKey(Election.ElectionDescription.ActiveContest.ObjectId))
-                {
-                    voted = _electionService.Votes[Election.ElectionDescription.ActiveContest.ObjectId];
-                }
-
-                return voted;
+                _hasVotedInActiveContest = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(CanVote));
+                OnPropertyChanged(nameof(CannotVote));
             }
         }
 

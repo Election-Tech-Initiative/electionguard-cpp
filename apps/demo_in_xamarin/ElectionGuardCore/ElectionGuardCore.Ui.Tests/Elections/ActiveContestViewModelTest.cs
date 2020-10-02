@@ -16,6 +16,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
 
         private readonly Election _election = new Election
         {
+            Id = "election1",
             ElectionDescription = new ElectionDescription
             {
                 Name = new InternationalizedText
@@ -93,13 +94,13 @@ namespace ElectionGuardCore.Ui.Tests.Elections
 
         [Test]
         [TestCase(null, false)]
-        [TestCase("contest1", false)]
-        [TestCase("contest1", true)]
-        public async Task HasVotedInActiveContest_ReflectsElectionServiceVotes(string contestId, bool hasVoted)
+        [TestCase("election1", false)]
+        [TestCase("election1", true)]
+        public async Task HasVotedInActiveContest_ReflectsElectionServiceVotes(string electionId, bool hasVoted)
         {
-            if (contestId != null)
+            if (electionId != null)
             {
-                _electionServiceMock.Setup(x => x.Votes).Returns(new Dictionary<string, bool> {{contestId, hasVoted}});
+                _electionServiceMock.Setup(x => x.HasVoted(electionId)).ReturnsAsync(hasVoted);
             }
 
             var viewModel = await CreateViewModel();

@@ -39,10 +39,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         {
             _clipboardServiceMock = new Mock<IClipboardService>();
             _alertServiceMock = new Mock<IAlertService>();
-
             _electionServiceMock = new Mock<IElectionService>();
-            _electionServiceMock.Setup(x => x.Votes).Returns(new Dictionary<string, bool>());
-
             _navigationServiceMock = new Mock<INavigationService>();
         }
 
