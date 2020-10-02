@@ -67,10 +67,8 @@ TEST_CASE("Hash to words converts to known words")
 {
     // Arrange
     const auto expectedHash = "325ab2622d35311db0320c9f3b421ee93017d16b9e4c7fef06704eda4fa5e30b";
-    const auto expectedWords =
-      "administrator-airfield-app-alcove-addition-adobe-administration-achiever-ape-administrator-"
-      "accent-ant-advent-advocate-acknowledgment-ascend-adjustment-account-area-alliance-answer-"
-      "age-ambience-aspect-absence-almanac-agenda-armpit-agent-antibody-arthur-accelerator";
+    const auto expectedWords = "change-AB262-cart-5311D-ladder-20C9F-cloudburst-21EE9-cellar-7D16B-"
+                               "illegal-C7FEF-alias-04EDA-curriculum-5E30B";
     const auto &deviceHash = ONE_MOD_Q();
     const auto &ballotHash = TWO_MOD_Q();
     uint64_t timestamp = 1000;
