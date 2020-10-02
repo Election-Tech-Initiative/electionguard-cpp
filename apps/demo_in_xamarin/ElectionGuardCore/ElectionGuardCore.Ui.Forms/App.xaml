@@ -41,6 +41,21 @@
 					Value="60"
 				/>
 			</Style>
+
+			<!-- Support for dark mode: -->
+
+			<Style TargetType="Label">
+				<Setter
+					Property="TextColor"
+					Value="Black"
+				/>
+			</Style>
+			<Style TargetType="ActivityIndicator">
+				<Setter
+					Property="Color"
+					Value="{x:Static ui:Colors.DarkGreen}"
+				/>
+			</Style>
 		</ResourceDictionary>
     </Application.Resources>
 </Application>

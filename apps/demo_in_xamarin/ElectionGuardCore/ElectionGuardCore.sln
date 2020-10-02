@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuardCore.Ui.Forms.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuardCore.Ui.Forms.iOS", "ElectionGuardCore.Ui.Forms.iOS\ElectionGuardCore.Ui.Forms.iOS.csproj", "{36CA66CC-05A2-47AB-9E49-5CE267945097}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuardCore.Ui.Forms", "ElectionGuardCore.Ui.Forms\ElectionGuardCore.Ui.Forms.csproj", "{15A45C17-4DC1-406B-9E3E-C89DBABC9615}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuardCore.Ui.Forms", "ElectionGuardCore.Ui.Forms\ElectionGuardCore.Ui.Forms.csproj", "{15A45C17-4DC1-406B-9E3E-C89DBABC9615}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuardCore.Ui", "ElectionGuardCore.Ui\ElectionGuardCore.Ui.csproj", "{361529CA-4E38-461D-8366-79268921CECF}"
 EndProject
@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A0DA22A2-432
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{00E0BEF4-10BB-4C3B-97A5-65DEF563E04E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuardCore.Ui.Tests", "ElectionGuardCore.Ui.Tests\ElectionGuardCore.Ui.Tests.csproj", "{F20D08DA-5171-4136-AA65-2E5A47A8E6AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuardCore.Ui.Tests", "ElectionGuardCore.Ui.Tests\ElectionGuardCore.Ui.Tests.csproj", "{F20D08DA-5171-4136-AA65-2E5A47A8E6AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +44,7 @@ Global
 		{36CA66CC-05A2-47AB-9E49-5CE267945097}.Debug|Any CPU.Build.0 = Debug|iPhoneSimulator
 		{36CA66CC-05A2-47AB-9E49-5CE267945097}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{36CA66CC-05A2-47AB-9E49-5CE267945097}.Debug|iPhone.Build.0 = Debug|iPhone
+		{36CA66CC-05A2-47AB-9E49-5CE267945097}.Debug|iPhone.Deploy.0 = Debug|iPhone
 		{36CA66CC-05A2-47AB-9E49-5CE267945097}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
 		{36CA66CC-05A2-47AB-9E49-5CE267945097}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
 		{36CA66CC-05A2-47AB-9E49-5CE267945097}.Release|Any CPU.ActiveCfg = Release|iPhoneSimulator
