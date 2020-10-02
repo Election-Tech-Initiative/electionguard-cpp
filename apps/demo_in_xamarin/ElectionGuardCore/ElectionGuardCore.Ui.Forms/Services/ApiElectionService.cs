@@ -8,7 +8,7 @@ namespace ElectionGuardCore.Ui.Forms.Services
 {
     public class ApiElectionService : ApiClientBase, IElectionService
     {
-        public ApiElectionService() : base("https://localhost") { }
+        public ApiElectionService(AppSettings appSettings) : base(appSettings) { }
 
         public async Task<Election> GetElection()
         {

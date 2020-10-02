@@ -11,11 +11,11 @@ namespace ElectionGuardCore.Ui.Forms.Services
     {
         private static readonly HttpClient Client = new HttpClient(); // instantiate once for app lifetime, per MS docs
 
-        private readonly string _baseUri;
+        private readonly Uri _baseUri;
 
-        protected ApiClientBase(string baseUri)
+        protected ApiClientBase(AppSettings appSettings)
         {
-            _baseUri = baseUri;
+            _baseUri = new Uri(appSettings.ApiBaseUri);
         }
 
         protected async Task SendRequest(string relativeUri, HttpMethod method,
@@ -66,9 +66,9 @@ namespace ElectionGuardCore.Ui.Forms.Services
             }
         }
 
-        private string GetUri(string relativeUri)
+        private Uri GetUri(string relativeUri)
         {
-            return $"{_baseUri}{relativeUri}";
+            return new Uri(_baseUri, relativeUri);
         }
 
         private void ThrowOnNonSuccessStatusCode(HttpResponseMessage response)

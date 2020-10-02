@@ -1,8 +1,11 @@
-﻿using Autofac;
+﻿using System.IO;
+using System.Reflection;
+using Autofac;
 using Autofac.Features.ResolveAnything;
 using ElectionGuardCore.Elections;
 using ElectionGuardCore.Encryption;
 using ElectionGuardCore.Ui.Forms.Services;
+using Newtonsoft.Json;
 using Xamarin.Forms;
 
 namespace ElectionGuardCore.Ui.Forms
@@ -13,8 +16,10 @@ namespace ElectionGuardCore.Ui.Forms
         {
             InitializeComponent();
 
+            var appSettings = LoadAppSettings();
+
             var navigationService = new NavigationService();
-            var container = CreateContainer(navigationService);
+            var container = CreateContainer(appSettings, navigationService);
             navigationService.SetContainer(container);  // need to set nav service dependencies after creating container
 
             var navigationPage = new NavigationPage(navigationService.GetDefaultPage());
@@ -24,30 +29,42 @@ namespace ElectionGuardCore.Ui.Forms
             MainPage = navigationPage;
         }
 
-        private IContainer CreateContainer(INavigationService navigationService)
+        private IContainer CreateContainer(AppSettings appSettings, INavigationService navigationService)
         {
             var builder = new ContainerBuilder();
+            builder.RegisterInstance(appSettings).AsSelf().SingleInstance();
+
             builder.RegisterInstance(navigationService).As<INavigationService>().SingleInstance();
             builder.RegisterType<AlertService>().As<IAlertService>().SingleInstance();
-            builder.RegisterType<MockElectionService>().As<IElectionService>().SingleInstance();
             builder.RegisterType<EncryptionService>().As<IEncryptionService>().SingleInstance();
             builder.RegisterType<ClipboardService>().As<IClipboardService>().SingleInstance();
+
+            // uncomment the desired IElectionService implementation
+            builder.RegisterType<MockElectionService>().As<IElectionService>().SingleInstance();
+            // builder.RegisterType<ApiElectionService>().As<IElectionService>().SingleInstance();
 
             builder.RegisterSource(new AnyConcreteTypeNotAlreadyRegisteredSource());
 
             return builder.Build();
         }
 
-        protected override void OnStart()
-        {
-        }
+        protected override void OnStart() { }
 
-        protected override void OnSleep()
-        {
-        }
+        protected override void OnSleep() { }
 
-        protected override void OnResume()
+        protected override void OnResume() { }
+
+        private AppSettings LoadAppSettings()
         {
+            var assembly = typeof(App).GetTypeInfo().Assembly;
+            using (var stream = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.appsettings.json"))
+            {
+                using (var reader = new StreamReader(stream))
+                {
+                    var json = reader.ReadToEnd();
+                    return JsonConvert.DeserializeObject<AppSettings>(json);
+                }
+            }
         }
     }
 }
