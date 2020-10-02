@@ -581,6 +581,7 @@ namespace electionguard
     }
 
     ElementModQ *CiphertextBallot::getTrackingHash() const { return pimpl->trackingHash.get(); }
+
     string CiphertextBallot::getTrackingCode() const
     {
         return Tracker::hashToWords(*pimpl->trackingHash);
@@ -672,7 +673,8 @@ namespace electionguard
                 validProofs[key] = selection.get().isValidEncryption(
                   *selection.get().getDescriptionHash(), elgamalPublicKey, cryptoExtendedBaseHash);
             }
-            validProofs[contest.get().getObjectId()] = contest.get().isValidEncryption(
+            string key = contest.get().getObjectId();
+            validProofs[key] = contest.get().isValidEncryption(
               *contest.get().getDescriptionHash(), elgamalPublicKey, cryptoExtendedBaseHash);
         }
 

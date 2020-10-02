@@ -29,6 +29,7 @@ namespace electionguard
     EncryptionDevice::EncryptionDevice(const uint64_t uuid, const string &location)
         : pimpl(new Impl(uuid, location))
     {
+        Log::debug(": EncryptionDevice: Created: UUID: " + to_string(uuid) + " at: " + location);
     }
     EncryptionDevice::~EncryptionDevice() = default;
 
@@ -78,12 +79,17 @@ namespace electionguard
 
     unique_ptr<CiphertextBallot> EncryptionMediator::encrypt(const PlaintextBallot &ballot) const
     {
+        Log::debug(" encrypt: objectId: " + ballot.getObjectId());
 
         if (!pimpl->trackerHashSeed) {
             auto trackerHashSeed = pimpl->encryptionDevice.getHash();
             pimpl->trackerHashSeed.swap(trackerHashSeed);
+            Log::debugHex(": encrypt: instantiated tacking hash: ",
+                          pimpl->trackerHashSeed->toHex());
         }
 
+        Log::debugHex(": encrypt: encrypting with previous hash: ",
+                      pimpl->trackerHashSeed->toHex());
         auto encryptedBallot =
           encryptBallot(ballot, pimpl->metadata, pimpl->context, *pimpl->trackerHashSeed);
 
@@ -108,6 +114,8 @@ namespace electionguard
         auto proofNonce = nonceSequence->next();
 
         uint64_t plaintext_ = plaintext.toInt();
+
+        Log::debugHex(": encryptSelection: for descriptionHash: ", descriptionHash->toHex());
 
         // Generate the encryption
         auto ciphertext = elgamalEncrypt(plaintext_, *selectionNonce, elgamalPublicKey);
@@ -154,6 +162,8 @@ namespace electionguard
 
         vector<unique_ptr<CiphertextBallotSelection>> encryptedSelections;
 
+        Log::debugHex(": encryptContest: for descriptionHash: ", descriptionHash->toHex());
+
         // TODO: improve performance, complete features
         // note this is a simplified version of the loop in python
         // where the caller must supply all values and placeholder selections are not handled
@@ -194,7 +204,7 @@ namespace electionguard
             return encryptedContest;
         }
 
-        throw "encryptContest failed validity check";
+        throw runtime_error("encryptContest failed validity check");
     }
 
     unique_ptr<CiphertextBallot> encryptBallot(const PlaintextBallot &plaintext,
@@ -214,6 +224,9 @@ namespace electionguard
                                                      plaintext.getObjectId(), *randomMasterNonce);
 
         vector<unique_ptr<CiphertextBallotContest>> encryptedContests;
+
+        Log::debugHex(": encryptBallot: for descriptionHash: ",
+                      metadata.getDescriptionHash().toHex());
 
         // TODO: improve performance, complete features
         for (const auto &contestDescription : metadata.getContests()) {
@@ -244,6 +257,8 @@ namespace electionguard
             throw runtime_error("encryptedBallot:: Error constructing encrypted ballot");
         }
 
+        Log::debug(": Encrypted Ballot: " + encryptedBallot->getObjectId());
+
         if (!shouldVerifyProofs) {
             return encryptedBallot;
         }
@@ -255,7 +270,7 @@ namespace electionguard
             return encryptedBallot;
         }
 
-        throw "encryptedBallot failed validity check";
+        throw runtime_error("encryptedBallot: failed validity check");
     }
 
 } // namespace electionguard

@@ -82,7 +82,7 @@ namespace ElectionGuardCore.Ui.Elections
                     .FirstOrDefault(c => c.ObjectId == ballotSelection.CandidateId);
                 if (candidate != null)
                 {
-                    candidates.Add(new CandidateViewModel(candidate));
+                    candidates.Add(new CandidateViewModel(candidate, ballotSelection));
                 }
             }
             Candidates = candidates;
@@ -119,7 +119,9 @@ namespace ElectionGuardCore.Ui.Elections
         {
             await _navigationService.Push(NavigationPaths.ReviewSelectionPage,
                 new ReviewSelectionViewModel.ReviewSelectionArgs(
-                    SelectedCandidate.Candidate, Args.ElectionDescription, Args.ElectionContext));
+                    Args.ElectionDescription, Args.ElectionContext,
+                    SelectedCandidate.Selection, SelectedCandidate.Candidate)
+                );
         }
 
         public class ContestSelectionListArgs
@@ -136,17 +138,29 @@ namespace ElectionGuardCore.Ui.Elections
 
         public class CandidateViewModel : ViewModelBase
         {
-            public CandidateViewModel(Candidate candidate)
+            public CandidateViewModel(Candidate candidate, SelectionDescription selection)
             {
                 if (candidate == null)
                 {
                     throw new ArgumentNullException(nameof(candidate));
                 }
 
+                if (selection == null)
+                {
+                    throw new ArgumentNullException(nameof(selection));
+                }
+
+                if (selection.CandidateId != candidate.ObjectId)
+                {
+                    throw new ArgumentException("Candidate must match selection");
+                }
+
                 Candidate = candidate;
+                Selection = selection;
             }
 
             public Candidate Candidate { get; }
+            public SelectionDescription Selection { get; }
 
             public string ObjectId => Candidate.ObjectId;
             public string BallotName => Candidate.BallotName.GetTextValue("en");

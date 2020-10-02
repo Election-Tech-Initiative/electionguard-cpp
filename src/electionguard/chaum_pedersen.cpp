@@ -203,7 +203,8 @@ namespace electionguard
 
             Log::debug(printMap, ": found an invalid Disjunctive Chaum-Pedersen proof: ");
 
-            Log::debugHex(" q->get: ", const_cast<ElementModQ &>(q).toHex());
+            Log::debugHex(" k->get: ", k.toHex());
+            Log::debugHex(" q->get: ", q.toHex());
             Log::debugHex(" alpha->get: ", alpha->toHex());
             Log::debugHex(" beta->get: ", beta->toHex());
             Log::debugHex(" a0->get: ", a0.toHex());
@@ -410,7 +411,8 @@ namespace electionguard
 
             Log::debug(printMap, ": found an invalid Constant Chaum-Pedersen proof: ");
 
-            Log::debugHex(" q->get: ", const_cast<ElementModQ &>(q).toHex());
+            Log::debugHex(" k->get: ", k.toHex());
+            Log::debugHex(" q->get: ", q.toHex());
             Log::debugHex(" alpha->get: ", alpha->toHex());
             Log::debugHex(" beta->get: ", beta->toHex());
             Log::debugHex(" a->get: ", a.toHex());

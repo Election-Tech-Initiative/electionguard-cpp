@@ -58,8 +58,12 @@ namespace ElectionGuardCore.Ui.Tests.Elections
                     },
                     BallotSelections = new List<SelectionDescription>
                     {
-                        new SelectionDescription { CandidateId = "robert", SequenceOrder = 0 },
-                        new SelectionDescription { CandidateId = "mary", SequenceOrder = 1 }
+                        new SelectionDescription {
+                            ObjectId = "robert-selection", CandidateId = "robert", SequenceOrder = 0
+                        },
+                        new SelectionDescription {
+                            ObjectId = "mary-selection", CandidateId = "mary", SequenceOrder = 1
+                        }
                     }
                 }
             }
@@ -140,20 +144,25 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         {
             var viewModel = await CreateViewModel();
             var candidate = viewModel.Candidates.Single(c => c.ObjectId == "mary");
+            var selection = _electionDescription.Contests.First()
+                .BallotSelections.First(s => s.CandidateId == candidate.ObjectId);
             candidate.IsSelected = true;
 
             viewModel.ReviewSelectionCommand.Execute(null);
 
             _navigationServiceMock.Verify(x => x.Push(NavigationPaths.ReviewSelectionPage,
                 It.Is<ReviewSelectionViewModel.ReviewSelectionArgs>(a =>
-                    a.Selection == candidate.Candidate && a.ElectionDescription == _electionDescription)));
+                    a.ElectionDescription == _electionDescription
+                    && a.Selection == selection && a.Candidate == candidate.Candidate)));
         }
 
         [Test]
         public void CandidateViewModel_Candidate_ReflectsCandidate()
         {
             var candidate = _electionDescription.Candidates.Single(c => c.ObjectId == "mary");
-            var viewModel = new ContestSelectionListViewModel.CandidateViewModel(candidate);
+            var selection = _electionDescription.Contests.First()
+                .BallotSelections.First(s => s.CandidateId == candidate.ObjectId);
+            var viewModel = new ContestSelectionListViewModel.CandidateViewModel(candidate, selection);
 
             viewModel.Candidate.Should().Be(candidate);
         }
@@ -162,7 +171,9 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         public void CandidateViewModel_ObjectId_ReflectsCandidate()
         {
             var candidate = _electionDescription.Candidates.Single(c => c.ObjectId == "mary");
-            var viewModel = new ContestSelectionListViewModel.CandidateViewModel(candidate);
+            var selection = _electionDescription.Contests.First()
+                .BallotSelections.First(s => s.CandidateId == candidate.ObjectId);
+            var viewModel = new ContestSelectionListViewModel.CandidateViewModel(candidate, selection);
 
             viewModel.ObjectId.Should().Be("mary");
         }
@@ -171,7 +182,9 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         public void CandidateViewModel_BallotName_IsFirstEnglishName()
         {
             var candidate = _electionDescription.Candidates.Single(c => c.ObjectId == "mary");
-            var viewModel = new ContestSelectionListViewModel.CandidateViewModel(candidate);
+            var selection = _electionDescription.Contests.First()
+                .BallotSelections.First(s => s.CandidateId == candidate.ObjectId);
+            var viewModel = new ContestSelectionListViewModel.CandidateViewModel(candidate, selection);
 
             viewModel.BallotName.Should().Be("Mary");
         }
@@ -180,7 +193,9 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         public void CandidateViewModel_GivenIsNotSelected_BackgroundColor_IsWhite()
         {
             var candidate = _electionDescription.Candidates.Single(c => c.ObjectId == "mary");
-            var viewModel = new ContestSelectionListViewModel.CandidateViewModel(candidate);
+            var selection = _electionDescription.Contests.First()
+                .BallotSelections.First(s => s.CandidateId == candidate.ObjectId);
+            var viewModel = new ContestSelectionListViewModel.CandidateViewModel(candidate, selection);
 
             viewModel.BackgroundColor.Should().Be(Colors.White);
         }
@@ -189,7 +204,9 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         public void CandidateViewModel_GivenIsSelected_BackgroundColor_IsLightGreen()
         {
             var candidate = _electionDescription.Candidates.Single(c => c.ObjectId == "mary");
-            var viewModel = new ContestSelectionListViewModel.CandidateViewModel(candidate)
+            var selection = _electionDescription.Contests.First()
+                .BallotSelections.First(s => s.CandidateId == candidate.ObjectId);
+            var viewModel = new ContestSelectionListViewModel.CandidateViewModel(candidate, selection)
             {
                 IsSelected = true
             };
@@ -201,7 +218,9 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         {
             var viewModel = new ContestSelectionListViewModel(_navigationServiceMock.Object)
             {
-                Parameter = new ContestSelectionListViewModel.ContestSelectionListArgs(_electionDescription, _electionContext)
+                Parameter = new ContestSelectionListViewModel.ContestSelectionListArgs(
+                    _electionDescription, _electionContext
+                )
             };
             await viewModel.Load();
 

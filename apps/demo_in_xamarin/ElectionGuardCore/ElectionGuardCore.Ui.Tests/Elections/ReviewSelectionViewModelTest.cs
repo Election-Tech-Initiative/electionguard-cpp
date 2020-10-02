@@ -16,6 +16,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         private Mock<INavigationService> _navigationServiceMock;
 
         private readonly Candidate _candidate = new Candidate();
+        private readonly SelectionDescription _selection = new SelectionDescription();
         private readonly ElectionDescription _electionDescription = new ElectionDescription();
         private readonly CiphertextElectionContext _context = new CiphertextElectionContext();
         private readonly CiphertextBallot _ciphertextBallot = new CiphertextBallot();
@@ -37,7 +38,9 @@ namespace ElectionGuardCore.Ui.Tests.Elections
 
             _encryptionServiceMock = new Mock<IEncryptionService>();
             _encryptionServiceMock.Setup(x => x.EncryptBallot(It.IsAny<ElectionDescription>(),
-                It.IsAny<CiphertextElectionContext>(), It.IsAny<Candidate>())).Returns(_ciphertextBallot);
+                It.IsAny<CiphertextElectionContext>(),
+                It.IsAny<SelectionDescription>(),
+                It.IsAny<Candidate>())).Returns(_ciphertextBallot);
 
             _navigationServiceMock = new Mock<INavigationService>();
         }
@@ -48,7 +51,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
             var viewModel = await CreateViewModel();
             viewModel.EncryptSelectionCommand.Execute(null);
 
-            _encryptionServiceMock.Verify(x => x.EncryptBallot(_electionDescription, _context, _candidate));
+            _encryptionServiceMock.Verify(x => x.EncryptBallot(_electionDescription, _context, _selection, _candidate));
         }
 
         [Test]
@@ -68,7 +71,8 @@ namespace ElectionGuardCore.Ui.Tests.Elections
             var viewModel = new ReviewSelectionViewModel(_alertServiceMock.Object, _encryptionServiceMock.Object,
                 _navigationServiceMock.Object)
             {
-                Parameter = new ReviewSelectionViewModel.ReviewSelectionArgs(_candidate, _electionDescription, _context)
+                Parameter = new ReviewSelectionViewModel.ReviewSelectionArgs(
+                    _electionDescription, _context, _selection, _candidate)
             };
             await viewModel.Load();
 

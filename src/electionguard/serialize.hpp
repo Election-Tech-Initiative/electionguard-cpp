@@ -153,8 +153,14 @@ namespace electionguard
                 auto number_of_guardians = j["number_of_guardians"].get<uint64_t>();
                 auto quorum = j["quorum"].get<uint64_t>();
 
-                return electionguard::CiphertextElectionContext::make(
-                  number_of_guardians, quorum, elgamal_public_key, description_hash);
+                auto elGamalPublicKey = ElementModP::fromHex(elgamal_public_key);
+                auto descriptionHash = ElementModQ::fromHex(description_hash);
+                auto cryptoBaseHash = ElementModQ::fromHex(crypto_base_hash);
+                auto cryptoExtendedBaseHash = ElementModQ::fromHex(crypto_extended_base_hash);
+
+                return make_unique<CiphertextElectionContext>(
+                  number_of_guardians, quorum, move(elGamalPublicKey), move(descriptionHash),
+                  move(cryptoBaseHash), move(cryptoExtendedBaseHash));
             }
 
           public:
@@ -188,12 +194,12 @@ namespace electionguard
                     json selections;
                     for (auto selection : contest.get().getSelections()) {
                         json s = {{"object_id", selection.get().getObjectId()},
-                                  {"vote", selection.get().toInt()}};
+                                  {"vote", to_string(selection.get().toInt())}};
                         selections.push_back(s);
                     }
                     contests.push_back({
                       {"object_id", contest.get().getObjectId()},
-                      {"selections", selections},
+                      {"ballot_selections", selections},
                     });
                 }
 
@@ -215,15 +221,15 @@ namespace electionguard
                 for (auto &contest : contests) {
                     auto contest_object_id = contest["object_id"].get<string>();
 
-                    auto selections = contest["selections"];
+                    auto selections = contest["ballot_selections"];
                     vector<unique_ptr<electionguard::PlaintextBallotSelection>> plaintextSelections;
                     plaintextSelections.reserve(selections.size());
                     for (auto &selection : selections) {
                         auto selection_object_id = selection["object_id"].get<string>();
-                        auto vote = selection["vote"].get<uint64_t>();
+                        auto vote = selection["vote"].get<string>();
                         plaintextSelections.push_back(
                           make_unique<electionguard::PlaintextBallotSelection>(selection_object_id,
-                                                                               to_string(vote)));
+                                                                               vote));
                     }
 
                     plaintextContests.push_back(make_unique<electionguard::PlaintextBallotContest>(
@@ -309,7 +315,8 @@ namespace electionguard
                   {"description_hash", serializable.getDescriptionHash()->toHex()},
                   {"previous_tracking_hash", serializable.getPreviousTrackingHash()->toHex()},
                   {"contests", contests},
-                  {"tracking_hash", serializable.getPreviousTrackingHash()->toHex()},
+                  {"tracking_hash", serializable.getTrackingHash()->toHex()},
+                  {"tracking_code", serializable.getTrackingCode()},
                   {"timestamp", serializable.getTimestamp()},
                   {"nonce", serializable.getNonce()->toHex()},
                   {"crypto_hash", serializable.getCryptoHash()->toHex()},

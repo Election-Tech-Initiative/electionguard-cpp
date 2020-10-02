@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using ElectionGuardCore.Elections;
 using ElectionGuardCore.Encryption;
@@ -40,7 +41,7 @@ namespace ElectionGuardCore.Ui.Elections
             }
         }
 
-        public string CandidateName => Args?.Selection.BallotName.GetTextValue("en");
+        public string CandidateName => Args?.Candidate.BallotName.GetTextValue("en");
 
         public ICommand EncryptSelectionCommand { get; }
 
@@ -51,24 +52,36 @@ namespace ElectionGuardCore.Ui.Elections
             {
                 CiphertextBallot result = null;
                 await _alertService.ShowBusy("Encrypting ballot…",
-                    () => result = _encryptionService.EncryptBallot(Args.ElectionDescription, Args.ElectionContext, Args.Selection),
+                    () => result = _encryptionService.EncryptBallot(
+                        Args.ElectionDescription, Args.ElectionContext, Args.Selection, Args.Candidate),
                     async () => await _navigationService.Push(NavigationPaths.SelectionVerificationPage,
-                        new SelectionVerificationViewModel.SelectionVerificationArgs(Args.ElectionDescription, Args.ElectionContext, result))
+                        new SelectionVerificationViewModel.SelectionVerificationArgs(
+                            Args.ElectionDescription, Args.ElectionContext, result)
+                        )
                 );
             }
         }
 
         public class ReviewSelectionArgs
         {
-            public readonly Candidate Selection;
             public readonly ElectionDescription ElectionDescription;
-            public readonly CiphertextElectionContext ElectionContext; 
+            public readonly CiphertextElectionContext ElectionContext;
+            public readonly SelectionDescription Selection;
+            public readonly Candidate Candidate;
 
-            public ReviewSelectionArgs(Candidate selection, ElectionDescription metadata, CiphertextElectionContext context)
+            public ReviewSelectionArgs(
+                ElectionDescription metadata, CiphertextElectionContext context,
+                SelectionDescription selection, Candidate candidate)
             {
-                Selection = selection;
+                if (selection.CandidateId != candidate.ObjectId)
+                {
+                    throw new ArgumentException("Candidate must match selection");
+                }
+
                 ElectionDescription = metadata;
                 ElectionContext = context;
+                Selection = selection;
+                Candidate = candidate;
             }
         }
     }
