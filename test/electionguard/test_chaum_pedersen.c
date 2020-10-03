@@ -43,10 +43,16 @@ bool test_constant_chaum_pedersen_proof(void)
     }
 
     // Act
-    eg_constant_chaum_pedersen_proof_t *proof =
-      eg_constant_chaum_pedersen_proof_make(message, nonce, public_key, seed, one_mod_q, 0UL);
-    eg_constant_chaum_pedersen_proof_t *bad_proof =
-      eg_constant_chaum_pedersen_proof_make(message, nonce, public_key, seed, one_mod_q, 1UL);
+    eg_constant_chaum_pedersen_proof_t *proof = NULL;
+    if (eg_constant_chaum_pedersen_proof_make(message, nonce, public_key, seed, one_mod_q, 0UL,
+                                              &proof)) {
+        assert(false);
+    }
+    eg_constant_chaum_pedersen_proof_t *bad_proof = NULL;
+    if (eg_constant_chaum_pedersen_proof_make(message, nonce, public_key, seed, one_mod_q, 1UL,
+                                              &bad_proof)) {
+        assert(false);
+    }
 
     // Assert
     assert(eg_constant_chaum_pedersen_proof_is_valid(proof, message, public_key, one_mod_q) ==
@@ -71,6 +77,12 @@ bool test_constant_chaum_pedersen_proof(void)
         assert(false);
     }
     if (eg_elgamal_ciphertext_free(message)) {
+        assert(false);
+    }
+    if (eg_constant_chaum_pedersen_proof_free(proof)) {
+        assert(false);
+    }
+    if (eg_constant_chaum_pedersen_proof_free(bad_proof)) {
         assert(false);
     }
 
