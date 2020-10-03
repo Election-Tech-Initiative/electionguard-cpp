@@ -106,7 +106,15 @@ namespace electionguard
             }
             postfix();
         }
+
+        static void error(string msg, exception e)
+        {
+            prefix();
+            cout << ": error: " << msg << ": " << e.what();
+            postfix();
+        }
     };
+
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD_CORE_LOG_HPP_INCLUDED__ */

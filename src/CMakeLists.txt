@@ -78,6 +78,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/include/electionguard/group.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/hash.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/hash.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/status.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/tracker.hpp
 )
 
