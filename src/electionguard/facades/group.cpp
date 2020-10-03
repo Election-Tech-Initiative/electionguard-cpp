@@ -55,16 +55,12 @@ eg_electionguard_status_t eg_element_mod_p_new_unchecked(const uint64_t in_data[
 EG_API eg_electionguard_status_t eg_element_mod_p_free(eg_element_mod_p_t *handle)
 {
     if (handle == nullptr) {
-        return ELECTIONGUARD_STATUS_SUCCESS;
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    try {
-        delete AS_TYPE(ElementModP, handle);
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(": eg_element_mod_p_free", e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ACCESS;
-    }
+    Log::debug("enter2");
+    delete AS_TYPE(ElementModP, handle);
+    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 eg_electionguard_status_t eg_element_mod_p_get_data(eg_element_mod_p_t *handle, uint64_t **out_data,
@@ -122,16 +118,11 @@ eg_electionguard_status_t eg_element_mod_q_new_unchecked(const uint64_t in_data[
 EG_API eg_electionguard_status_t eg_element_mod_q_free(eg_element_mod_q_t *handle)
 {
     if (handle == nullptr) {
-        return ELECTIONGUARD_STATUS_SUCCESS;
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    try {
-        delete AS_TYPE(ElementModQ, handle);
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_free", e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ACCESS;
-    }
+    delete AS_TYPE(ElementModQ, handle);
+    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 eg_electionguard_status_t eg_element_mod_q_get_data(eg_element_mod_q_t *handle, uint64_t **out_data,
@@ -152,14 +143,14 @@ eg_electionguard_status_t eg_element_mod_q_get_data(eg_element_mod_q_t *handle, 
 
 #pragma region ElementModQ Functions
 
-eg_electionguard_status_t eg_element_mod_q_new_rand_q(eg_element_mod_q_t **out_handle)
+eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle)
 {
     try {
         auto random = rand_q();
         *out_handle = AS_TYPE(eg_element_mod_q_t, random.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_new_rand_q", e);
+        Log::error(": eg_element_mod_q_rand_q_new", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }

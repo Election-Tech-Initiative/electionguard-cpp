@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 
 project("ElectionGuardTests"
     VERSION 0.0.1 
-    LANGUAGES CXX
+    LANGUAGES C CXX
 )
 
 # --- Import tools ----
@@ -27,6 +27,7 @@ CPMAddPackage(
 
 # ---- Sources ----
 
+# C++ Tests
 add_executable(ElectionGuardTests 
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/constants.hpp
@@ -47,9 +48,20 @@ if(MSVC)
     target_compile_definitions(ElectionGuardTests PUBLIC DOCTEST_CONFIG_USE_STD_HEADERS)
 endif()
 
+# C Tests
+add_executable(ElectionGuardCTests
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.c
+)
+
+target_compile_features(ElectionGuardCTests PRIVATE c_std_99)
+
 # ---- Link Libraries ----
 
 target_link_libraries(ElectionGuardTests PRIVATE doctest ${META_PROJECT_TARGET})
+target_link_libraries(ElectionGuardCTests PRIVATE ${META_PROJECT_TARGET})
 
 # ---- Add Tests ----
 

@@ -3,6 +3,7 @@
 
 #include "export.h"
 #include "group.h"
+#include "status.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,10 +16,15 @@ typedef struct eg_elgamal_keypair_s eg_elgamal_keypair_t;
 
 // no constructors defined.  use `eg_elgamal_keypair_from_secret`
 
-EG_API eg_elgamal_keypair_t *eg_elgamal_keypair_from_secret(eg_element_mod_q_t *secret_key);
+EG_API eg_electionguard_status_t eg_elgamal_keypair_from_secret_new(
+  eg_element_mod_q_t *in_secret_key, eg_elgamal_keypair_t **out_handle);
 
-EG_API eg_element_mod_q_t *eg_elgamal_keypair_get_secret_key(eg_elgamal_keypair_t *keypair);
-EG_API eg_element_mod_p_t *eg_elgamal_keypair_get_public_key(eg_elgamal_keypair_t *keypair);
+EG_API eg_electionguard_status_t eg_elgamal_keypair_free(eg_elgamal_keypair_t *handle);
+
+EG_API eg_electionguard_status_t eg_elgamal_keypair_get_secret_key(
+  eg_elgamal_keypair_t *handle, eg_element_mod_q_t **out_secret_key);
+EG_API eg_electionguard_status_t eg_elgamal_keypair_get_public_key(
+  eg_elgamal_keypair_t *handle, eg_element_mod_p_t **out_public_key);
 
 // ElGamalCiphertext
 
@@ -27,15 +33,25 @@ typedef struct eg_elgamal_ciphertext_s eg_elgamal_ciphertext_t;
 
 // no constructors defined.  use `eg_elgamal_encrypt`
 
-eg_element_mod_p_t *eg_elgamal_ciphertext_get_pad(eg_elgamal_ciphertext_t *ciphertext);
-eg_element_mod_p_t *eg_elgamal_ciphertext_get_data(eg_elgamal_ciphertext_t *ciphertext);
+EG_API eg_electionguard_status_t eg_elgamal_ciphertext_free(eg_elgamal_ciphertext_t *handle);
 
-eg_element_mod_q_t *eg_elgamal_ciphertext_crypto_hash(eg_elgamal_ciphertext_t *ciphertext);
+EG_API eg_electionguard_status_t eg_elgamal_ciphertext_get_pad(eg_elgamal_ciphertext_t *handle,
+                                                               eg_element_mod_p_t **out_pad);
+EG_API eg_electionguard_status_t eg_elgamal_ciphertext_get_data(eg_elgamal_ciphertext_t *handle,
+                                                                eg_element_mod_p_t **out_data);
+
+EG_API eg_electionguard_status_t eg_elgamal_ciphertext_crypto_hash(
+  eg_elgamal_ciphertext_t *handle, eg_element_mod_q_t **out_crypto_hash);
+
+EG_API eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_with_secret(
+  eg_elgamal_ciphertext_t *handle, eg_element_mod_q_t *in_secret_key, uint64_t *plaintext);
 
 // ElgamalEncrypt
 
-EG_API eg_elgamal_ciphertext_t *eg_elgamal_encrypt(uint64_t m, eg_element_mod_q_t *nonce,
-                                                   eg_element_mod_p_t *public_key);
+EG_API eg_electionguard_status_t eg_elgamal_encrypt(uint64_t in_plaintext,
+                                                    eg_element_mod_q_t *in_nonce,
+                                                    eg_element_mod_p_t *in_public_key,
+                                                    eg_elgamal_ciphertext_t **out_ciphertext);
 
 #ifdef __cplusplus
 }

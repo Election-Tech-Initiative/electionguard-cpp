@@ -1,80 +1,147 @@
 #include "electionguard/elgamal.hpp"
 
+#include "../log.hpp"
 #include "electionguard/group.hpp"
-#include "memory_cache.hpp"
+#include "electionguard/status.h"
 #include "variant_cast.hpp"
 
 extern "C" {
 #include "electionguard/elgamal.h"
 }
 
-using electionguard::Cache;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
 using electionguard::ElGamalCiphertext;
 using electionguard::ElGamalKeyPair;
+using electionguard::Log;
 
 #pragma region ElGamalKeyPair
 
-// TODO: safe initialization
-static Cache<ElGamalCiphertext> cache_ciphertext;
-static Cache<ElGamalKeyPair> cache_keypair;
-static Cache<ElementModQ> cache_element_mod_q;
-
-eg_elgamal_keypair_t *eg_elgamal_keypair_from_secret(eg_element_mod_q_t *secret_key)
+eg_electionguard_status_t eg_elgamal_keypair_from_secret_new(eg_element_mod_q_t *in_secret_key,
+                                                             eg_elgamal_keypair_t **out_handle)
 {
-    auto *secretKey = AS_TYPE(ElementModQ, secret_key);
-    auto keyPair = ElGamalKeyPair::fromSecret(*secretKey);
-    auto *reference = cache_keypair.retain(move(keyPair));
-    return AS_TYPE(eg_elgamal_keypair_t, reference);
+    if (in_secret_key == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    try {
+        auto *secretKey = AS_TYPE(ElementModQ, in_secret_key);
+        auto keyPair = ElGamalKeyPair::fromSecret(*secretKey);
+
+        *out_handle = AS_TYPE(eg_elgamal_keypair_t, keyPair.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_elgamal_keypair_from_secret_new", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
-eg_element_mod_q_t *eg_elgamal_keypair_get_secret_key(eg_elgamal_keypair_t *keypair)
+eg_electionguard_status_t eg_elgamal_keypair_free(eg_elgamal_keypair_t *handle)
 {
-    auto *keyPair_ = AS_TYPE(ElGamalKeyPair, keypair);
-    return AS_TYPE(eg_element_mod_q_t, keyPair_->getSecretKey());
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete AS_TYPE(ElGamalKeyPair, handle);
+    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_element_mod_p_t *eg_elgamal_keypair_get_public_key(eg_elgamal_keypair_t *keypair)
+eg_electionguard_status_t eg_elgamal_keypair_get_secret_key(eg_elgamal_keypair_t *handle,
+                                                            eg_element_mod_q_t **out_secret_key)
 {
-    auto *keyPair_ = AS_TYPE(ElGamalKeyPair, keypair);
-    return AS_TYPE(eg_element_mod_p_t, keyPair_->getPublicKey());
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+    auto *keyPair = AS_TYPE(ElGamalKeyPair, handle);
+    *out_secret_key = AS_TYPE(eg_element_mod_q_t, keyPair->getSecretKey());
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_elgamal_keypair_get_public_key(eg_elgamal_keypair_t *handle,
+                                                            eg_element_mod_p_t **out_public_key)
+{
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+    auto *keyPair = AS_TYPE(ElGamalKeyPair, handle);
+    *out_public_key = AS_TYPE(eg_element_mod_p_t, keyPair->getPublicKey());
+    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 #pragma endregion
 
 #pragma region ElGamalCiphertext
 
-eg_element_mod_p_t *eg_elgamal_ciphertext_get_pad(eg_elgamal_ciphertext_t *ciphertext)
+eg_electionguard_status_t eg_elgamal_ciphertext_free(eg_elgamal_ciphertext_t *handle)
 {
-    auto *pad = AS_TYPE(ElGamalCiphertext, ciphertext)->getPad();
-    return AS_TYPE(eg_element_mod_p_t, pad);
-}
-eg_element_mod_p_t *eg_elgamal_ciphertext_get_data(eg_elgamal_ciphertext_t *ciphertext)
-{
-    auto *data = AS_TYPE(ElGamalCiphertext, ciphertext)->getData();
-    return AS_TYPE(eg_element_mod_p_t, data);
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete AS_TYPE(ElGamalCiphertext, handle);
+    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_element_mod_q_t *eg_elgamal_ciphertext_crypto_hash(eg_elgamal_ciphertext_t *ciphertext)
+eg_electionguard_status_t eg_elgamal_ciphertext_get_pad(eg_elgamal_ciphertext_t *handle,
+                                                        eg_element_mod_p_t **out_pad)
 {
-    auto cryptoHash = AS_TYPE(ElGamalCiphertext, ciphertext)->crypto_hash();
-    auto *reference = cache_element_mod_q.retain(move(cryptoHash));
-    return AS_TYPE(eg_element_mod_q_t, reference);
+    auto *pad = AS_TYPE(ElGamalCiphertext, handle)->getPad();
+    *out_pad = AS_TYPE(eg_element_mod_p_t, pad);
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_elgamal_ciphertext_get_data(eg_elgamal_ciphertext_t *handle,
+                                                         eg_element_mod_p_t **out_data)
+{
+    auto *data = AS_TYPE(ElGamalCiphertext, handle)->getData();
+    *out_data = AS_TYPE(eg_element_mod_p_t, data);
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_elgamal_ciphertext_crypto_hash(eg_elgamal_ciphertext_t *handle,
+                                                            eg_element_mod_q_t **out_crypto_hash)
+{
+    try {
+        auto cryptoHash = AS_TYPE(ElGamalCiphertext, handle)->crypto_hash();
+        *out_crypto_hash = AS_TYPE(eg_element_mod_q_t, cryptoHash.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_elgamal_ciphertext_crypto_hash", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_with_secret(
+  eg_elgamal_ciphertext_t *handle, eg_element_mod_q_t *in_secret_key, uint64_t *out_plaintext)
+{
+    try {
+        auto *secretKey = AS_TYPE(ElementModQ, in_secret_key);
+        *out_plaintext = AS_TYPE(ElGamalCiphertext, handle)->decrypt(*secretKey);
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_elgamal_ciphertext_decrypt_with_secret", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
 }
 
 #pragma endregion
 
 #pragma region ElgamalEncrypt
 
-eg_elgamal_ciphertext_t *eg_elgamal_encrypt(uint64_t m, eg_element_mod_q_t *nonce,
-                                            eg_element_mod_p_t *public_key)
+eg_electionguard_status_t eg_elgamal_encrypt(uint64_t in_plaintext, eg_element_mod_q_t *in_nonce,
+                                             eg_element_mod_p_t *in_public_key,
+                                             eg_elgamal_ciphertext_t **out_ciphertext)
 {
-    auto *nonce_ = AS_TYPE(ElementModQ, nonce);
-    auto *publicKey = AS_TYPE(ElementModP, public_key);
-    auto ciphertext = elgamalEncrypt(m, *nonce_, *publicKey);
-    auto *reference = cache_ciphertext.retain(move(ciphertext));
-    return AS_TYPE(eg_elgamal_ciphertext_t, reference);
+    try {
+        auto *nonce = AS_TYPE(ElementModQ, in_nonce);
+        auto *publicKey = AS_TYPE(ElementModP, in_public_key);
+        auto ciphertext = elgamalEncrypt(in_plaintext, *nonce, *publicKey);
+        *out_ciphertext = AS_TYPE(eg_elgamal_ciphertext_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_elgamal_encrypt", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
 }
 
 #pragma endregion
