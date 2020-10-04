@@ -31,10 +31,12 @@ bool test_encrypt_selection(void)
 
     eg_selection_description_t *metadata =
       eg_selection_description_create("some-selection-object_id", candidate_id, 1UL);
-
     eg_element_mod_q_t *hash_context = eg_selection_description_crypto_hash(metadata);
-    eg_plaintext_ballot_selection_t *plaintext =
-      eg_plaintext_ballot_selection_create(candidate_id, "1");
+
+    eg_plaintext_ballot_selection_t *plaintext = NULL;
+    if (eg_plaintext_ballot_selection_new(candidate_id, "1", &plaintext)) {
+        assert(false);
+    }
 
     eg_element_mod_p_t *public_key = NULL;
     if (eg_elgamal_keypair_get_public_key(key_pair, &public_key)) {
@@ -51,8 +53,15 @@ bool test_encrypt_selection(void)
     // Assert
     assert(result != NULL);
 
-    eg_elgamal_ciphertext_t *ciphertext = eg_ciphertext_ballot_selection_get_ciphertext(result);
-    eg_disjunctive_chaum_pedersen_proof_t *proof = eg_ciphertext_ballot_selection_get_proof(result);
+    eg_elgamal_ciphertext_t *ciphertext = NULL;
+    if (eg_ciphertext_ballot_selection_get_ciphertext(result, &ciphertext)) {
+        assert(false);
+    }
+
+    eg_disjunctive_chaum_pedersen_proof_t *proof = NULL;
+    if (eg_ciphertext_ballot_selection_get_proof(result, &proof)) {
+        assert(false);
+    }
 
     assert(eg_ciphertext_ballot_selection_is_valid_encryption(result, hash_context, public_key,
                                                               one_mod_q) == true);
@@ -73,8 +82,16 @@ bool test_encrypt_selection(void)
     if (eg_element_mod_q_free(nonce)) {
         assert(false);
     }
+    if (eg_plaintext_ballot_selection_free(plaintext)) {
+        assert(false);
+    }
+    if (eg_ciphertext_ballot_selection_free(result)) {
+        assert(false);
+    }
 
     public_key = NULL;
+    ciphertext = NULL;
+    proof = NULL;
 
     return true;
 }
