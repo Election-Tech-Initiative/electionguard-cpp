@@ -81,7 +81,7 @@ eg_electionguard_status_t eg_constant_chaum_pedersen_proof_make(
         *out_handle = AS_TYPE(eg_constant_chaum_pedersen_proof_t, proof.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_new_unchecked", e);
+        Log::error(": eg_constant_chaum_pedersen_proof_make", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }

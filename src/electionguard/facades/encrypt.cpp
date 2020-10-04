@@ -1,6 +1,6 @@
 #include "electionguard/encrypt.hpp"
 
-#include "memory_cache.hpp"
+#include "../log.hpp"
 #include "variant_cast.hpp"
 
 #include <cerrno>
@@ -10,7 +10,6 @@ extern "C" {
 #include "electionguard/encrypt.h"
 }
 
-using electionguard::Cache;
 using electionguard::CiphertextBallot;
 using electionguard::CiphertextBallotSelection;
 using electionguard::CiphertextElectionContext;
@@ -20,88 +19,126 @@ using electionguard::encryptBallot;
 using electionguard::EncryptionDevice;
 using electionguard::EncryptionMediator;
 using electionguard::InternalElectionDescription;
+using electionguard::Log;
 using electionguard::PlaintextBallot;
 using electionguard::PlaintextBallotSelection;
 using electionguard::SelectionDescription;
 
-// TODO: safe initialization
-static Cache<CiphertextBallotSelection> cache_ciphertext_ballot_selection;
-static Cache<CiphertextBallot> cache_ciphertext_ballot;
-static Cache<EncryptionDevice> cache_encryption_device;
-static Cache<EncryptionMediator> cache_encryption_mediator;
-static Cache<ElementModQ> cache_element_mod_q;
-
 #pragma region EncryptionDevice
 
-eg_encryption_device_t *eg_encryption_device_create(const uint64_t uuid, const char *location)
+eg_electionguard_status_t eg_encryption_device_new(const uint64_t in_uuid, const char *in_location,
+                                                   eg_encryption_device_t **out_handle)
 {
-    auto device = make_unique<EncryptionDevice>(uuid, string(location));
-    auto *reference = cache_encryption_device.retain(move(device));
-    return AS_TYPE(eg_encryption_device_t, reference);
+    try {
+        auto device = make_unique<EncryptionDevice>(in_uuid, string(in_location));
+        *out_handle = AS_TYPE(eg_encryption_device_t, device.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_encryption_device_new", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
-eg_element_mod_q_t *eg_encryption_device_get_hash(eg_encryption_device_t *device)
+eg_electionguard_status_t eg_encryption_device_free(eg_encryption_device_t *handle)
 {
-    auto hash = AS_TYPE(EncryptionDevice, device)->getHash();
-    auto *reference = cache_element_mod_q.retain(move(hash));
-    return AS_TYPE(eg_element_mod_q_t, reference);
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete AS_TYPE(EncryptionDevice, handle);
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_encryption_device_get_hash(eg_encryption_device_t *handle,
+                                                        eg_element_mod_q_t **out_hash)
+{
+    try {
+        auto hash = AS_TYPE(EncryptionDevice, handle)->getHash();
+        *out_hash = AS_TYPE(eg_element_mod_q_t, hash.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_encryption_device_get_hash", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
 #pragma endregion
 
 #pragma region EncryptionMediator
 
-eg_encryption_mediator_t *
-eg_encryption_mediator_create(eg_internal_election_description_t *metadata,
-                              eg_ciphertext_election_context_t *context,
-                              eg_encryption_device_t *encryption_device)
+eg_electionguard_status_t eg_encryption_mediator_new(
+  eg_internal_election_description_t *in_metadata, eg_ciphertext_election_context_t *in_context,
+  eg_encryption_device_t *in_encryption_device, eg_encryption_mediator_t **out_handle)
 {
-    auto *metadata_ = AS_TYPE(InternalElectionDescription, metadata);
-    auto *context_ = AS_TYPE(CiphertextElectionContext, context);
-    auto *device_ = AS_TYPE(EncryptionDevice, encryption_device);
-    auto mediator = make_unique<EncryptionMediator>(*metadata_, *context_, *device_);
+    try {
+        auto *metadata = AS_TYPE(InternalElectionDescription, in_metadata);
+        auto *context = AS_TYPE(CiphertextElectionContext, in_context);
+        auto *device = AS_TYPE(EncryptionDevice, in_encryption_device);
+        auto mediator = make_unique<EncryptionMediator>(*metadata, *context, *device);
 
-    auto *reference = cache_encryption_mediator.retain(move(mediator));
-    return AS_TYPE(eg_encryption_mediator_t, reference);
+        *out_handle = AS_TYPE(eg_encryption_mediator_t, mediator.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_encryption_mediator_new", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
-eg_ciphertext_ballot_t *eg_encryption_mediator_encrypt(eg_encryption_mediator_t *mediator,
-                                                       eg_plaintext_ballot_t *ballot)
+eg_electionguard_status_t eg_encryption_mediator_free(eg_encryption_mediator_t *handle)
 {
-    auto *plaintext = AS_TYPE(PlaintextBallot, ballot);
-    auto ciphertext = AS_TYPE(EncryptionMediator, mediator)->encrypt(*plaintext);
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
 
-    auto *reference = cache_ciphertext_ballot.retain(move(ciphertext));
-    return AS_TYPE(eg_ciphertext_ballot_t, reference);
+    delete AS_TYPE(EncryptionMediator, handle);
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_encryption_mediator_encrypt_ballot(eg_encryption_mediator_t *handle,
+                                      eg_plaintext_ballot_t *in_plaintext,
+                                      eg_ciphertext_ballot_t **out_ciphertext_handle)
+{
+    try {
+        auto *plaintext = AS_TYPE(PlaintextBallot, in_plaintext);
+        auto ciphertext = AS_TYPE(EncryptionMediator, handle)->encrypt(*plaintext);
+
+        *out_ciphertext_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_encryption_mediator_encrypt_ballot", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
 #pragma endregion
 
 #pragma region EncryptSelection
 
-eg_ciphertext_ballot_selection_t *
-eg_encrypt_selection(eg_plaintext_ballot_selection_t *plaintext,
-                     eg_selection_description_t *description, eg_element_mod_p_t *public_key,
-                     eg_element_mod_q_t *crypto_extended_base_hash, eg_element_mod_q_t *nonce_seed,
-                     bool is_placeholder, bool should_verify_proofs)
+eg_electionguard_status_t eg_encrypt_selection(eg_plaintext_ballot_selection_t *in_plaintext,
+                                               eg_selection_description_t *in_description,
+                                               eg_element_mod_p_t *in_public_key,
+                                               eg_element_mod_q_t *in_crypto_extended_base_hash,
+                                               eg_element_mod_q_t *in_nonce_seed,
+                                               bool in_is_placeholder, bool in_should_verify_proofs,
+                                               eg_ciphertext_ballot_selection_t **out_handle)
 {
     try {
-        auto *plaintext_ = AS_TYPE(PlaintextBallotSelection, plaintext);
-        auto *description_ = AS_TYPE(SelectionDescription, description);
-        auto *public_key_ = AS_TYPE(ElementModP, public_key);
-        auto *crypto_extended_base_hash_ = AS_TYPE(ElementModQ, crypto_extended_base_hash);
-        auto *nonce_seed_ = AS_TYPE(ElementModQ, nonce_seed);
+        auto *plaintext = AS_TYPE(PlaintextBallotSelection, in_plaintext);
+        auto *description = AS_TYPE(SelectionDescription, in_description);
+        auto *public_key = AS_TYPE(ElementModP, in_public_key);
+        auto *crypto_extended_base_hash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
+        auto *nonce_seed_ = AS_TYPE(ElementModQ, in_nonce_seed);
 
         auto ciphertext =
-          encryptSelection(*plaintext_, *description_, *public_key_, *crypto_extended_base_hash_,
-                           *nonce_seed_, is_placeholder, should_verify_proofs);
+          encryptSelection(*plaintext, *description, *public_key, *crypto_extended_base_hash,
+                           *nonce_seed_, in_is_placeholder, in_should_verify_proofs);
 
-        auto *reference = cache_ciphertext_ballot_selection.retain(move(ciphertext));
-        return AS_TYPE(eg_ciphertext_ballot_selection_t, reference);
-    } catch (const exception &) {
-        // TODO: real return codes
-        errno = EIO;
-        return nullptr;
+        *out_handle = AS_TYPE(eg_ciphertext_ballot_selection_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_encrypt_selection", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
 
@@ -109,54 +146,54 @@ eg_encrypt_selection(eg_plaintext_ballot_selection_t *plaintext,
 
 #pragma region EncryptContest
 
-eg_ciphertext_ballot_contest_t *
-eg_encrypt_contest(eg_plaintext_ballot_contest_t *plaintext, eg_contest_description_t *description,
-                   eg_element_mod_p_t *public_key, eg_element_mod_q_t *crypto_extended_base_hash,
-                   eg_element_mod_q_t *nonce_seed, bool should_verify_proofs)
-{
-    // TODO: Implement
-    return nullptr;
-}
-
 #pragma endregion
 
 #pragma region EncryptBallot
 
-eg_ciphertext_ballot_t *eg_encrypt_ballot(eg_plaintext_ballot_t *plaintext,
-                                          eg_internal_election_description_t *metadata,
-                                          eg_ciphertext_election_context_t *context,
-                                          eg_element_mod_q_t *seed_hash, bool should_verify_proofs)
+eg_electionguard_status_t eg_encrypt_ballot(eg_plaintext_ballot_t *in_plaintext,
+                                            eg_internal_election_description_t *in_metadata,
+                                            eg_ciphertext_election_context_t *in_context,
+                                            eg_element_mod_q_t *in_seed_hash,
+                                            bool in_should_verify_proofs,
+                                            eg_ciphertext_ballot_t **out_handle)
 {
-    auto *plaintext_ = AS_TYPE(PlaintextBallot, plaintext);
-    auto *metadata_ = AS_TYPE(InternalElectionDescription, metadata);
-    auto *context_ = AS_TYPE(CiphertextElectionContext, context);
-    auto *seed_hash_ = AS_TYPE(ElementModQ, seed_hash);
+    try {
+        auto *plaintext = AS_TYPE(PlaintextBallot, in_plaintext);
+        auto *metadata = AS_TYPE(InternalElectionDescription, in_metadata);
+        auto *context = AS_TYPE(CiphertextElectionContext, in_context);
+        auto *seed_hash = AS_TYPE(ElementModQ, in_seed_hash);
 
-    auto ciphertext =
-      encryptBallot(*plaintext_, *metadata_, *context_, *seed_hash_, nullptr, should_verify_proofs);
-    auto *reference = cache_ciphertext_ballot.retain(move(ciphertext));
-    return AS_TYPE(eg_ciphertext_ballot_t, reference);
+        auto ciphertext = encryptBallot(*plaintext, *metadata, *context, *seed_hash, nullptr,
+                                        in_should_verify_proofs);
+        *out_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_encrypt_ballot", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
-eg_ciphertext_ballot_t *eg_encrypt_ballot_with_nonce(eg_plaintext_ballot_t *plaintext,
-                                                     eg_internal_election_description_t *metadata,
-                                                     eg_ciphertext_election_context_t *context,
-                                                     eg_element_mod_q_t *seed_hash,
-                                                     eg_element_mod_q_t *nonce,
-                                                     bool should_verify_proofs)
+eg_electionguard_status_t eg_encrypt_ballot_with_nonce(
+  eg_plaintext_ballot_t *in_plaintext, eg_internal_election_description_t *in_metadata,
+  eg_ciphertext_election_context_t *in_context, eg_element_mod_q_t *in_seed_hash,
+  eg_element_mod_q_t *in_nonce, bool in_should_verify_proofs, eg_ciphertext_ballot_t **out_handle)
 {
-    auto *plaintext_ = AS_TYPE(PlaintextBallot, plaintext);
-    auto *metadata_ = AS_TYPE(InternalElectionDescription, metadata);
-    auto *context_ = AS_TYPE(CiphertextElectionContext, context);
-    auto *seed_hash_ = AS_TYPE(ElementModQ, seed_hash);
-    auto *nonce_ = AS_TYPE(ElementModQ, nonce);
+    try {
+        auto *plaintext = AS_TYPE(PlaintextBallot, in_plaintext);
+        auto *metadata = AS_TYPE(InternalElectionDescription, in_metadata);
+        auto *context = AS_TYPE(CiphertextElectionContext, in_context);
+        auto *seed_hash = AS_TYPE(ElementModQ, in_seed_hash);
+        auto *nonce = AS_TYPE(ElementModQ, in_nonce);
+        unique_ptr<ElementModQ> nonce_ptr{nonce};
 
-    unique_ptr<ElementModQ> nonce_ptr{nonce_};
-
-    auto ciphertext = encryptBallot(*plaintext_, *metadata_, *context_, *seed_hash_,
-                                    move(nonce_ptr), should_verify_proofs);
-    auto *reference = cache_ciphertext_ballot.retain(move(ciphertext));
-    return AS_TYPE(eg_ciphertext_ballot_t, reference);
+        auto ciphertext = encryptBallot(*plaintext, *metadata, *context, *seed_hash,
+                                        move(nonce_ptr), in_should_verify_proofs);
+        *out_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_encrypt_ballot_with_nonce", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
 #pragma endregion

@@ -42,8 +42,11 @@ bool test_encrypt_selection(void)
     }
 
     // Act
-    eg_ciphertext_ballot_selection_t *result =
-      eg_encrypt_selection(plaintext, metadata, public_key, one_mod_q, nonce, false, true);
+    eg_ciphertext_ballot_selection_t *result = NULL;
+    if (eg_encrypt_selection(plaintext, metadata, public_key, one_mod_q, nonce, false, true,
+                             &result)) {
+        assert(false);
+    }
 
     // Assert
     assert(result != NULL);
