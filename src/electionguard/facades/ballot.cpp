@@ -264,7 +264,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_free(eg_ciphertext_ballot_t *hand
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(PlaintextBallot, handle);
+    delete AS_TYPE(CiphertextBallot, handle);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 

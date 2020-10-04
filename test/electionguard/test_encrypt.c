@@ -29,9 +29,16 @@ bool test_encrypt_selection(void)
         assert(false);
     }
 
-    eg_selection_description_t *metadata =
-      eg_selection_description_create("some-selection-object_id", candidate_id, 1UL);
-    eg_element_mod_q_t *hash_context = eg_selection_description_crypto_hash(metadata);
+    eg_selection_description_t *metadata = NULL;
+
+    if (eg_selection_description_new("some-selection-object_id", candidate_id, 1UL, &metadata)) {
+        assert(false);
+    }
+
+    eg_element_mod_q_t *hash_context = NULL;
+    if (eg_selection_description_crypto_hash(metadata, &hash_context)) {
+        assert(false);
+    }
 
     eg_plaintext_ballot_selection_t *plaintext = NULL;
     if (eg_plaintext_ballot_selection_new(candidate_id, "1", &plaintext)) {
@@ -86,6 +93,9 @@ bool test_encrypt_selection(void)
         assert(false);
     }
     if (eg_ciphertext_ballot_selection_free(result)) {
+        assert(false);
+    }
+    if (eg_selection_description_free(metadata)) {
         assert(false);
     }
 
