@@ -31,7 +31,7 @@ eg_electionguard_status_t eg_elgamal_keypair_from_secret_new(eg_element_mod_q_t 
         *out_handle = AS_TYPE(eg_elgamal_keypair_t, keyPair.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_elgamal_keypair_from_secret_new", e);
+        Log::error(":eg_elgamal_keypair_from_secret_new", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -106,7 +106,7 @@ eg_electionguard_status_t eg_elgamal_ciphertext_crypto_hash(eg_elgamal_ciphertex
         *out_crypto_hash = AS_TYPE(eg_element_mod_q_t, cryptoHash.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_elgamal_ciphertext_crypto_hash", e);
+        Log::error(":eg_elgamal_ciphertext_crypto_hash", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -119,7 +119,7 @@ eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_with_secret(
         *out_plaintext = AS_TYPE(ElGamalCiphertext, handle)->decrypt(*secretKey);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_elgamal_ciphertext_decrypt_with_secret", e);
+        Log::error(":eg_elgamal_ciphertext_decrypt_with_secret", e);
         return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     }
 }
@@ -139,7 +139,7 @@ eg_electionguard_status_t eg_elgamal_encrypt(uint64_t in_plaintext, eg_element_m
         *out_ciphertext = AS_TYPE(eg_elgamal_ciphertext_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_elgamal_encrypt", e);
+        Log::error(":eg_elgamal_encrypt", e);
         return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     }
 }

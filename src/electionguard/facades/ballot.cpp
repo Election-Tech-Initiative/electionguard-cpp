@@ -280,7 +280,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_object_id(eg_ciphertext_ballo
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_ciphertext_ballot_get_object_id", e);
+        Log::error(":eg_ciphertext_ballot_get_object_id", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -295,7 +295,7 @@ eg_ciphertext_ballot_get_tracking_hash(eg_ciphertext_ballot_t *handle,
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_ciphertext_ballot_get_tracking_hash", e);
+        Log::error(":eg_ciphertext_ballot_get_tracking_hash", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -312,7 +312,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_tracking_code(eg_ciphertext_b
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_ciphertext_ballot_get_tracking_code", e);
+        Log::error(":eg_ciphertext_ballot_get_tracking_code", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -346,7 +346,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_from_json(char *in_data,
         *out_handle = AS_TYPE(eg_ciphertext_ballot_t, deserialized.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_ciphertext_ballot_from_json", e);
+        Log::error(":eg_ciphertext_ballot_from_json", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -361,7 +361,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_from_bson(uint8_t *in_data, uint6
         *out_handle = AS_TYPE(eg_ciphertext_ballot_t, deserialized.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_ciphertext_ballot_from_bson", e);
+        Log::error(":eg_ciphertext_ballot_from_bson", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -381,7 +381,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_json(eg_ciphertext_ballot_t *h
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_ciphertext_ballot_to_json", e);
+        Log::error(":eg_ciphertext_ballot_to_json", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -400,7 +400,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_bson(eg_ciphertext_ballot_t *h
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_ciphertext_ballot_to_bson", e);
+        Log::error(":eg_ciphertext_ballot_to_bson", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }

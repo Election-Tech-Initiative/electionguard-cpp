@@ -79,7 +79,7 @@ eg_electionguard_status_t eg_encryption_mediator_new(
         *out_handle = AS_TYPE(eg_encryption_mediator_t, mediator.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_encryption_mediator_new", e);
+        Log::error(":eg_encryption_mediator_new", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -106,7 +106,7 @@ eg_encryption_mediator_encrypt_ballot(eg_encryption_mediator_t *handle,
         *out_ciphertext_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_encryption_mediator_encrypt_ballot", e);
+        Log::error(":eg_encryption_mediator_encrypt_ballot", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -137,7 +137,7 @@ eg_electionguard_status_t eg_encrypt_selection(eg_plaintext_ballot_selection_t *
         *out_handle = AS_TYPE(eg_ciphertext_ballot_selection_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_encrypt_selection", e);
+        Log::error(":eg_encrypt_selection", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -168,7 +168,7 @@ eg_electionguard_status_t eg_encrypt_ballot(eg_plaintext_ballot_t *in_plaintext,
         *out_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_encrypt_ballot", e);
+        Log::error(":eg_encrypt_ballot", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -191,7 +191,7 @@ eg_electionguard_status_t eg_encrypt_ballot_with_nonce(
         *out_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_encrypt_ballot_with_nonce", e);
+        Log::error(":eg_encrypt_ballot_with_nonce", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }

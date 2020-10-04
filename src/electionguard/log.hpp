@@ -107,10 +107,10 @@ namespace electionguard
             postfix();
         }
 
-        static void error(string msg, exception e)
+        static void error(string msg, const exception &e)
         {
             prefix();
-            cout << ": error: " << msg << ": " << e.what();
+            cerr << ":ERROR: " << msg << ": " << e.what();
             postfix();
         }
     };

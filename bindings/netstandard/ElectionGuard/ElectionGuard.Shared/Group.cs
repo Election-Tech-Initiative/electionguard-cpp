@@ -1,25 +1,23 @@
 ﻿using System;
-
-
+using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
     using NaiveElementModP = NativeInterface.ElementModP.ElementModPType;
     using NaiveElementModQ = NativeInterface.ElementModQ.ElementModQType;
 
-    public class ElementModP
+    public class ElementModP : DisposableBase
     {
-        public static readonly int MAX_SIZE = 64;
+        public static readonly ulong MAX_SIZE = 64;
 
-        public ulong[] Data { get { return Get(); } set { CreateNative(value); } }
-
+        public ulong[] Data { get { return GetNative(); } set { NewNative(value); } }
         internal unsafe NaiveElementModP* Handle;
 
         public ElementModP(ulong[] data)
         {
             try
             {
-                CreateNative(data);
+                NewNative(data);
             }
             catch
             {
@@ -32,28 +30,60 @@ namespace ElectionGuard
             Handle = handle;
         }
 
-        private unsafe void CreateNative(ulong[] data)
+        protected override unsafe void DisposeUnamanged()
+        {
+            base.DisposeUnamanged();
+            var status = NativeInterface.ElementModP.Free(Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
+            }
+            Handle = null;
+        }
+
+        public unsafe string ToHex()
+        {
+            var status = NativeInterface.ElementModP.ToHex(Handle, out IntPtr pointer);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"ToHex Error Status: {status}");
+            }
+            var value = Marshal.PtrToStringAnsi(pointer);
+            return value;
+        }
+
+        private unsafe void NewNative(ulong[] data)
         {
             fixed (ulong* pointer = new ulong[MAX_SIZE])
             {
-                for (var i = 0; i < MAX_SIZE; i++)
+                for (ulong i = 0; i < MAX_SIZE; i++)
                 {
                     pointer[i] = data[i];
                 }
 
-                Handle = NativeInterface.ElementModP.Create(pointer);
+                var status = NativeInterface.ElementModP.New(pointer, out Handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"createNative Error Status: {status}");
+                }
             }
         }
 
-        private unsafe ulong[] Get()
+        private unsafe ulong[] GetNative()
         {
+            if (Handle == null)
+            {
+                return null;
+            }
+
             var data = new ulong[MAX_SIZE];
             fixed (ulong* element = new ulong[MAX_SIZE])
             {
-                var dhSize = NativeInterface.ElementModP.Get(Handle, &element);
-                if (dhSize != MAX_SIZE)
+                var status = NativeInterface.ElementModP.GetData(Handle, &element, out UIntPtr size);
+                if (size.ToUInt64() != MAX_SIZE)
                 {
                     Console.WriteLine("wrong size");
+                    return null;
                 }
 
                 if (element == null)
@@ -62,7 +92,7 @@ namespace ElectionGuard
                     return null;
                 }
 
-                for (var i = 0; i < MAX_SIZE; i++)
+                for (ulong i = 0; i < MAX_SIZE; i++)
                 {
                     data[i] = element[i];
                 }
@@ -71,20 +101,19 @@ namespace ElectionGuard
             return data;
         }
     }
-    
-    public class ElementModQ
-    {
-        public static readonly int MAX_SIZE = 4;
 
-        public ulong[] Data { get { return Get(); } set { createNative(value); } }
+    public class ElementModQ : DisposableBase
+    {
+        public static readonly ulong MAX_SIZE = 4;
+
+        public ulong[] Data { get { return GetNative(); } set { NewNative(value); } }
         internal unsafe NaiveElementModQ* Handle;
 
         public ElementModQ(ulong[] data)
         {
-            // TODO: safety
             try
             {
-                createNative(data);
+                NewNative(data);
             } catch
             {
                 Console.WriteLine("construction error");
@@ -96,28 +125,60 @@ namespace ElectionGuard
             Handle = handle;
         }
 
-        private unsafe void createNative(ulong[] data)
+        public unsafe string ToHex()
+        {
+            var status = NativeInterface.ElementModQ.ToHex(Handle, out IntPtr pointer);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"ToHex Error Status: {status}");
+            }
+            var value = Marshal.PtrToStringAnsi(pointer);
+            return value;
+        }
+
+        protected override unsafe void DisposeUnamanged()
+        {
+            base.DisposeUnamanged();
+            var status = NativeInterface.ElementModQ.Free(Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
+            }
+            Handle = null;
+        }
+
+        private unsafe void NewNative(ulong[] data)
         {
             fixed (ulong* pointer = new ulong[MAX_SIZE])
             {
-                for (var i = 0; i < MAX_SIZE; i++)
+                for (ulong i = 0; i < MAX_SIZE; i++)
                 {
                     pointer[i] = data[i];
                 }
 
-                Handle = NativeInterface.ElementModQ.Create(pointer);
+                var status = NativeInterface.ElementModQ.New(pointer, out Handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"createNative Error Status: {status}");
+                }
             }
         }
 
-        public unsafe ulong[] Get()
+        private unsafe ulong[] GetNative()
         {
+            if (Handle == null)
+            {
+                return null;
+            }
+
             var data = new ulong[MAX_SIZE];
             fixed (ulong* element = new ulong[MAX_SIZE])
             {
-                var dhSize = NativeInterface.ElementModQ.Get(Handle, &element);
-                if (dhSize != MAX_SIZE)
+                var status = NativeInterface.ElementModQ.GetData(Handle, &element, out UIntPtr size);
+                if (size.ToUInt64() != MAX_SIZE)
                 {
                     Console.WriteLine("wrong size");
+                    return null;
                 }
 
                 if (element == null)
@@ -126,7 +187,7 @@ namespace ElectionGuard
                     return null;
                 }
 
-                for (var i = 0; i < MAX_SIZE; i++)
+                for (ulong i = 0; i < MAX_SIZE; i++)
                 {
                     data[i] = element[i];
                 }

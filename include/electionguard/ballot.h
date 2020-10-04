@@ -109,7 +109,7 @@ typedef struct eg_ciphertext_ballot_s eg_ciphertext_ballot_t;
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_free(eg_ciphertext_ballot_t *handle);
 
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_object_id(eg_ciphertext_ballot_t *handle,
-                                                                    const char *out_object_id);
+                                                                    const char **out_object_id);
 
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_tracking_hash(
   eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_tracking_hash);

@@ -39,7 +39,7 @@ eg_electionguard_status_t eg_selection_description_new(const char *in_object_id,
         *out_handle = AS_TYPE(eg_selection_description_t, description.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_selection_description_new", e);
+        Log::error(":eg_selection_description_new", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -66,7 +66,7 @@ eg_electionguard_status_t eg_selection_description_get_object_id(eg_selection_de
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_selection_description_get_object_id", e);
+        Log::error(":eg_selection_description_get_object_id", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -84,7 +84,7 @@ eg_selection_description_get_candidate_id(eg_selection_description_t *handle,
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_selection_description_get_candidate_id", e);
+        Log::error(":eg_selection_description_get_candidate_id", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -142,7 +142,7 @@ eg_internal_election_description_from_json(char *in_data,
         *out_handle = AS_TYPE(eg_internal_election_description_t, deserialized.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_internal_election_description_from_json", e);
+        Log::error(":eg_internal_election_description_from_json", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -158,7 +158,7 @@ eg_internal_election_description_from_bson(uint8_t *in_data, uint64_t in_length,
         *out_handle = AS_TYPE(eg_internal_election_description_t, deserialized.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_internal_election_description_from_bson", e);
+        Log::error(":eg_internal_election_description_from_bson", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -179,7 +179,7 @@ eg_internal_election_description_to_json(eg_internal_election_description_t *han
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_internal_election_description_to_json", e);
+        Log::error(":eg_internal_election_description_to_json", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -199,7 +199,7 @@ eg_internal_election_description_to_bson(eg_internal_election_description_t *han
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_internal_election_description_to_bson", e);
+        Log::error(":eg_internal_election_description_to_bson", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -272,7 +272,7 @@ eg_electionguard_status_t eg_ciphertext_election_context_make(
         *out_handle = AS_TYPE(eg_ciphertext_election_context_t, context.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_ciphertext_election_context_make", e);
+        Log::error(":eg_ciphertext_election_context_make", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -291,7 +291,7 @@ eg_electionguard_status_t eg_ciphertext_election_context_make_from_hex(
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_ciphertext_election_context_make_from_hex", e);
+        Log::error(":eg_ciphertext_election_context_make_from_hex", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -307,7 +307,7 @@ eg_ciphertext_election_context_from_json(char *in_data,
         *out_handle = AS_TYPE(eg_ciphertext_election_context_t, deserialized.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_ciphertext_election_context_from_json", e);
+        Log::error(":eg_ciphertext_election_context_from_json", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -323,7 +323,7 @@ eg_ciphertext_election_context_from_bson(uint8_t *in_data, uint64_t in_length,
         *out_handle = AS_TYPE(eg_ciphertext_election_context_t, deserialized.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_ciphertext_election_context_from_bson", e);
+        Log::error(":eg_ciphertext_election_context_from_bson", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -344,7 +344,7 @@ eg_ciphertext_election_context_to_json(eg_ciphertext_election_context_t *handle,
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_ciphertext_election_context_to_json", e);
+        Log::error(":eg_ciphertext_election_context_to_json", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -364,7 +364,7 @@ eg_ciphertext_election_context_to_bson(eg_ciphertext_election_context_t *handle,
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_ciphertext_election_context_to_bson", e);
+        Log::error(":eg_ciphertext_election_context_to_bson", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
