@@ -283,12 +283,12 @@ TEST_CASE("Hacl_Bignum4096_new_bn_from_bytes_be Test BigNum 4096 from and to byt
 {
     uint8_t oneByte[MAX_P_SIZE] = {1};
     uint64_t *bnResult = Hacl_Bignum4096_new_bn_from_bytes_be(sizeof(oneByte), oneByte);
-    //Log::debug(bnResult, MAX_P_LEN, " : Test BigNum 4096 from and to bytes : bnResult =");
+    Log::debug(bnResult, MAX_P_LEN, " : Test BigNum 4096 from and to bytes : bnResult =");
 
-    uint8_t byteResult[512] = {};
+    uint8_t byteResult[MAX_P_SIZE] = {};
     Hacl_Bignum4096_bn_to_bytes_be(bnResult, byteResult);
-    //Log::debug(byteResult, 512, " : Test BigNum 4096 from and to bytes : byteResult =");
-    CHECK(byteResult[511] == oneByte[0]);
+    Log::debug(byteResult, MAX_P_SIZE, " : Test BigNum 4096 from and to bytes : byteResult =");
+    CHECK(byteResult[0] == oneByte[0]);
 }
 
 TEST_CASE("Hacl_Bignum256_new_bn_from_bytes_be Test BigNum 256 from and to bytes")
@@ -297,10 +297,10 @@ TEST_CASE("Hacl_Bignum256_new_bn_from_bytes_be Test BigNum 256 from and to bytes
     uint64_t *bnResult = Hacl_Bignum256_new_bn_from_bytes_be(sizeof(oneByte), oneByte);
     //Log::debug(bnResult, MAX_Q_LEN, " : Test BigNum 256 from and to bytes : bnResult =");
 
-    uint8_t byteResult[32] = {};
+    uint8_t byteResult[MAX_Q_SIZE] = {};
     Hacl_Bignum256_bn_to_bytes_be(bnResult, byteResult);
-    //Log::debug(byteResult, 32, " : Test BigNum 256 from and to bytes : byteResult =");
-    CHECK(byteResult[31] == oneByte[0]);
+    //Log::debug(byteResult, MAX_Q_SIZE, " : Test BigNum 256 from and to bytes : byteResult =");
+    CHECK(byteResult[0] == oneByte[0]);
 }
 
 #pragma endregion

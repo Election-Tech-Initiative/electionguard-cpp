@@ -258,6 +258,7 @@ namespace electionguard
         }
 
         Log::debug(": Encrypted Ballot: encrypted: " + encryptedBallot->getObjectId());
+        Log::debug(encryptedBallot->toJson());
 
         if (!shouldVerifyProofs) {
             return encryptedBallot;
