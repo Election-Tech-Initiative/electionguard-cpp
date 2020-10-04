@@ -4,6 +4,9 @@
 static bool test_constant_chaum_pedersen_proof(void);
 
 bool test_chaum_pedersen_proof(void) { return test_constant_chaum_pedersen_proof(); }
+
+// TODO: Add Disjunctive tests
+
 bool test_constant_chaum_pedersen_proof(void)
 {
     // Arrange

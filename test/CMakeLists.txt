@@ -55,6 +55,8 @@ add_executable(ElectionGuardCTests
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_tracker.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h
 )
 
 target_compile_features(ElectionGuardCTests PRIVATE c_std_99)

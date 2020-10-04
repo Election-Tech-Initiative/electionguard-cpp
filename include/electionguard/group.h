@@ -28,6 +28,9 @@ EG_API eg_electionguard_status_t eg_element_mod_p_free(eg_element_mod_p_t *handl
 EG_API eg_electionguard_status_t eg_element_mod_p_get_data(eg_element_mod_p_t *handle,
                                                            uint64_t **out_data, size_t out_size);
 
+EG_API eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle,
+                                                         char **out_hex);
+
 // TODO: finish implementation
 
 // ElementModQ
@@ -42,9 +45,10 @@ EG_API eg_electionguard_status_t eg_element_mod_q_new_unchecked(const uint64_t i
 
 EG_API eg_electionguard_status_t eg_element_mod_q_free(eg_element_mod_q_t *handle);
 
-/// returns the array size and places the getter value in the data field
 EG_API eg_electionguard_status_t eg_element_mod_q_get_data(eg_element_mod_q_t *handle,
                                                            uint64_t **out_data, size_t *out_size);
+
+EG_API eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *handle, char *out_hex);
 
 EG_API eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle);
 

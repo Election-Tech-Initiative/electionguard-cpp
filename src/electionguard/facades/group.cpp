@@ -77,6 +77,22 @@ eg_electionguard_status_t eg_element_mod_p_get_data(eg_element_mod_p_t *handle, 
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
+eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle, char **out_hex)
+{
+    try {
+        auto hex_rep = AS_TYPE(ElementModP, handle)->toHex();
+        auto data_size = hex_rep.length() + 1;
+        auto *data_array = new char[data_size];
+        strncpy(data_array, hex_rep.c_str(), data_size);
+        *out_hex = data_array;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_element_mod_p_to_hex", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 #pragma endregion
 
 #pragma region ElementModQ
@@ -137,6 +153,22 @@ eg_electionguard_status_t eg_element_mod_q_get_data(eg_element_mod_q_t *handle, 
     *out_size = (size_t)MAX_Q_LEN;
 
     return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *handle, char **out_hex)
+{
+    try {
+        auto hex_rep = AS_TYPE(ElementModQ, handle)->toHex();
+        auto data_size = hex_rep.length() + 1;
+        auto *data_array = new char[data_size];
+        strncpy(data_array, hex_rep.c_str(), data_size);
+        *out_hex = data_array;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_element_mod_q_to_hex", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
 #pragma endregion

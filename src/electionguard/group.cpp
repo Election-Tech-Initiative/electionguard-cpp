@@ -267,6 +267,15 @@ namespace electionguard
         return this->isInBounds() && residue;
     }
 
+    vector<uint8_t> ElementModP::toBytes() const
+    {
+        uint8_t byteResult[MAX_P_SIZE] = {};
+        // Use Hacl to convert the bignum to byte array
+        Hacl_Bignum4096_bn_to_bytes_be(static_cast<uint64_t *>(pimpl->data),
+                                       static_cast<uint8_t *>(byteResult));
+        return vector<uint8_t>(begin(byteResult), end(byteResult));
+    }
+
     string ElementModP::toHex() const
     {
         // Returned bytes array from Hacl needs to be pre-allocated to 512 bytes

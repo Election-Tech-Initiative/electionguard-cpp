@@ -281,7 +281,7 @@ TEST_CASE("Hacl_Bignum256_mod_exp Test mod exp for BigNum 256 valid precondition
 
 TEST_CASE("Hacl_Bignum4096_new_bn_from_bytes_be Test BigNum 4096 from and to bytes")
 {
-    uint8_t oneByte[1] = {1};
+    uint8_t oneByte[MAX_P_SIZE] = {1};
     uint64_t *bnResult = Hacl_Bignum4096_new_bn_from_bytes_be(sizeof(oneByte), oneByte);
     //Log::debug(bnResult, MAX_P_LEN, " : Test BigNum 4096 from and to bytes : bnResult =");
 
@@ -293,7 +293,7 @@ TEST_CASE("Hacl_Bignum4096_new_bn_from_bytes_be Test BigNum 4096 from and to byt
 
 TEST_CASE("Hacl_Bignum256_new_bn_from_bytes_be Test BigNum 256 from and to bytes")
 {
-    uint8_t oneByte[1] = {1};
+    uint8_t oneByte[MAX_Q_SIZE] = {1};
     uint64_t *bnResult = Hacl_Bignum256_new_bn_from_bytes_be(sizeof(oneByte), oneByte);
     //Log::debug(bnResult, MAX_Q_LEN, " : Test BigNum 256 from and to bytes : bnResult =");
 

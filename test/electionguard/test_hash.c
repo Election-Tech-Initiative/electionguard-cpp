@@ -17,8 +17,6 @@ bool test_hash_elems(void)
         assert(false);
     }
 
-    printf("string hash %llu", string_hash_data[0]);
-
     // TODO: check the actual hash string
     assert(string_hash != NULL);
     assert(string_hash != 0);
