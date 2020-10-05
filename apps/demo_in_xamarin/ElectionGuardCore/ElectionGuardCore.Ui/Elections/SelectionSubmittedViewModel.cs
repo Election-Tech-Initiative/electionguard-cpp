@@ -73,20 +73,20 @@ namespace ElectionGuardCore.Ui.Elections
         {
             await _navigationService.PopToRoot();
             await _navigationService.Push(NavigationPaths.ContestSelectionListPage,
-                new ContestSelectionListViewModel.ContestSelectionListArgs(Args.ElectionDescription,
+                new ContestSelectionListViewModel.ContestSelectionListArgs(Args.Election,
                     Args.CiphertextElectionContext));
         }
 
         public class SelectionSubmittedArgs
         {
             public readonly bool VoteCast;
-            public readonly ElectionDescription ElectionDescription;
+            public readonly Election Election;
             public readonly CiphertextElectionContext CiphertextElectionContext;
 
-            public SelectionSubmittedArgs(bool voteCast, ElectionDescription electionDescription, CiphertextElectionContext context)
+            public SelectionSubmittedArgs(bool voteCast, Election election, CiphertextElectionContext context)
             {
                 VoteCast = voteCast;
-                ElectionDescription = electionDescription;
+                Election = election;
                 CiphertextElectionContext = context;
             }
         }

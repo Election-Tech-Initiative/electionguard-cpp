@@ -75,7 +75,9 @@ unique_ptr<PlaintextBallotContest> contestFrom(const ContestDescription &contest
 
 unique_ptr<PlaintextBallot> getFakeBallot(const InternalElectionDescription &metadata)
 {
-    string ballotId = "ballot-id-123";
+    string ballotId = "ballot-id-123-ballot-id-123-ballot-id-123-ballot-id-123-ballot-id-123ballot-"
+                      "id-123-ballot-id-123-ballot-id-123-ballot-id-123-ballot-id-123-ballot-id-"
+                      "123-ballot-id-123-ballot-id-123-ballot-id-123";
 
     vector<unique_ptr<PlaintextBallotContest>> contests;
     for (const auto &contest : metadata.getContests()) {

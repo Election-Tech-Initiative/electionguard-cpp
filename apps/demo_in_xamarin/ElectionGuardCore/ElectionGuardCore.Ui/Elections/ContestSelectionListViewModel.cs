@@ -36,23 +36,23 @@ namespace ElectionGuardCore.Ui.Elections
             set
             {
                 _args = value;
-                ElectionDescription = _args.ElectionDescription;
+                Election = _args.Election;
             }
         }
 
-        private ElectionDescription _electionDescription;
-        private ElectionDescription ElectionDescription
+        private Election _election;
+        private Election Election
         {
-            get => _electionDescription;
+            get => _election;
             set
             {
-                _electionDescription = value;
+                _election = value;
                 OnPropertyChanged(nameof(ContestTitle));
                 RefreshCandidates();
             }
         }
 
-        public string ContestTitle => ElectionDescription?.ActiveContest.BallotTitle.GetTextValue("en");
+        public string ContestTitle => Election?.ElectionDescription.ActiveContest.BallotTitle.GetTextValue("en");
 
         private List<CandidateViewModel> _candidates;
         public List<CandidateViewModel> Candidates
@@ -67,18 +67,18 @@ namespace ElectionGuardCore.Ui.Elections
 
         private void RefreshCandidates()
         {
-            if (ElectionDescription?.ActiveContest?.BallotSelections == null)
+            if (Election?.ElectionDescription.ActiveContest?.BallotSelections == null)
             {
                 Candidates = null;
                 return;
             }
 
             var candidates = new List<CandidateViewModel>();
-            foreach (var ballotSelection in ElectionDescription.ActiveContest.BallotSelections.OrderBy(b =>
+            foreach (var ballotSelection in Election.ElectionDescription.ActiveContest.BallotSelections.OrderBy(b =>
                 b.SequenceOrder))
             {
                 var candidate =
-                    Args.ElectionDescription.Candidates
+                    Args.Election.ElectionDescription.Candidates
                     .FirstOrDefault(c => c.ObjectId == ballotSelection.CandidateId);
                 if (candidate != null)
                 {
@@ -119,19 +119,19 @@ namespace ElectionGuardCore.Ui.Elections
         {
             await _navigationService.Push(NavigationPaths.ReviewSelectionPage,
                 new ReviewSelectionViewModel.ReviewSelectionArgs(
-                    Args.ElectionDescription, Args.ElectionContext,
+                    Args.Election, Args.ElectionContext,
                     SelectedCandidate.Selection, SelectedCandidate.Candidate)
                 );
         }
 
         public class ContestSelectionListArgs
         {
-            public readonly ElectionDescription ElectionDescription;
+            public readonly Election Election;
             public readonly CiphertextElectionContext ElectionContext;
 
-            public ContestSelectionListArgs(ElectionDescription metadata, CiphertextElectionContext context)
+            public ContestSelectionListArgs(Election election, CiphertextElectionContext context)
             {
-                ElectionDescription = metadata;
+                Election = election;
                 ElectionContext = context;
             }
         }
