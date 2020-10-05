@@ -14,35 +14,39 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         private Mock<IElectionService> _electionServiceMock;
         private Mock<INavigationService> _navigationServiceMock;
 
-        private readonly ElectionDescription _electionDescription = new ElectionDescription
+        private readonly Election _election = new Election
         {
-            Name = new InternationalizedText
+            Id = "election1",
+            ElectionDescription = new ElectionDescription
             {
-                Text = new List<LanguageText>
+                Name = new InternationalizedText
                 {
-                    new LanguageText
+                    Text = new List<LanguageText>
                     {
-                        Language = "en",
-                        Value = "Hello"
-                    },
-                    new LanguageText
-                    {
-                        Language = "es",
-                        Value = "Hola"
+                        new LanguageText
+                        {
+                            Language = "en",
+                            Value = "Hello"
+                        },
+                        new LanguageText
+                        {
+                            Language = "es",
+                            Value = "Hola"
+                        }
                     }
-                }
-            },
-            Contests = new List<ContestDescription>
-            {
-                new ContestDescription
-                {
-                    ObjectId = "contest1",
-                    Name = "Contest1"
                 },
-                new ContestDescription
+                Contests = new List<ContestDescription>
                 {
-                    ObjectId = "contest2",
-                    Name = "Contest2"
+                    new ContestDescription
+                    {
+                        ObjectId = "contest1",
+                        Name = "Contest1"
+                    },
+                    new ContestDescription
+                    {
+                        ObjectId = "contest2",
+                        Name = "Contest2"
+                    }
                 }
             }
         };
@@ -61,17 +65,18 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         public void SetUp()
         {
             _electionServiceMock = new Mock<IElectionService>();
-            _electionServiceMock.Setup(x => x.GetElectionDescription()).ReturnsAsync(_electionDescription);
-            _electionServiceMock.Setup(x => x.GetCiphertextElectionContext()).ReturnsAsync(_electionContext);
+            _electionServiceMock.Setup(x => x.GetElection()).ReturnsAsync(_election);
+            _electionServiceMock.Setup(x => x.GetCiphertextElectionContext(_election.Id))
+                .ReturnsAsync(_electionContext);
 
             _navigationServiceMock = new Mock<INavigationService>();
         }
 
         [Test]
-        public async Task Load_LoadsElectionDescriptionFromService()
+        public async Task Load_LoadsElectionFromService()
         {
             var viewModel = await CreateViewModel();
-            viewModel.ElectionDescription.Should().Be(_electionDescription);
+            viewModel.Election.Should().Be(_election);
         }
 
         [Test]
@@ -90,13 +95,13 @@ namespace ElectionGuardCore.Ui.Tests.Elections
 
         [Test]
         [TestCase(null, false)]
-        [TestCase("contest1", false)]
-        [TestCase("contest1", true)]
-        public async Task HasVotedInActiveContest_ReflectsElectionServiceVotes(string contestId, bool hasVoted)
+        [TestCase("election1", false)]
+        [TestCase("election1", true)]
+        public async Task HasVotedInActiveContest_ReflectsElectionServiceVotes(string electionId, bool hasVoted)
         {
-            if (contestId != null)
+            if (electionId != null)
             {
-                _electionServiceMock.Setup(x => x.Votes).Returns(new Dictionary<string, bool> {{contestId, hasVoted}});
+                _electionServiceMock.Setup(x => x.HasVoted(electionId)).ReturnsAsync(hasVoted);
             }
 
             var viewModel = await CreateViewModel();
@@ -115,7 +120,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
             _navigationServiceMock.Verify(x =>
                 x.Push(NavigationPaths.ContestSelectionListPage,
                 It.Is<ContestSelectionListViewModel.ContestSelectionListArgs>(a =>
-                    a.ElectionDescription == _electionDescription
+                    a.Election == _election
                     && a.ElectionContext == _electionContext)));
         }
 

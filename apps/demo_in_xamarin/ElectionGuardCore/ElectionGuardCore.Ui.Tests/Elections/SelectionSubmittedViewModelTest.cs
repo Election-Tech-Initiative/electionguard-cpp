@@ -12,7 +12,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
     {
         private Mock<INavigationService> _navigationServiceMock;
 
-        private readonly ElectionDescription _electionDescription = new ElectionDescription();
+        private readonly Election _election = new Election();
         private readonly CiphertextElectionContext _context = new CiphertextElectionContext();
 
         [SetUp]
@@ -53,14 +53,14 @@ namespace ElectionGuardCore.Ui.Tests.Elections
             _navigationServiceMock.Verify(x => x.PopToRoot());
             _navigationServiceMock.Verify(x => x.Push(NavigationPaths.ContestSelectionListPage,
                 It.Is<ContestSelectionListViewModel.ContestSelectionListArgs>(a =>
-                    a.ElectionDescription == _electionDescription && a.ElectionContext == _context)));
+                    a.Election == _election && a.ElectionContext == _context)));
         }
 
         private async Task<SelectionSubmittedViewModel> CreateViewModel(bool voteCast)
         {
             var viewModel = new SelectionSubmittedViewModel(_navigationServiceMock.Object)
             {
-                Parameter = new SelectionSubmittedViewModel.SelectionSubmittedArgs(voteCast, _electionDescription,
+                Parameter = new SelectionSubmittedViewModel.SelectionSubmittedArgs(voteCast, _election,
                     _context)
             };
             await viewModel.Load();

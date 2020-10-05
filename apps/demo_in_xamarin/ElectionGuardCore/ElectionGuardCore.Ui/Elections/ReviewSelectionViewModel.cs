@@ -53,10 +53,10 @@ namespace ElectionGuardCore.Ui.Elections
                 CiphertextBallot result = null;
                 await _alertService.ShowBusy("Encrypting ballot…",
                     () => result = _encryptionService.EncryptBallot(
-                        Args.ElectionDescription, Args.ElectionContext, Args.Selection, Args.Candidate),
+                        Args.Election.ElectionDescription, Args.ElectionContext, Args.Selection, Args.Candidate),
                     async () => await _navigationService.Push(NavigationPaths.SelectionVerificationPage,
                         new SelectionVerificationViewModel.SelectionVerificationArgs(
-                            Args.ElectionDescription, Args.ElectionContext, result)
+                            Args.Election, Args.ElectionContext, result)
                         )
                 );
             }
@@ -64,13 +64,13 @@ namespace ElectionGuardCore.Ui.Elections
 
         public class ReviewSelectionArgs
         {
-            public readonly ElectionDescription ElectionDescription;
+            public readonly Election Election;
             public readonly CiphertextElectionContext ElectionContext;
             public readonly SelectionDescription Selection;
             public readonly Candidate Candidate;
 
             public ReviewSelectionArgs(
-                ElectionDescription metadata, CiphertextElectionContext context,
+                Election election, CiphertextElectionContext context,
                 SelectionDescription selection, Candidate candidate)
             {
                 if (selection.CandidateId != candidate.ObjectId)
@@ -78,7 +78,7 @@ namespace ElectionGuardCore.Ui.Elections
                     throw new ArgumentException("Candidate must match selection");
                 }
 
-                ElectionDescription = metadata;
+                Election = election;
                 ElectionContext = context;
                 Selection = selection;
                 Candidate = candidate;
