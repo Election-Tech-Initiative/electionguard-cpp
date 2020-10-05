@@ -20,12 +20,15 @@
 /// Converts the binary value stored as a byte array
 /// to its big num representation stored as ElementModP
 /// </summary>
-unique_ptr<electionguard::ElementModP> bytes_to_p(uint8_t *bytes, size_t size)
+unique_ptr<electionguard::ElementModP> bytes_to_p(const uint8_t *bytes, size_t size)
 {
-    // TODO: validate inputs are within range
-    auto *bigNum = Hacl_Bignum4096_new_bn_from_bytes_be(size, bytes);
+    if (bytes == nullptr || size > MAX_P_SIZE) {
+        throw out_of_range("Cannot convert ElementModP with size: " + to_string(size));
+    }
+
+    auto *bigNum = Hacl_Bignum4096_new_bn_from_bytes_be(size, const_cast<uint8_t *>(bytes));
     if (bigNum == nullptr) {
-        throw out_of_range("bytes_to_p could not allocate");
+        throw bad_alloc();
     }
 
     // The ElementModP constructor expects the bignum
@@ -59,10 +62,13 @@ unique_ptr<electionguard::ElementModP> bytes_to_p(vector<uint8_t> bytes)
 /// </summary>
 unique_ptr<electionguard::ElementModQ> bytes_to_q(const uint8_t *bytes, size_t size)
 {
-    // TODO: validate inputs are within range
+    if (bytes == nullptr || size > MAX_Q_SIZE) {
+        throw out_of_range("Cannot convert ElementModQ with size: " + to_string(size));
+    }
+
     auto *bigNum = Hacl_Bignum256_new_bn_from_bytes_be(size, const_cast<uint8_t *>(bytes));
     if (bigNum == nullptr) {
-        throw out_of_range("bytes_to_q could not allocate");
+        throw bad_alloc();
     }
 
     // The ElementModQ constructor expects the bignum
@@ -176,6 +182,8 @@ namespace electionguard
 
     struct ElementModP::Impl {
 
+        uint64_t data[MAX_P_LEN] = {};
+
         Impl(const vector<uint64_t> &elem, bool unchecked)
         {
             uint64_t array[MAX_P_LEN] = {};
@@ -184,7 +192,7 @@ namespace electionguard
                                                       static_cast<uint64_t *>(array)) > 0) {
                 throw out_of_range("Value for ElementModP is greater than allowed");
             }
-            memcpy(static_cast<uint64_t *>(data), static_cast<uint64_t *>(array), MAX_P_SIZE);
+            copy(begin(array), end(array), begin(data));
         };
 
         Impl(const uint64_t (&elem)[MAX_P_LEN], bool unchecked)
@@ -193,7 +201,7 @@ namespace electionguard
                                                       const_cast<uint64_t *>(elem)) > 0) {
                 throw out_of_range("Value for ElementModP is greater than allowed");
             }
-            memcpy(static_cast<uint64_t *>(data), const_cast<uint64_t *>(elem), MAX_P_SIZE);
+            copy(begin(elem), end(elem), begin(data));
         };
 
         ~Impl() { Lib_Memzero0_memzero(static_cast<uint64_t *>(data), MAX_P_LEN); };
@@ -218,8 +226,6 @@ namespace electionguard
             return Hacl_Bignum4096_lt_mask(static_cast<uint64_t *>(data),
                                            static_cast<uint64_t *>(other_.data)) > 0;
         }
-
-        uint64_t data[MAX_P_LEN] = {};
     };
 
     // Lifecycle Methods
@@ -320,7 +326,7 @@ namespace electionguard
                                                      static_cast<uint64_t *>(array)) > 0) {
                 throw out_of_range("Value for ElementModQ is greater than allowed");
             }
-            memcpy(static_cast<uint64_t *>(data), static_cast<uint64_t *>(array), MAX_Q_SIZE);
+            copy(begin(array), end(array), begin(data));
         };
 
         Impl(const uint64_t (&elem)[MAX_Q_LEN], bool unchecked)
@@ -329,7 +335,7 @@ namespace electionguard
                                                      const_cast<uint64_t *>(elem)) > 0) {
                 throw out_of_range("Value for ElementModQ is greater than allowed");
             }
-            memcpy(static_cast<uint64_t *>(data), const_cast<uint64_t *>(elem), MAX_Q_SIZE);
+            copy(begin(elem), end(elem), begin(data));
         };
 
         ~Impl() { Lib_Memzero0_memzero(static_cast<uint64_t *>(data), MAX_Q_LEN); };

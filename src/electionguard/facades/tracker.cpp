@@ -21,7 +21,7 @@ eg_electionguard_status_t eg_get_hash_for_device(uint64_t in_uuid, const char *i
         *out_device_hash = AS_TYPE(eg_element_mod_q_t, hash.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_get_hash_for_device", e);
+        Log::error(":eg_get_hash_for_device", e);
         return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     }
 }
@@ -43,7 +43,7 @@ eg_electionguard_status_t eg_get_rotating_tracker_hash(eg_element_mod_q_t *in_pr
         *out_tracker_hash = AS_TYPE(eg_element_mod_q_t, hash.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_get_rotating_tracker_hash", e);
+        Log::error(":eg_get_rotating_tracker_hash", e);
         return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     }
 }
@@ -67,7 +67,7 @@ eg_electionguard_status_t eg_hash_to_words(eg_element_mod_q_t *in_tracker_hash,
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_to_hex", e);
+        Log::error(":eg_element_mod_q_to_hex", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }

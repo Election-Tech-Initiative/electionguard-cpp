@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -21,7 +22,7 @@ namespace ElectionGuard
             }
             catch
             {
-                Console.WriteLine("construction error");
+                Debug.WriteLine("construction error");
             }
         }
 
@@ -36,7 +37,7 @@ namespace ElectionGuard
             var status = NativeInterface.ElementModP.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
+                Debug.WriteLine($"DisposeUnamanged Error Status: {status}");
             }
             Handle = null;
         }
@@ -46,7 +47,7 @@ namespace ElectionGuard
             var status = NativeInterface.ElementModP.ToHex(Handle, out IntPtr pointer);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"ToHex Error Status: {status}");
+                Debug.WriteLine($"ToHex Error Status: {status}");
             }
             var value = Marshal.PtrToStringAnsi(pointer);
             return value;
@@ -64,7 +65,7 @@ namespace ElectionGuard
                 var status = NativeInterface.ElementModP.New(pointer, out Handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"createNative Error Status: {status}");
+                    Debug.WriteLine($"createNative Error Status: {status}");
                 }
             }
         }
@@ -82,13 +83,13 @@ namespace ElectionGuard
                 var status = NativeInterface.ElementModP.GetData(Handle, &element, out UIntPtr size);
                 if (size.ToUInt64() != MAX_SIZE)
                 {
-                    Console.WriteLine("wrong size");
+                    Debug.WriteLine("wrong size");
                     return null;
                 }
 
                 if (element == null)
                 {
-                    Console.WriteLine("element is null");
+                    Debug.WriteLine("element is null");
                     return null;
                 }
 
@@ -116,7 +117,7 @@ namespace ElectionGuard
                 NewNative(data);
             } catch
             {
-                Console.WriteLine("construction error");
+                Debug.WriteLine("construction error");
             }
         }
 
@@ -130,7 +131,7 @@ namespace ElectionGuard
             var status = NativeInterface.ElementModQ.ToHex(Handle, out IntPtr pointer);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"ToHex Error Status: {status}");
+                Debug.WriteLine($"ToHex Error Status: {status}");
             }
             var value = Marshal.PtrToStringAnsi(pointer);
             return value;
@@ -142,7 +143,7 @@ namespace ElectionGuard
             var status = NativeInterface.ElementModQ.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
+                Debug.WriteLine($"DisposeUnamanged Error Status: {status}");
             }
             Handle = null;
         }
@@ -159,7 +160,7 @@ namespace ElectionGuard
                 var status = NativeInterface.ElementModQ.New(pointer, out Handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"createNative Error Status: {status}");
+                    Debug.WriteLine($"createNative Error Status: {status}");
                 }
             }
         }
@@ -177,13 +178,13 @@ namespace ElectionGuard
                 var status = NativeInterface.ElementModQ.GetData(Handle, &element, out UIntPtr size);
                 if (size.ToUInt64() != MAX_SIZE)
                 {
-                    Console.WriteLine("wrong size");
+                    Debug.WriteLine("wrong size");
                     return null;
                 }
 
                 if (element == null)
                 {
-                    Console.WriteLine("element is null");
+                    Debug.WriteLine("element is null");
                     return null;
                 }
 

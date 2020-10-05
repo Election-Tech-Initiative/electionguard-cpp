@@ -40,8 +40,13 @@ namespace ElectionGuardCore.Ui.Forms
             builder.RegisterType<ClipboardService>().As<IClipboardService>().SingleInstance();
 
             // uncomment the desired IElectionService implementation
-            builder.RegisterType<MockElectionService>().As<IElectionService>().SingleInstance();
-            // builder.RegisterType<ApiElectionService>().As<IElectionService>().SingleInstance();
+            if (appSettings.UseMockApi)
+            {
+                builder.RegisterType<MockElectionService>().As<IElectionService>().SingleInstance();
+            } else
+            {
+                builder.RegisterType<ApiElectionService>().As<IElectionService>().SingleInstance();
+            }
 
             builder.RegisterSource(new AnyConcreteTypeNotAlreadyRegisteredSource());
 

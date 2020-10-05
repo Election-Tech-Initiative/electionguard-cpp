@@ -306,7 +306,6 @@ eg_ciphertext_election_context_from_json(char *in_data,
     try {
         auto data = string(in_data);
         auto deserialized = CiphertextElectionContext::fromJson(data);
-
         *out_handle = AS_TYPE(eg_ciphertext_election_context_t, deserialized.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
