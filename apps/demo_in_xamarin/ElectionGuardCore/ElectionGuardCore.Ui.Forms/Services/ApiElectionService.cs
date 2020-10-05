@@ -18,7 +18,7 @@ namespace ElectionGuardCore.Ui.Forms.Services
 
         public async Task<CiphertextElectionContext> GetCiphertextElectionContext(string electionId)
         {
-            return await SendRequestForResponse<CiphertextElectionContext>($"/elections/{electionId}/contest",
+            return await SendRequestForResponse<CiphertextElectionContext>($"/elections/{electionId}/context",
                 HttpMethod.Get);
         }
 

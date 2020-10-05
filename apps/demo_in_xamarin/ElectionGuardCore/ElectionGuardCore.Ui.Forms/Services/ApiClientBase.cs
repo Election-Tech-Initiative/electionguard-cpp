@@ -4,6 +4,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace ElectionGuardCore.Ui.Forms.Services
 {
@@ -13,9 +15,23 @@ namespace ElectionGuardCore.Ui.Forms.Services
 
         private readonly Uri _baseUri;
 
+        private readonly JsonSerializerSettings _serializerSettings;
+
         protected ApiClientBase(AppSettings appSettings)
         {
             _baseUri = new Uri(appSettings.ApiBaseUri);
+
+            _serializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new SnakeCaseNamingStrategy()
+                },
+                Converters = new List<JsonConverter>
+                {
+                    new StringEnumConverter(typeof(SnakeCaseNamingStrategy))
+                }
+            };
         }
 
         protected async Task SendRequest(string relativeUri, HttpMethod method,
@@ -38,14 +54,14 @@ namespace ElectionGuardCore.Ui.Forms.Services
                 ThrowOnNonSuccessStatusCode(response);
 
                 var responseJson = response.Content == null ? null : await response.Content.ReadAsStringAsync();
-                return responseJson == null ? default : JsonConvert.DeserializeObject<TResponse>(responseJson);
+                return responseJson == null ? default : JsonConvert.DeserializeObject<TResponse>(responseJson, _serializerSettings);
             }
         }
 
         private async Task<HttpResponseMessage> SendHttpRequest(string relativeUri, HttpMethod method,
             IDictionary<string, string> headers, object requestData)
         {
-            var requestJson = requestData == null ? null : JsonConvert.SerializeObject(requestData);
+            var requestJson = requestData == null ? null : JsonConvert.SerializeObject(requestData, _serializerSettings);
 
             using (var request = new HttpRequestMessage(method, GetUri(relativeUri)))
             {
