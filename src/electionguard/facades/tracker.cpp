@@ -7,6 +7,8 @@ extern "C" {
 #include "electionguard/tracker.h"
 }
 
+#include <cstring>
+
 using electionguard::ElementModQ;
 using electionguard::Log;
 using electionguard::Tracker;
@@ -59,7 +61,7 @@ eg_electionguard_status_t eg_hash_to_words(eg_element_mod_q_t *in_tracker_hash,
         auto *trackerHash = AS_TYPE(ElementModQ, in_tracker_hash);
         auto words = Tracker::hashToWords(*trackerHash, in_separator);
         auto data_size = words.length() + 1;
-        auto *data_array = new char[data_size];
+        auto *data_array = (char *)malloc(data_size);
         strncpy(data_array, words.c_str(), data_size);
         *out_hash_words = data_array;
 

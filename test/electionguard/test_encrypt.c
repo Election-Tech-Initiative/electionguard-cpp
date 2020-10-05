@@ -94,6 +94,9 @@ bool test_encrypt_selection(void)
     if (eg_element_mod_q_free(nonce)) {
         assert(false);
     }
+    if (eg_element_mod_q_free(hash_context)) {
+        assert(false);
+    }
     if (eg_plaintext_ballot_selection_free(plaintext)) {
         assert(false);
     }
@@ -134,6 +137,11 @@ bool test_encrypt_ballot()
     }
 
     assert(strings_are_equal(json, derived) == true);
+
+    if (eg_plaintext_ballot_free(fromJson)) {
+        assert(false);
+    }
+
     free(derived);
     return true;
 }
