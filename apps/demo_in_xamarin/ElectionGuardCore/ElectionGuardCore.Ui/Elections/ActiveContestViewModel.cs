@@ -22,23 +22,22 @@ namespace ElectionGuardCore.Ui.Elections
         public override async Task Load()
         {
             // TODO show loading indicator
-            ElectionDescription = await _electionService.GetElectionDescription();
-            ElectionContext = await _electionService.GetCiphertextElectionContext();
+            Election = await _electionService.GetElection();
+            ElectionContext = await _electionService.GetCiphertextElectionContext(Election.Id);
+
+            HasVotedInActiveContest = await _electionService.HasVoted(Election.Id);
         }
 
-        private ElectionDescription _electionDescription;
-        public ElectionDescription ElectionDescription
+        private Election _election;
+        public Election Election
         {
-            get => _electionDescription;
-            private set
+            get => _election;
+            set
             {
-                _electionDescription = value;
+                _election = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(ElectionName));
                 OnPropertyChanged(nameof(ActiveContestName));
-                OnPropertyChanged(nameof(HasVotedInActiveContest));
-                OnPropertyChanged(nameof(CanVote));
-                OnPropertyChanged(nameof(CannotVote));
             }
         }
 
@@ -53,24 +52,21 @@ namespace ElectionGuardCore.Ui.Elections
             }
         }
 
-        public string ElectionName => ElectionDescription?.Name?.GetTextValue("en");
+        public string ElectionName => Election?.ElectionDescription.Name.GetTextValue("en");
 
-        public string ActiveContestName => ElectionDescription?.ActiveContest?.Name ??
+        public string ActiveContestName => Election?.ElectionDescription.ActiveContest?.Name ??
                                            "There is currently not an active contest available";
 
+        private bool _hasVotedInActiveContest;
         public bool HasVotedInActiveContest
         {
-            get
+            get => _hasVotedInActiveContest;
+            private set
             {
-                var voted = false;
-                if (ElectionDescription?.ActiveContest?.ObjectId != null &&
-                    _electionService.Votes != null &&
-                    _electionService.Votes.ContainsKey(ElectionDescription.ActiveContest.ObjectId))
-                {
-                    voted = _electionService.Votes[ElectionDescription.ActiveContest.ObjectId];
-                }
-
-                return voted;
+                _hasVotedInActiveContest = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(CanVote));
+                OnPropertyChanged(nameof(CannotVote));
             }
         }
 
@@ -82,7 +78,7 @@ namespace ElectionGuardCore.Ui.Elections
         private async void BeginVote(object parameter)
         {
             await _navigationService.Push(NavigationPaths.ContestSelectionListPage,
-                new ContestSelectionListViewModel.ContestSelectionListArgs(ElectionDescription, ElectionContext));
+                new ContestSelectionListViewModel.ContestSelectionListArgs(Election, ElectionContext));
         }
     }
 }

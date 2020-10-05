@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace ElectionGuardCore.Elections
 {
     public interface IElectionService
     {
-        Task<ElectionDescription> GetElectionDescription();
-        Task<CiphertextElectionContext> GetCiphertextElectionContext();
-        IDictionary<string, bool> Votes { get; }    // TODO replace w/ real API operation
+        Task<Election> GetElection();
+        Task<CiphertextElectionContext> GetCiphertextElectionContext(string electionId);
+        Task CastBallot(string electionId, CiphertextBallot ballot);
+        Task SpoilBallot(string electionId, CiphertextBallot ballot);
+
+        Task<bool> HasVoted(string electionId);     // TODO replace w/ real API operation
     }
 }

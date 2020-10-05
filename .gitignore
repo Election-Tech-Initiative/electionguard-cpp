@@ -138,3 +138,5 @@ bindings/netstandard/ElectionGuard/packages/
 cmake-build-debug/
 *.csproj.user
 *.sln.DotSettings.user
+
+appsettings.json

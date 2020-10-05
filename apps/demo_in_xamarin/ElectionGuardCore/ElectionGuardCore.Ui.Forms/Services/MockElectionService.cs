@@ -10,6 +10,7 @@ namespace ElectionGuardCore.Ui.Forms.Services
     internal class MockElectionService : IElectionService
     {
         private readonly JsonSerializerSettings _serializerSettings;
+        private readonly Dictionary<string, bool> _votes = new Dictionary<string, bool>();
 
         public MockElectionService()
         {
@@ -284,14 +285,20 @@ namespace ElectionGuardCore.Ui.Forms.Services
 
         private static readonly string SampleCiphertextelectionContextJson = "{\"crypto_base_hash\": \"113133177615765376285011049573550420815271886877763010626891582395189234851926\", \"crypto_extended_base_hash\": \"105453391201168277388902836868037575613019125079321017624607857728655939685293\", \"description_hash\": \"53955750461069851967519202298702206066009470464098563801488249985305233352944\", \"elgamal_public_key\": \"650903852758409990312291004707477534089130033640662303715889879300347470392572690670101560912298594019829500498680782581572320776102549359895131407798036010654305977756399507847597479423671994208260039161369645650200942975974929953888903769695737089030275004229889476017798210970661871162275031836161607571451823712343702817531718010784271941394242942006265819298593036639468800809490092770569604506388439055292605497883778779611729789663664798167171674337068864723339201806682926014651803729389240636842705316934200504855627368696961128633360112017545267132035378493927445218628450907731842309001212988582993449142731558063793504208297748527143100200065294394641695565727310707322384170547753676466622210526941258867623997491196087758801720083186367809900514525632362462844385192386919825231284597310902731851602135234568810844789653646269937313911984366094930582328113744033618007077931478678652204258800943529497120480504301445563522118452831782982792079277539134130956843111167981302599894866033073072191529549456530244798319208372693788385873385381417507913172762961192775063726092027733799628281766673150600650635616539905903227431959490156343811435649089212902563459216275058506452739629763054946580522277008451961937902994906\", \"number_of_guardians\": 5, \"quorum\": 3}";
 
-        public Task<ElectionDescription> GetElectionDescription()
+        public Task<Election> GetElection()
         {
             var electionDescription =
                 JsonConvert.DeserializeObject<ElectionDescription>(SampleElectionDescriptionJson, _serializerSettings);
-            return Task.FromResult(electionDescription);
+            var election = new Election
+            {
+                Id = "42",
+                ElectionDescription = electionDescription,
+                State = ElectionState.Open
+            };
+            return Task.FromResult(election);
         }
 
-        public Task<CiphertextElectionContext> GetCiphertextElectionContext()
+        public Task<CiphertextElectionContext> GetCiphertextElectionContext(string electionId)
         {
             var ciphertextelectionContext =
                 JsonConvert.DeserializeObject<CiphertextElectionContext>(SampleCiphertextelectionContextJson,
@@ -299,6 +306,22 @@ namespace ElectionGuardCore.Ui.Forms.Services
             return Task.FromResult(ciphertextelectionContext);
         }
 
-        public IDictionary<string, bool> Votes { get; } = new Dictionary<string, bool>();   // TODO for demo purposes only
+        public Task CastBallot(string electionId, CiphertextBallot ballot)
+        {
+            _votes[electionId] = true;
+            return Task.CompletedTask;
+        }
+
+        public Task SpoilBallot(string electionId, CiphertextBallot ballot)
+        {
+            _votes[electionId] = false;
+            return Task.CompletedTask;
+        }
+
+        public Task<bool> HasVoted(string electionId)
+        {
+            var hasVoted = _votes.ContainsKey(electionId) && _votes[electionId];
+            return Task.FromResult(hasVoted);
+        }
     }
 }

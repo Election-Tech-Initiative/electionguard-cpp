@@ -14,55 +14,60 @@ namespace ElectionGuardCore.Ui.Tests.Elections
     {
         private Mock<INavigationService> _navigationServiceMock;
 
-        private readonly ElectionDescription _electionDescription = new ElectionDescription
+        private readonly Election _election = new Election
         {
-            Candidates = new List<Candidate>
+            ElectionDescription = new ElectionDescription
             {
-                new Candidate
+                Candidates = new List<Candidate>
                 {
-                    ObjectId = "robert",
-                    BallotName = new InternationalizedText
+                    new Candidate
                     {
-                        Text = new List<LanguageText>
+                        ObjectId = "robert",
+                        BallotName = new InternationalizedText
                         {
-                            new LanguageText { Language = "es", Value = "Roberto" },
-                            new LanguageText { Language = "en", Value = "Robert" }
-                        }
-                    }
-                },
-                new Candidate
-                {
-                    ObjectId = "mary",
-                    BallotName = new InternationalizedText
-                    {
-                        Text = new List<LanguageText>
-                        {
-                            new LanguageText { Language = "es", Value = "Maria" },
-                            new LanguageText { Language = "en", Value = "Mary" }
-                        }
-                    }
-                },
-            },
-            Contests = new List<ContestDescription>
-            {
-                new ContestDescription
-                {
-                    BallotTitle = new InternationalizedText
-                    {
-                        Text = new List<LanguageText>
-                        {
-                            new LanguageText { Language = "es", Value = "Hola" },
-                            new LanguageText { Language = "en", Value = "Hello" },
-                            new LanguageText { Language = "en", Value = "Hello again" }
+                            Text = new List<LanguageText>
+                            {
+                                new LanguageText {Language = "es", Value = "Roberto"},
+                                new LanguageText {Language = "en", Value = "Robert"}
+                            }
                         }
                     },
-                    BallotSelections = new List<SelectionDescription>
+                    new Candidate
                     {
-                        new SelectionDescription {
-                            ObjectId = "robert-selection", CandidateId = "robert", SequenceOrder = 0
+                        ObjectId = "mary",
+                        BallotName = new InternationalizedText
+                        {
+                            Text = new List<LanguageText>
+                            {
+                                new LanguageText {Language = "es", Value = "Maria"},
+                                new LanguageText {Language = "en", Value = "Mary"}
+                            }
+                        }
+                    },
+                },
+                Contests = new List<ContestDescription>
+                {
+                    new ContestDescription
+                    {
+                        BallotTitle = new InternationalizedText
+                        {
+                            Text = new List<LanguageText>
+                            {
+                                new LanguageText {Language = "es", Value = "Hola"},
+                                new LanguageText {Language = "en", Value = "Hello"},
+                                new LanguageText {Language = "en", Value = "Hello again"}
+                            }
                         },
-                        new SelectionDescription {
-                            ObjectId = "mary-selection", CandidateId = "mary", SequenceOrder = 1
+                        BallotSelections = new List<SelectionDescription>
+                        {
+                            new SelectionDescription
+                            {
+                                ObjectId = "robert-selection", CandidateId = "robert", SequenceOrder = 0
+                            },
+                            new SelectionDescription
+                            {
+                                ObjectId = "mary-selection", CandidateId = "mary", SequenceOrder = 1
+                            }
                         }
                     }
                 }
@@ -144,7 +149,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         {
             var viewModel = await CreateViewModel();
             var candidate = viewModel.Candidates.Single(c => c.ObjectId == "mary");
-            var selection = _electionDescription.Contests.First()
+            var selection = _election.ElectionDescription.Contests.First()
                 .BallotSelections.First(s => s.CandidateId == candidate.ObjectId);
             candidate.IsSelected = true;
 
@@ -152,15 +157,15 @@ namespace ElectionGuardCore.Ui.Tests.Elections
 
             _navigationServiceMock.Verify(x => x.Push(NavigationPaths.ReviewSelectionPage,
                 It.Is<ReviewSelectionViewModel.ReviewSelectionArgs>(a =>
-                    a.ElectionDescription == _electionDescription
+                    a.Election == _election
                     && a.Selection == selection && a.Candidate == candidate.Candidate)));
         }
 
         [Test]
         public void CandidateViewModel_Candidate_ReflectsCandidate()
         {
-            var candidate = _electionDescription.Candidates.Single(c => c.ObjectId == "mary");
-            var selection = _electionDescription.Contests.First()
+            var candidate = _election.ElectionDescription.Candidates.Single(c => c.ObjectId == "mary");
+            var selection = _election.ElectionDescription.Contests.First()
                 .BallotSelections.First(s => s.CandidateId == candidate.ObjectId);
             var viewModel = new ContestSelectionListViewModel.CandidateViewModel(candidate, selection);
 
@@ -170,8 +175,8 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         [Test]
         public void CandidateViewModel_ObjectId_ReflectsCandidate()
         {
-            var candidate = _electionDescription.Candidates.Single(c => c.ObjectId == "mary");
-            var selection = _electionDescription.Contests.First()
+            var candidate = _election.ElectionDescription.Candidates.Single(c => c.ObjectId == "mary");
+            var selection = _election.ElectionDescription.Contests.First()
                 .BallotSelections.First(s => s.CandidateId == candidate.ObjectId);
             var viewModel = new ContestSelectionListViewModel.CandidateViewModel(candidate, selection);
 
@@ -181,8 +186,8 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         [Test]
         public void CandidateViewModel_BallotName_IsFirstEnglishName()
         {
-            var candidate = _electionDescription.Candidates.Single(c => c.ObjectId == "mary");
-            var selection = _electionDescription.Contests.First()
+            var candidate = _election.ElectionDescription.Candidates.Single(c => c.ObjectId == "mary");
+            var selection = _election.ElectionDescription.Contests.First()
                 .BallotSelections.First(s => s.CandidateId == candidate.ObjectId);
             var viewModel = new ContestSelectionListViewModel.CandidateViewModel(candidate, selection);
 
@@ -192,8 +197,8 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         [Test]
         public void CandidateViewModel_GivenIsNotSelected_BackgroundColor_IsWhite()
         {
-            var candidate = _electionDescription.Candidates.Single(c => c.ObjectId == "mary");
-            var selection = _electionDescription.Contests.First()
+            var candidate = _election.ElectionDescription.Candidates.Single(c => c.ObjectId == "mary");
+            var selection = _election.ElectionDescription.Contests.First()
                 .BallotSelections.First(s => s.CandidateId == candidate.ObjectId);
             var viewModel = new ContestSelectionListViewModel.CandidateViewModel(candidate, selection);
 
@@ -203,8 +208,8 @@ namespace ElectionGuardCore.Ui.Tests.Elections
         [Test]
         public void CandidateViewModel_GivenIsSelected_BackgroundColor_IsLightGreen()
         {
-            var candidate = _electionDescription.Candidates.Single(c => c.ObjectId == "mary");
-            var selection = _electionDescription.Contests.First()
+            var candidate = _election.ElectionDescription.Candidates.Single(c => c.ObjectId == "mary");
+            var selection = _election.ElectionDescription.Contests.First()
                 .BallotSelections.First(s => s.CandidateId == candidate.ObjectId);
             var viewModel = new ContestSelectionListViewModel.CandidateViewModel(candidate, selection)
             {
@@ -219,7 +224,7 @@ namespace ElectionGuardCore.Ui.Tests.Elections
             var viewModel = new ContestSelectionListViewModel(_navigationServiceMock.Object)
             {
                 Parameter = new ContestSelectionListViewModel.ContestSelectionListArgs(
-                    _electionDescription, _electionContext
+                    _election, _electionContext
                 )
             };
             await viewModel.Load();
