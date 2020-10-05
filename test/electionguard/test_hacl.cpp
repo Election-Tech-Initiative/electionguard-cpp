@@ -274,6 +274,8 @@ TEST_CASE("Hacl_Bignum4096_new_bn_from_bytes_be Test BigNum 4096 from and to byt
     Hacl_Bignum4096_bn_to_bytes_be(bnResult, byteResult);
 
     CHECK(byteResult[0] == oneByte[0]);
+
+    free(bnResult);
 }
 
 TEST_CASE("Hacl_Bignum256_new_bn_from_bytes_be Test BigNum 256 from and to bytes")
@@ -285,6 +287,8 @@ TEST_CASE("Hacl_Bignum256_new_bn_from_bytes_be Test BigNum 256 from and to bytes
     Hacl_Bignum256_bn_to_bytes_be(bnResult, byteResult);
 
     CHECK(byteResult[0] == oneByte[0]);
+
+    free(bnResult);
 }
 
 #pragma endregion

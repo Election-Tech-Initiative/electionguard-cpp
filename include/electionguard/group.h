@@ -26,7 +26,7 @@ EG_API eg_electionguard_status_t eg_element_mod_p_new_unchecked(const uint64_t i
 EG_API eg_electionguard_status_t eg_element_mod_p_free(eg_element_mod_p_t *handle);
 
 EG_API eg_electionguard_status_t eg_element_mod_p_get_data(eg_element_mod_p_t *handle,
-                                                           uint64_t **out_data, size_t out_size);
+                                                           uint64_t **out_data, size_t *out_size);
 
 EG_API eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle,
                                                          char **out_hex);

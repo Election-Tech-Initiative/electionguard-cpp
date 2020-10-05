@@ -13,9 +13,11 @@ TEST_CASE("Same ElementModQs with same Zero data produce same Hash")
 {
     uint64_t z1[4] = {};
     uint64_t z2[4] = {};
+    auto e1 = make_unique<ElementModQ>(z1);
+    auto e2 = make_unique<ElementModQ>(z2);
 
-    auto zero_hash_q1 = hash_elems(new ElementModQ(z1));
-    auto zero_hash_q2 = hash_elems(new ElementModQ(z2));
+    auto zero_hash_q1 = hash_elems(e1.get());
+    auto zero_hash_q2 = hash_elems(e2.get());
 
     CHECK((*zero_hash_q1 == *zero_hash_q2));
     // but different addresses

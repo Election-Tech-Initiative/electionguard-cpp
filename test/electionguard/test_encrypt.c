@@ -129,8 +129,9 @@ bool test_encrypt_ballot()
 
     char *derived;
     size_t size;
-    if (eg_plaintext_ballot_to_json(fromJson, &derived, &size))
+    if (eg_plaintext_ballot_to_json(fromJson, &derived, &size)) {
         assert(false);
+    }
 
     assert(strings_are_equal(json, derived) == true);
     free(derived);

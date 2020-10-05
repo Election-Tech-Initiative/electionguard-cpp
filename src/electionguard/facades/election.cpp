@@ -60,7 +60,7 @@ eg_electionguard_status_t eg_selection_description_get_object_id(eg_selection_de
     try {
         auto objectId = AS_TYPE(SelectionDescription, handle)->getObjectId();
         auto data_size = objectId.length() + 1;
-        auto *data_array = new char[data_size];
+        auto *data_array = (char *)malloc(data_size);
         strncpy(data_array, objectId.c_str(), data_size);
         *out_object_id = data_array;
 
@@ -78,7 +78,7 @@ eg_selection_description_get_candidate_id(eg_selection_description_t *handle,
     try {
         auto objectId = AS_TYPE(SelectionDescription, handle)->getCandidateId();
         auto data_size = objectId.length() + 1;
-        auto *data_array = new char[data_size];
+        auto *data_array = (char *)malloc(data_size);
         strncpy(data_array, objectId.c_str(), data_size);
         *out_candidate_id = data_array;
 
@@ -168,11 +168,11 @@ eg_internal_election_description_to_json(eg_internal_election_description_t *han
                                          char **out_data, size_t *out_size)
 {
     try {
-        auto domain_type = AS_TYPE(InternalElectionDescription, handle);
+        auto *domain_type = AS_TYPE(InternalElectionDescription, handle);
         auto data_string = domain_type->toJson();
 
         auto data_size = data_string.length() + 1;
-        auto *data_array = new char[data_size];
+        auto *data_array = (char *)malloc(data_size);
         strncpy(data_array, data_string.c_str(), data_size);
         *out_data = data_array;
         *out_size = data_size;
@@ -189,7 +189,7 @@ eg_internal_election_description_to_bson(eg_internal_election_description_t *han
                                          uint8_t **out_data, size_t *out_size)
 {
     try {
-        auto domain_type = AS_TYPE(InternalElectionDescription, handle);
+        auto *domain_type = AS_TYPE(InternalElectionDescription, handle);
         auto data_bytes = domain_type->toBson();
 
         auto *data_array = new uint8_t[data_bytes.size()];
@@ -223,7 +223,7 @@ eg_electionguard_status_t
 eg_ciphertext_election_context_get_elgamal_public_key(eg_ciphertext_election_context_t *handle,
                                                       eg_element_mod_p_t **out_elgamal_public_key)
 {
-    auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getElGamalPublicKey();
+    const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getElGamalPublicKey();
     *out_elgamal_public_key = AS_TYPE(eg_element_mod_p_t, const_cast<ElementModP *>(pointer));
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -232,7 +232,7 @@ eg_electionguard_status_t
 eg_ciphertext_election_context_get_description_hash(eg_ciphertext_election_context_t *handle,
                                                     eg_element_mod_q_t **out_description_hash)
 {
-    auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getDescriptionHash();
+    const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getDescriptionHash();
     *out_description_hash = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(pointer));
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -241,7 +241,7 @@ eg_electionguard_status_t
 eg_ciphertext_election_context_get_crypto_base_hash(eg_ciphertext_election_context_t *handle,
                                                     eg_element_mod_q_t **out_crypto_base_hash)
 {
-    auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getCryptoBaseHash();
+    const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getCryptoBaseHash();
     *out_crypto_base_hash = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(pointer));
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -249,7 +249,7 @@ eg_ciphertext_election_context_get_crypto_base_hash(eg_ciphertext_election_conte
 eg_electionguard_status_t eg_ciphertext_election_context_get_crypto_extended_base_hash(
   eg_ciphertext_election_context_t *handle, eg_element_mod_q_t **out_crypto_extended_base_hash)
 {
-    auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getCryptoExtendedBaseHash();
+    const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getCryptoExtendedBaseHash();
     *out_crypto_extended_base_hash =
       AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(pointer));
     return ELECTIONGUARD_STATUS_SUCCESS;
@@ -333,11 +333,11 @@ eg_ciphertext_election_context_to_json(eg_ciphertext_election_context_t *handle,
                                        size_t *out_size)
 {
     try {
-        auto domain_type = AS_TYPE(CiphertextElectionContext, handle);
+        auto *domain_type = AS_TYPE(CiphertextElectionContext, handle);
         auto data_string = domain_type->toJson();
 
         auto data_size = data_string.length() + 1;
-        auto *data_array = new char[data_size];
+        auto *data_array = (char *)malloc(data_size);
         strncpy(data_array, data_string.c_str(), data_size);
         *out_data = data_array;
         *out_size = data_size;

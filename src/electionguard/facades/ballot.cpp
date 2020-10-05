@@ -55,7 +55,7 @@ eg_plaintext_ballot_selection_get_object_id(eg_plaintext_ballot_selection_t *han
     try {
         auto objectId = AS_TYPE(PlaintextBallotSelection, handle)->getObjectId();
         auto data_size = objectId.length() + 1;
-        auto *data_array = new char[data_size];
+        auto *data_array = (char *)malloc(data_size);
         strncpy(data_array, objectId.c_str(), data_size);
         *out_object_id = data_array;
 
@@ -88,7 +88,7 @@ eg_ciphertext_ballot_selection_get_object_id(eg_ciphertext_ballot_selection_t *h
     try {
         auto objectId = AS_TYPE(CiphertextBallotSelection, handle)->getObjectId();
         auto data_size = objectId.length() + 1;
-        auto *data_array = new char[data_size];
+        auto *data_array = (char *)malloc(data_size);
         strncpy(data_array, objectId.c_str(), data_size);
         *out_object_id = data_array;
 
@@ -174,7 +174,7 @@ eg_electionguard_status_t eg_plaintext_ballot_get_object_id(eg_plaintext_ballot_
     try {
         auto objectId = AS_TYPE(PlaintextBallot, handle)->getObjectId();
         auto data_size = objectId.length() + 1;
-        auto *data_array = new char[data_size];
+        auto *data_array = (char *)malloc(data_size);
         strncpy(data_array, objectId.c_str(), data_size);
         *out_object_id = data_array;
 
@@ -223,7 +223,7 @@ eg_electionguard_status_t eg_plaintext_ballot_to_json(eg_plaintext_ballot_t *han
         auto data_string = domain_type->toJson();
 
         auto data_size = data_string.length() + 1;
-        auto *data_array = new char[data_size];
+        auto *data_array = (char *)malloc(data_size);
         strncpy(data_array, data_string.c_str(), data_size);
         *out_data = data_array;
         *out_size = data_size;
@@ -274,7 +274,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_object_id(eg_ciphertext_ballo
     try {
         auto objectId = AS_TYPE(CiphertextBallot, handle)->getObjectId();
         auto data_size = objectId.length() + 1;
-        auto *data_array = new char[data_size];
+        auto *data_array = (char *)malloc(data_size);
         strncpy(data_array, objectId.c_str(), data_size);
         *out_object_id = data_array;
 
@@ -306,7 +306,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_tracking_code(eg_ciphertext_b
     try {
         auto code = AS_TYPE(CiphertextBallot, handle)->getTrackingCode();
         auto data_size = code.length() + 1;
-        auto *data_array = new char[data_size];
+        auto *data_array = (char *)malloc(data_size);
         strncpy(data_array, code.c_str(), data_size);
         *out_tracking_code = data_array;
 
@@ -374,7 +374,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_json(eg_ciphertext_ballot_t *h
         auto data_string = domain_type->toJson();
 
         auto data_size = data_string.length() + 1;
-        auto *data_array = new char[data_size];
+        auto *data_array = (char *)malloc(data_size);
         strncpy(data_array, data_string.c_str(), data_size);
         *out_data = data_array;
         *out_size = data_size;

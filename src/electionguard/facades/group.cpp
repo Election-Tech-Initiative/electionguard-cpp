@@ -64,7 +64,7 @@ EG_API eg_electionguard_status_t eg_element_mod_p_free(eg_element_mod_p_t *handl
 }
 
 eg_electionguard_status_t eg_element_mod_p_get_data(eg_element_mod_p_t *handle, uint64_t **out_data,
-                                                    size_t out_size)
+                                                    size_t *out_size)
 {
     if (handle == nullptr) {
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
@@ -72,7 +72,7 @@ eg_electionguard_status_t eg_element_mod_p_get_data(eg_element_mod_p_t *handle, 
 
     auto *element = AS_TYPE(ElementModP, handle);
     *out_data = element->get();
-    out_size = MAX_P_LEN;
+    *out_size = MAX_P_LEN;
 
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -82,7 +82,7 @@ eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle, ch
     try {
         auto hex_rep = AS_TYPE(ElementModP, handle)->toHex();
         auto data_size = hex_rep.length() + 1;
-        auto *data_array = new char[data_size];
+        auto *data_array = (char *)malloc(data_size);
         strncpy(data_array, hex_rep.c_str(), data_size);
         *out_hex = data_array;
 
@@ -160,7 +160,7 @@ eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *handle, ch
     try {
         auto hex_rep = AS_TYPE(ElementModQ, handle)->toHex();
         auto data_size = hex_rep.length() + 1;
-        auto *data_array = new char[data_size];
+        auto *data_array = (char *)malloc(data_size);
         strncpy(data_array, hex_rep.c_str(), data_size);
         *out_hex = data_array;
 
