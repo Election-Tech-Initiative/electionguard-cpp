@@ -8,7 +8,10 @@ bool test_tracker(void) { return test_generate_tracking_code_rotates(); }
 bool test_generate_tracking_code_rotates(void)
 {
     // Arrange
-    eg_element_mod_q_t *device_hash = eg_get_hash_for_device(1234, "some-location-string");
+    eg_element_mod_q_t *device_hash = NULL;
+    if (eg_get_hash_for_device(1234, "some-location-string", &device_hash)) {
+        assert(false);
+    }
 
     uint64_t first_hash[4] = {1, 2, 3, 4};
     eg_element_mod_q_t *first_ballot_hash = NULL;
@@ -23,10 +26,14 @@ bool test_generate_tracking_code_rotates(void)
     }
 
     // Act
-    eg_element_mod_q_t *rotating_hash_1 =
-      eg_get_rotating_tracker_hash(device_hash, 1000, first_ballot_hash);
-    eg_element_mod_q_t *rotating_hash_2 =
-      eg_get_rotating_tracker_hash(rotating_hash_1, 1001, second_ballot_hash);
+    eg_element_mod_q_t *rotating_hash_1 = NULL;
+    if (eg_get_rotating_tracker_hash(device_hash, 1000, first_ballot_hash, &rotating_hash_1)) {
+        assert(false);
+    }
+    eg_element_mod_q_t *rotating_hash_2 = NULL;
+    if (eg_get_rotating_tracker_hash(rotating_hash_1, 1001, second_ballot_hash, &rotating_hash_2)) {
+        assert(false);
+    }
 
     // Assert
     assert(device_hash != NULL);
@@ -67,6 +74,18 @@ bool test_generate_tracking_code_rotates(void)
     }
 
     if (eg_element_mod_q_free(second_ballot_hash)) {
+        assert(false);
+    }
+
+    if (eg_element_mod_q_free(rotating_hash_1)) {
+        assert(false);
+    }
+
+    if (eg_element_mod_q_free(rotating_hash_2)) {
+        assert(false);
+    }
+
+    if (eg_element_mod_q_free(device_hash)) {
         assert(false);
     }
 
