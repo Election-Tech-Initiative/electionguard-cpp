@@ -15,5 +15,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Ballot.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Encrypt.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Election.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DisposableBase.cs" />
   </ItemGroup>
 </Project>

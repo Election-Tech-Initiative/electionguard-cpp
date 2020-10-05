@@ -1,52 +1,73 @@
 #include "electionguard/tracker.hpp"
 
-#include "memory_cache.hpp"
+#include "../log.hpp"
 #include "variant_cast.hpp"
 
 extern "C" {
 #include "electionguard/tracker.h"
 }
 
-using electionguard::Cache;
+#include <cstring>
+
 using electionguard::ElementModQ;
+using electionguard::Log;
 using electionguard::Tracker;
 
-// TODO: safe initialization
-static Cache<ElementModQ> cache_element_mod_q;
-
-EG_API eg_element_mod_q_t *eg_get_hash_for_device(uint64_t uuid, const char *location)
+eg_electionguard_status_t eg_get_hash_for_device(uint64_t in_uuid, const char *in_location,
+                                                 eg_element_mod_q_t **out_device_hash)
 {
-    auto hash = Tracker::getHashForDevice(uuid, string(location));
-    auto *reference = cache_element_mod_q.retain(move(hash));
-    return AS_TYPE(eg_element_mod_q_t, reference);
+    try {
+        auto hash = Tracker::getHashForDevice(in_uuid, string(in_location));
+        *out_device_hash = AS_TYPE(eg_element_mod_q_t, hash.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_get_hash_for_device", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
 }
 
-EG_API eg_element_mod_q_t *eg_get_rotating_tracker_hash(eg_element_mod_q_t *previous,
-                                                        uint64_t timestamp,
-                                                        eg_element_mod_q_t *ballot_hash)
+eg_electionguard_status_t eg_get_rotating_tracker_hash(eg_element_mod_q_t *in_previous,
+                                                       uint64_t in_timestamp,
+                                                       eg_element_mod_q_t *in_ballot_hash,
+                                                       eg_element_mod_q_t **out_tracker_hash)
 {
-    if (previous == nullptr || ballot_hash == nullptr) {
-        return nullptr;
+    if (in_previous == nullptr || in_ballot_hash == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    auto *previousHash = AS_TYPE(ElementModQ, previous);
-    auto *ballotHash = AS_TYPE(ElementModQ, ballot_hash);
+    try {
+        auto *previousHash = AS_TYPE(ElementModQ, in_previous);
+        auto *ballotHash = AS_TYPE(ElementModQ, in_ballot_hash);
 
-    auto hash = Tracker::getRotatingTrackerHash(*previousHash, timestamp, *ballotHash);
-    auto *reference = cache_element_mod_q.retain(move(hash));
-    return AS_TYPE(eg_element_mod_q_t, reference);
+        auto hash = Tracker::getRotatingTrackerHash(*previousHash, in_timestamp, *ballotHash);
+        *out_tracker_hash = AS_TYPE(eg_element_mod_q_t, hash.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_get_rotating_tracker_hash", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
 }
 
-EG_API const char *eg_hash_to_words_with_default_separator(eg_element_mod_q_t *tracker_hash)
+eg_electionguard_status_t
+eg_hash_to_words_with_default_separator(eg_element_mod_q_t *in_tracker_hash, char **out_hash_words)
 {
-    return eg_hash_to_words(tracker_hash, " ");
+    return eg_hash_to_words(in_tracker_hash, " ", out_hash_words);
 }
 
-EG_API const char *eg_hash_to_words(eg_element_mod_q_t *tracker_hash, const char *separator)
+eg_electionguard_status_t eg_hash_to_words(eg_element_mod_q_t *in_tracker_hash,
+                                           const char *in_separator, char **out_hash_words)
 {
+    try {
+        auto *trackerHash = AS_TYPE(ElementModQ, in_tracker_hash);
+        auto words = Tracker::hashToWords(*trackerHash, in_separator);
+        auto data_size = words.length() + 1;
+        auto *data_array = (char *)malloc(data_size);
+        strncpy(data_array, words.c_str(), data_size);
+        *out_hash_words = data_array;
 
-    auto *trackerHash = AS_TYPE(ElementModQ, tracker_hash);
-    auto words = Tracker::hashToWords(*trackerHash, separator);
-    const auto *words_ = words.c_str();
-    return words_;
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_element_mod_q_to_hex", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }

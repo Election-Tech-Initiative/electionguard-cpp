@@ -26,9 +26,9 @@ class DisjunctiveChaumPedersenProofHarness : DisjunctiveChaumPedersenProof
 
 TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
 {
-    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
     const auto &nonce = ONE_MOD_Q();
     const auto &seed = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
 
     auto firstMessage = elgamalEncrypt(0UL, nonce, *keypair->getPublicKey());
 
@@ -57,9 +57,9 @@ TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
 
 TEST_CASE("Constant CP Proof encryption of zero")
 {
-    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
     const auto &nonce = ONE_MOD_Q();
     const auto &seed = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
 
     auto message = elgamalEncrypt(0UL, nonce, *keypair->getPublicKey());
     auto proof = ConstantChaumPedersenProof::make(*message, nonce, *keypair->getPublicKey(), seed,

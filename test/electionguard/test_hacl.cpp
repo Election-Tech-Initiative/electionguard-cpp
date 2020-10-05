@@ -25,8 +25,6 @@ TEST_CASE("Hacl_Bignum256_add MAX_256 + 1 overflows")
     uint64_t carry = Hacl_Bignum256_add(const_cast<uint64_t *>(MAX_256), factor, result);
     CHECK(carry == 0x01);
 
-    //Log::debug(result, MAX_Q_LEN_DOUBLE, ": Hacl_Bignum256_add->result: ");
-
     CHECK(result[0] == 0x00);
     CHECK(result[1] == 0x00);
     CHECK(result[2] == 0x00);
@@ -41,8 +39,6 @@ TEST_CASE("Hacl_Bignum256_add MAX_256 + MAX_64 overflows")
     uint64_t carry = Hacl_Bignum256_add(const_cast<uint64_t *>(MAX_256), factor, result);
     CHECK(carry == 0x01);
 
-    //Log::debug(result, MAX_Q_LEN_DOUBLE, ": Hacl_Bignum256_add->result: ");
-
     CHECK(result[0] == 0xfffffffffffffffe);
     CHECK(result[1] == 0x00);
     CHECK(result[2] == 0x00);
@@ -55,8 +51,6 @@ TEST_CASE("Hacl_Bignum256_add MAX_256 + MAX_256 overflows")
     uint64_t carry =
       Hacl_Bignum256_add(const_cast<uint64_t *>(MAX_256), const_cast<uint64_t *>(MAX_256), result);
     CHECK(carry == 0x01);
-
-    //Log::debug(result, MAX_Q_LEN_DOUBLE, ": Hacl_Bignum256_add->result: ");
 
     CHECK(result[0] == 0xfffffffffffffffe);
     CHECK(result[1] == 0xffffffffffffffff);
@@ -77,8 +71,6 @@ TEST_CASE("Hacl_Bignum256_sub 0 - MAX_256 underflows")
     uint64_t carry = Hacl_Bignum256_sub(factor, const_cast<uint64_t *>(MAX_256), result);
     CHECK(carry == 0x01);
 
-    //Log::debug(result, MAX_Q_LEN_DOUBLE, ": Hacl_Bignum256_sub->result: ");
-
     CHECK(result[0] == 0x01);
     CHECK(result[1] == 0x00);
     CHECK(result[2] == 0x00);
@@ -93,8 +85,6 @@ TEST_CASE("Hacl_Bignum256_sub 1 - MAX_256 underflows")
     uint64_t result[MAX_Q_LEN_DOUBLE] = {};
     uint64_t carry = Hacl_Bignum256_sub(factor, const_cast<uint64_t *>(MAX_256), result);
     CHECK(carry == 0x01);
-
-    //Log::debug(result, MAX_Q_LEN_DOUBLE, ": Hacl_Bignum256_sub->result: ");
 
     CHECK(result[0] == 0x02);
     CHECK(result[1] == 0x00);
@@ -111,8 +101,6 @@ TEST_CASE("Hacl_Bignum256_sub MAX_64 - MAX_256 underflows")
     uint64_t carry = Hacl_Bignum256_sub(factor, const_cast<uint64_t *>(MAX_256), result);
     CHECK(carry == 0x01);
 
-    //Log::debug(result, MAX_Q_LEN_DOUBLE, ": Hacl_Bignum256_sub->result: ");
-
     CHECK(result[0] == 0x00);
     CHECK(result[1] == 0x01);
     CHECK(result[2] == 0x00);
@@ -128,8 +116,6 @@ TEST_CASE("Hacl_Bignum256_sub MAX_256 - MAX_256 == 0")
     uint64_t carry =
       Hacl_Bignum256_sub(const_cast<uint64_t *>(MAX_256), const_cast<uint64_t *>(MAX_256), result);
     CHECK(carry == 0x00);
-
-    //Log::debug(result, MAX_Q_LEN_DOUBLE, ": Hacl_Bignum256_sub->result: ");
 
     CHECK(result[0] == 0x00);
     CHECK(result[1] == 0x00);
@@ -281,26 +267,28 @@ TEST_CASE("Hacl_Bignum256_mod_exp Test mod exp for BigNum 256 valid precondition
 
 TEST_CASE("Hacl_Bignum4096_new_bn_from_bytes_be Test BigNum 4096 from and to bytes")
 {
-    uint8_t oneByte[1] = {1};
+    uint8_t oneByte[MAX_P_SIZE] = {1};
     uint64_t *bnResult = Hacl_Bignum4096_new_bn_from_bytes_be(sizeof(oneByte), oneByte);
-    //Log::debug(bnResult, MAX_P_LEN, " : Test BigNum 4096 from and to bytes : bnResult =");
 
-    uint8_t byteResult[512] = {};
+    uint8_t byteResult[MAX_P_SIZE] = {};
     Hacl_Bignum4096_bn_to_bytes_be(bnResult, byteResult);
-    //Log::debug(byteResult, 512, " : Test BigNum 4096 from and to bytes : byteResult =");
-    CHECK(byteResult[511] == oneByte[0]);
+
+    CHECK(byteResult[0] == oneByte[0]);
+
+    free(bnResult);
 }
 
 TEST_CASE("Hacl_Bignum256_new_bn_from_bytes_be Test BigNum 256 from and to bytes")
 {
-    uint8_t oneByte[1] = {1};
+    uint8_t oneByte[MAX_Q_SIZE] = {1};
     uint64_t *bnResult = Hacl_Bignum256_new_bn_from_bytes_be(sizeof(oneByte), oneByte);
-    //Log::debug(bnResult, MAX_Q_LEN, " : Test BigNum 256 from and to bytes : bnResult =");
 
-    uint8_t byteResult[32] = {};
+    uint8_t byteResult[MAX_Q_SIZE] = {};
     Hacl_Bignum256_bn_to_bytes_be(bnResult, byteResult);
-    //Log::debug(byteResult, 32, " : Test BigNum 256 from and to bytes : byteResult =");
-    CHECK(byteResult[31] == oneByte[0]);
+
+    CHECK(byteResult[0] == oneByte[0]);
+
+    free(bnResult);
 }
 
 #pragma endregion

@@ -257,7 +257,8 @@ namespace electionguard
             throw runtime_error("encryptedBallot:: Error constructing encrypted ballot");
         }
 
-        Log::debug(": Encrypted Ballot: " + encryptedBallot->getObjectId());
+        Log::debug(": Encrypted Ballot: encrypted: " + encryptedBallot->getObjectId());
+        Log::debug(encryptedBallot->toJson());
 
         if (!shouldVerifyProofs) {
             return encryptedBallot;

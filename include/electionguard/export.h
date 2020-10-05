@@ -1,7 +1,7 @@
 #ifndef __ELECTIONGUARD_CORE_EXPORT_H_INCLUDED__
 #define __ELECTIONGUARD_CORE_EXPORT_H_INCLUDED__
 
-/* Use the windows pattern to export suymbols */
+/* Use the windows pattern to export symbols */
 
 #ifndef EG_API
 #    ifdef _WIN32

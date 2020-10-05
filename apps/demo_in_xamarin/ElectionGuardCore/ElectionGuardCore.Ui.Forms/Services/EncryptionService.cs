@@ -87,6 +87,8 @@ namespace ElectionGuardCore.Ui.Forms.Services
         {
             return new CiphertextElectionContext
             {
+                NumberOfGuardians = context.NumberOfGuardians,
+                Quorum = context.Quorum,
                 ElgamalPublicKey = BigInteger.Parse(context.ElgamalPublicKey).ToString("X"),
                 DescriptionHash = BigInteger.Parse(context.DescriptionHash).ToString("X"),
                 CryptoBaseHash = BigInteger.Parse(context.CryptoBaseHash).ToString("X"),

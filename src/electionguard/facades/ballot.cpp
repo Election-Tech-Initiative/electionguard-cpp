@@ -2,18 +2,17 @@
 
 #include "../log.hpp"
 #include "electionguard/group.hpp"
-#include "memory_cache.hpp"
 #include "variant_cast.hpp"
 
 #include <cstring>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 
 extern "C" {
 #include "electionguard/ballot.h"
 }
 
-using electionguard::Cache;
 using electionguard::CiphertextBallot;
 using electionguard::CiphertextBallotSelection;
 using electionguard::ElementModP;
@@ -22,66 +21,130 @@ using electionguard::Log;
 using electionguard::PlaintextBallot;
 using electionguard::PlaintextBallotSelection;
 
-static Cache<PlaintextBallot> cache_plaintext_ballot;
-static Cache<CiphertextBallot> cache_ciphertext_ballot;
-static Cache<ElementModQ> cache_element_mod_q;
-
 #pragma region PlaintextBallotSelection
 
-eg_plaintext_ballot_selection_t *eg_plaintext_ballot_selection_create(const char *object_id,
-                                                                      const char *vote)
+eg_electionguard_status_t
+eg_plaintext_ballot_selection_new(const char *in_object_id, const char *in_vote,
+                                  eg_plaintext_ballot_selection_t **out_handle)
 {
-    return AS_TYPE(eg_plaintext_ballot_selection_t, new PlaintextBallotSelection(object_id, vote));
+    try {
+        auto selection = make_unique<PlaintextBallotSelection>(in_object_id, in_vote);
+        *out_handle = AS_TYPE(eg_plaintext_ballot_selection_t, selection.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_plaintext_ballot_selection_new", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
-const char *eg_plaintext_ballot_selection_get_object_id(eg_plaintext_ballot_selection_t *selection)
+eg_electionguard_status_t
+eg_plaintext_ballot_selection_free(eg_plaintext_ballot_selection_t *handle)
 {
-    auto objectId = AS_TYPE(PlaintextBallotSelection, selection)->getObjectId();
-    const auto *cstr = objectId.c_str();
-    return cstr;
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete AS_TYPE(PlaintextBallotSelection, handle);
+    handle = nullptr;
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_plaintext_ballot_selection_get_object_id(eg_plaintext_ballot_selection_t *handle,
+                                            const char **out_object_id)
+{
+    try {
+        auto objectId = AS_TYPE(PlaintextBallotSelection, handle)->getObjectId();
+        auto data_size = objectId.length() + 1;
+        auto *data_array = (char *)malloc(data_size);
+        strncpy(data_array, objectId.c_str(), data_size);
+        *out_object_id = data_array;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_plaintext_ballot_selection_get_object_id", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
 #pragma endregion
 
 #pragma region CiphertextBallotSelection
 
-const char *
-eg_ciphertext_ballot_selection_get_object_id(eg_ciphertext_ballot_selection_t *selection)
+eg_electionguard_status_t
+eg_ciphertext_ballot_selection_free(eg_ciphertext_ballot_selection_t *handle)
 {
-    auto objectId = AS_TYPE(CiphertextBallotSelection, selection)->getObjectId();
-    const auto *cstr = objectId.c_str();
-    return cstr;
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete AS_TYPE(CiphertextBallotSelection, handle);
+    handle = nullptr;
+    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_element_mod_q_t *
-eg_ciphertext_ballot_selection_get_description_hash(eg_ciphertext_ballot_selection_t *selection)
+eg_electionguard_status_t
+eg_ciphertext_ballot_selection_get_object_id(eg_ciphertext_ballot_selection_t *handle,
+                                             const char **out_object_id)
 {
-    auto *descriptionHash = AS_TYPE(CiphertextBallotSelection, selection)->getDescriptionHash();
-    return AS_TYPE(eg_element_mod_q_t, descriptionHash);
+    try {
+        auto objectId = AS_TYPE(CiphertextBallotSelection, handle)->getObjectId();
+        auto data_size = objectId.length() + 1;
+        auto *data_array = (char *)malloc(data_size);
+        strncpy(data_array, objectId.c_str(), data_size);
+        *out_object_id = data_array;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_ciphertext_ballot_selection_get_object_id", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
-eg_elgamal_ciphertext_t *
-eg_ciphertext_ballot_selection_get_ciphertext(eg_ciphertext_ballot_selection_t *selection)
+eg_electionguard_status_t
+eg_ciphertext_ballot_selection_get_description_hash(eg_ciphertext_ballot_selection_t *handle,
+                                                    eg_element_mod_q_t **out_hash)
 {
-    auto *ciphertext = AS_TYPE(CiphertextBallotSelection, selection)->getCiphertext();
-    return AS_TYPE(eg_elgamal_ciphertext_t, ciphertext);
+    auto *descriptionHash = AS_TYPE(CiphertextBallotSelection, handle)->getDescriptionHash();
+    *out_hash = AS_TYPE(eg_element_mod_q_t, descriptionHash);
+    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_disjunctive_chaum_pedersen_proof_t *
-eg_ciphertext_ballot_selection_get_proof(eg_ciphertext_ballot_selection_t *selection)
+eg_electionguard_status_t
+eg_ciphertext_ballot_selection_get_ciphertext(eg_ciphertext_ballot_selection_t *handle,
+                                              eg_elgamal_ciphertext_t **out_ciphertext)
 {
-    auto *proof = AS_TYPE(CiphertextBallotSelection, selection)->getProof();
-    return AS_TYPE(eg_disjunctive_chaum_pedersen_proof_t, proof);
+    auto *ciphertext = AS_TYPE(CiphertextBallotSelection, handle)->getCiphertext();
+    *out_ciphertext = AS_TYPE(eg_elgamal_ciphertext_t, ciphertext);
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_ciphertext_ballot_selection_get_crypto_hash(eg_ciphertext_ballot_selection_t *handle,
+                                               eg_element_mod_q_t **out_hash)
+{
+    auto *hash = AS_TYPE(CiphertextBallotSelection, handle)->getCryptoHash();
+    *out_hash = AS_TYPE(eg_element_mod_q_t, hash);
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_ciphertext_ballot_selection_get_proof(eg_ciphertext_ballot_selection_t *handle,
+                                         eg_disjunctive_chaum_pedersen_proof_t **out_proof)
+{
+    auto *proof = AS_TYPE(CiphertextBallotSelection, handle)->getProof();
+    *out_proof = AS_TYPE(eg_disjunctive_chaum_pedersen_proof_t, proof);
+    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 bool eg_ciphertext_ballot_selection_is_valid_encryption(
-  eg_ciphertext_ballot_selection_t *selection, eg_element_mod_q_t *seed_hash,
-  eg_element_mod_p_t *public_key, eg_element_mod_q_t *crypto_extended_base_hash)
+  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t *in_seed_hash,
+  eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash)
 {
-    auto *seedHash = AS_TYPE(ElementModQ, seed_hash);
-    auto *publicKey = AS_TYPE(ElementModP, public_key);
-    auto *cryptoExtendedBaseHash = AS_TYPE(ElementModQ, crypto_extended_base_hash);
-    return AS_TYPE(CiphertextBallotSelection, selection)
+    auto *seedHash = AS_TYPE(ElementModQ, in_seed_hash);
+    auto *publicKey = AS_TYPE(ElementModP, in_public_key);
+    auto *cryptoExtendedBaseHash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
+    return AS_TYPE(CiphertextBallotSelection, handle)
       ->isValidEncryption(*seedHash, *publicKey, *cryptoExtendedBaseHash);
 }
 
@@ -97,80 +160,165 @@ bool eg_ciphertext_ballot_selection_is_valid_encryption(
 
 #pragma region PlaintextBallot
 
-const char *eg_plaintext_ballot_get_object_id(eg_plaintext_ballot_t *plaintext)
+eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle)
 {
-    auto objectId = AS_TYPE(PlaintextBallot, plaintext)->getObjectId();
-    const auto *cstr = objectId.c_str();
-    return cstr;
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete AS_TYPE(PlaintextBallot, handle);
+    handle = nullptr;
+    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_plaintext_ballot_t *eg_plaintext_ballot_from_json(char *data)
+eg_electionguard_status_t eg_plaintext_ballot_get_object_id(eg_plaintext_ballot_t *handle,
+                                                            const char **out_object_id)
 {
-    auto data_string = string(data);
-    auto serialized = PlaintextBallot::fromJson(data_string);
-    auto *reference = cache_plaintext_ballot.retain(move(serialized));
-    return AS_TYPE(eg_plaintext_ballot_t, reference);
-}
-eg_plaintext_ballot_t *eg_plaintext_ballot_from_bson(uint8_t *data, uint64_t length)
-{
-    auto data_bytes = vector<uint8_t>(data, data + length);
-    auto serialized = PlaintextBallot::fromBson(data_bytes);
-    auto *reference = cache_plaintext_ballot.retain(move(serialized));
-    return AS_TYPE(eg_plaintext_ballot_t, reference);
-}
+    try {
+        auto objectId = AS_TYPE(PlaintextBallot, handle)->getObjectId();
+        auto data_size = objectId.length() + 1;
+        auto *data_array = (char *)malloc(data_size);
+        strncpy(data_array, objectId.c_str(), data_size);
+        *out_object_id = data_array;
 
-// returns the size and fills out_data
-uint64_t eg_plaintext_ballot_to_json(eg_plaintext_ballot_t *plaintext, char **out_data)
-{
-    auto domain_type = AS_TYPE(PlaintextBallot, plaintext);
-    auto data_string = domain_type->toJson();
-
-    auto data_size = data_string.length() + 1;
-    auto *data_array = new char[data_size];
-    strncpy(data_array, data_string.c_str(), data_size);
-    *out_data = data_array;
-
-    // TODO: cleanup data_array
-    return data_size;
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_plaintext_ballot_get_object_id", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
-uint64_t eg_plaintext_ballot_to_bson(eg_plaintext_ballot_t *plaintext, uint8_t **out_data)
+eg_electionguard_status_t eg_plaintext_ballot_from_json(char *in_data,
+                                                        eg_plaintext_ballot_t **out_handle)
 {
-    auto domain_type = AS_TYPE(PlaintextBallot, plaintext);
-    auto data_bytes = domain_type->toBson();
+    try {
+        auto data = string(in_data);
+        auto deserialized = PlaintextBallot::fromJson(data);
 
-    auto *data_array = new uint8_t[data_bytes.size()];
-    copy(data_bytes.begin(), data_bytes.end(), data_array);
-    *out_data = data_array;
+        *out_handle = AS_TYPE(eg_plaintext_ballot_t, deserialized.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_plaintext_ballot_from_json", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
 
-    // TODO: cleanup data_array
-    return data_bytes.size();
+eg_electionguard_status_t eg_plaintext_ballot_from_bson(uint8_t *in_data, uint64_t in_length,
+                                                        eg_plaintext_ballot_t **out_handle)
+{
+    try {
+        auto data_bytes = vector<uint8_t>(in_data, in_data + in_length);
+        auto deserialized = PlaintextBallot::fromBson(data_bytes);
+
+        *out_handle = AS_TYPE(eg_plaintext_ballot_t, deserialized.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_plaintext_ballot_from_bson", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_plaintext_ballot_to_json(eg_plaintext_ballot_t *handle,
+                                                      char **out_data, size_t *out_size)
+{
+    try {
+        auto domain_type = AS_TYPE(PlaintextBallot, handle);
+        auto data_string = domain_type->toJson();
+
+        auto data_size = data_string.length() + 1;
+        auto *data_array = (char *)malloc(data_size);
+        strncpy(data_array, data_string.c_str(), data_size);
+        *out_data = data_array;
+        *out_size = data_size;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_plaintext_ballot_from_bson", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_plaintext_ballot_to_bson(eg_plaintext_ballot_t *handle,
+                                                      uint8_t **out_data, size_t *out_size)
+{
+    try {
+        auto domain_type = AS_TYPE(PlaintextBallot, handle);
+        auto data_bytes = domain_type->toBson();
+
+        auto *data_array = new uint8_t[data_bytes.size()];
+        copy(data_bytes.begin(), data_bytes.end(), data_array);
+        *out_data = data_array;
+        *out_size = data_bytes.size();
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_plaintext_ballot_from_bson", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
 #pragma endregion
 
 #pragma region CiphertextBallot
 
-const char *eg_ciphertext_ballot_get_object_id(eg_ciphertext_ballot_t *ciphertext)
+eg_electionguard_status_t eg_ciphertext_ballot_free(eg_ciphertext_ballot_t *handle)
 {
-    auto objectId = AS_TYPE(CiphertextBallot, ciphertext)->getObjectId();
-    const auto *cstr = objectId.c_str();
-    return cstr;
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete AS_TYPE(CiphertextBallot, handle);
+    handle = nullptr;
+    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_element_mod_q_t *eg_ciphertext_ballot_get_tracking_hash(eg_ciphertext_ballot_t *ciphertext)
+eg_electionguard_status_t eg_ciphertext_ballot_get_object_id(eg_ciphertext_ballot_t *handle,
+                                                             const char **out_object_id)
 {
-    auto hash = AS_TYPE(CiphertextBallot, ciphertext)->getTrackingHash();
-    unique_ptr<ElementModQ> hash_reference{hash};
-    auto *reference = cache_element_mod_q.retain(move(hash_reference));
-    return AS_TYPE(eg_element_mod_q_t, reference);
+    try {
+        auto objectId = AS_TYPE(CiphertextBallot, handle)->getObjectId();
+        auto data_size = objectId.length() + 1;
+        auto *data_array = (char *)malloc(data_size);
+        strncpy(data_array, objectId.c_str(), data_size);
+        *out_object_id = data_array;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_ballot_get_object_id", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
-const char *eg_ciphertext_ballot_get_tracking_code(eg_ciphertext_ballot_t *ciphertext)
+eg_electionguard_status_t
+eg_ciphertext_ballot_get_tracking_hash(eg_ciphertext_ballot_t *handle,
+                                       eg_element_mod_q_t **out_tracking_hash)
 {
-    auto code = AS_TYPE(CiphertextBallot, ciphertext)->getTrackingCode();
-    const auto *cstr = code.c_str();
-    return cstr;
+    try {
+        auto hash = AS_TYPE(CiphertextBallot, handle)->getTrackingHash();
+        *out_tracking_hash = AS_TYPE(eg_element_mod_q_t, hash);
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_ballot_get_tracking_hash", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_ciphertext_ballot_get_tracking_code(eg_ciphertext_ballot_t *handle,
+                                                                 const char **out_tracking_code)
+{
+    try {
+        auto code = AS_TYPE(CiphertextBallot, handle)->getTrackingCode();
+        auto data_size = code.length() + 1;
+        auto *data_array = (char *)malloc(data_size);
+        strncpy(data_array, code.c_str(), data_size);
+        *out_tracking_code = data_array;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_ballot_get_tracking_code", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
 uint64_t eg_ciphertext_ballot_get_timestamp(eg_ciphertext_ballot_t *ciphertext)
@@ -179,56 +327,86 @@ uint64_t eg_ciphertext_ballot_get_timestamp(eg_ciphertext_ballot_t *ciphertext)
     return timestamp;
 }
 
-bool eg_ciphertext_ballot_is_valid_encryption(eg_ciphertext_ballot_t *ciphertext,
-                                              eg_element_mod_q_t *seed_hash,
-                                              eg_element_mod_p_t *public_key,
-                                              eg_element_mod_q_t *crypto_extended_base_hash)
+bool eg_ciphertext_ballot_is_valid_encryption(eg_ciphertext_ballot_t *handle,
+                                              eg_element_mod_q_t *in_seed_hash,
+                                              eg_element_mod_p_t *in_public_key,
+                                              eg_element_mod_q_t *in_crypto_extended_base_hash)
 {
-    auto ciphertext_ = AS_TYPE(CiphertextBallot, ciphertext);
-    auto seed_hash_ = AS_TYPE(ElementModQ, seed_hash);
-    auto public_key_ = AS_TYPE(ElementModP, public_key);
-    auto extended_hash_ = AS_TYPE(ElementModQ, crypto_extended_base_hash);
+    auto ciphertext = AS_TYPE(CiphertextBallot, handle);
+    auto seed_hash = AS_TYPE(ElementModQ, in_seed_hash);
+    auto public_key = AS_TYPE(ElementModP, in_public_key);
+    auto extended_hash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
 
-    return ciphertext_->isValidEncryption(*seed_hash_, *public_key_, *extended_hash_);
+    return ciphertext->isValidEncryption(*seed_hash, *public_key, *extended_hash);
 }
 
-eg_ciphertext_ballot_t *eg_ciphertext_ballot_from_json(char *data)
+eg_electionguard_status_t eg_ciphertext_ballot_from_json(char *in_data,
+                                                         eg_ciphertext_ballot_t **out_handle)
 {
-    auto data_string = string(data);
-    auto serialized = CiphertextBallot::fromJson(data_string);
-    auto *reference = cache_ciphertext_ballot.retain(move(serialized));
-    return AS_TYPE(eg_ciphertext_ballot_t, reference);
-}
-eg_ciphertext_ballot_t *eg_ciphertext_ballot_from_bson(uint8_t *data, uint64_t length)
-{
-    auto data_bytes = vector<uint8_t>(data, data + length);
-    auto serialized = CiphertextBallot::fromBson(data_bytes);
-    auto *reference = cache_ciphertext_ballot.retain(move(serialized));
-    return AS_TYPE(eg_ciphertext_ballot_t, reference);
-}
+    try {
+        auto data = string(in_data);
+        auto deserialized = CiphertextBallot::fromJson(data);
 
-// returns the size and fills out_data
-uint64_t eg_ciphertext_ballot_to_json(eg_ciphertext_ballot_t *ciphertext, char **out_data)
-{
-    auto domain_type = AS_TYPE(CiphertextBallot, ciphertext);
-    auto data_string = domain_type->toJson();
-
-    auto data_size = data_string.length() + 1;
-    auto data_array = new char[data_size];
-    strncpy(data_array, data_string.c_str(), data_size);
-    *out_data = data_array;
-    return data_size;
+        *out_handle = AS_TYPE(eg_ciphertext_ballot_t, deserialized.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_ballot_from_json", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
-uint64_t eg_ciphertext_ballot_to_bson(eg_ciphertext_ballot_t *ciphertext, uint8_t **out_data)
+eg_electionguard_status_t eg_ciphertext_ballot_from_bson(uint8_t *in_data, uint64_t in_length,
+                                                         eg_ciphertext_ballot_t **out_handle)
 {
-    auto domain_type = AS_TYPE(CiphertextBallot, ciphertext);
-    auto data_bytes = domain_type->toBson();
+    try {
+        auto data_bytes = vector<uint8_t>(in_data, in_data + in_length);
+        auto deserialized = CiphertextBallot::fromBson(data_bytes);
 
-    auto *data_array = new uint8_t[data_bytes.size()];
-    copy(data_bytes.begin(), data_bytes.end(), data_array);
-    *out_data = data_array;
-    return data_bytes.size();
+        *out_handle = AS_TYPE(eg_ciphertext_ballot_t, deserialized.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_ballot_from_bson", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_ciphertext_ballot_to_json(eg_ciphertext_ballot_t *handle,
+                                                       char **out_data, uint64_t *out_size)
+{
+    try {
+        auto domain_type = AS_TYPE(CiphertextBallot, handle);
+        auto data_string = domain_type->toJson();
+
+        auto data_size = data_string.length() + 1;
+        auto *data_array = (char *)malloc(data_size);
+        strncpy(data_array, data_string.c_str(), data_size);
+        *out_data = data_array;
+        *out_size = data_size;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_ballot_to_json", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_ciphertext_ballot_to_bson(eg_ciphertext_ballot_t *handle,
+                                                       uint8_t **out_data, uint64_t *out_size)
+{
+    try {
+        auto domain_type = AS_TYPE(CiphertextBallot, handle);
+        auto data_bytes = domain_type->toBson();
+
+        auto *data_array = new uint8_t[data_bytes.size()];
+        copy(data_bytes.begin(), data_bytes.end(), data_array);
+        *out_data = data_array;
+        *out_size = data_bytes.size();
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_ballot_to_bson", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
 #pragma endregion

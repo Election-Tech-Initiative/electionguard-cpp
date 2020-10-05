@@ -99,14 +99,17 @@ namespace electionguard
         return result;
     }
 
+    const string LEADING_CHARS = "0 \n\r\t\f\v";
+
     string sanitize_hex_string(const string &hexString)
     {
         string sanitized;
-        bool isOdd = (hexString.size() % 2) != 0U;
+        string leftTrimmed = hexString.substr(hexString.find_first_not_of(LEADING_CHARS));
+        bool isOdd = (leftTrimmed.size() % 2) != 0U;
         if (isOdd) {
             sanitized.insert(0, 1, '0');
         }
-        sanitized.append(hexString);
+        sanitized.append(leftTrimmed);
         return sanitized;
     }
 } // namespace electionguard

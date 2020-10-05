@@ -119,6 +119,7 @@ namespace electionguard
             throw invalid_argument(
               "DisjunctiveChaumPedersenProof::make:: only supports plaintexts of 0 or 1");
         }
+        Log::debug(":DisjunctiveChaumPedersenProof: making proof.");
         if (plaintext == 1) {
             return make_one(message, r, k, q, seed);
         }
@@ -130,7 +131,7 @@ namespace electionguard
     bool DisjunctiveChaumPedersenProof::isValid(const ElGamalCiphertext &message,
                                                 const ElementModP &k, const ElementModQ &q)
     {
-
+        Log::debug(":DisjunctiveChaumPedersenProof::isValid: ");
         auto *alpha = message.getPad();
         auto *beta = message.getData();
 
@@ -219,7 +220,7 @@ namespace electionguard
 
             return false;
         }
-
+        Log::debug(":DisjunctiveChaumPedersenProof::isValid: TRUE!");
         return success;
     }
 
@@ -339,6 +340,7 @@ namespace electionguard
                                      const ElementModP &k, const ElementModQ &seed,
                                      const ElementModQ &hash_header, uint64_t constant)
     {
+        Log::debug(":ConstantChaumPedersenProof:: making proof");
         auto *alpha = message.getPad();
         auto *beta = message.getData();
 
@@ -364,6 +366,7 @@ namespace electionguard
     bool ConstantChaumPedersenProof::isValid(const ElGamalCiphertext &message, const ElementModP &k,
                                              const ElementModQ &q)
     {
+        Log::debug(":ConstantChaumPedersenProof::isValid: ");
         auto *alpha = message.getPad();
         auto *beta = message.getData();
 
@@ -422,7 +425,7 @@ namespace electionguard
 
             return false;
         }
-
+        Log::debug(":ConstantChaumPedersenProof::isValid: TRUE!");
         return success;
     }
 #pragma endregion

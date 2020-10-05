@@ -4,6 +4,7 @@
 #include "ballot.h"
 #include "election.h"
 #include "export.h"
+#include "status.h"
 
 #include <stdbool.h>
 
@@ -16,23 +17,29 @@ extern "C" {
 struct eg_encryption_device_s;
 typedef struct eg_encryption_device_s eg_encryption_device_t;
 
-EG_API eg_encryption_device_t *eg_encryption_device_create(const uint64_t uuid,
-                                                           const char *location);
+EG_API eg_electionguard_status_t eg_encryption_device_new(const uint64_t in_uuid,
+                                                          const char *in_location,
+                                                          eg_encryption_device_t **out_handle);
 
-EG_API eg_element_mod_q_t *eg_encryption_device_get_hash(eg_encryption_device_t *device);
+EG_API eg_electionguard_status_t eg_encryption_device_free(eg_encryption_device_t *handle);
+
+EG_API eg_electionguard_status_t eg_encryption_device_get_hash(eg_encryption_device_t *handle,
+                                                               eg_element_mod_q_t **out_hash);
 
 // EncryptionMediator
 
 struct eg_encryption_mediator_s;
 typedef struct eg_encryption_mediator_s eg_encryption_mediator_t;
 
-EG_API eg_encryption_mediator_t *
-eg_encryption_mediator_create(eg_internal_election_description_t *metadata,
-                              eg_ciphertext_election_context_t *context,
-                              eg_encryption_device_t *encryption_device);
+EG_API eg_electionguard_status_t eg_encryption_mediator_new(
+  eg_internal_election_description_t *in_metadata, eg_ciphertext_election_context_t *in_context,
+  eg_encryption_device_t *in_encryption_device, eg_encryption_mediator_t **out_handle);
 
-EG_API eg_ciphertext_ballot_t *eg_encryption_mediator_encrypt(eg_encryption_mediator_t *mediator,
-                                                              eg_plaintext_ballot_t *ballot);
+EG_API eg_electionguard_status_t eg_encryption_mediator_free(eg_encryption_mediator_t *handle);
+
+EG_API eg_electionguard_status_t eg_encryption_mediator_encrypt_ballot(
+  eg_encryption_mediator_t *handle, eg_plaintext_ballot_t *in_plaintext,
+  eg_ciphertext_ballot_t **out_ciphertext_handle);
 
 /// <summary>
 /// Encrypt a specific `BallotSelection` in the context of a specific `BallotContest`
@@ -49,27 +56,25 @@ EG_API eg_ciphertext_ballot_t *eg_encryption_mediator_encrypt(eg_encryption_medi
 /// <param name="should_verify_proofs">specify if the proofs should be verified prior to returning (default True)</param>
 /// <returns>A `CiphertextBallotSelection`</returns>
 /// </summary>
-EG_API eg_ciphertext_ballot_selection_t *
-eg_encrypt_selection(eg_plaintext_ballot_selection_t *plaintext,
-                     eg_selection_description_t *description, eg_element_mod_p_t *public_key,
-                     eg_element_mod_q_t *crypto_extended_base_hash, eg_element_mod_q_t *nonce_seed,
-                     bool is_placeholder, bool should_verify_proofs);
+EG_API eg_electionguard_status_t eg_encrypt_selection(
+  eg_plaintext_ballot_selection_t *in_plaintext, eg_selection_description_t *in_description,
+  eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash,
+  eg_element_mod_q_t *in_nonce_seed, bool in_is_placeholder, bool in_should_verify_proofs,
+  eg_ciphertext_ballot_selection_t **out_handle);
 
-EG_API eg_ciphertext_ballot_contest_t *
-eg_encrypt_contest(eg_plaintext_ballot_contest_t *plaintext, eg_contest_description_t *description,
-                   eg_element_mod_p_t *public_key, eg_element_mod_q_t *crypto_extended_base_hash,
-                   eg_element_mod_q_t *nonce_seed, bool should_verify_proofs);
+// TODO: eg_encrypt_contest
 
-EG_API eg_ciphertext_ballot_t *eg_encrypt_ballot(eg_plaintext_ballot_t *plaintext,
-                                                 eg_internal_election_description_t *metadata,
-                                                 eg_ciphertext_election_context_t *context,
-                                                 eg_element_mod_q_t *seed_hash,
-                                                 bool should_verify_proofs);
+EG_API eg_electionguard_status_t eg_encrypt_ballot(eg_plaintext_ballot_t *in_plaintext,
+                                                   eg_internal_election_description_t *in_metadata,
+                                                   eg_ciphertext_election_context_t *in_context,
+                                                   eg_element_mod_q_t *in_seed_hash,
+                                                   bool in_should_verify_proofs,
+                                                   eg_ciphertext_ballot_t **out_handle);
 
-EG_API eg_ciphertext_ballot_t *eg_encrypt_ballot_with_nonce(
-  eg_plaintext_ballot_t *plaintext, eg_internal_election_description_t *metadata,
-  eg_ciphertext_election_context_t *context, eg_element_mod_q_t *seed_hash,
-  eg_element_mod_q_t *nonce, bool should_verify_proofs);
+EG_API eg_electionguard_status_t eg_encrypt_ballot_with_nonce(
+  eg_plaintext_ballot_t *in_plaintext, eg_internal_election_description_t *in_metadata,
+  eg_ciphertext_election_context_t *in_context, eg_element_mod_q_t *in_seed_hash,
+  eg_element_mod_q_t *in_nonce, bool in_should_verify_proofs, eg_ciphertext_ballot_t **out_handle);
 
 #ifdef __cplusplus
 }

@@ -3,9 +3,11 @@
 
 #include "constants.h"
 #include "export.h"
+#include "status.h"
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,24 +18,42 @@ extern "C" {
 struct eg_element_mod_p_s;
 typedef struct eg_element_mod_p_s eg_element_mod_p_t;
 
-EG_API eg_element_mod_p_t *eg_element_mod_p_create(uint64_t *elem);
-EG_API eg_element_mod_p_t *eg_element_mod_p_create_unchecked(uint64_t *elem);
+EG_API eg_electionguard_status_t eg_element_mod_p_new(const uint64_t in_data[MAX_P_LEN],
+                                                      eg_element_mod_p_t **out_handle);
+EG_API eg_electionguard_status_t eg_element_mod_p_new_unchecked(const uint64_t in_data[MAX_P_LEN],
+                                                                eg_element_mod_p_t **out_handle);
 
-/// returns the array size and places the getter value in the data field
-EG_API uint8_t eg_element_mod_p_get(eg_element_mod_p_t *elem, uint64_t **data);
+EG_API eg_electionguard_status_t eg_element_mod_p_free(eg_element_mod_p_t *handle);
+
+EG_API eg_electionguard_status_t eg_element_mod_p_get_data(eg_element_mod_p_t *handle,
+                                                           uint64_t **out_data, size_t *out_size);
+
+EG_API eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle,
+                                                         char **out_hex);
+
+// TODO: finish implementation
 
 // ElementModQ
 
 struct eg_element_mod_q_s;
 typedef struct eg_element_mod_q_s eg_element_mod_q_t;
 
-EG_API eg_element_mod_q_t *eg_element_mod_q_create(const uint64_t elem[MAX_Q_LEN]);
-EG_API eg_element_mod_q_t *eg_element_mod_q_create_unchecked(const uint64_t elem[MAX_Q_LEN]);
+EG_API eg_electionguard_status_t eg_element_mod_q_new(const uint64_t in_data[MAX_Q_LEN],
+                                                      eg_element_mod_q_t **out_handle);
+EG_API eg_electionguard_status_t eg_element_mod_q_new_unchecked(const uint64_t in_data[MAX_Q_LEN],
+                                                                eg_element_mod_q_t **out_handle);
 
-/// returns the array size and places the getter value in the data field
-EG_API uint8_t eg_element_mod_q_get(eg_element_mod_q_t *elem, uint64_t **data);
+EG_API eg_electionguard_status_t eg_element_mod_q_free(eg_element_mod_q_t *handle);
 
-EG_API eg_element_mod_q_t *eg_rand_q();
+EG_API eg_electionguard_status_t eg_element_mod_q_get_data(eg_element_mod_q_t *handle,
+                                                           uint64_t **out_data, size_t *out_size);
+
+EG_API eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *handle,
+                                                         char **out_hex);
+
+EG_API eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle);
+
+// TODO: finish implementation
 
 #ifdef __cplusplus
 }

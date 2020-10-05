@@ -153,10 +153,10 @@ namespace electionguard
                 auto number_of_guardians = j["number_of_guardians"].get<uint64_t>();
                 auto quorum = j["quorum"].get<uint64_t>();
 
-                auto elGamalPublicKey = ElementModP::fromHex(elgamal_public_key);
                 auto descriptionHash = ElementModQ::fromHex(description_hash);
                 auto cryptoBaseHash = ElementModQ::fromHex(crypto_base_hash);
                 auto cryptoExtendedBaseHash = ElementModQ::fromHex(crypto_extended_base_hash);
+                auto elGamalPublicKey = ElementModP::fromHex(elgamal_public_key);
 
                 return make_unique<CiphertextElectionContext>(
                   number_of_guardians, quorum, move(elGamalPublicKey), move(descriptionHash),

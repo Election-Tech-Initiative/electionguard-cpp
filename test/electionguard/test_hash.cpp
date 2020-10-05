@@ -13,12 +13,12 @@ TEST_CASE("Same ElementModQs with same Zero data produce same Hash")
 {
     uint64_t z1[4] = {};
     uint64_t z2[4] = {};
+    auto e1 = make_unique<ElementModQ>(z1);
+    auto e2 = make_unique<ElementModQ>(z2);
 
-    auto zero_hash_q1 = hash_elems(new ElementModQ(z1));
-    auto zero_hash_q2 = hash_elems(new ElementModQ(z2));
+    auto zero_hash_q1 = hash_elems(e1.get());
+    auto zero_hash_q2 = hash_elems(e2.get());
 
-    // Log::debug(" : zero_hash_q1 = " + zero_hash_q1->toHex());
-    // Log::debug(" : zero_hash_q2 = " + zero_hash_q2->toHex());
     CHECK((*zero_hash_q1 == *zero_hash_q2));
     // but different addresses
     CHECK(&zero_hash_q1 != &zero_hash_q2);
@@ -29,8 +29,6 @@ TEST_CASE("Hash Value for Zero string different from Zero number")
     auto zero_hash1 = hash_elems(0UL);
     auto zero_hash2 = hash_elems("0");
 
-    // Log::debug(" : zero_hash1 = " + zero_hash1->toHex());
-    // Log::debug(" : zero_hash2 = " + zero_hash2->toHex());
     CHECK((*zero_hash1 != *zero_hash2));
     // but different addresses
     CHECK(&zero_hash1 != &zero_hash2);
@@ -41,8 +39,6 @@ TEST_CASE("Hash Value for non-zero number string same as explicit number")
     auto one_hash1 = hash_elems(1UL);
     auto one_hash2 = hash_elems("1");
 
-    // Log::debug(" : one_hash1 = " + one_hash1->toHex());
-    // Log::debug(" : one_hash2 = " + one_hash2->toHex());
     CHECK((*one_hash1 == *one_hash2));
     // but different addresses
     CHECK(&one_hash1 != &one_hash2);
@@ -53,8 +49,6 @@ TEST_CASE("Same Number Value Hash with explicit number")
     auto one_hash1 = hash_elems(1UL);
     auto one_hash2 = hash_elems(1UL);
 
-    // Log::debug(" : one_hash1 = " + one_hash1->toHex());
-    // Log::debug(" : one_hash2 = " + one_hash2->toHex());
     CHECK((*one_hash1 == *one_hash2));
     // but different addresses
     CHECK(&one_hash1 != &one_hash2);
@@ -105,8 +99,6 @@ TEST_CASE("Same Hash Value from nested-list and taking result of hashed list and
     auto nonNestedHash1 = hash_elems({"0", "1"});
     auto nonNestedHash2 = hash_elems({nonNestedHash1->toHex(), "3"});
 
-    // Log::debug(" : nestedHash = " + nestedHash->toHex());
-    // Log::debug(" : nonNestedHash2 = " + nonNestedHash2->toHex());
     CHECK((*nestedHash != *nonNestedHash1));
     CHECK((*nestedHash == *nonNestedHash2));
     // but different addresses

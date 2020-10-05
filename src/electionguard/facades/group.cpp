@@ -1,92 +1,191 @@
 #include "electionguard/group.hpp"
 
-#include "memory_cache.hpp"
+#include "../log.hpp"
 #include "variant_cast.hpp"
 
 extern "C" {
 #include "electionguard/group.h"
 }
 
-#include "../log.hpp"
-
 #include <cstring>
 
-using electionguard::Cache;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
+using electionguard::Log;
 using electionguard::rand_q;
 
 using std::string;
 
-// TODO: safe initialization
-static Cache<ElementModP> cache_element_mod_p;
-static Cache<ElementModQ> cache_element_mod_q;
-
 #pragma region ElementModP
 
-eg_element_mod_p_t *eg_element_mod_p_create(uint64_t *elem)
+eg_electionguard_status_t eg_element_mod_p_new(const uint64_t in_data[MAX_P_LEN],
+                                               eg_element_mod_p_t **out_handle)
 {
-    uint64_t data[MAX_P_LEN] = {};
-    memcpy(static_cast<uint64_t *>(data), elem, MAX_P_SIZE);
-    auto element = make_unique<ElementModP>(data);
-    auto *reference = cache_element_mod_p.retain(move(element));
-    return AS_TYPE(eg_element_mod_p_t, reference);
+    try {
+        uint64_t data[MAX_P_LEN] = {};
+        memcpy(static_cast<uint64_t *>(data), in_data, MAX_P_SIZE);
+
+        auto element = make_unique<ElementModP>(data);
+        *out_handle = AS_TYPE(eg_element_mod_p_t, element.release());
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_element_mod_p_new", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
-eg_element_mod_p_t *eg_element_mod_p_create_unchecked(uint64_t *elem)
+eg_electionguard_status_t eg_element_mod_p_new_unchecked(const uint64_t in_data[MAX_P_LEN],
+                                                         eg_element_mod_p_t **out_handle)
 {
-    uint64_t data[MAX_P_LEN] = {};
-    memcpy(static_cast<uint64_t *>(data), elem, MAX_P_SIZE);
-    auto element = make_unique<ElementModP>(data, true);
-    auto *reference = cache_element_mod_p.retain(move(element));
-    return AS_TYPE(eg_element_mod_p_t, reference);
+    try {
+        uint64_t data[MAX_P_LEN] = {};
+        memcpy(static_cast<uint64_t *>(data), in_data, MAX_P_SIZE);
+
+        auto element = make_unique<ElementModP>(data, true);
+        *out_handle = AS_TYPE(eg_element_mod_p_t, element.release());
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_element_mod_p_new_unchecked", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
-uint8_t eg_element_mod_p_get(eg_element_mod_p_t *elem, uint64_t **data)
+EG_API eg_electionguard_status_t eg_element_mod_p_free(eg_element_mod_p_t *handle)
 {
-    auto *element = AS_TYPE(ElementModP, elem);
-    *data = element->get();
-    return MAX_P_LEN;
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete AS_TYPE(ElementModP, handle);
+    handle = nullptr;
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_element_mod_p_get_data(eg_element_mod_p_t *handle, uint64_t **out_data,
+                                                    size_t *out_size)
+{
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto *element = AS_TYPE(ElementModP, handle);
+    *out_data = element->get();
+    *out_size = MAX_P_LEN;
+
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle, char **out_hex)
+{
+    try {
+        auto hex_rep = AS_TYPE(ElementModP, handle)->toHex();
+        auto data_size = hex_rep.length() + 1;
+        auto *data_array = (char *)malloc(data_size);
+        strncpy(data_array, hex_rep.c_str(), data_size);
+        *out_hex = data_array;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_element_mod_p_to_hex", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
 #pragma endregion
 
 #pragma region ElementModQ
 
-eg_element_mod_q_t *eg_element_mod_q_create(const uint64_t elem[MAX_Q_LEN])
+eg_electionguard_status_t eg_element_mod_q_new(const uint64_t in_data[MAX_Q_LEN],
+                                               eg_element_mod_q_t **out_handle)
 {
-    uint64_t data[MAX_Q_LEN] = {};
-    memcpy(static_cast<uint64_t *>(data), elem, MAX_Q_SIZE);
-    auto element = make_unique<ElementModQ>(data);
-    auto *reference = cache_element_mod_q.retain(move(element));
-    return AS_TYPE(eg_element_mod_q_t, reference);
+    try {
+        uint64_t data[MAX_Q_LEN] = {};
+        memcpy(static_cast<uint64_t *>(data), in_data, MAX_Q_SIZE);
+
+        auto element = make_unique<ElementModQ>(data);
+        *out_handle = AS_TYPE(eg_element_mod_q_t, element.release());
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_element_mod_q_new", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
-eg_element_mod_q_t *eg_element_mod_q_create_unchecked(uint64_t *elem)
+eg_electionguard_status_t eg_element_mod_q_new_unchecked(const uint64_t in_data[MAX_Q_LEN],
+                                                         eg_element_mod_q_t **out_handle)
 {
-    uint64_t data[MAX_Q_LEN] = {};
-    memcpy(static_cast<uint64_t *>(data), elem, MAX_Q_SIZE);
-    auto element = make_unique<ElementModQ>(data, false);
-    auto *reference = cache_element_mod_q.retain(move(element));
-    return AS_TYPE(eg_element_mod_q_t, reference);
+    try {
+        uint64_t data[MAX_Q_LEN] = {};
+        memcpy(static_cast<uint64_t *>(data), in_data, MAX_Q_SIZE);
+
+        auto element = make_unique<ElementModQ>(data, true);
+        *out_handle = AS_TYPE(eg_element_mod_q_t, element.release());
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_element_mod_q_new_unchecked", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
-uint8_t eg_element_mod_q_get(eg_element_mod_q_t *elem, uint64_t **data)
+EG_API eg_electionguard_status_t eg_element_mod_q_free(eg_element_mod_q_t *handle)
 {
-    auto *element = AS_TYPE(ElementModQ, elem);
-    *data = element->get();
-    return MAX_Q_LEN;
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete AS_TYPE(ElementModQ, handle);
+    handle = nullptr;
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_element_mod_q_get_data(eg_element_mod_q_t *handle, uint64_t **out_data,
+                                                    size_t *out_size)
+{
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto *element = AS_TYPE(ElementModQ, handle);
+    *out_data = element->get();
+    *out_size = (size_t)MAX_Q_LEN;
+
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *handle, char **out_hex)
+{
+    try {
+        auto hex_rep = AS_TYPE(ElementModQ, handle)->toHex();
+        auto data_size = hex_rep.length() + 1;
+        auto *data_array = (char *)malloc(data_size);
+        strncpy(data_array, hex_rep.c_str(), data_size);
+        *out_hex = data_array;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_element_mod_q_to_hex", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
 #pragma endregion
 
 #pragma region ElementModQ Functions
 
-eg_element_mod_q_t *eg_rand_q()
+eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle)
 {
-    auto random = rand_q();
-    auto *reference = cache_element_mod_q.retain(move(random));
-    return AS_TYPE(eg_element_mod_q_t, reference);
+    try {
+        auto random = rand_q();
+        *out_handle = AS_TYPE(eg_element_mod_q_t, random.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_element_mod_q_rand_q_new", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
 #pragma endregion

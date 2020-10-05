@@ -25,7 +25,6 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/encrypt.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/group.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/hash.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/memory_cache.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/tracker.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/chaum_pedersen.cpp
@@ -78,6 +77,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/include/electionguard/group.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/hash.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/hash.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/status.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/tracker.hpp
 )
 

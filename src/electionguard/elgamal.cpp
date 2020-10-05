@@ -178,6 +178,8 @@ namespace electionguard
         auto pubkey_pow_n = pow_mod_p(publicKey, *nonce4096);
         auto data = mul_mod_p(*gpowp_m, *pubkey_pow_n);
 
+        Log::debug(":ElgGamal: Generated Encryption");
+
         return make_unique<ElGamalCiphertext>(move(pad), move(data));
     }
 

@@ -39,6 +39,7 @@ namespace electionguard
         uint64_t *get() const;
         bool isInBounds() const;
         bool isValidResidue() const;
+        vector<uint8_t> toBytes() const;
         string toHex() const;
 
         /// <summary>
