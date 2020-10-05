@@ -37,7 +37,9 @@ namespace ElectionGuard
         internal unsafe NativeEncryptionMediator* Handle;
 
         public unsafe EncryptionMediator(
-            InternalElectionDescription metadata, CiphertextElectionContext context, EncryptionDevice device)
+            InternalElectionDescription metadata,
+            CiphertextElectionContext context,
+            EncryptionDevice device)
         {
             var status = NativeInterface.EncryptionMediator.New(
                 metadata.Handle, context.Handle, device.Handle, out Handle);
@@ -47,15 +49,30 @@ namespace ElectionGuard
             }
         }
 
-        public unsafe CiphertextBallot Encrypt(PlaintextBallot plaintext)
+        public unsafe CiphertextBallot Encrypt(
+            PlaintextBallot plaintext, bool verifyProofs = false)
         {
-            var status = NativeInterface.EncryptionMediator.Encrypt(
-                Handle, plaintext.Handle, out NativeCiphertextBallot* ciphertext);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            if (verifyProofs)
             {
-                Debug.WriteLine($"InternalElectionDescription Error Status: {status}");
+                var status = NativeInterface.EncryptionMediator.EncryptAndVerify(
+                Handle, plaintext.Handle, out NativeCiphertextBallot* ciphertext);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Debug.WriteLine($"InternalElectionDescription Error Status: {status}");
+                }
+                return new CiphertextBallot(ciphertext);
             }
-            return new CiphertextBallot(ciphertext);
+            else
+            {
+                var status = NativeInterface.EncryptionMediator.Encrypt(
+                Handle, plaintext.Handle, out NativeCiphertextBallot* ciphertext);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Debug.WriteLine($"InternalElectionDescription Error Status: {status}");
+                }
+                return new CiphertextBallot(ciphertext);
+            }
+            
         }
 
         protected override unsafe void DisposeUnamanged()
@@ -76,13 +93,16 @@ namespace ElectionGuard
             PlaintextBallot ballot,
             InternalElectionDescription metadata,
             CiphertextElectionContext context,
-            ElementModQ seedHash, ElementModQ nonce = null)
+            ElementModQ seedHash,
+            ElementModQ nonce = null,
+            bool verifyProofs = true)
         {
             if (nonce == null)
             {
                 var status = NativeInterface.Encrypt.Ballot(
                     ballot.Handle, metadata.Handle, context.Handle,
-                    seedHash.Handle, true, out NativeCiphertextBallot* ciphertext);
+                    seedHash.Handle, verifyProofs,
+                    out NativeCiphertextBallot* ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     Debug.WriteLine($"DisposeUnamanged Error Status: {status}");
@@ -93,7 +113,8 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.Encrypt.Ballot(
                     ballot.Handle, metadata.Handle, context.Handle,
-                    seedHash.Handle, nonce.Handle, true, out NativeCiphertextBallot* ciphertext);
+                    seedHash.Handle, nonce.Handle, verifyProofs,
+                    out NativeCiphertextBallot* ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     Debug.WriteLine($"DisposeUnamanged Error Status: {status}");

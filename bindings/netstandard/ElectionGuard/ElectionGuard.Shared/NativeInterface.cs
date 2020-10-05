@@ -253,6 +253,11 @@ namespace ElectionGuard
             internal static extern Status Encrypt(
                 EncryptionMediatorType* handle,
                 PlaintextBallot.PlaintextBallotType* plainutext, out CiphertextBallot.CiphertextBallotType* ciphertext);
+
+            [DllImport(DllName, EntryPoint = "eg_encryption_mediator_encrypt_ballot_verify_proofs")]
+            internal static extern Status EncryptAndVerify(
+                EncryptionMediatorType* handle,
+                PlaintextBallot.PlaintextBallotType* plainutext, out CiphertextBallot.CiphertextBallotType* ciphertext);
         }
 
 

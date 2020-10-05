@@ -3,6 +3,7 @@ using ElectionGuardCore.Elections;
 using ElectionGuardCore.Encryption;
 using SDK = ElectionGuard;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System;
 using Newtonsoft.Json;
@@ -77,6 +78,13 @@ namespace ElectionGuardCore.Ui.Forms.Services
 
             // encrypt
             var ciphertext_ = mediator.Encrypt(plaintext_);
+
+            if(!ciphertext_.IsValidEncryption(
+                context_.DescriptionHash, context_.ElGamalPublicKey, context_.CryptoExtendedBaseHash))
+            {
+                Debug.WriteLine($"Error encrypting ballot {plaintext_.ObjectId}");
+                return null;
+            }
 
             // convert the SDK ciphertext into a DTO object
             var ciphertext = JsonConvert.DeserializeObject<CiphertextBallot>(ciphertext_.ToJson(), _serializerSettings);

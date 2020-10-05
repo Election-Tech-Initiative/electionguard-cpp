@@ -77,7 +77,9 @@ namespace electionguard
         return *this;
     }
 
-    unique_ptr<CiphertextBallot> EncryptionMediator::encrypt(const PlaintextBallot &ballot) const
+    unique_ptr<CiphertextBallot>
+    EncryptionMediator::encrypt(const PlaintextBallot &ballot,
+                                bool shouldVerifyProofs /* = true */) const
     {
         Log::debug(" encrypt: objectId: " + ballot.getObjectId());
 
@@ -90,8 +92,8 @@ namespace electionguard
 
         Log::debugHex(": encrypt: encrypting with previous hash: ",
                       pimpl->trackerHashSeed->toHex());
-        auto encryptedBallot =
-          encryptBallot(ballot, pimpl->metadata, pimpl->context, *pimpl->trackerHashSeed);
+        auto encryptedBallot = encryptBallot(ballot, pimpl->metadata, pimpl->context,
+                                             *pimpl->trackerHashSeed, nullptr, shouldVerifyProofs);
 
         pimpl->trackerHashSeed = make_unique<ElementModQ>(*encryptedBallot->getTrackingHash());
         return encryptedBallot;

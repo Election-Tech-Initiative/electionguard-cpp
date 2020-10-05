@@ -41,6 +41,10 @@ EG_API eg_electionguard_status_t eg_encryption_mediator_encrypt_ballot(
   eg_encryption_mediator_t *handle, eg_plaintext_ballot_t *in_plaintext,
   eg_ciphertext_ballot_t **out_ciphertext_handle);
 
+EG_API eg_electionguard_status_t eg_encryption_mediator_encrypt_ballot_verify_proofs(
+  eg_encryption_mediator_t *handle, eg_plaintext_ballot_t *in_plaintext,
+  eg_ciphertext_ballot_t **out_ciphertext_handle);
+
 /// <summary>
 /// Encrypt a specific `BallotSelection` in the context of a specific `BallotContest`
 ///
