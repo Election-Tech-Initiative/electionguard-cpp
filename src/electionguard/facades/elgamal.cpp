@@ -43,6 +43,7 @@ eg_electionguard_status_t eg_elgamal_keypair_free(eg_elgamal_keypair_t *handle)
     }
 
     delete AS_TYPE(ElGamalKeyPair, handle);
+    handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -79,6 +80,7 @@ eg_electionguard_status_t eg_elgamal_ciphertext_free(eg_elgamal_ciphertext_t *ha
     }
 
     delete AS_TYPE(ElGamalCiphertext, handle);
+    handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 

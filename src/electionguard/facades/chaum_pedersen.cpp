@@ -43,6 +43,7 @@ eg_constant_chaum_pedersen_proof_free(eg_constant_chaum_pedersen_proof_t *handle
     }
 
     delete AS_TYPE(ConstantChaumPedersenProof, handle);
+    handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 

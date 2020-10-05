@@ -45,6 +45,7 @@ eg_plaintext_ballot_selection_free(eg_plaintext_ballot_selection_t *handle)
     }
 
     delete AS_TYPE(PlaintextBallotSelection, handle);
+    handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -78,6 +79,7 @@ eg_ciphertext_ballot_selection_free(eg_ciphertext_ballot_selection_t *handle)
     }
 
     delete AS_TYPE(CiphertextBallotSelection, handle);
+    handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -165,6 +167,7 @@ eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle
     }
 
     delete AS_TYPE(PlaintextBallot, handle);
+    handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -265,6 +268,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_free(eg_ciphertext_ballot_t *hand
     }
 
     delete AS_TYPE(CiphertextBallot, handle);
+    handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 

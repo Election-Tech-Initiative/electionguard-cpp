@@ -51,6 +51,7 @@ eg_electionguard_status_t eg_selection_description_free(eg_selection_description
     }
 
     delete AS_TYPE(SelectionDescription, handle);
+    handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -117,6 +118,7 @@ eg_internal_election_description_free(eg_internal_election_description_t *handle
     }
 
     delete AS_TYPE(InternalElectionDescription, handle);
+    handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -216,6 +218,7 @@ eg_ciphertext_election_context_free(eg_ciphertext_election_context_t *handle)
     }
 
     delete AS_TYPE(CiphertextElectionContext, handle);
+    handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 

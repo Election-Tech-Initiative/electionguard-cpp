@@ -58,8 +58,8 @@ EG_API eg_electionguard_status_t eg_element_mod_p_free(eg_element_mod_p_t *handl
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    Log::debug("enter2");
     delete AS_TYPE(ElementModP, handle);
+    handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -138,6 +138,7 @@ EG_API eg_electionguard_status_t eg_element_mod_q_free(eg_element_mod_q_t *handl
     }
 
     delete AS_TYPE(ElementModQ, handle);
+    handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 

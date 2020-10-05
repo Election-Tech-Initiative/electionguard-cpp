@@ -46,6 +46,7 @@ eg_electionguard_status_t eg_encryption_device_free(eg_encryption_device_t *hand
     }
 
     delete AS_TYPE(EncryptionDevice, handle);
+    handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -91,6 +92,7 @@ eg_electionguard_status_t eg_encryption_mediator_free(eg_encryption_mediator_t *
     }
 
     delete AS_TYPE(EncryptionMediator, handle);
+    handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
