@@ -37,6 +37,19 @@ namespace electionguard
                         };
                         selections.push_back(s);
                     }
+                    json title_text;
+                    for (auto language : contest.get().getBallotTitle()->getText()) {
+                        json l = {{"value", language.get().getValue()},
+                                  {"language", language.get().getLanguage()}};
+                        title_text.push_back(l);
+                    }
+                    json subtitle_text;
+                    for (auto language : contest.get().getBallotTitle()->getText()) {
+                        json l = {{"value", language.get().getValue()},
+                                  {"language", language.get().getLanguage()}};
+                        subtitle_text.push_back(l);
+                    }
+
                     contests.push_back({
                       {"object_id", contest.get().getObjectId()},
                       {"electoral_district_id", contest.get().getElectoralDistrictId()},
@@ -45,8 +58,8 @@ namespace electionguard
                       {"number_elected", contest.get().getNumberElected()},
                       {"votes_allowed", contest.get().getVotesAllowed()},
                       {"name", contest.get().getName()},
-                      {"ballot_title", contest.get().getBallotTitle()},
-                      {"ballot_subtitle", contest.get().getBallotSubtitle()},
+                      {"ballot_title", {"text", title_text}},
+                      {"ballot_subtitle", {"text", subtitle_text}},
                       {"ballot_selections", selections},
                     });
                 }
@@ -70,12 +83,26 @@ namespace electionguard
                     auto number_elected = contest["number_elected"].get<uint64_t>();
                     auto votes_allowed = contest["votes_allowed"].get<uint64_t>();
                     auto name = contest["name"].get<string>();
-                    auto ballot_title = contest["ballot_title"].is_object()
-                                          ? contest["ballot_title"].dump()
-                                          : contest["ballot_title"].get<string>();
-                    auto ballot_subtitle = contest["ballot_subtitle"].is_object()
-                                             ? contest["ballot_subtitle"].dump()
-                                             : contest["ballot_subtitle"].get<string>();
+
+                    auto ballot_title = contest["ballot_title"];
+                    auto title_text = ballot_title["text"];
+                    vector<unique_ptr<Language>> ballotTitleText;
+                    ballotTitleText.reserve(title_text.size());
+                    for (auto &title : title_text) {
+                        auto value = title["value"].get<string>();
+                        auto language = title["language"].get<string>();
+                        ballotTitleText.push_back(make_unique<Language>(value, language));
+                    }
+
+                    auto ballot_subtitle = contest["ballot_subtitle"];
+                    auto subtitle_text = ballot_subtitle["text"];
+                    vector<unique_ptr<Language>> ballotSubTitleText;
+                    ballotSubTitleText.reserve(subtitle_text.size());
+                    for (auto &subtitle : subtitle_text) {
+                        auto value = subtitle["value"].get<string>();
+                        auto language = subtitle["language"].get<string>();
+                        ballotSubTitleText.push_back(make_unique<Language>(value, language));
+                    }
 
                     auto selections = contest["ballot_selections"];
                     vector<unique_ptr<SelectionDescription>> selectionDescriptions;
@@ -88,10 +115,14 @@ namespace electionguard
                           selection_object_id, candidate_id, selection_sequence_order));
                     }
 
+                    auto ballotTitle = make_unique<InternationalizedText>(move(ballotTitleText));
+                    auto ballotSubTitle =
+                      make_unique<InternationalizedText>(move(ballotSubTitleText));
+
                     contestDescriptions.push_back(make_unique<ContestDescription>(
                       contest_object_id, electoral_district_id, contest_sequence_order,
-                      vote_variation, number_elected, votes_allowed, name, ballot_title,
-                      ballot_subtitle, move(selectionDescriptions)));
+                      vote_variation, number_elected, votes_allowed, name, move(ballotTitle),
+                      move(ballotSubTitle), move(selectionDescriptions)));
                 }
 
                 if (j["description_hash"] != nullptr) {
@@ -303,7 +334,7 @@ namespace electionguard
                     contests.push_back({
                       {"object_id", contest.get().getObjectId()},
                       {"description_hash", contest.get().getDescriptionHash()->toHex()},
-                      {"selections", selections},
+                      {"ballot_selections", selections},
                       {"nonce", contest.get().getNonce()->toHex()},
                       {"crypto_hash", contest.get().getCryptoHash()->toHex()},
                       {"proof", contest_proof},
@@ -311,7 +342,7 @@ namespace electionguard
                 }
                 json result = {
                   {"object_id", serializable.getObjectId()},
-                  {"balolot_style", serializable.getBallotStyle()},
+                  {"ballot_style", serializable.getBallotStyle()},
                   {"description_hash", serializable.getDescriptionHash()->toHex()},
                   {"previous_tracking_hash", serializable.getPreviousTrackingHash()->toHex()},
                   {"contests", contests},
@@ -326,7 +357,7 @@ namespace electionguard
             static unique_ptr<electionguard::CiphertextBallot> toObject(json j)
             {
                 auto object_id = j["object_id"].get<string>();
-                auto balolot_style = j["balolot_style"].get<string>();
+                auto balolot_style = j["ballot_style"].get<string>();
                 auto description_hash = j["description_hash"].get<string>();
                 auto previous_tracking_hash = j["previous_tracking_hash"].get<string>();
                 auto tracking_hash = j["tracking_hash"].get<string>();
@@ -357,7 +388,7 @@ namespace electionguard
                       ElementModQ::fromHex(contest_proof_challenge),
                       ElementModQ::fromHex(contest_proof_response), contest_proof_constant);
 
-                    auto selections = contest["selections"];
+                    auto selections = contest["ballot_selections"];
                     vector<unique_ptr<electionguard::CiphertextBallotSelection>>
                       plaintextSelections;
                     plaintextSelections.reserve(selections.size());

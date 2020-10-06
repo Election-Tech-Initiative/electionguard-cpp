@@ -12,6 +12,50 @@
 namespace electionguard
 {
 
+    class EG_API Language : public CryptoHashable
+    {
+      public:
+        Language(const Language &other);
+        Language(const Language &&other);
+        Language(string value, string language);
+        ~Language();
+
+        Language &operator=(Language other);
+        Language &operator=(Language &&other);
+
+        string getValue();
+        string getLanguage();
+
+        virtual unique_ptr<ElementModQ> crypto_hash() override;
+        virtual unique_ptr<ElementModQ> crypto_hash() const override;
+
+      private:
+        class Impl;
+        unique_ptr<Impl> pimpl;
+    };
+
+    EG_API class InternationalizedText : CryptoHashable
+    {
+      public:
+        //vector<Language> text;
+        InternationalizedText(const InternationalizedText &other);
+        InternationalizedText(const InternationalizedText &&other);
+        InternationalizedText(vector<unique_ptr<Language>> text);
+        ~InternationalizedText();
+
+        InternationalizedText &operator=(InternationalizedText other);
+        InternationalizedText &operator=(InternationalizedText &&other);
+
+        vector<reference_wrapper<Language>> getText();
+
+        virtual unique_ptr<ElementModQ> crypto_hash() override;
+        virtual unique_ptr<ElementModQ> crypto_hash() const override;
+
+      private:
+        class Impl;
+        unique_ptr<Impl> pimpl;
+    };
+
     /// <summary>
     /// Data entity for the ballot selections in a contest,
     /// for example linking candidates and parties to their vote counts.
@@ -57,8 +101,8 @@ namespace electionguard
         ContestDescription(const string &objectId, const string &electoralDistrictId,
                            const uint64_t sequenceOrder, const string &voteVariation,
                            const uint64_t numberElected, const uint64_t votesAllowed,
-                           const string &name, const string &ballotTitle,
-                           const string &ballotSubtitle,
+                           const string &name, unique_ptr<InternationalizedText> ballotTitle,
+                           unique_ptr<InternationalizedText> ballotSubtitle,
                            vector<unique_ptr<SelectionDescription>> selections);
         ~ContestDescription();
 
@@ -73,8 +117,8 @@ namespace electionguard
         uint64_t getVotesAllowed() const;
         string getName() const;
 
-        string getBallotTitle() const; // TODO: domain type
-        string getBallotSubtitle() const;
+        InternationalizedText *getBallotTitle() const; // TODO: domain type
+        InternationalizedText *getBallotSubtitle() const;
 
         vector<reference_wrapper<SelectionDescription>> getSelections() const;
 

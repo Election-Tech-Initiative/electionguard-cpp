@@ -31,15 +31,15 @@ CPMAddPackage(
 add_executable(ElectionGuardTests 
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/constants.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_group.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hacl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_nonces.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_tracker.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_words.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_group.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hacl.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_nonces.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_tracker.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_words.cpp
 )
 
 target_compile_features(ElectionGuardTests PRIVATE cxx_std_17)
@@ -49,22 +49,22 @@ if(MSVC)
 endif()
 
 # C Tests
-add_executable(ElectionGuardCTests
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_tracker.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h
-)
+# add_executable(ElectionGuardCTests
+#     ${CMAKE_CURRENT_SOURCE_DIR}/main.c
+#     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.c
+#     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.c
+#     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.c
+#     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.c
+#     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_tracker.c
+#     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h
+# )
 
-target_compile_features(ElectionGuardCTests PRIVATE c_std_99)
+# target_compile_features(ElectionGuardCTests PRIVATE c_std_99)
 
 # ---- Link Libraries ----
 
 target_link_libraries(ElectionGuardTests PRIVATE doctest ${META_PROJECT_TARGET})
-target_link_libraries(ElectionGuardCTests PRIVATE ${META_PROJECT_TARGET})
+# target_link_libraries(ElectionGuardCTests PRIVATE ${META_PROJECT_TARGET})
 
 # ---- Add Tests ----
 

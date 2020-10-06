@@ -62,7 +62,9 @@ namespace electionguard
     template <typename T> string hash_inner_vector(vector<T> inner_vector)
     {
         vector<CryptoHashableType> hashable_vector(inner_vector.begin(), inner_vector.end());
-        return hash_elems(hashable_vector)->toHex();
+        auto hash = hash_elems(hashable_vector)->toHex();
+        Log::debug(": hash collection : " + hash);
+        return hash;
     }
 
     enum CryptoHashableTypeEnum {
@@ -120,6 +122,7 @@ namespace electionguard
             {
                 auto hashable = get<reference_wrapper<CryptoHashable>>(a).get().crypto_hash();
                 input_string = hashable->toHex();
+                //Log::debug("input string: " + input_string);
                 break;
             }
             case ELEMENTMODP_REF: // reference_wrapper<ElementModP>
@@ -228,6 +231,8 @@ namespace electionguard
         if (input_string.empty()) {
             input_string = null_string;
         }
+
+        Log::debug(": input string: " + input_string);
 
         const uint8_t *input = reinterpret_cast<const uint8_t *>(input_string.c_str());
         Hacl_Streaming_SHA2_update_256(p, const_cast<uint8_t *>(input), input_string.size());
