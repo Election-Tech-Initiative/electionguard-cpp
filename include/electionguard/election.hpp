@@ -24,7 +24,9 @@ namespace electionguard
         Language &operator=(Language &&other);
 
         string getValue();
+        string getValue() const;
         string getLanguage();
+        string getLanguage() const;
 
         virtual unique_ptr<ElementModQ> crypto_hash() override;
         virtual unique_ptr<ElementModQ> crypto_hash() const override;
@@ -34,19 +36,20 @@ namespace electionguard
         unique_ptr<Impl> pimpl;
     };
 
-    EG_API class InternationalizedText : CryptoHashable
+    EG_API class InternationalizedText : public CryptoHashable
     {
       public:
         //vector<Language> text;
         InternationalizedText(const InternationalizedText &other);
         InternationalizedText(const InternationalizedText &&other);
-        InternationalizedText(vector<unique_ptr<Language>> text);
+        explicit InternationalizedText(vector<unique_ptr<Language>> text);
         ~InternationalizedText();
 
         InternationalizedText &operator=(InternationalizedText other);
         InternationalizedText &operator=(InternationalizedText &&other);
 
         vector<reference_wrapper<Language>> getText();
+        vector<reference_wrapper<Language>> getText() const;
 
         virtual unique_ptr<ElementModQ> crypto_hash() override;
         virtual unique_ptr<ElementModQ> crypto_hash() const override;

@@ -38,13 +38,13 @@ namespace electionguard
                         selections.push_back(s);
                     }
                     json title_text;
-                    for (auto language : contest.get().getBallotTitle()->getText()) {
+                    for (const auto &language : contest.get().getBallotTitle()->getText()) {
                         json l = {{"value", language.get().getValue()},
                                   {"language", language.get().getLanguage()}};
                         title_text.push_back(l);
                     }
                     json subtitle_text;
-                    for (auto language : contest.get().getBallotTitle()->getText()) {
+                    for (const auto &language : contest.get().getBallotTitle()->getText()) {
                         json l = {{"value", language.get().getValue()},
                                   {"language", language.get().getLanguage()}};
                         subtitle_text.push_back(l);
@@ -58,8 +58,8 @@ namespace electionguard
                       {"number_elected", contest.get().getNumberElected()},
                       {"votes_allowed", contest.get().getVotesAllowed()},
                       {"name", contest.get().getName()},
-                      {"ballot_title", {"text", title_text}},
-                      {"ballot_subtitle", {"text", subtitle_text}},
+                      {"ballot_title", {{"text", title_text}}},
+                      {"ballot_subtitle", {{"text", subtitle_text}}},
                       {"ballot_selections", selections},
                     });
                 }

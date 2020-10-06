@@ -14,19 +14,13 @@ using ContextSerializer = electionguard::Serialize::CiphertextelectionContext;
 namespace electionguard
 {
 
-    struct Language::Impl : public ElectionObjectBase {
+    struct Language::Impl {
         string value;
         string language;
 
         Impl(string value, string language) : value(move(value)), language(move(language)) {}
 
-        unique_ptr<ElementModQ> crypto_hash()
-        {
-            Log::debug("hashing value: " + value + " language: " + language);
-            auto hash = hash_elems({value, language});
-            Log::debug("hashed language: " + hash->toHex());
-            return hash;
-        }
+        unique_ptr<ElementModQ> crypto_hash() const { return hash_elems({value, language}); }
     };
 
     // Lifecycle Methods
@@ -41,28 +35,27 @@ namespace electionguard
         return *this;
     }
     string Language::getValue() { return pimpl->value; }
+    string Language::getValue() const { return pimpl->value; }
     string Language::getLanguage() { return pimpl->language; }
+    string Language::getLanguage() const { return pimpl->language; }
 
     unique_ptr<ElementModQ> Language::crypto_hash() { return pimpl->crypto_hash(); }
     unique_ptr<ElementModQ> Language::crypto_hash() const { return pimpl->crypto_hash(); }
 
-    struct InternationalizedText::Impl : public ElectionObjectBase {
+    struct InternationalizedText::Impl {
         vector<unique_ptr<Language>> text;
 
-        Impl(vector<unique_ptr<Language>> text) : text(move(text)) {}
+        explicit Impl(vector<unique_ptr<Language>> text) : text(move(text)) {}
 
-        unique_ptr<ElementModQ> crypto_hash()
+        unique_ptr<ElementModQ> crypto_hash() const
         {
             vector<reference_wrapper<CryptoHashable>> refs;
             refs.reserve(this->text.size());
             for (const auto &i : this->text) {
-                Log::debug("pushing back: " + i.get()->getValue());
                 refs.push_back(ref<CryptoHashable>(*i));
             }
-            Log::debug("hasing text:");
-            auto hash = hash_elems(refs);
-            Log::debug("hashed text: " + hash->toHex());
-            return hash;
+
+            return hash_elems(refs);
         }
     };
 
@@ -91,6 +84,16 @@ namespace electionguard
         return refs;
     }
 
+    vector<reference_wrapper<Language>> InternationalizedText::getText() const
+    {
+        vector<reference_wrapper<Language>> refs;
+        refs.reserve(pimpl->text.size());
+        for (const auto &i : pimpl->text) {
+            refs.push_back(ref(*i));
+        }
+        return refs;
+    }
+
     unique_ptr<ElementModQ> InternationalizedText::crypto_hash() { return pimpl->crypto_hash(); }
     unique_ptr<ElementModQ> InternationalizedText::crypto_hash() const
     {
@@ -110,7 +113,7 @@ namespace electionguard
             this->sequenceOrder = sequenceOrder;
         }
 
-        unique_ptr<ElementModQ> crypto_hash()
+        unique_ptr<ElementModQ> crypto_hash() const
         {
             return hash_elems({object_id, sequenceOrder, candidateId});
         }
@@ -186,17 +189,10 @@ namespace electionguard
                 selectionRefs.push_back(ref<CryptoHashable>(*selection));
             }
 
-            auto title = ballotTitle->crypto_hash();
-            auto subtitle = ballotSubtitle->crypto_hash();
-
-            Log::debug("contest " + object_id + " title hash: " + title->toHex());
-            Log::debug("contest " + object_id + " subtitle hash: " + subtitle->toHex());
-
-            auto hash =
-              hash_elems({object_id, sequenceOrder, electoralDistrictId, voteVariation, title.get(),
-                          subtitle.get(), name, numberElected, votesAllowed, selectionRefs});
-            Log::debug("contest " + object_id + " hash: " + hash->toHex());
-            return hash;
+            return hash_elems({object_id, sequenceOrder, electoralDistrictId, voteVariation,
+                               ref<CryptoHashable>(*ballotTitle),
+                               ref<CryptoHashable>(*ballotSubtitle), name, numberElected,
+                               votesAllowed, selectionRefs});
         }
     };
 
