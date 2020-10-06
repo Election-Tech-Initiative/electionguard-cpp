@@ -187,6 +187,18 @@ namespace electionguard
             }
         }
 
+        for (uint64_t i = 0; i < description.getNumberElected(); i++) {
+            auto placeholderId = description.getObjectId() + "-placeholder-" + to_string(i);
+            auto placeholder = make_unique<SelectionDescription>(
+              placeholderId, placeholderId, description.getSelections().size() + i);
+            auto plaintext = make_unique<PlaintextBallotSelection>(placeholderId, "0", true);
+
+            auto encrypted =
+              encryptSelection(*plaintext, *placeholder, elgamalPublicKey, cryptoExtendedBaseHash,
+                               *contestNonce, true, shouldVerifyProofs);
+            encryptedSelections.push_back(move(encrypted));
+        }
+
         auto encryptedContest = CiphertextBallotContest::make(
           plaintext.getObjectId(), *descriptionHash, move(encryptedSelections), elgamalPublicKey,
           cryptoExtendedBaseHash, *proofNonce, description.getNumberElected(), move(contestNonce));

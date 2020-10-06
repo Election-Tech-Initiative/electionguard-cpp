@@ -118,6 +118,8 @@ namespace electionguard
         return pimpl->descriptionHash.get();
     }
 
+    bool CiphertextBallotSelection::getIsPlaceholder() const { return pimpl->isPlaceholder; }
+
     ElGamalCiphertext *CiphertextBallotSelection::getCiphertext() const
     {
         return pimpl->ciphertext.get();

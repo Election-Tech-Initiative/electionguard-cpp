@@ -94,6 +94,8 @@ namespace electionguard
         /// </summary>
         ElementModQ *getDescriptionHash() const;
 
+        bool getIsPlaceholder() const;
+
         /// The encrypted representation of the vote field
         ElGamalCiphertext *getCiphertext() const;
 
