@@ -169,6 +169,7 @@ namespace electionguard
         // TODO: improve performance, complete features
         // note this is a simplified version of the loop in python
         // where the caller must supply all values and placeholder selections are not handled
+        uint64_t max_sequenceId = 0;
         for (const auto &selectionDescription : description.getSelections()) {
             bool hasSelection = false;
             for (const auto &selection : plaintext.getSelections()) {
@@ -182,15 +183,24 @@ namespace electionguard
                 }
             }
 
+            if (selectionDescription.get().getSequenceOrder() > max_sequenceId) {
+                max_sequenceId = selectionDescription.get().getSequenceOrder();
+            }
+
             if (!hasSelection) {
                 throw invalid_argument("caller must include all selections");
             }
         }
 
+        // since we know the above will meet the selection limit,
+        // just append the number elected count of placeholders with the proper description hashes
         for (uint64_t i = 0; i < description.getNumberElected(); i++) {
-            auto placeholderId = description.getObjectId() + "-placeholder-" + to_string(i);
-            auto placeholder = make_unique<SelectionDescription>(
-              placeholderId, placeholderId, description.getSelections().size() + i);
+            auto sequence = max_sequenceId + 1 + i;
+            auto placeholderId =
+              description.getObjectId() + "-" + to_string(sequence) + "-placeholder";
+            auto candidateId = description.getObjectId() + "-" + to_string(sequence) + "-candidate";
+            auto placeholder =
+              make_unique<SelectionDescription>(placeholderId, candidateId, sequence);
             auto plaintext = make_unique<PlaintextBallotSelection>(placeholderId, "0", true);
 
             auto encrypted =

@@ -720,7 +720,7 @@ namespace electionguard
       const ElementModQ &seedHash)
     {
         if (contests.empty()) {
-            throw invalid_argument("mismatching selection state for " + objectId +
+            throw invalid_argument("mismatching contests state for " + objectId +
                                    "expected(some) actual(none)");
         }
 
