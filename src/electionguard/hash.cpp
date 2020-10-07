@@ -120,6 +120,7 @@ namespace electionguard
             {
                 auto hashable = get<reference_wrapper<CryptoHashable>>(a).get().crypto_hash();
                 input_string = hashable->toHex();
+                //Log::debug("input string: " + input_string);
                 break;
             }
             case ELEMENTMODP_REF: // reference_wrapper<ElementModP>

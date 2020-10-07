@@ -23,16 +23,37 @@ unique_ptr<InternalElectionDescription> getFakeMetadata(const ElementModQ &descr
     selections2.push_back(
       make_unique<SelectionDescription>("contest-2-selection-2-id", "candidate-2-id", 2UL));
 
+    vector<unique_ptr<Language>> contest1TitleText;
+    contest1TitleText.push_back(make_unique<Language>("some-title-string", "en"));
+    contest1TitleText.push_back(make_unique<Language>("some-title-string-es", "es"));
+
+    vector<unique_ptr<Language>> contest1SubTitleText;
+    contest1SubTitleText.push_back(make_unique<Language>("some-title-string", "en"));
+    contest1SubTitleText.push_back(make_unique<Language>("some-title-string-es", "es"));
+
+    auto title1 = make_unique<InternationalizedText>(move(contest1TitleText));
+    auto subtitle1 = make_unique<InternationalizedText>(move(contest1SubTitleText));
+
+    vector<unique_ptr<Language>> contest2TitleText;
+    contest2TitleText.push_back(make_unique<Language>("some-title-string", "en"));
+    contest2TitleText.push_back(make_unique<Language>("some-title-string-es", "es"));
+    vector<unique_ptr<Language>> contest2SubTitleText;
+    contest2SubTitleText.push_back(make_unique<Language>("some-title-string", "en"));
+    contest2SubTitleText.push_back(make_unique<Language>("some-title-string-es", "es"));
+
+    auto title2 = make_unique<InternationalizedText>(move(contest2TitleText));
+    auto subtitle2 = make_unique<InternationalizedText>(move(contest2SubTitleText));
+
     vector<unique_ptr<ContestDescription>> contests;
     const auto numElected = 2UL;
     contests.push_back(make_unique<ContestDescription>(
       "contest-1-id", "district-1-id", 1UL, "n_of_m", numElected, numElected, "contest-1-name",
-      "contest-1-title", "contest-1-sub", move(selections1)));
+      move(title1), move(subtitle1), move(selections1)));
 
     const auto numElected2 = 1UL;
     contests.push_back(make_unique<ContestDescription>(
       "contest-2-id", "district-1-id", 1UL, "n_of_m", numElected, numElected, "contest-2-name",
-      "contest-2-title", "contest-1-sub", move(selections2)));
+      move(title2), move(subtitle2), move(selections2)));
 
     auto metadata = make_unique<InternalElectionDescription>(descriptionHash, move(contests));
     return metadata;
@@ -145,7 +166,7 @@ TEST_CASE("Can serialize InternalElectionDescription")
 
     // Act
     auto fromJson = InternalElectionDescription::fromJson(json);
-    auto fromBson = InternalElectionDescription::fromBson(bson);
+    //auto fromBson = InternalElectionDescription::fromBson(bson);
 
     // Assert
     CHECK(metadata->getDescriptionHash().toHex() == fromJson->getDescriptionHash().toHex());

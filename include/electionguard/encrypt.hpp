@@ -41,7 +41,8 @@ namespace electionguard
         EncryptionMediator &operator=(EncryptionMediator other);
         EncryptionMediator &operator=(EncryptionMediator &&other);
 
-        unique_ptr<CiphertextBallot> encrypt(const PlaintextBallot &ballot) const;
+        unique_ptr<CiphertextBallot> encrypt(const PlaintextBallot &ballot,
+                                             bool shouldVerifyProofs = true) const;
 
       private:
         class Impl;

@@ -78,7 +78,7 @@ namespace electionguard
         // while ignoring any initial 0-bytes
         bool detectedFirstNonZeroBytes = false;
         stringstream stream;
-        stream << hex;
+        stream << hex << uppercase;
         for (auto byte : bytes) {
             if (!detectedFirstNonZeroBytes && byte != 0) {
                 detectedFirstNonZeroBytes = true;

@@ -203,7 +203,7 @@ TEST_CASE("a_minus_b_mod_q:  (0 - Q) % Q == 0")
 
 TEST_CASE("a_minus_b_mod_q:  (Q - MAX_256) % Q == (Q - 189)")
 {
-    string expectedHex("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe86");
+    string expectedHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE86");
 
     const auto &q = Q();
     auto max = make_unique<ElementModQ>(MAX_256, true);
@@ -220,7 +220,7 @@ TEST_CASE("a_minus_b_mod_q:  (Q - MAX_256) % Q == (Q - 189)")
 
 TEST_CASE("a_minus_b_mod_q:  ((Q + 1) - MAX_256)) % Q == (Q - 188)")
 {
-    string expectedHex("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe87");
+    string expectedHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE87");
 
     auto qplusone = make_unique<ElementModQ>(Q_PLUS_ONE, true);
     auto max = make_unique<ElementModQ>(MAX_256, true);
@@ -237,7 +237,7 @@ TEST_CASE("a_minus_b_mod_q:  ((Q + 1) - MAX_256)) % Q == (Q - 188)")
 
 TEST_CASE("a_minus_b_mod_q:  (Q - (MAX_256 - 1)) % Q == (Q - 188)")
 {
-    string expectedHex("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe87");
+    string expectedHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE87");
 
     const auto &q = Q();
     auto max = make_unique<ElementModQ>(MAX_256_MINUS_ONE, true);
@@ -254,7 +254,7 @@ TEST_CASE("a_minus_b_mod_q:  (Q - (MAX_256 - 1)) % Q == (Q - 188)")
 
 TEST_CASE("a_minus_b_mod_q:  ((Q + 1) - (MAX_256 - 1)) % Q == (Q - 187)")
 {
-    string expectedHex("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe88");
+    string expectedHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE88");
 
     auto qplusone = make_unique<ElementModQ>(Q_PLUS_ONE, true);
     auto max = make_unique<ElementModQ>(MAX_256_MINUS_ONE, true);
@@ -283,7 +283,7 @@ TEST_CASE("a_minus_b_mod_q:  (1 - Q) % Q == 1")
 
 TEST_CASE("a_minus_b_mod_q:  (1 - 2) % Q == (Q - 1)")
 {
-    string expectedHex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff42");
+    string expectedHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF42");
     auto one = ElementModQ::fromUint64(1UL);
     auto two = ElementModQ::fromUint64(2UL);
     auto zero = ElementModQ::fromUint64(0UL);
@@ -299,7 +299,7 @@ TEST_CASE("a_minus_b_mod_q:  (1 - 2) % Q == (Q - 1)")
 
 TEST_CASE("a_minus_b_mod_q:  (10 - 15) % Q == (Q - 5)")
 {
-    string expectedHex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff3e");
+    string expectedHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3E");
     auto ten = ElementModQ::fromUint64(10UL);
     auto fifteen = ElementModQ::fromUint64(15UL);
     auto five = ElementModQ::fromUint64(5UL);
@@ -315,7 +315,7 @@ TEST_CASE("a_minus_b_mod_q:  (10 - 15) % Q == (Q - 5)")
 
 TEST_CASE("a_minus_b_mod_q (Q - 1) % Q has hex value ending in 42")
 {
-    string expectedHex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff42");
+    string expectedHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF42");
     const auto &q = Q();
     auto one = ElementModQ::fromUint64(1);
     auto residue = make_unique<ElementModQ>(Q_MINUS_ONE);
@@ -522,13 +522,13 @@ TEST_CASE("mul_mod_p 3 * 3 should equal 9")
 }
 
 TEST_CASE("mul_mod_p for max uint64 * max uint64 should equal hex value "
-          "fffffffffffffffe0000000000000001)")
+          "FFFFFFFFFFFFFFFE0000000000000001)")
 {
     auto uint64Max = numeric_limits<uint64_t>::max();
     auto p = mul_mod_p(*ElementModP::fromUint64(uint64Max), *ElementModP::fromUint64(uint64Max));
     // Log::debug(": p->toHex() = " + p->toHex());
 
-    CHECK(p->toHex() == "fffffffffffffffe0000000000000001");
+    CHECK(p->toHex() == "FFFFFFFFFFFFFFFE0000000000000001");
 }
 
 #pragma endregion
@@ -608,7 +608,7 @@ TEST_CASE("Max of Q")
 
 TEST_CASE("Hex string converted to Q matches original hex when converted back toHex")
 {
-    string expectedHex("f0f0f0f0f0f0f0f0");
+    string expectedHex("F0F0F0F0F0F0F0F0");
     auto q = ElementModQ::fromHex(expectedHex);
     // Log::debug(": q->toHex() = " + q->toHex() + " and expectedHex = " + expectedHex);
 
@@ -617,7 +617,7 @@ TEST_CASE("Hex string converted to Q matches original hex when converted back to
 
 TEST_CASE("Test Q is converted correctly")
 {
-    string expectedQHex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff43");
+    string expectedQHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF43");
 
     auto qFromHex = ElementModQ::fromHex(expectedQHex);
     auto qFromRawArray = make_unique<ElementModQ>(Q_ARRAY_REVERSE, true);
@@ -637,18 +637,18 @@ TEST_CASE("Test Q is converted correctly")
 TEST_CASE("Test P is converted correctly")
 {
     string expectedPHex(
-      "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff93c467e37db0c7a4d1be3f810152"
-      "cb56a1cecc3af65cc0190c03df34709affbd8e4b59fa03a9f0eed0649ccb621057d11056ae9132135a08e43b4673"
-      "d74bafea58deb878cc86d733dbe7bf38154b36cf8a96d1567899aaae0c09d4c8b6b7b86fd2a1ea1de62ff8643ec7"
-      "c271827977225e6ac2f0bd61c746961542a3ce3bea5db54fe70e63e6d09f8fc28658e80567a47cfde60ee741e5d8"
-      "5a7bd46931ced8220365594964b839896fcaabccc9b31959c083f22ad3ee591c32fab2c7448f2a057db2db49ee52"
-      "e0182741e53865f004cc8e704b7c5c40bf304c4d8c4f13edf6047c555302d2238d8ce11df2424f1b66c2c5d238d0"
-      "744db679af2890487031f9c0aea1c4bb6fe9554ee528fdf1b05e5b256223b2f09215f3719f9c7ccc69ddf172d0d6"
-      "234217fcc0037f18b93ef5389130b7a661e5c26e54214068bbcafea32a67818bd3075ad1f5c7e9cc3d1737fb2817"
-      "1baf84dbb6612b7881c1a48e439cd03a92bf52225a2b38e6542e9f722bce15a381b5753ea842763381ccae83512b"
-      "30511b32e5e8d80362149ad030aaba5f3a5798bb22aa7ec1b6d0f17903f4e234ea6034aa85973f79a93ffb82a75c"
-      "47c03d43d2f9ca02d03199baceddd45334dbc6b5ffffffffffffffffffffffffffffffffffffffffffffffffffff"
-      "ffffffffffff");
+      "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF93C467E37DB0C7A4D1BE3F810152"
+      "CB56A1CECC3AF65CC0190C03DF34709AFFBD8E4B59FA03A9F0EED0649CCB621057D11056AE9132135A08E43B4673"
+      "D74BAFEA58DEB878CC86D733DBE7BF38154B36CF8A96D1567899AAAE0C09D4C8B6B7B86FD2A1EA1DE62FF8643EC7"
+      "C271827977225E6AC2F0BD61C746961542A3CE3BEA5DB54FE70E63E6D09F8FC28658E80567A47CFDE60EE741E5D8"
+      "5A7BD46931CED8220365594964B839896FCAABCCC9B31959C083F22AD3EE591C32FAB2C7448F2A057DB2DB49EE52"
+      "E0182741E53865F004CC8E704B7C5C40BF304C4D8C4F13EDF6047C555302D2238D8CE11DF2424F1B66C2C5D238D0"
+      "744DB679AF2890487031F9C0AEA1C4BB6FE9554EE528FDF1B05E5B256223B2F09215F3719F9C7CCC69DDF172D0D6"
+      "234217FCC0037F18B93EF5389130B7A661E5C26E54214068BBCAFEA32A67818BD3075AD1F5C7E9CC3D1737FB2817"
+      "1BAF84DBB6612B7881C1A48E439CD03A92BF52225A2B38E6542E9F722BCE15A381B5753EA842763381CCAE83512B"
+      "30511B32E5E8D80362149AD030AABA5F3A5798BB22AA7EC1B6D0F17903F4E234EA6034AA85973F79A93FFB82A75C"
+      "47C03D43D2F9CA02D03199BACEDDD45334DBC6B5FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+      "FFFFFFFFFFFF");
 
     auto pFromHex = ElementModP::fromHex(expectedPHex);
     const auto &p = P();
@@ -659,18 +659,18 @@ TEST_CASE("Test P is converted correctly")
 TEST_CASE("Test G is converted correctly")
 {
     string expectedGHex(
-      "037de384f98f6e038d2a3141825b33d5d45ec4cc64cfd15e750d6798f5196cf2a142cdf33f6ef853840ec7d4ec80"
-      "4794cfb0cfb65363b2566387b98ee0e3def1b706fa55d5038ffb4a62dcbb93b1ddd8d3b308da86d1c3a525ef356f"
-      "e5bb59314e65633480b396e1dd4b795f78de07d86b0e2a05be6af78fd7f736fcba6c032e26e050af50a03c65fa7b"
-      "6c87f4554cb57f3dabcbad8eb9d8fdebeef58570669acc3eda17dbfc47b8b3c39aa08b829b28872e62b5d1b13a98"
-      "f09d40ac20c2ab74a6750e7c8750b5141e221c41f55bba31d8e41422b64d2cba7aaa0e9fd8785702f6932825bf45"
-      "de8386d24900742062c1322b37c50af182158090c35da9355e6cf7f72da39a2284fdfb1918b2a2a30e69501fa234"
-      "2b728263df23f1db8355bde1eb276fb3685f371672ceb313fdab069cc9b11ab6c59bce62baad96aac96b0dbe0c7e"
-      "71fcb22552545a5d1cedeee01e4bc0cdbdb76b6ad45f09af5e71114a005f93ad97b8fe09274e76c94b2008926b38"
-      "caec94c95e96d628f6bc80662ba06207801328b2c6a60526bf7cd02d9661385ac3b1cbdb50f759d0e9f61c11a07b"
-      "f4218f299bcb2900520076ebd2d95a3dee96d4809ef34abeb83fdba8a12c5ca82757288a89c931cf564f00e8a317"
-      "ae1e1d828e61369ba0ddbadb10c136f8691101ad82dc54775ab8353840d9992197d80a6e94b38ac417cddf40b0c7"
-      "3abf03e8e0aa");
+      "037DE384F98F6E038D2A3141825B33D5D45EC4CC64CFD15E750D6798F5196CF2A142CDF33F6EF853840EC7D4EC80"
+      "4794CFB0CFB65363B2566387B98EE0E3DEF1B706FA55D5038FFB4A62DCBB93B1DDD8D3B308DA86D1C3A525EF356F"
+      "E5BB59314E65633480B396E1DD4B795F78DE07D86B0E2A05BE6AF78FD7F736FCBA6C032E26E050AF50A03C65FA7B"
+      "6C87F4554CB57F3DABCBAD8EB9D8FDEBEEF58570669ACC3EDA17DBFC47B8B3C39AA08B829B28872E62B5D1B13A98"
+      "F09D40AC20C2AB74A6750E7C8750B5141E221C41F55BBA31D8E41422B64D2CBA7AAA0E9FD8785702F6932825BF45"
+      "DE8386D24900742062C1322B37C50AF182158090C35DA9355E6CF7F72DA39A2284FDFB1918B2A2A30E69501FA234"
+      "2B728263DF23F1DB8355BDE1EB276FB3685F371672CEB313FDAB069CC9B11AB6C59BCE62BAAD96AAC96B0DBE0C7E"
+      "71FCB22552545A5D1CEDEEE01E4BC0CDBDB76B6AD45F09AF5E71114A005F93AD97B8FE09274E76C94B2008926B38"
+      "CAEC94C95E96D628F6BC80662BA06207801328B2C6A60526BF7CD02D9661385AC3B1CBDB50F759D0E9F61C11A07B"
+      "F4218F299BCB2900520076EBD2D95A3DEE96D4809EF34ABEB83FDBA8A12C5CA82757288A89C931CF564F00E8A317"
+      "AE1E1D828E61369BA0DDBADB10C136F8691101AD82DC54775AB8353840D9992197D80A6E94B38AC417CDDF40B0C7"
+      "3ABF03E8E0AA");
 
     auto gFromHex = ElementModP::fromHex(expectedGHex);
 
