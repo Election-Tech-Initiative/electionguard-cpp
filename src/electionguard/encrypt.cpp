@@ -117,7 +117,8 @@ namespace electionguard
 
         uint64_t plaintext_ = plaintext.toInt();
 
-        Log::debugHex(": encryptSelection: for descriptionHash: ", descriptionHash->toHex());
+        Log::debugHex(": encryptSelection: for " + description.getObjectId() + " hash: ",
+                      descriptionHash->toHex());
 
         // Generate the encryption
         auto ciphertext = elgamalEncrypt(plaintext_, *selectionNonce, elgamalPublicKey);

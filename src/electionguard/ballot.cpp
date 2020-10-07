@@ -431,15 +431,11 @@ namespace electionguard
             throw invalid_argument("mismatching selection state for " + objectId +
                                    "expected(some) actual(none)");
         }
-
-        vector<reference_wrapper<ElementModQ>> selectionHashes;
-        selectionHashes.reserve(selections.size());
+        vector<CryptoHashableType> elems = {objectId, &const_cast<ElementModQ &>(seedHash)};
         for (const auto &selection : selections) {
-            selectionHashes.push_back(ref(*selection.get().getCryptoHash()));
+            elems.push_back(ref(*selection.get().getCryptoHash()));
         }
-        auto contestHash =
-          hash_elems({objectId, &const_cast<ElementModQ &>(seedHash), selectionHashes});
-        return contestHash;
+        return hash_elems(elems);
     }
 
 #pragma endregion
@@ -724,12 +720,11 @@ namespace electionguard
                                    "expected(some) actual(none)");
         }
 
-        vector<reference_wrapper<ElementModQ>> contestHashes;
-        contestHashes.reserve(contests.size());
+        vector<CryptoHashableType> elems = {objectId, &const_cast<ElementModQ &>(seedHash)};
         for (const auto &contest : contests) {
-            contestHashes.push_back(ref(*contest.get().getCryptoHash()));
+            elems.push_back(ref(*contest.get().getCryptoHash()));
         }
-        return hash_elems({objectId, ref(seedHash), contestHashes});
+        return hash_elems(elems);
     }
 
 #pragma endregion
