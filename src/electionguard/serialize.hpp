@@ -243,7 +243,7 @@ namespace electionguard
             {
 
                 auto object_id = j["object_id"].get<string>();
-                auto balolot_style = j["ballot_style"].get<string>();
+                auto ballot_style = j["ballot_style"].get<string>();
 
                 auto contests = j["contests"];
 
@@ -267,7 +267,7 @@ namespace electionguard
                       contest_object_id, move(plaintextSelections)));
                 }
 
-                return make_unique<electionguard::PlaintextBallot>(object_id, balolot_style,
+                return make_unique<electionguard::PlaintextBallot>(object_id, ballot_style,
                                                                    move(plaintextContests));
             }
 
@@ -318,7 +318,7 @@ namespace electionguard
                           {{"object_id", selection.get().getObjectId()},
                            {"description_hash", selection.get().getDescriptionHash()->toHex()},
                            {"ciphertext", ciphertext},
-                           {"is_placeholder_selection", false},
+                           {"is_placeholder_selection", selection.get().getIsPlaceholder()},
                            {"nonce", selection.get().getNonce()->toHex()},
                            {"crypto_hash", selection.get().getCryptoHash()->toHex()},
                            {"proof", selection_proof}});
@@ -357,7 +357,7 @@ namespace electionguard
             static unique_ptr<electionguard::CiphertextBallot> toObject(json j)
             {
                 auto object_id = j["object_id"].get<string>();
-                auto balolot_style = j["ballot_style"].get<string>();
+                auto ballot_style = j["ballot_style"].get<string>();
                 auto description_hash = j["description_hash"].get<string>();
                 auto previous_tracking_hash = j["previous_tracking_hash"].get<string>();
                 auto tracking_hash = j["tracking_hash"].get<string>();
@@ -456,7 +456,7 @@ namespace electionguard
                 }
 
                 return make_unique<electionguard::CiphertextBallot>(
-                  object_id, balolot_style, *ElementModQ::fromHex(description_hash),
+                  object_id, ballot_style, *ElementModQ::fromHex(description_hash),
                   ElementModQ::fromHex(previous_tracking_hash), move(plaintextContests),
                   ElementModQ::fromHex(tracking_hash), timestamp, ElementModQ::fromHex(nonce),
                   ElementModQ::fromHex(crypto_hash));
