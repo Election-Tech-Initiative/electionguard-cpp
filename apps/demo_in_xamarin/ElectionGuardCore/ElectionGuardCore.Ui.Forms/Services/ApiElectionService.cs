@@ -13,7 +13,28 @@ namespace ElectionGuardCore.Ui.Forms.Services
         public async Task<Election> GetElection()
         {
             var elections = await SendRequestForResponse<List<Election>>("/elections", HttpMethod.Get);
-            return elections.FirstOrDefault();  // TODO determine which election to use
+            if (elections != null)
+            {
+                foreach (var election in elections)
+                {
+                    var candidates = election.ElectionDescription?.Candidates;
+                    var parties = election.ElectionDescription?.Parties;
+
+                    foreach (var candidate in candidates)
+                    {
+                        candidate.Party = parties?.FirstOrDefault(x => x.ObjectId == candidate.PartyId);
+                    }
+
+                    foreach (var contest in election.ElectionDescription?.Contests)
+                    {
+                        foreach (var selection in contest.BallotSelections)
+                        {
+                            selection.Candidate = candidates?.FirstOrDefault(x => x.ObjectId == selection.CandidateId);
+                        }
+                    }
+                }
+            }
+            return elections.FirstOrDefault(i=> i.State == ElectionState.Open);  // TODO determine which election to use
         }
 
         public async Task<CiphertextElectionContext> GetCiphertextElectionContext(string electionId)

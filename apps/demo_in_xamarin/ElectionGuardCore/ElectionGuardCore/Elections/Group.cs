@@ -35,13 +35,16 @@ namespace ElectionGuardCore.Elections
         public override object ReadJson(
             JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
+            var stringValue = reader.Value as string;
+            var prefix = stringValue.Length % 2 == 0 ? "00" : "0";
+
             if (objectType == typeof(ElementModP))
             {
-                return new ElementModP { Data = BigInteger.Parse((string)reader.Value, NumberStyles.AllowHexSpecifier) };
+                return new ElementModP { Data = BigInteger.Parse($"{prefix}{stringValue}", NumberStyles.AllowHexSpecifier) };
             }
             else
             {
-                return new ElementModQ { Data = BigInteger.Parse((string)reader.Value, NumberStyles.AllowHexSpecifier) };
+                return new ElementModQ { Data = BigInteger.Parse($"{prefix}{stringValue}", NumberStyles.AllowHexSpecifier) };
             }
         }
 
@@ -49,11 +52,11 @@ namespace ElectionGuardCore.Elections
         {
             if (value.GetType() == typeof(ElementModP))
             {
-                writer.WriteRawValue(((ElementModP)value).Data.ToString());
+                writer.WriteValue(((ElementModP)value).Data.ToString());
             }
             else
             {
-                writer.WriteRawValue(((ElementModQ)value).Data.ToString());
+                writer.WriteValue(((ElementModQ)value).Data.ToString());
             }
         }
     }

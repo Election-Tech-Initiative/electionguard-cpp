@@ -1,4 +1,6 @@
-﻿namespace ElectionGuardCore.Elections
+﻿using Newtonsoft.Json;
+
+namespace ElectionGuardCore.Elections
 {
     public class Candidate
     {
@@ -7,5 +9,8 @@
         public string PartyId { get; set; }
         public string ImageUri { get; set; }
         public bool? IsWriteIn { get; set; }
+
+        [JsonIgnore]
+        public Party Party { get; set; }
     }
 }

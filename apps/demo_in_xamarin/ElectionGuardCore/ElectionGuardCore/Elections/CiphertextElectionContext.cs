@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Numerics;
+
 namespace ElectionGuardCore.Elections
 {
     /// <summary>
@@ -18,5 +20,19 @@ namespace ElectionGuardCore.Elections
         public string DescriptionHash { get; set; }
         public string CryptoBaseHash { get; set; }
         public string CryptoExtendedBaseHash { get; set; }
+    }
+
+    public static class CiphertextElectionContextExtensions
+    {
+        public static CiphertextElectionContext ToHex(this CiphertextElectionContext context) =>
+            new CiphertextElectionContext
+            {
+                NumberOfGuardians = context.NumberOfGuardians,
+                Quorum = context.Quorum,
+                ElgamalPublicKey = BigInteger.Parse(context.ElgamalPublicKey).ToString("X"),
+                DescriptionHash = BigInteger.Parse(context.DescriptionHash).ToString("X"),
+                CryptoBaseHash = BigInteger.Parse(context.CryptoBaseHash).ToString("X"),
+                CryptoExtendedBaseHash = BigInteger.Parse(context.CryptoExtendedBaseHash).ToString("X"),
+            };
     }
 }
