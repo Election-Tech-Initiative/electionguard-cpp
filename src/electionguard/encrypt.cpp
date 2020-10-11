@@ -95,6 +95,7 @@ namespace electionguard
         auto encryptedBallot = encryptBallot(ballot, pimpl->metadata, pimpl->context,
                                              *pimpl->trackerHashSeed, nullptr, shouldVerifyProofs);
 
+        Log::debug(": encrypt: ballot encrypted");
         pimpl->trackerHashSeed = make_unique<ElementModQ>(*encryptedBallot->getTrackingHash());
         return encryptedBallot;
     }
