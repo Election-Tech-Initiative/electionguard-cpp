@@ -269,6 +269,7 @@ namespace electionguard
                 }
             }
             if (!hasContest) {
+                Log::debug(": missing contest: " + contestDescription.get().getObjectId());
                 throw invalid_argument("caller must include all contests");
             }
         }

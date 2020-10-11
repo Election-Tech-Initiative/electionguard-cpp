@@ -608,7 +608,8 @@ namespace electionguard
       unique_ptr<ElementModQ> trackingHash /* = nullptr */)
     {
         if (contests.empty()) {
-            throw invalid_argument(" ballot must have at least some contests");
+            Log::debug(":ballot must have at least some contests");
+            throw invalid_argument("ballot must have at least some contests");
         }
 
         vector<reference_wrapper<CiphertextBallotContest>> contestsRefs;
