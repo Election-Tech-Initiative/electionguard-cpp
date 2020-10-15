@@ -71,9 +71,9 @@ namespace ElectionGuardCore.Ui.Forms.Services
             var sdkPlaintextBallot = new SDK.PlaintextBallot(serializedPlaintextBallot);
 
             // encrypt
-            var ciphertext_ = mediator.Encrypt(sdkPlaintextBallot);
+            var sdkCiphertext = mediator.Encrypt(sdkPlaintextBallot);
 
-            if(!ciphertext_.IsValidEncryption(
+            if(!sdkCiphertext.IsValidEncryption(
                 sdkContext.DescriptionHash, sdkContext.ElGamalPublicKey, sdkContext.CryptoExtendedBaseHash))
             {
                 Debug.WriteLine($"Error encrypting ballot {sdkPlaintextBallot.ObjectId}");
@@ -82,7 +82,7 @@ namespace ElectionGuardCore.Ui.Forms.Services
 
             // convert the SDK ciphertext into a DTO object
             var ciphertext = JsonConvert.DeserializeObject<CiphertextBallot>(
-                ciphertext_.ToJson(), _serializerSettings);
+                sdkCiphertext.ToJson(), _serializerSettings);
             return ciphertext;
         }
 
