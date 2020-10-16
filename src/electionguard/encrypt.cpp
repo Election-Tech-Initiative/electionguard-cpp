@@ -95,6 +95,7 @@ namespace electionguard
         auto encryptedBallot = encryptBallot(ballot, pimpl->metadata, pimpl->context,
                                              *pimpl->trackerHashSeed, nullptr, shouldVerifyProofs);
 
+        Log::debug(": encrypt: ballot encrypted");
         pimpl->trackerHashSeed = make_unique<ElementModQ>(*encryptedBallot->getTrackingHash());
         return encryptedBallot;
     }
@@ -268,6 +269,7 @@ namespace electionguard
                 }
             }
             if (!hasContest) {
+                Log::debug(": missing contest: " + contestDescription.get().getObjectId());
                 throw invalid_argument("caller must include all contests");
             }
         }

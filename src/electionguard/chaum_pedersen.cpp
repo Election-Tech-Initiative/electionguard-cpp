@@ -345,7 +345,7 @@ namespace electionguard
         auto *beta = message.getData();
 
         // Pick a random number in Q.
-        auto nonces = make_unique<Nonces>(seed, "disjoint-chaum-pedersen-proof");
+        auto nonces = make_unique<Nonces>(seed, "constant-chaum-pedersen-proof");
         auto u = nonces->get(0);
 
         // Compute the NIZKP

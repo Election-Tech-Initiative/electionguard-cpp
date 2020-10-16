@@ -22,7 +22,8 @@ namespace ElectionGuardCore.Ui.Forms.Services
                 },
                 Converters = new List<JsonConverter>
                 {
-                    new StringEnumConverter(typeof(SnakeCaseNamingStrategy))
+                    new StringEnumConverter(typeof(SnakeCaseNamingStrategy)),
+                    new ElementConverter()
                 }
             };
         }

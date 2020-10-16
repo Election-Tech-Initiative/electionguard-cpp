@@ -12,6 +12,7 @@ namespace ElectionGuardCore.Elections
         public ContactInformation ContactInformation { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+        public List<GeopoliticalUnit> GeopoliticalUnits { get; set; }
         public List<Candidate> Candidates { get; set; }
         public List<Party> Parties { get; set; }
         public List<ContestDescription> Contests { get; set; }

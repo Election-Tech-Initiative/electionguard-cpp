@@ -36,12 +36,6 @@ namespace ElectionGuardCore.Ui.Forms.Services
             };
         }
 
-        private class InternalElectionDescription
-        {
-            public List<ContestDescription> Contests { get; set; }
-            public string DescriptionHash { get; set; }
-        }
-
         public CiphertextBallot EncryptBallot(
             ElectionDescription metadata, CiphertextElectionContext context,
             SelectionDescription selection, Candidate candidate)
@@ -57,51 +51,39 @@ namespace ElectionGuardCore.Ui.Forms.Services
             PlaintextBallot plaintext = FillPlaintextBallotFromSingleSelection(metadata, selection);
 
             // serialize all the things into the SDK
-            var hexContext = ToHex(context);
+            var hexContext = context.ToHex();
             var internalMetadata = new InternalElectionDescription
             {
                 Contests = metadata.Contests,
                 DescriptionHash = hexContext.DescriptionHash
             };
 
-            var metadata_json = JsonConvert.SerializeObject(internalMetadata, _serializerSettings);
-            var context_json = JsonConvert.SerializeObject(hexContext, _serializerSettings);      
+            var serializedMetadata = JsonConvert.SerializeObject(internalMetadata, _serializerSettings);
+            var serializedContext = JsonConvert.SerializeObject(hexContext, _serializerSettings);      
 
-            var metadata_ = new SDK.InternalElectionDescription(metadata_json);
-            var context_ = new SDK.CiphertextElectionContext(context_json);
+            var sdkMetadata = new SDK.InternalElectionDescription(serializedMetadata);
+            var sdkContext = new SDK.CiphertextElectionContext(serializedContext);
             var device = new SDK.EncryptionDevice(DeviceId, "Some-Location-String");
-            var mediator = new SDK.EncryptionMediator(metadata_, context_, device);
+            var mediator = new SDK.EncryptionMediator(sdkMetadata, sdkContext, device);
 
             // create an SDK representation of the plaintext ballot
-            var json = JsonConvert.SerializeObject(plaintext, _serializerSettings);
-            var plaintext_ = new SDK.PlaintextBallot(json);
+            var serializedPlaintextBallot = JsonConvert.SerializeObject(plaintext, _serializerSettings);
+            var sdkPlaintextBallot = new SDK.PlaintextBallot(serializedPlaintextBallot);
 
             // encrypt
-            var ciphertext_ = mediator.Encrypt(plaintext_);
+            var sdkCiphertext = mediator.Encrypt(sdkPlaintextBallot);
 
-            if(!ciphertext_.IsValidEncryption(
-                context_.DescriptionHash, context_.ElGamalPublicKey, context_.CryptoExtendedBaseHash))
+            if(!sdkCiphertext.IsValidEncryption(
+                sdkContext.DescriptionHash, sdkContext.ElGamalPublicKey, sdkContext.CryptoExtendedBaseHash))
             {
-                Debug.WriteLine($"Error encrypting ballot {plaintext_.ObjectId}");
+                Debug.WriteLine($"Error encrypting ballot {sdkPlaintextBallot.ObjectId}");
                 return null;
             }
 
             // convert the SDK ciphertext into a DTO object
-            var ciphertext = JsonConvert.DeserializeObject<CiphertextBallot>(ciphertext_.ToJson(), _serializerSettings);
+            var ciphertext = JsonConvert.DeserializeObject<CiphertextBallot>(
+                sdkCiphertext.ToJson(), _serializerSettings);
             return ciphertext;
-        }
-
-        private CiphertextElectionContext ToHex(CiphertextElectionContext context)
-        {
-            return new CiphertextElectionContext
-            {
-                NumberOfGuardians = context.NumberOfGuardians,
-                Quorum = context.Quorum,
-                ElgamalPublicKey = BigInteger.Parse(context.ElgamalPublicKey).ToString("X"),
-                DescriptionHash = BigInteger.Parse(context.DescriptionHash).ToString("X"),
-                CryptoBaseHash = BigInteger.Parse(context.CryptoBaseHash).ToString("X"),
-                CryptoExtendedBaseHash = BigInteger.Parse(context.CryptoExtendedBaseHash).ToString("X"),
-            };
         }
 
         private PlaintextBallot FillPlaintextBallotFromSingleSelection(

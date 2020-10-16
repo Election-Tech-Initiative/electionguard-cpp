@@ -6,7 +6,7 @@ namespace ElectionGuardCore.Elections
     {
         public string Type { get; set; }
         public string ObjectId { get; set; }
-        public int SequenceOrder { get; set; }
+        public ulong SequenceOrder { get; set; }
         public List<SelectionDescription> BallotSelections { get; set; }
         public InternationalizedText BallotTitle { get; set; }
         public InternationalizedText BallotSubtitle { get; set; }

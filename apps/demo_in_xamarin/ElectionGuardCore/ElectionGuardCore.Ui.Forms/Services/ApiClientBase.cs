@@ -11,8 +11,20 @@ namespace ElectionGuardCore.Ui.Forms.Services
 {
     public abstract class ApiClientBase
     {
-        private static readonly HttpClient Client = new HttpClient(); // instantiate once for app lifetime, per MS docs
-
+#if DEBUG
+        private static readonly HttpClient Client = new HttpClient(
+                   new HttpClientHandler()
+                   {
+                       ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) =>
+                       {
+                           //bypass
+                           return true;
+                       },
+                   }
+                   , false);
+#else
+        private static readonly HttpClient Client = new HttpClient();
+#endif
         private readonly Uri _baseUri;
 
         private readonly JsonSerializerSettings _serializerSettings;
