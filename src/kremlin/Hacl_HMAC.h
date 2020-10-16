@@ -22,15 +22,14 @@
  */
 
 
-#ifndef __Hacl_Blake2s_32_H
-#define __Hacl_Blake2s_32_H
+#ifndef __Hacl_HMAC_H
+#define __Hacl_HMAC_H
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
 #include "evercrypt_targetconfig.h"
-#include "libintvector.h"
 #include "kremlin/internal/types.h"
 #include "kremlin/lowstar_endianness.h"
 #include <string.h>
@@ -38,29 +37,47 @@ extern "C" {
 
 
 #include "Hacl_Kremlib.h"
-#include "Lib_Memzero0.h"
-#include "Hacl_Impl_Blake2_Constants.h"
-
-typedef struct K___uint32_t_uint32_t_s
-{
-  uint32_t fst;
-  uint32_t snd;
-}
-K___uint32_t_uint32_t;
+#include "Hacl_Hash.h"
 
 void
-Hacl_Blake2s_32_blake2s(
-  uint32_t nn,
-  uint8_t *output,
-  uint32_t ll,
-  uint8_t *d,
-  uint32_t kk,
-  uint8_t *k
+Hacl_HMAC_legacy_compute_sha1(
+  uint8_t *dst,
+  uint8_t *key,
+  uint32_t key_len,
+  uint8_t *data,
+  uint32_t data_len
+);
+
+void
+Hacl_HMAC_compute_sha2_256(
+  uint8_t *dst,
+  uint8_t *key,
+  uint32_t key_len,
+  uint8_t *data,
+  uint32_t data_len
+);
+
+void
+Hacl_HMAC_compute_sha2_384(
+  uint8_t *dst,
+  uint8_t *key,
+  uint32_t key_len,
+  uint8_t *data,
+  uint32_t data_len
+);
+
+void
+Hacl_HMAC_compute_sha2_512(
+  uint8_t *dst,
+  uint8_t *key,
+  uint32_t key_len,
+  uint8_t *data,
+  uint32_t data_len
 );
 
 #if defined(__cplusplus)
 }
 #endif
 
-#define __Hacl_Blake2s_32_H_DEFINED
+#define __Hacl_HMAC_H_DEFINED
 #endif

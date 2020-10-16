@@ -22,30 +22,27 @@
  */
 
 
-#include "Hacl_Spec.h"
+#ifndef __Lib_RandomBuffer_System_H
+#define __Lib_RandomBuffer_System_H
 
-Spec_Agile_Cipher_cipher_alg
-Spec_Cipher_Expansion_cipher_alg_of_impl(Spec_Cipher_Expansion_impl i)
-{
-  switch (i)
-  {
-    case Spec_Cipher_Expansion_Hacl_CHACHA20:
-      {
-        return Spec_Agile_Cipher_CHACHA20;
-      }
-    case Spec_Cipher_Expansion_Vale_AES128:
-      {
-        return Spec_Agile_Cipher_AES128;
-      }
-    case Spec_Cipher_Expansion_Vale_AES256:
-      {
-        return Spec_Agile_Cipher_AES256;
-      }
-    default:
-      {
-        KRML_HOST_EPRINTF("KreMLin incomplete match at %s:%d\n", __FILE__, __LINE__);
-        KRML_HOST_EXIT(253U);
-      }
-  }
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+#include "evercrypt_targetconfig.h"
+#include "kremlin/internal/types.h"
+#include "kremlin/lowstar_endianness.h"
+#include <string.h>
+#include "kremlin/internal/target.h"
+
+
+
+
+extern bool Lib_RandomBuffer_System_randombytes(uint8_t *buf, uint32_t len);
+
+#if defined(__cplusplus)
 }
+#endif
 
+#define __Lib_RandomBuffer_System_H_DEFINED
+#endif
