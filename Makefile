@@ -28,13 +28,13 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 	ln -s "$(brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
-	sudo apt install build-essential
-	sudo apt install llvm
-	sudo apt install cmake
-	sudo apt install lcov
-	sudo apt install cppcheck
-	sudo apt install clang-tidy
-	sudo apt install valgrind
+	sudo apt install -y build-essential
+	sudo apt install -y llvm
+	sudo apt install -y cmake
+	sudo apt install -y lcov
+	sudo apt install -y cppcheck
+	sudo apt install -y clang-tidy
+	sudo apt install -y valgrind
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
     

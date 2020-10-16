@@ -1,0 +1,60 @@
+name: Pull Request
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "apps/**"
+      - "bindings/**"
+      - "include/**"
+      - "src/**"
+      - "test/**"
+    branches: [main]
+  pull_request:
+    paths:
+      - ".github/**"
+      - "apps/**"
+      - "bindings/**"
+      - "include/**"
+      - "src/**"
+      - "test/**"
+    branches: [main]
+
+env:
+  TARGET: Release
+
+jobs:
+  build_and_test:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        name: ["ubuntu-18.04-clang-9", "macos-10.15-xcode-12.5"]
+        include:
+          - name: ubuntu-18.04-clang-11
+            os: ubuntu-18.04
+            compiler: clang
+            version: "11"
+          - name: macOS-10.15-xcode-12.0
+            os: macOS-10.15
+            compiler: xcode
+            version: "12.0"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Change Directory
+        run: cd ${{ github.workspace }}
+      - name: Update Environment
+        if: runner.os == 'Linux'
+        run: sudo apt-get update
+      - name: Update Environment
+        if: runner.os == 'macOS'
+        run: sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
+      - name: Configure Environment
+        run: make environment
+      - name: Run Tests
+        run: make test
+      - name: Run Address Sanitizer
+        run: make sanitize-asan
