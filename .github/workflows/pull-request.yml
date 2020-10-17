@@ -53,7 +53,10 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           ls -ls /Applications/
+          xcode-select --install
+          which llvm-lcov
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
+          which llvm-lcov
       - name: Configure Environment
         run: make environment
       - name: Run Tests
