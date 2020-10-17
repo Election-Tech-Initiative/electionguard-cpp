@@ -51,7 +51,9 @@ jobs:
         run: sudo apt-get update
       - name: Update Environment
         if: runner.os == 'macOS'
-        run: sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
+        run: |
+          ls -ls /Applications/
+          sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
       - name: Configure Environment
         run: make environment
       - name: Run Tests
