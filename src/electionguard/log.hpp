@@ -18,8 +18,9 @@ namespace electionguard
     {
         static void prefix(const char *caller = "")
         {
-            auto now = time(nullptr);
-            cout << "[ " << put_time(gmtime(&now), "%c") << " ]: " << caller << ": ";
+            auto now_seconds = time(nullptr);
+            struct tm now;
+            cout << "[ " << put_time(gmtime_r(&now_seconds, &now), "%c") << " ]: " << caller << ": ";
         }
 
         static void postfix() { cout << endl; }
