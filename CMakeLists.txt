@@ -31,7 +31,9 @@ endif()
 option(CMAKE_BUILD_TYPE         "Build with or without debug symbols"                       Release)
 option(BUILD_SHARED_LIBS         "Build SHARED libraries"                                   OFF)
 option(OPTION_ENABLE_TESTS      "Enable support for testing private headers"                OFF)
+option(CODE_COVERAGE            "Use code coverage"                                         OFF)
 option(OPTION_GENERATE_DOCS     "Generate documentation"                                    OFF)
+option(USE_DYNAMIC_ANALYSIS     "Enable Dynamic tools"                                      OFF)
 
 # ---- Modules ----
 
