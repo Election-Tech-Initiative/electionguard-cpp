@@ -1,15 +1,5 @@
 .PHONY: build build-debug build-debug-all build-release build-android build-ios clean format memcheck sanitize sanitize-asan sanitize-tsan test
 
-# Debug or Release (capitalized)
-TARGET?=Release
-
-ifeq ($(OPERATING_SYSTEM),Darwin)
-NDK_PATH?=/Users/$$USER/Library/Android/sdk/ndk/21.3.6528147
-endif
-ifeq ($(OPERATING_SYSTEM),Linux)
-NDK_PATH?=/usr/local/lib/android/sdk/ndk/21.3.6528147
-endif
-
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_BUILD_DIR=$(realpath .)/build
 ELECTIONGUARD_BUILD_APPS_DIR=$(ELECTIONGUARD_BUILD_DIR)/apps
@@ -22,6 +12,16 @@ ifeq ($(OS),Windows_NT)
     OPERATING_SYSTEM := Windows
 else
     OPERATING_SYSTEM := $(shell uname 2>/dev/null || echo Unknown)
+endif
+
+# Debug or Release (capitalized)
+TARGET?=Release
+
+ifeq ($(OPERATING_SYSTEM),Darwin)
+NDK_PATH?=/Users/$$USER/Library/Android/sdk/ndk/21.3.6528147
+endif
+ifeq ($(OPERATING_SYSTEM),Linux)
+NDK_PATH?=/usr/local/lib/android/sdk/ndk/21.3.6528147
 endif
 
 all: environment build
@@ -46,7 +46,7 @@ ifeq ($(OPERATING_SYSTEM),Linux)
 	sudo apt install -y valgrind
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
-    @echo 🏁 MACOS INSTALL
+    @echo 🏁 WINDOWS INSTALL
 endif
 
 ifeq ($(TARGET),Release)
@@ -140,7 +140,7 @@ build-netstandard: build-android build-ios
 	@echo 🖥️ BUILD NETSTANDARD
 ifeq ($(OPERATING_SYSTEM),Darwin)
 	msbuild ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /t:Build /p:Configuration=$(TARGET)
-	cp ./bindings/netstandard/ElectionGuard/ElectionGuard.NuGet/bin/$(TARGET)/* $(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/$(TARGET)
+	cp ./bindings/netstandard/ElectionGuard/ElectionGuard.NuGet/bin/$(TARGET)/* $(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/$(TARGET)/
 else
 	echo "NetStandard builds are only supported on MacOS"
 endif
@@ -153,6 +153,8 @@ clean:
 	if [ ! -d "$(ELECTIONGUARD_BUILD_APPS_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_APPS_DIR); fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_BINDING_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_BINDING_DIR); fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard" ]; then mkdir $(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/Debug" ]; then mkdir $(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/Debug; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/Release" ]; then mkdir $(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/Release; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR); fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/android" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/android; fi
