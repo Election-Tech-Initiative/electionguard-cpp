@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
-    using NativeElementModP = NativeInterface.ElementModP.ElementModPType;
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQType;
     using NativePlaintextBallot = NativeInterface.PlaintextBallot.PlaintextBallotType;
     using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotType;
@@ -18,7 +16,7 @@ namespace ElectionGuard
                 var status = NativeInterface.PlaintextBallot.GetObjectId(Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Debug.WriteLine($"PlaintextBallot Error ObjectId: {status}");
+                    Console.WriteLine($"PlaintextBallot Error ObjectId: {status}");
                     return null;
                 }
                 return Marshal.PtrToStringAnsi(value);
@@ -32,7 +30,7 @@ namespace ElectionGuard
             var status = NativeInterface.PlaintextBallot.FromJson(json, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Debug.WriteLine($"PlaintextBallot Error Status: {status}");
+                Console.WriteLine($"PlaintextBallot Error Status: {status}");
             }
         }
 
@@ -42,7 +40,7 @@ namespace ElectionGuard
             var status = NativeInterface.PlaintextBallot.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Debug.WriteLine($"DisposeUnamanged Error Status: {status}");
+                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
             }
             Handle = null;
         }
@@ -53,7 +51,7 @@ namespace ElectionGuard
                 Handle, out IntPtr pointer, out UIntPtr size);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Debug.WriteLine($"ToJson Error Status: {status}");
+                Console.WriteLine($"ToJson Error Status: {status}");
                 return null;
             }
             var json = Marshal.PtrToStringAnsi(pointer);
@@ -72,7 +70,7 @@ namespace ElectionGuard
                 var status = NativeInterface.CiphertextBallot.GetObjectId(Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Debug.WriteLine($"CiphertextBallot Error ObjectId: {status}");
+                    Console.WriteLine($"CiphertextBallot Error ObjectId: {status}");
                     return null;
                 }
                 return Marshal.PtrToStringAnsi(value);
@@ -87,7 +85,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ* value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Debug.WriteLine($"TrackingHash Error Status: {status}");
+                    Console.WriteLine($"TrackingHash Error Status: {status}");
                     return null;
                 }
                 return new ElementModQ(value);
@@ -101,7 +99,7 @@ namespace ElectionGuard
                 var status = NativeInterface.CiphertextBallot.GetTrackingCode(Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Debug.WriteLine($"CiphertextBallot Error TrackingCode: {status}");
+                    Console.WriteLine($"CiphertextBallot Error TrackingCode: {status}");
                     return null;
                 }
                 return Marshal.PtrToStringAnsi(value);
@@ -128,7 +126,7 @@ namespace ElectionGuard
             var status = NativeInterface.CiphertextBallot.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Debug.WriteLine($"DisposeUnamanged Error Status: {status}");
+                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
             }
             Handle = null;
         }
@@ -146,10 +144,11 @@ namespace ElectionGuard
                 Handle, out IntPtr pointer, out UIntPtr size);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Debug.WriteLine($"ToJson Error Status: {status}");
+                Console.WriteLine($"ToJson Error Status: {status}");
                 return null;
             }
-            var json = Marshal.PtrToStringAnsi(pointer);
+            var json = Marshal.PtrToStringAnsi(pointer, (int)size);
+            Marshal.FreeHGlobal(pointer);
             return json;
         }
     }
