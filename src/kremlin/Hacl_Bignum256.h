@@ -122,7 +122,7 @@ bool Hacl_Bignum256_mod(uint64_t *n, uint64_t *a, uint64_t *res);
 Write `a ^ b mod n` in `res`.
 
   The arguments a, n, r2 and the outparam res are meant to be 256-bit bignums, i.e. uint64_t[4].
-  The argument r2 is a precomputed constant 2 ^ 512 mod n obtained through Hacl_Bignum4096_new_precompr2.
+  The argument r2 is a precomputed constant 2 ^ 512 mod n obtained through Hacl_Bignum256_new_precompr2.
   The argument b is a bignum of any size, and bBits is an upper bound on the
   number of significant bits of b. A tighter bound results in faster execution
   time. When in doubt, the number of bits for the bignum size is always a safe
@@ -240,21 +240,22 @@ Compute `2 ^ (128 * nLen) mod n`.
   If the return value is non-null, clients must eventually call free(3) on it to
   avoid memory leaks.
 */
-uint64_t *Hacl_Bignum256_new_precompr2(uint32_t nLen, uint64_t *n);
+uint64_t *Hacl_Bignum256_new_precompr2(uint32_t len, uint64_t *n);
 
 /*
 Write `a ^ (-1) mod n` in `res`.
 
   The arguments a, n and the outparam res are meant to be 256-bit bignums, i.e. uint64_t[4].
-  The function returns false if any of the preconditions of mod_exp_precompr2 are
-  violated, true otherwise.
 
-  This function is *UNSAFE* and requires C clients to observe bn_mod_inv_prime_lemma
-  from Hacl.Spec.Bignum.ModInv.fst, which amounts to:
+  This function is *UNSAFE* and requires C clients to observe the precondition of
+  bn_mod_inv_prime_lemma from Hacl.Spec.Bignum.ModInv.fst, which amounts to:
   • n is a prime
-  • 0 < a 
+  • n % 2 = 1
+  • 1 < n
+  • 0 < a
+  • a < n 
 */
-bool Hacl_Bignum256_mod_inv_prime(uint64_t *n, uint64_t *a, uint64_t *res);
+void Hacl_Bignum256_mod_inv_prime(uint64_t *n, uint64_t *a, uint64_t *res);
 
 
 /********************/
