@@ -30,12 +30,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name: ["ubuntu-18.04-clang-11", "macos-10.15-xcode-12.0"]
+        name:
+          [
+            "ubuntu-18.04-gcc-9.3.0",
+            "ubuntu-18.04-clang-10.0.0",
+            "macos-10.15-xcode-12.0",
+          ]
         include:
-          - name: ubuntu-18.04-clang-11
+          - name: ubuntu-18.04-gcc-9.3.0
+            os: ubuntu-18.04
+            compiler: gcc
+            version: "9"
+          - name: ubuntu-18.04-clang-10.0.0
             os: ubuntu-18.04
             compiler: clang
-            version: "11"
+            version: "10"
           - name: macOS-10.15-xcode-12.0
             os: macOS-10.15
             compiler: xcode
@@ -48,18 +57,48 @@ jobs:
         run: cd ${{ github.workspace }}
       - name: Update Environment
         if: runner.os == 'Linux'
-        run: sudo apt-get update
+        run: |
+          sudo apt-get update
+
+          if [ "${{ matrix.compiler }}" = "gcc" ]; then
+            echo "::set-env name=CC::gcc-${{ matrix.version }}"
+            echo "::set-env name=CXX::g++-${{ matrix.version }}"
+          else
+            sudo apt-get install -y clang-${{ matrix.version }} g++-multilib
+            echo "::set-env name=CC::clang-${{ matrix.version }}"
+            echo "::set-env name=CXX::clang++-${{ matrix.version }}"
+          fi
+
       - name: Update Environment
         if: runner.os == 'macOS'
         run: |
           ls -ls /Applications/
-          xcode-select --install
-          which llvm-lcov
+          ls -ls $ANDROID_SDK_ROOT/ndk
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
           which llvm-lcov
       - name: Configure Environment
         run: make environment
+      - name: Make Release Build
+        if: runner.os == 'Linux'
+        env:
+          NDK_PATH: $$ANDROID_SDK_ROOT/ndk/21.3.6528147
+        run: |
+          make build
+          # if [ "${{ matrix.compiler }}" = "clang" ]; then
+          #   make build-android
+          # fi
+      - name: Make Release Build
+        if: runner.os == 'macOS'
+        env:
+          NDK_PATH: $$ANDROID_HOME/ndk/21.3.6528147
+        run: |
+          make build
+          # make build-android
+          # make build-ios
+          # make build-netstandard
       - name: Run Tests
+        if: runner.os == 'macOS'
         run: make test
       - name: Run Address Sanitizer
+        if: runner.os == 'Linux'
         run: make sanitize-asan
