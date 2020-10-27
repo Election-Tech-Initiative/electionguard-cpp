@@ -24,7 +24,7 @@ namespace ElectionGuard
 #if Android
         const string DllName = "libelectionguard.so";
 #else
-    const string DllName = "__Internal";
+        const string DllName = "__Internal";
 #endif
 
         internal unsafe struct CharPtr { };
@@ -65,8 +65,8 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_get_data")]
             internal static extern Status GetData(ElementModQType* handle, ulong** out_data, out UIntPtr out_size);
 
-           [DllImport(DllName, EntryPoint = "eg_element_mod_q_to_hex")]
-           internal static extern Status ToHex(ElementModQType* handle, out IntPtr out_hex);
+            [DllImport(DllName, EntryPoint = "eg_element_mod_q_to_hex")]
+            internal static extern Status ToHex(ElementModQType* handle, out IntPtr out_hex);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_rand_q_new")]
             internal static extern Status Random(out ElementModQType* handle);
@@ -89,7 +89,7 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_internal_election_description_from_bson")]
             internal static extern Status FromBson(
-                uint *data, ulong length, InternalElectionDescriptionType* handle);
+                uint* data, ulong length, InternalElectionDescriptionType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_internal_election_description_to_json")]
             internal static extern Status ToJson(
@@ -97,7 +97,7 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_internal_election_description_to_bson")]
             internal static extern Status ToBson(
-                InternalElectionDescriptionType* handle, out uint *data, out UIntPtr size);
+                InternalElectionDescriptionType* handle, out uint* data, out UIntPtr size);
         }
 
         internal static unsafe class CiphertextElectionContext
@@ -215,8 +215,16 @@ namespace ElectionGuard
             internal static extern Status ToJson(
                 CiphertextBallotType* handle, out IntPtr data, out UIntPtr size);
 
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_to_json_with_nonces")]
+            internal static extern Status ToJsonWithNonces(
+                CiphertextBallotType* handle, out IntPtr data, out UIntPtr size);
+
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_to_bson")]
             internal static extern Status ToBson(
+                CiphertextBallotType* handle, out uint* data, out UIntPtr size);
+
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_to_bson_with_nonces")]
+            internal static extern Status ToBsonWithNonces(
                 CiphertextBallotType* handle, out uint* data, out UIntPtr size);
         }
 

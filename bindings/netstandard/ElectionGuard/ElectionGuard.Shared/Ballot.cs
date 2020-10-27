@@ -138,10 +138,14 @@ namespace ElectionGuard
                 Handle, seedHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
         }
 
-        public unsafe string ToJson()
+        public unsafe string ToJson(bool withNonces = false)
         {
-            var status = NativeInterface.CiphertextBallot.ToJson(
-                Handle, out IntPtr pointer, out UIntPtr size);
+            var status = withNonces
+                ? NativeInterface.CiphertextBallot.ToJsonWithNonces(
+                Handle, out IntPtr pointer, out UIntPtr size)
+                : NativeInterface.CiphertextBallot.ToJson(
+                Handle, out pointer, out size);
+
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"ToJson Error Status: {status}");

@@ -693,12 +693,15 @@ namespace electionguard
         return nonceSeed(*pimpl->descriptionHash, pimpl->object_id, *pimpl->nonce);
     }
 
-    vector<uint8_t> CiphertextBallot::toBson() const
+    vector<uint8_t> CiphertextBallot::toBson(bool withNonces /* = false */) const
     {
-        return CiphertextBallotSerializer::toBson(*this);
+        return CiphertextBallotSerializer::toBson(*this, withNonces);
     }
 
-    string CiphertextBallot::toJson() const { return CiphertextBallotSerializer::toJson(*this); }
+    string CiphertextBallot::toJson(bool withNonces /* = false */) const
+    {
+        return CiphertextBallotSerializer::toJson(*this, withNonces);
+    }
 
     unique_ptr<CiphertextBallot> CiphertextBallot::fromJson(string data)
     {

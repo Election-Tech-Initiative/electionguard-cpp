@@ -148,8 +148,13 @@ TEST_CASE("Encrypt Ballot with mediator succeeds")
                                         *context->getCryptoExtendedBaseHash()) == true);
 
     // Can Serialize CiphertextBallot
-    auto json = ciphertext->toJson();
+    auto json = ciphertext->toJson(); // as default values
     auto fromJson = CiphertextBallot::fromJson(json);
+    CHECK(fromJson->getNonce()->toHex() == ZERO_MOD_Q().toHex());
+
+    auto jsonWithNonces = ciphertext->toJson(true); // serialize with nonce values
+    auto fromJsonWithNonces = CiphertextBallot::fromJson(jsonWithNonces);
+    CHECK(fromJsonWithNonces->getNonce()->toHex() == ciphertext->getNonce()->toHex());
 
     CHECK(plaintext->getObjectId() == plaintext->getObjectId());
 

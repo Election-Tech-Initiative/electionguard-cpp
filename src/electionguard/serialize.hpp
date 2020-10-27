@@ -293,7 +293,8 @@ namespace electionguard
         class CiphertextBallot
         {
           private:
-            static json fromObject(const electionguard::CiphertextBallot &serializable)
+            static json fromObject(const electionguard::CiphertextBallot &serializable,
+                                   bool withNonces)
             {
                 json contests;
                 for (const auto &contest : serializable.getContests()) {
@@ -314,14 +315,19 @@ namespace electionguard
                           {"proof_zero_response", p->getProofZeroResponse()->toHex()},
                           {"proof_one_response", p->getProofOneResponse()->toHex()},
                         };
-                        selections.push_back(
-                          {{"object_id", selection.get().getObjectId()},
-                           {"description_hash", selection.get().getDescriptionHash()->toHex()},
-                           {"ciphertext", ciphertext},
-                           {"is_placeholder_selection", selection.get().getIsPlaceholder()},
-                           {"nonce", selection.get().getNonce()->toHex()},
-                           {"crypto_hash", selection.get().getCryptoHash()->toHex()},
-                           {"proof", selection_proof}});
+
+                        json selection_props = {
+                          {"object_id", selection.get().getObjectId()},
+                          {"description_hash", selection.get().getDescriptionHash()->toHex()},
+                          {"ciphertext", ciphertext},
+                          {"is_placeholder_selection", selection.get().getIsPlaceholder()},
+                          {"crypto_hash", selection.get().getCryptoHash()->toHex()},
+                          {"proof", selection_proof}};
+
+                        if (withNonces) {
+                            selection_props["nonce"] = selection.get().getNonce()->toHex();
+                        }
+                        selections.push_back(selection_props);
                     }
                     auto *p = contest.get().getProof();
                     json contest_proof = {
@@ -331,14 +337,18 @@ namespace electionguard
                       {"response", p->getResponse()->toHex()},
                       {"constant", p->getConstant()},
                     };
-                    contests.push_back({
+                    json contest_props = {
                       {"object_id", contest.get().getObjectId()},
                       {"description_hash", contest.get().getDescriptionHash()->toHex()},
                       {"ballot_selections", selections},
-                      {"nonce", contest.get().getNonce()->toHex()},
                       {"crypto_hash", contest.get().getCryptoHash()->toHex()},
                       {"proof", contest_proof},
-                    });
+                    };
+                    if (withNonces) {
+                        contest_props["nonce"] = contest.get().getNonce()->toHex();
+                    }
+
+                    contests.push_back(contest_props);
                 }
                 json result = {
                   {"object_id", serializable.getObjectId()},
@@ -349,9 +359,11 @@ namespace electionguard
                   {"tracking_hash", serializable.getTrackingHash()->toHex()},
                   {"tracking_code", serializable.getTrackingCode()},
                   {"timestamp", serializable.getTimestamp()},
-                  {"nonce", serializable.getNonce()->toHex()},
                   {"crypto_hash", serializable.getCryptoHash()->toHex()},
                 };
+                if (withNonces) {
+                    result["nonce"] = serializable.getNonce()->toHex();
+                }
                 return result;
             }
             static unique_ptr<electionguard::CiphertextBallot> toObject(json j)
@@ -362,7 +374,7 @@ namespace electionguard
                 auto previous_tracking_hash = j["previous_tracking_hash"].get<string>();
                 auto tracking_hash = j["tracking_hash"].get<string>();
                 auto timestamp = j["timestamp"].get<uint64_t>();
-                auto nonce = j["nonce"].get<string>();
+                auto nonce = j["nonce"].is_null() ? "0x00" : j["nonce"].get<string>();
                 auto crypto_hash = j["crypto_hash"].get<string>();
 
                 auto contests = j["contests"];
@@ -372,7 +384,8 @@ namespace electionguard
                 for (auto &contest : contests) {
                     auto contest_object_id = contest["object_id"].get<string>();
                     auto contest_description_hash = contest["description_hash"].get<string>();
-                    auto contest_nonce = contest["nonce"].get<string>();
+                    auto contest_nonce =
+                      contest["nonce"].is_null() ? "0x00" : contest["nonce"].get<string>();
                     auto contest_crypto_hash = contest["crypto_hash"].get<string>();
 
                     auto proof = contest["proof"];
@@ -398,7 +411,8 @@ namespace electionguard
                           selection["description_hash"].get<string>();
                         auto selection_is_placeholder_selection =
                           selection["is_placeholder_selection"].get<bool>();
-                        auto selection_nonce = selection["nonce"].get<string>();
+                        auto selection_nonce =
+                          selection["nonce"].is_null() ? "0x00" : selection["nonce"].get<string>();
                         auto selection_crypto_hash = selection["crypto_hash"].get<string>();
 
                         auto ciphertext = selection["ciphertext"];
@@ -463,13 +477,15 @@ namespace electionguard
             }
 
           public:
-            static vector<uint8_t> toBson(const electionguard::CiphertextBallot &serializable)
+            static vector<uint8_t> toBson(const electionguard::CiphertextBallot &serializable,
+                                          bool withNonces)
             {
-                return json::to_bson(fromObject(serializable));
+                return json::to_bson(fromObject(serializable, withNonces));
             }
-            static string toJson(const electionguard::CiphertextBallot &serializable)
+            static string toJson(const electionguard::CiphertextBallot &serializable,
+                                 bool withNonces)
             {
-                return fromObject(serializable).dump();
+                return fromObject(serializable, withNonces).dump();
             }
             static unique_ptr<electionguard::CiphertextBallot> fromBson(vector<uint8_t> data)
             {
