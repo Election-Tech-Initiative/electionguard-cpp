@@ -524,7 +524,7 @@ TEST_CASE("mul_mod_p 3 * 3 should equal 9")
 TEST_CASE("mul_mod_p for max uint64 * max uint64 should equal hex value "
           "FFFFFFFFFFFFFFFE0000000000000001)")
 {
-    auto uint64Max = numeric_limits<uint64_t>::max();
+    uint64_t uint64Max = 0xffffffffffffffff;
     auto p = mul_mod_p(*ElementModP::fromUint64(uint64Max), *ElementModP::fromUint64(uint64Max));
     // Log::debug(": p->toHex() = " + p->toHex());
 
