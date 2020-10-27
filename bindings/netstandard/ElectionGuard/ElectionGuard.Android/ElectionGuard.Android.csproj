@@ -57,19 +57,19 @@
     <Folder Include="libs\x86_64\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedNativeLibrary Include="..\..\..\..\build\libs\android\armeabi-v7a\src\libelectionguard.so">
+    <EmbeddedNativeLibrary Include="..\..\..\..\build\libs\android\$(Configuration)\armeabi-v7a\src\libelectionguard.so">
       <Link>libs\armeabi-v7a\libelectionguard.so</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedNativeLibrary>
-    <EmbeddedNativeLibrary Include="..\..\..\..\build\libs\android\arm64-v8a\src\libelectionguard.so">
+    <EmbeddedNativeLibrary Include="..\..\..\..\build\libs\android\$(Configuration)\arm64-v8a\src\libelectionguard.so">
       <Link>libs\arm64-v8a\libelectionguard.so</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedNativeLibrary>
-    <EmbeddedNativeLibrary Include="..\..\..\..\build\libs\android\x86_64\src\libelectionguard.so">
+    <EmbeddedNativeLibrary Include="..\..\..\..\build\libs\android\$(Configuration)\x86_64\src\libelectionguard.so">
       <Link>libs\x86_64\libelectionguard.so</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedNativeLibrary>
-    <EmbeddedNativeLibrary Include="..\..\..\..\build\libs\android\x86\src\libelectionguard.so">
+    <EmbeddedNativeLibrary Include="..\..\..\..\build\libs\android\$(Configuration)\x86\src\libelectionguard.so">
       <Link>libs\x86\libelectionguard.so</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedNativeLibrary>
