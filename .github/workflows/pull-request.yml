@@ -75,7 +75,6 @@ jobs:
           ls -ls /Applications/
           ls -ls $ANDROID_SDK_ROOT/ndk
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
-          which llvm-lcov
       - name: Configure Environment
         run: make environment
       - name: Make Release Build
