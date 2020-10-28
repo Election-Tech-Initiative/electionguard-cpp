@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -19,7 +18,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ* value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Debug.WriteLine($"DescriptionHash Error Status: {status}");
+                    Console.WriteLine($"DescriptionHash Error Status: {status}");
                     return null;
                 }
                 return new ElementModQ(value);
@@ -33,7 +32,7 @@ namespace ElectionGuard
             var status = NativeInterface.InternalElectionDescription.FromJson(json, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Debug.WriteLine($"InternalElectionDescription Error Status: {status}");
+                Console.WriteLine($"InternalElectionDescription Error Status: {status}");
             }
         }
 
@@ -43,7 +42,7 @@ namespace ElectionGuard
             var status = NativeInterface.InternalElectionDescription.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Debug.WriteLine($"DisposeUnamanged Error Status: {status}");
+                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
             }
             Handle = null;
         }
@@ -54,7 +53,7 @@ namespace ElectionGuard
                 Handle, out IntPtr pointer, out UIntPtr size);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Debug.WriteLine($"ToJson Error Status: {status}");
+                Console.WriteLine($"ToJson Error Status: {status}");
                 return null;
             }
             var json = Marshal.PtrToStringAnsi(pointer);
@@ -72,7 +71,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModP* value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Debug.WriteLine($"ElGamalPublicKey Error Status: {status}");
+                    Console.WriteLine($"ElGamalPublicKey Error Status: {status}");
                     return null;
                 }
                 return new ElementModP(value);
@@ -87,7 +86,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ* value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Debug.WriteLine($"DescriptionHash Error Status: {status}");
+                    Console.WriteLine($"DescriptionHash Error Status: {status}");
                     return null;
                 }
                 return new ElementModQ(value);
@@ -102,7 +101,7 @@ namespace ElectionGuard
                      Handle, out NativeElementModQ* value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Debug.WriteLine($"CryptoBaseHash Error Status: {status}");
+                    Console.WriteLine($"CryptoBaseHash Error Status: {status}");
                     return null;
                 }
                 return new ElementModQ(value);
@@ -117,7 +116,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ* value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Debug.WriteLine($"CryptoExtendedBaseHash Error Status: {status}");
+                    Console.WriteLine($"CryptoExtendedBaseHash Error Status: {status}");
                     return null;
                 }
                 return new ElementModQ(value);
@@ -131,7 +130,7 @@ namespace ElectionGuard
             var status = NativeInterface.CiphertextElectionContext.FromJson(json, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Debug.WriteLine($"CiphertextElectionContext Error Status: {status}");
+                Console.WriteLine($"CiphertextElectionContext Error Status: {status}");
             }
         }
 
@@ -141,7 +140,7 @@ namespace ElectionGuard
             var status = NativeInterface.CiphertextElectionContext.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Debug.WriteLine($"DisposeUnamanged Error Status: {status}");
+                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
             }
             Handle = null;
         }
@@ -152,7 +151,7 @@ namespace ElectionGuard
                 Handle, out IntPtr pointer, out UIntPtr size);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Debug.WriteLine($"ToJson Error Status: {status}");
+                Console.WriteLine($"ToJson Error Status: {status}");
                 return null;
             }
             var json = Marshal.PtrToStringAnsi(pointer);

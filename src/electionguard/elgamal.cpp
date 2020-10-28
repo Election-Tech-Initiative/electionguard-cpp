@@ -128,12 +128,8 @@ namespace electionguard
         }
 
         uint64_t inverse[MAX_P_LEN] = {};
-        success = Hacl_Bignum4096_mod_inv_prime(p.get(), static_cast<uint64_t *>(divisor),
-                                                static_cast<uint64_t *>(inverse));
-        if (!success) {
-            Log::debug(": could not calculate inverse");
-            return 0;
-        }
+        Hacl_Bignum4096_mod_inv_prime(p.get(), static_cast<uint64_t *>(divisor),
+                                      static_cast<uint64_t *>(inverse));
 
         uint64_t mulResult[MAX_P_LEN_DOUBLE] = {};
         Hacl_Bignum4096_mul(this->getData()->get(), static_cast<uint64_t *>(inverse),
