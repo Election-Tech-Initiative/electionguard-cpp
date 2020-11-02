@@ -133,9 +133,15 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_from_bson(
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_to_json(eg_ciphertext_ballot_t *handle,
                                                               char **out_data, uint64_t *out_size);
 
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_to_json_with_nonces(
+  eg_ciphertext_ballot_t *handle, char **out_data, uint64_t *out_size);
+
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_to_bson(eg_ciphertext_ballot_t *handle,
                                                               uint8_t **out_data,
                                                               uint64_t *out_size);
+
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_to_bson_with_nonces(
+  eg_ciphertext_ballot_t *handle, uint8_t **out_data, uint64_t *out_size);
 
 #ifdef __cplusplus
 }

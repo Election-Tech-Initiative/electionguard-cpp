@@ -310,8 +310,8 @@ namespace electionguard
 
         unique_ptr<ElementModQ> nonceSeed();
 
-        vector<uint8_t> toBson() const;
-        string toJson() const;
+        vector<uint8_t> toBson(bool withNonces = false) const;
+        string toJson(bool withNonces = false) const;
         static unique_ptr<CiphertextBallot> fromJson(string data);
         static unique_ptr<CiphertextBallot> fromBson(vector<uint8_t> data);
 

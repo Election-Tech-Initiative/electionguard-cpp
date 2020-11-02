@@ -390,6 +390,27 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_json(eg_ciphertext_ballot_t *h
     }
 }
 
+eg_electionguard_status_t eg_ciphertext_ballot_to_json_with_nonces(eg_ciphertext_ballot_t *handle,
+                                                                   char **out_data,
+                                                                   uint64_t *out_size)
+{
+    try {
+        auto domain_type = AS_TYPE(CiphertextBallot, handle);
+        auto data_string = domain_type->toJson(true);
+
+        auto data_size = data_string.length() + 1;
+        auto *data_array = (char *)malloc(data_size);
+        strncpy(data_array, data_string.c_str(), data_size);
+        *out_data = data_array;
+        *out_size = data_size;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_ballot_to_json_with_nonces", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 eg_electionguard_status_t eg_ciphertext_ballot_to_bson(eg_ciphertext_ballot_t *handle,
                                                        uint8_t **out_data, uint64_t *out_size)
 {
@@ -405,6 +426,26 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_bson(eg_ciphertext_ballot_t *h
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_ciphertext_ballot_to_bson", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_ciphertext_ballot_to_bson_with_nonces(eg_ciphertext_ballot_t *handle,
+                                                                   uint8_t **out_data,
+                                                                   uint64_t *out_size)
+{
+    try {
+        auto domain_type = AS_TYPE(CiphertextBallot, handle);
+        auto data_bytes = domain_type->toBson(true);
+
+        auto *data_array = new uint8_t[data_bytes.size()];
+        copy(data_bytes.begin(), data_bytes.end(), data_array);
+        *out_data = data_array;
+        *out_size = data_bytes.size();
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_ballot_to_bson_with_nonces", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
