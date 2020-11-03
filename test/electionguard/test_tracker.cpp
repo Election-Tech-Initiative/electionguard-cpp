@@ -67,8 +67,8 @@ TEST_CASE("Hash to words converts to known words")
 {
     // Arrange
     const auto expectedHash = "325AB2622D35311DB0320C9F3B421EE93017D16B9E4C7FEF06704EDA4FA5E30B";
-    const auto expectedWords = "change-AB262-cart-5311D-ladder-20C9F-cloudburst-21EE9-cellar-7D16B-"
-                               "illegal-C7FEF-alias-04EDA-curriculum-5E30B";
+    const auto expectedWords = "civilian-AB262-championship-5311D-maybe-20C9F-configuration-21EE9-"
+                               "chipmunk-7D16B-lambkin-C7FEF-allergist-04EDA-disclosure-5E30B";
     const auto &deviceHash = ONE_MOD_Q();
     const auto &ballotHash = TWO_MOD_Q();
     uint64_t timestamp = 1000;
