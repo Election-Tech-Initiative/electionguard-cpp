@@ -2,10 +2,12 @@
 
 #include "../kremlin/Hacl_Bignum256.h"
 #include "../kremlin/Hacl_Bignum4096.h"
+#include "../kremlin/Hacl_HMAC_DRBG.h"
 #include "../kremlin/Lib_Memzero0.h"
 #include "../kremlin/Lib_RandomBuffer_System.h"
 #include "convert.hpp"
 #include "log.hpp"
+#include "random.hpp"
 
 #include <cstdint>
 #include <iomanip>
@@ -719,28 +721,22 @@ namespace electionguard
 
     unique_ptr<ElementModQ> rand_q()
     {
-        uint8_t bytes[MAX_Q_SIZE] = {0};
-        if (Lib_RandomBuffer_System_randombytes(const_cast<uint8_t *>(bytes), MAX_Q_SIZE)) {
+        auto bytes = Random::getBytes();
 
-            auto *bigNum =
-              Hacl_Bignum256_new_bn_from_bytes_be(MAX_Q_SIZE, const_cast<uint8_t *>(bytes));
-            if (bigNum == nullptr) {
-                throw bad_alloc();
-            }
-
-            // TODO: use Hacl_HMAC_DRBG_create_in
-
-            // first index of Q cannot cannod exceed 0xFFFFFFFFFFFFFF43
-            bigNum[0] = bigNum[0] & 0xFFFFFFFFFFFFFF43;
-
-            uint64_t element[MAX_Q_LEN] = {0};
-            memcpy(static_cast<uint64_t *>(element), bigNum, MAX_Q_SIZE);
-            free(bigNum);
-
-            return make_unique<ElementModQ>(element);
+        auto *bigNum =
+          Hacl_Bignum256_new_bn_from_bytes_be(MAX_Q_SIZE, const_cast<uint8_t *>(bytes.data()));
+        if (bigNum == nullptr) {
+            throw bad_alloc();
         }
 
-        throw runtime_error("rand_q: could not read random value from source");
+        // first index of Q cannot cannod exceed 0xFFFFFFFFFFFFFF43
+        bigNum[0] = bigNum[0] & 0xFFFFFFFFFFFFFF43;
+
+        uint64_t element[MAX_Q_LEN] = {0};
+        memcpy(static_cast<uint64_t *>(element), bigNum, MAX_Q_SIZE);
+        free(bigNum);
+
+        return make_unique<ElementModQ>(element);
     }
 
 #pragma endregion
