@@ -3,9 +3,172 @@ using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
+    // Declare native types for convenience
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQType;
+    using NativePlaintextBallotSelection = NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionType;
+    using NativeCiphertextBallotSelection = NativeInterface.CiphertextBallotSelection.CiphertextBallotSelectionType;
+    using NativePlaintextBallotContest = NativeInterface.PlaintextBallotContest.PlaintextBallotContestType;
+    using NativeCiphertextBallotContest = NativeInterface.CiphertextBallotContest.CiphertextBallotContestType;
     using NativePlaintextBallot = NativeInterface.PlaintextBallot.PlaintextBallotType;
     using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotType;
+
+    #region PlaintextBallotSelction
+
+    public class PlaintextBallotSelection : DisposableBase
+    {
+        public unsafe string ObjectId
+        {
+            get
+            {
+                var status = NativeInterface.PlaintextBallotSelection.GetObjectId(Handle, out IntPtr value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"PlaintextBallotContest Error ObjectId: {status}");
+                    return null;
+                }
+                return Marshal.PtrToStringAnsi(value);
+            }
+        }
+
+        internal unsafe NativePlaintextBallotSelection* Handle;
+
+        unsafe internal PlaintextBallotSelection(NativePlaintextBallotSelection* handle)
+        {
+            Handle = handle;
+        }
+
+        protected override unsafe void DisposeUnamanged()
+        {
+            base.DisposeUnamanged();
+            var status = NativeInterface.PlaintextBallotSelection.Free(Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
+            }
+            Handle = null;
+        }
+    }
+
+    #endregion
+
+    #region CiphertextBallotSelection
+
+    public class CiphertextBallotSelection : DisposableBase
+    {
+        public unsafe string ObjectId
+        {
+            get
+            {
+                var status = NativeInterface.CiphertextBallotSelection.GetObjectId(Handle, out IntPtr value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"PlaintextBallotContest Error ObjectId: {status}");
+                    return null;
+                }
+                return Marshal.PtrToStringAnsi(value);
+            }
+        }
+
+        internal unsafe NativeCiphertextBallotSelection* Handle;
+
+        unsafe internal CiphertextBallotSelection(NativeCiphertextBallotSelection* handle)
+        {
+            Handle = handle;
+        }
+
+        protected override unsafe void DisposeUnamanged()
+        {
+            base.DisposeUnamanged();
+            var status = NativeInterface.CiphertextBallotSelection.Free(Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
+            }
+            Handle = null;
+        }
+    }
+
+    #endregion
+
+    #region PlaintextBallotContest
+
+    public class PlaintextBallotContest: DisposableBase
+    {
+        public unsafe string ObjectId
+        {
+            get
+            {
+                var status = NativeInterface.PlaintextBallotContest.GetObjectId(Handle, out IntPtr value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"PlaintextBallotContest Error ObjectId: {status}");
+                    return null;
+                }
+                return Marshal.PtrToStringAnsi(value);
+            }
+        }
+
+        internal unsafe NativePlaintextBallotContest* Handle;
+
+        unsafe internal PlaintextBallotContest(NativePlaintextBallotContest* handle)
+        {
+            Handle = handle;
+        }
+
+        protected override unsafe void DisposeUnamanged()
+        {
+            base.DisposeUnamanged();
+            var status = NativeInterface.PlaintextBallotContest.Free(Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
+            }
+            Handle = null;
+        }
+    }
+
+    #endregion
+
+    #region CiphertextBallotContest
+
+    public class CiphertextBallotContest : DisposableBase
+    {
+        public unsafe string ObjectId
+        {
+            get
+            {
+                var status = NativeInterface.CiphertextBallotContest.GetObjectId(Handle, out IntPtr value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"PlaintextBallotContest Error ObjectId: {status}");
+                    return null;
+                }
+                return Marshal.PtrToStringAnsi(value);
+            }
+        }
+
+        internal unsafe NativeCiphertextBallotContest* Handle;
+
+        unsafe internal CiphertextBallotContest(NativeCiphertextBallotContest* handle)
+        {
+            Handle = handle;
+        }
+
+        protected override unsafe void DisposeUnamanged()
+        {
+            base.DisposeUnamanged();
+            var status = NativeInterface.CiphertextBallotContest.Free(Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
+            }
+            Handle = null;
+        }
+    }
+
+    #endregion
+
+    #region PlaintextBallot
 
     public class PlaintextBallot: DisposableBase
     {
@@ -23,6 +186,29 @@ namespace ElectionGuard
             }
         }
 
+        public unsafe string BallotStyle
+        {
+            get
+            {
+                var status = NativeInterface.PlaintextBallot.GetBallotStyle(Handle, out IntPtr value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"PlaintextBallot Error BallotStyle: {status}");
+                    return null;
+                }
+                return Marshal.PtrToStringAnsi(value);
+            }
+        }
+
+        public unsafe ulong ContestsSize
+        {
+            get
+            {
+                var size = NativeInterface.PlaintextBallot.GetContestsSize(Handle);
+                return size;
+            }
+        }
+
         internal unsafe NativePlaintextBallot* Handle;
 
         public unsafe PlaintextBallot(string json)
@@ -32,6 +218,18 @@ namespace ElectionGuard
             {
                 Console.WriteLine($"PlaintextBallot Error Status: {status}");
             }
+        }
+
+        public unsafe PlaintextBallotContest GetContestAt(ulong index)
+        {
+            var status = NativeInterface.PlaintextBallot.GetContestAtIndex(
+                Handle, index, out NativePlaintextBallotContest* value);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"PlaintextBallot Error BallotStyle: {status}");
+                return null;
+            }
+            return new PlaintextBallotContest(value);
         }
 
         protected override unsafe void DisposeUnamanged()
@@ -58,6 +256,10 @@ namespace ElectionGuard
             return json;
         }
     }
+
+    #endregion
+
+    #region CiphertextBallot
 
     public class CiphertextBallot: DisposableBase
     {
@@ -156,4 +358,6 @@ namespace ElectionGuard
             return json;
         }
     }
+
+    #endregion
 }
