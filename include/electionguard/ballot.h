@@ -36,6 +36,8 @@ eg_plaintext_ballot_selection_free(eg_plaintext_ballot_selection_t *handle);
 EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_get_object_id(
   eg_plaintext_ballot_selection_t *handle, char **out_object_id);
 
+// TODO: Add missing fields
+
 #endif
 
 #ifndef CiphertextBallotSelection
@@ -63,7 +65,7 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_ciphertext(
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_crypto_hash(
   eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t **out_hash);
 
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_Nonce(
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_nonce(
   eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t **out_nonce);
 
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_proof(

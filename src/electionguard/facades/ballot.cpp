@@ -141,7 +141,7 @@ eg_ciphertext_ballot_selection_get_crypto_hash(eg_ciphertext_ballot_selection_t 
 }
 
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_nonce(
-  eg_ciphertext_ballot_contest_t *handle, eg_element_mod_q_t **out_nonce)
+  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t **out_nonce)
 {
     auto *nonce = AS_TYPE(CiphertextBallotSelection, handle)->getNonce();
     *out_nonce = AS_TYPE(eg_element_mod_q_t, nonce);
