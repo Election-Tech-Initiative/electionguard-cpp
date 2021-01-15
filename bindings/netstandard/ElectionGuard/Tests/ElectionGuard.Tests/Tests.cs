@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using NUnit.Framework;
 
 namespace ElectionGuard.Tests
 {
+    [TestFixture]
     public class Tests
     {
         [SetUp]
@@ -33,7 +34,6 @@ namespace ElectionGuard.Tests
 
                 // verify the contest property accessors
                 var contestId = contest.ObjectId;
-                Debug.WriteLine($"contestId: {contestId}");
                 Assert.That(contestId == $"contest-{i + 1}-id");
 
                 // iterate over the selections in the contest
