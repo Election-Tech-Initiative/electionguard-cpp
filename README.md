@@ -70,7 +70,7 @@ To build for iOS you need XCode installed
 
 ### 🖥️ Windows (using MSYS2)
 
-Building on windows is currently supported using the `MSYS2` toolchain.  `MSVC` support will be included in a future release.  There are currently no plans to support other toolchains such as `cygwin`.
+Building on windows is currently supported using the `MSYS2` toolchain.  `MSVC` support will be included in a future release.
 
 - Install [Chocolatey]()
 - Install [Powershell Core](https://github.com/powershell/powershell)
@@ -80,7 +80,7 @@ Building on windows is currently supported using the `MSYS2` toolchain.  `MSVC` 
 - Reopen the MSYS2 prompt and run:
     ```
     pacman -Syu
-    pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-gmp mingw-w64-x86_64-cmake make
+    pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake make
     ```
 - Modify your `%Path%` to include the newly-installed software. You should include these two paths:
     ```

@@ -140,7 +140,7 @@ target_include_directories(${META_PROJECT_TARGET}
 add_library(nlohmann_json INTERFACE IMPORTED)
 target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
 
-# Statically link in libc++
+# Statically link in libstdc++
 set(CMAKE_EXE_LINKER_FLAGS " -static")
 target_link_libraries(${META_PROJECT_TARGET} PRIVATE nlohmann_json -static-libstdc++)
 

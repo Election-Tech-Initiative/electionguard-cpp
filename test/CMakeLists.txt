@@ -64,7 +64,7 @@ target_compile_features(ElectionGuardCTests PRIVATE c_std_99)
 
 # ---- Link Libraries ----
 
-# Statically link in libc++
+# Statically link in libstdc++
 set(CMAKE_EXE_LINKER_FLAGS " -static")
 target_link_libraries(ElectionGuardTests PRIVATE doctest ${META_PROJECT_TARGET} -static-libstdc++)
 target_link_libraries(ElectionGuardCTests PRIVATE ${META_PROJECT_TARGET})
