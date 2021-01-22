@@ -140,9 +140,13 @@ target_include_directories(${META_PROJECT_TARGET}
 add_library(nlohmann_json INTERFACE IMPORTED)
 target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
 
-# Statically link in libstdc++
-set(CMAKE_EXE_LINKER_FLAGS " -static")
-target_link_libraries(${META_PROJECT_TARGET} PRIVATE nlohmann_json -static-libstdc++)
+if (WIN32)
+    # Statically link in libstdc++
+    set(CMAKE_EXE_LINKER_FLAGS " -static")
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE nlohmann_json -static-libstdc++)
+else()
+target_link_libraries(${META_PROJECT_TARGET} PRIVATE nlohmann_json)
+endif()
 
 # ---- Install ----
 
@@ -202,14 +206,13 @@ if(OPTION_ENABLE_TESTS)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-redundant-decls)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unknown-pragmas)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-parameter)
-        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-but-set-parameter)
-        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-but-set-variable)
     endif()
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-static-in-inline)
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-
+    target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-but-set-parameter)
+    target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-but-set-variable)
     endif()
 
 endif()

@@ -82,7 +82,7 @@ jobs:
       - name: Update Environment
         if: runner.os == 'Windows'
         run: |
-          $msyspath="C:\msys64"
+          $msyspath="msys64"
           echo "$msyspath\usr\bin" >> $GITHUB_PATH
           echo "$msyspath" >> $GITHUB_PATH
           echo "$msyspath\mingw64\bin" >> $GITHUB_PATH
@@ -90,6 +90,15 @@ jobs:
           echo "$msyspath\mingw64\include" >> $GITHUB_PATH
       - name: Configure Environment
         run: make environment
+      - name: Run Tests
+        if: runner.os == 'Linux'
+        run: make sanitize-asan
+      - name: Run Tests
+        if: runner.os == 'macOS'
+        run: make coverage
+      - name: Run Tests
+        if: runner.os == 'Windows'
+        run: make test
       - name: Make Release Build
         if: runner.os == 'Linux'
         env:
@@ -108,9 +117,3 @@ jobs:
           # make build-android
           # make build-ios
           # make build-netstandard
-      - name: Run Tests
-        if: runner.os == 'macOS'
-        run: make test
-      - name: Run Address Sanitizer
-        if: runner.os == 'Linux'
-        run: make sanitize-asan
