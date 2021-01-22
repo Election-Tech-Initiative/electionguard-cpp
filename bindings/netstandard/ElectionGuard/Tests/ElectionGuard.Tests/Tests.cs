@@ -7,12 +7,6 @@ namespace ElectionGuard.Tests
     [TestFixture]
     public class Tests
     {
-        [SetUp]
-        public void Setup()
-        {
-            
-        }
-
         [Test]
         public void test_ballot_property_getters()
         {
