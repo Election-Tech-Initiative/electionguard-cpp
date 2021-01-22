@@ -97,10 +97,7 @@ jobs:
         run: make test
       - name: Run Tests
         if: runner.os == 'Windows'
-        shell: powershell
-        run: |
-          echo "$GITHUB_WORKSPACE\build\libs\x86_64\Debug\src" >> $GITHUB_PATH
-          make test
+        run: make test
       - name: Make Release Build
         if: runner.os == 'Linux'
         env:
