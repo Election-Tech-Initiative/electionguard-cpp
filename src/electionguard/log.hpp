@@ -20,7 +20,14 @@ namespace electionguard
         {
             auto now_seconds = time(nullptr);
             struct tm now;
-            cout << "[ " << put_time(gmtime_r(&now_seconds, &now), "%c") << " ]: " << caller << ": ";
+#ifdef _WIN32
+            // TODO: handle err
+            gmtime_s(&now, &now_seconds);
+            cout << "[ " << put_time(&now, "%c") << " ]: " << caller << ": ";
+#else
+            cout << "[ " << put_time(gmtime_r(&now_seconds, &now), "%c") << " ]: " << caller
+                 << ": ";
+#endif
         }
 
         static void postfix() { cout << endl; }
@@ -82,7 +89,8 @@ namespace electionguard
             cout_state.copyfmt(cout);
             cout << "base-16: " << endl;
             for (size_t i(0); i < bLen; i++) {
-                cout << "[" << hex << setw(2) << setfill('0') << (uint32_t)bytes[i] << "]";
+                cout << "[" << hex << setw(2) << setfill('0') << static_cast<uint32_t>(bytes[i])
+                     << "]";
             }
             postfix();
             cout.copyfmt(cout_state);
@@ -103,7 +111,8 @@ namespace electionguard
             prefix(caller);
             cout << msg << endl;
             for (auto element : container) {
-                cout << "[" << hex << setw(2) << setfill('0') << (uint32_t)element << "]";
+                cout << "[" << hex << setw(2) << setfill('0') << static_cast<uint32_t>(element)
+                     << "]";
             }
             postfix();
         }

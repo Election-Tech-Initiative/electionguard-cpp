@@ -374,18 +374,18 @@ namespace electionguard
                 auto previous_tracking_hash = j["previous_tracking_hash"].get<string>();
                 auto tracking_hash = j["tracking_hash"].get<string>();
                 auto timestamp = j["timestamp"].get<uint64_t>();
-                auto nonce = j["nonce"].is_null() ? "0x00" : j["nonce"].get<string>();
+                auto ballot_nonce = j["nonce"].is_null() ? "" : j["nonce"].get<string>();
                 auto crypto_hash = j["crypto_hash"].get<string>();
 
                 auto contests = j["contests"];
 
-                vector<unique_ptr<CiphertextBallotContest>> plaintextContests;
-                plaintextContests.reserve(contests.size());
+                vector<unique_ptr<CiphertextBallotContest>> ciphertextContests;
+                ciphertextContests.reserve(contests.size());
                 for (auto &contest : contests) {
                     auto contest_object_id = contest["object_id"].get<string>();
                     auto contest_description_hash = contest["description_hash"].get<string>();
                     auto contest_nonce =
-                      contest["nonce"].is_null() ? "0x00" : contest["nonce"].get<string>();
+                      contest["nonce"].is_null() ? "" : contest["nonce"].get<string>();
                     auto contest_crypto_hash = contest["crypto_hash"].get<string>();
 
                     auto proof = contest["proof"];
@@ -403,8 +403,8 @@ namespace electionguard
 
                     auto selections = contest["ballot_selections"];
                     vector<unique_ptr<electionguard::CiphertextBallotSelection>>
-                      plaintextSelections;
-                    plaintextSelections.reserve(selections.size());
+                      ciphertextSelections;
+                    ciphertextSelections.reserve(selections.size());
                     for (auto &selection : selections) {
                         auto selection_object_id = selection["object_id"].get<string>();
                         auto selection_description_hash =
@@ -412,7 +412,7 @@ namespace electionguard
                         auto selection_is_placeholder_selection =
                           selection["is_placeholder_selection"].get<bool>();
                         auto selection_nonce =
-                          selection["nonce"].is_null() ? "0x00" : selection["nonce"].get<string>();
+                          selection["nonce"].is_null() ? "" : selection["nonce"].get<string>();
                         auto selection_crypto_hash = selection["crypto_hash"].get<string>();
 
                         auto ciphertext = selection["ciphertext"];
@@ -454,25 +454,35 @@ namespace electionguard
                             ElementModQ::fromHex(selection_proof_zero_response),
                             ElementModQ::fromHex(selection_proof_one_response));
 
-                        plaintextSelections.push_back(
+                        auto nonce = selection_nonce.empty()
+                                       ? make_unique<ElementModQ>(ZERO_MOD_Q())
+                                       : ElementModQ::fromHex(selection_nonce);
+
+                        ciphertextSelections.push_back(
                           make_unique<electionguard::CiphertextBallotSelection>(
                             selection_object_id, *ElementModQ::fromHex(selection_description_hash),
                             move(deserializedCiphertext), selection_is_placeholder_selection,
-                            ElementModQ::fromHex(selection_nonce),
-                            ElementModQ::fromHex(selection_crypto_hash),
+                            move(nonce), ElementModQ::fromHex(selection_crypto_hash),
                             move(deserializedDisjunctive)));
                     }
 
-                    plaintextContests.push_back(make_unique<electionguard::CiphertextBallotContest>(
-                      contest_object_id, *ElementModQ::fromHex(contest_description_hash),
-                      move(plaintextSelections), ElementModQ::fromHex(contest_nonce),
-                      ElementModQ::fromHex(contest_crypto_hash), move(deserializedProof)));
+                    auto nonce = contest_nonce.empty() ? make_unique<ElementModQ>(ZERO_MOD_Q())
+                                                       : ElementModQ::fromHex(contest_nonce);
+
+                    ciphertextContests.push_back(
+                      make_unique<electionguard::CiphertextBallotContest>(
+                        contest_object_id, *ElementModQ::fromHex(contest_description_hash),
+                        move(ciphertextSelections), move(nonce),
+                        ElementModQ::fromHex(contest_crypto_hash), move(deserializedProof)));
                 }
+
+                auto nonce = ballot_nonce.empty() ? make_unique<ElementModQ>(ZERO_MOD_Q())
+                                                  : ElementModQ::fromHex(ballot_nonce);
 
                 return make_unique<electionguard::CiphertextBallot>(
                   object_id, ballot_style, *ElementModQ::fromHex(description_hash),
-                  ElementModQ::fromHex(previous_tracking_hash), move(plaintextContests),
-                  ElementModQ::fromHex(tracking_hash), timestamp, ElementModQ::fromHex(nonce),
+                  ElementModQ::fromHex(previous_tracking_hash), move(ciphertextContests),
+                  ElementModQ::fromHex(tracking_hash), timestamp, move(nonce),
                   ElementModQ::fromHex(crypto_hash));
             }
 

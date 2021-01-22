@@ -25,7 +25,8 @@ namespace electionguard
         const size_t baseHex = 16;
         for (size_t i(0); i < hex.size(); i += 2) {
             string byteString = hex.substr(i, 2);
-            auto byte = static_cast<uint8_t>(stoi(byteString, nullptr, baseHex));
+            auto as_int = stoi(byteString, nullptr, baseHex);
+            uint8_t byte = static_cast<uint8_t>(as_int);
             bytesOut[i / 2] = byte;
         }
     }
@@ -35,7 +36,7 @@ namespace electionguard
         const size_t baseHex = 16;
         for (size_t i(0); i < hex.size(); i += 2) {
             string byteString = hex.substr(i, 2);
-            uint16_t as_int = stoi(byteString, nullptr, baseHex);
+            auto as_int = stoi(byteString, nullptr, baseHex);
             uint16_t bigEndian = htobe16(as_int);
             bytesOut[i / 2] = (uint8_t)bigEndian;
         }
@@ -47,7 +48,7 @@ namespace electionguard
         const size_t baseHex = 16;
         for (size_t i = 0; i < hexString.size(); i += 2) {
             auto byteString = hexString.substr(i, 2);
-            uint16_t as_int = stoi(byteString, nullptr, baseHex);
+            auto as_int = stoi(byteString, nullptr, baseHex);
             uint8_t array[sizeof(uint16_t)];
             memmove(&array, &as_int, sizeof(as_int));
             bytes.push_back(array[0]);
@@ -62,7 +63,7 @@ namespace electionguard
         const size_t baseHex = 16;
         for (size_t i = 0; i < hexString.size(); i += 2) {
             auto byteString = hexString.substr(i, 2);
-            uint16_t as_int = stoi(byteString, nullptr, baseHex);
+            auto as_int = stoi(byteString, nullptr, baseHex);
             uint8_t array[sizeof(uint16_t)];
             uint16_t bigEndian = htobe16(as_int);
             memmove(&array, &bigEndian, sizeof(bigEndian));

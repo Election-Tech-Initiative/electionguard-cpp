@@ -25,6 +25,10 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/encrypt.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/group.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/hash.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum256.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum256.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum4096.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum4096.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/tracker.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/chaum_pedersen.cpp
@@ -97,14 +101,17 @@ add_library(${META_PROJECT_TARGET}::${META_PROJECT_TARGET} ALIAS ${META_PROJECT_
 # Set the target compile features rather than setting CMAKE_CXX_STANDARD 
 # so we don't pollute other targets that may compile differently
 target_compile_features(${META_PROJECT_TARGET} PRIVATE cxx_std_17)
-
 target_compile_options(${META_PROJECT_TARGET} PUBLIC "$<$<BOOL:${MSVC}>:/permissive->")
 
 if (MINGW)
+    message("++ Building with MINGW")
     # Remove lib prefix
     set_target_properties(${META_PROJECT_TARGET} PROPERTIES PREFIX "")
+
     # define dll export markers
-    add_compile_definitions(ELECTIONGUARD_BUILD_SHARED)
+    if (BUILD_SHARED_LIBS)
+        add_compile_definitions(ELECTIONGUARD_BUILD_SHARED)
+    endif()
 endif()
 
 if (IOS AND CMAKE_IOS_INSTALL_COMBINED)
@@ -132,7 +139,10 @@ target_include_directories(${META_PROJECT_TARGET}
 
 add_library(nlohmann_json INTERFACE IMPORTED)
 target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
-target_link_libraries(${META_PROJECT_TARGET} PRIVATE nlohmann_json)
+
+# Statically link in libc++
+set(CMAKE_EXE_LINKER_FLAGS " -static")
+target_link_libraries(${META_PROJECT_TARGET} PRIVATE nlohmann_json -static-libstdc++)
 
 # ---- Install ----
 
@@ -173,15 +183,33 @@ if(OPTION_ENABLE_TESTS)
     # Expose the internal headers to tests
     target_include_directories(${META_PROJECT_TARGET}
         SYSTEM PUBLIC
-            #$<INSTALL_INTERFACE:${PROJECT_SOURCE_DIR}/src>
             $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
     )
 
-    # When running tests, we set some specific compiler flags
-    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wall -Wextra -pedantic -pedantic-errors -Wmissing-field-initializers -Wno-static-in-inline -Wno-unknown-pragmas)
-    elseif(MSVC)
+    # When running tests, set some specific compiler flags
+    if(MSVC)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC /W4 /WX)
+    endif()
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wall)
+       # TODO: target_compile_options(${META_PROJECT_TARGET} PUBLIC -Werror)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wextra)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -pedantic)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -pedantic-errors)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wmissing-field-initializers)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-variable)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-redundant-decls)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unknown-pragmas)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-parameter)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-but-set-parameter)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-but-set-variable)
+    endif()
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-static-in-inline)
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+
     endif()
 
 endif()
