@@ -83,6 +83,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           $msyspath="msys64"
+          choco install msys2 --params="/InstallDir:$msyspath /NoPath" -y
           echo "$msyspath\usr\bin" >> $GITHUB_PATH
           echo "$msyspath" >> $GITHUB_PATH
           echo "$msyspath\mingw64\bin" >> $GITHUB_PATH
@@ -95,7 +96,7 @@ jobs:
         run: make sanitize-asan
       - name: Run Tests
         if: runner.os == 'macOS'
-        run: make coverage
+        run: make test
       - name: Run Tests
         if: runner.os == 'Windows'
         run: make test

@@ -52,8 +52,8 @@ endif
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo 🏁 WINDOWS INSTALL
 	choco install wget
-	pacman --noconfirm -Syu
-	pacman --noconfirm -S mingw-w64-x86_64-gcc
+	msys2 -c 'pacman --noconfirm -Syu'
+	msys2 -c 'pacman --noconfirm -S mingw-w64-x86_64-gcc'
 endif
 	wget -O cmake/CPM.cmake https://github.com/TheLartians/CPM.cmake/releases/latest/download/CPM.cmake
 

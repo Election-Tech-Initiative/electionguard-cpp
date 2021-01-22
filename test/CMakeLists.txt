@@ -71,6 +71,7 @@ if (WIN32)
 else()
     target_link_libraries(ElectionGuardTests PRIVATE doctest ${META_PROJECT_TARGET})
 endif()
+
 target_link_libraries(ElectionGuardCTests PRIVATE ${META_PROJECT_TARGET})
 
 # ---- Add Tests ----
