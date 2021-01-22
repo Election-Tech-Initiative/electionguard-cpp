@@ -51,6 +51,7 @@ endif()
 # C Tests
 add_executable(ElectionGuardCTests
     ${CMAKE_CURRENT_SOURCE_DIR}/main.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.c

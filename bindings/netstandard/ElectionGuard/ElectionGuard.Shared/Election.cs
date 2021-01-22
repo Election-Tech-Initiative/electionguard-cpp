@@ -36,9 +36,9 @@ namespace ElectionGuard
             }
         }
 
-        protected override unsafe void DisposeUnamanged()
+        protected override unsafe void DisposeUnmanaged()
         {
-            base.DisposeUnamanged();
+            base.DisposeUnmanaged();
             var status = NativeInterface.InternalElectionDescription.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
@@ -134,9 +134,9 @@ namespace ElectionGuard
             }
         }
 
-        protected override unsafe void DisposeUnamanged()
+        protected override unsafe void DisposeUnmanaged()
         {
-            base.DisposeUnamanged();
+            base.DisposeUnmanaged();
             var status = NativeInterface.CiphertextElectionContext.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {

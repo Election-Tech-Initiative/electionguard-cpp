@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-// ElgamalKeyPair
+#ifndef ElgamalKeyPair
 
 struct eg_elgamal_keypair_s;
 typedef struct eg_elgamal_keypair_s eg_elgamal_keypair_t;
@@ -26,7 +26,9 @@ EG_API eg_electionguard_status_t eg_elgamal_keypair_get_secret_key(
 EG_API eg_electionguard_status_t eg_elgamal_keypair_get_public_key(
   eg_elgamal_keypair_t *handle, eg_element_mod_p_t **out_public_key);
 
-// ElGamalCiphertext
+#endif
+
+#ifndef ElGamalCiphertext
 
 struct eg_elgamal_ciphertext_s;
 typedef struct eg_elgamal_ciphertext_s eg_elgamal_ciphertext_t;
@@ -46,12 +48,16 @@ EG_API eg_electionguard_status_t eg_elgamal_ciphertext_crypto_hash(
 EG_API eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_with_secret(
   eg_elgamal_ciphertext_t *handle, eg_element_mod_q_t *in_secret_key, uint64_t *plaintext);
 
-// ElgamalEncrypt
+#endif
+
+#ifndef ElgamalEncrypt
 
 EG_API eg_electionguard_status_t eg_elgamal_encrypt(uint64_t in_plaintext,
                                                     eg_element_mod_q_t *in_nonce,
                                                     eg_element_mod_p_t *in_public_key,
                                                     eg_elgamal_ciphertext_t **out_ciphertext);
+
+#endif
 
 #ifdef __cplusplus
 }

@@ -16,5 +16,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Encrypt.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Election.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DisposableBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ElGamal.cs" />
   </ItemGroup>
 </Project>

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+bool test_ballot(void);
 bool test_chaum_pedersen_proof(void);
 bool test_elgamal(void);
 bool test_encrypt(void);
@@ -13,6 +14,7 @@ bool test_tracker(void);
 
 int main(void)
 {
+    assert(test_ballot() == true);
     assert(test_chaum_pedersen_proof() == true);
     assert(test_elgamal() == true);
     assert(test_encrypt() == true);
