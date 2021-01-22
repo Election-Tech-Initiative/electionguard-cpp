@@ -79,16 +79,13 @@ jobs:
           ls -ls /Applications/
           ls -ls $ANDROID_SDK_ROOT/ndk
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
+      - uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: mingw-w64-x86_64-gcc
       - name: Update Environment
         if: runner.os == 'Windows'
-        run: |
-          $msyspath="msys64"
-          choco install msys2 --params="/InstallDir:$msyspath /NoPath" -y
-          echo "$msyspath\usr\bin" >> $GITHUB_PATH
-          echo "$msyspath" >> $GITHUB_PATH
-          echo "$msyspath\mingw64\bin" >> $GITHUB_PATH
-          echo "$msyspath\mingw64\lib" >> $GITHUB_PATH
-          echo "$msyspath\mingw64\include" >> $GITHUB_PATH
+        run: echo "msys installed"
       - name: Configure Environment
         run: make environment
       - name: Run Tests
