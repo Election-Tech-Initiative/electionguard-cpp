@@ -250,12 +250,7 @@ else
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
-	export PATH=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/src:$$PATH; \
-	echo $$PATH; \
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests
-	
-	export PATH=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/src:$$PATH; \
-	echo $$PATH; \
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
 
 coverage:
@@ -277,5 +272,5 @@ else
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
-	PATH=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/src:$$PATH; $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests
-	PATH=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/src:$$PATH; $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
