@@ -52,8 +52,6 @@ endif
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo 🏁 WINDOWS INSTALL
 	choco install wget
-	msys2 -c 'pacman --noconfirm -Syu'
-	msys2 -c 'pacman --noconfirm -S mingw-w64-x86_64-gcc'
 endif
 	wget -O cmake/CPM.cmake https://github.com/TheLartians/CPM.cmake/releases/latest/download/CPM.cmake
 
@@ -252,8 +250,13 @@ else
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
-	PATH=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/src:$$PATH; $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests
-	PATH=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/src:$$PATH; $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
+	export PATH=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/src:$$PATH; \
+	echo $$PATH; \
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests
+	
+	export PATH=$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/src:$$PATH; \
+	echo $$PATH; \
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
 
 coverage:
 	@echo ✅ CHECK COVERAGE

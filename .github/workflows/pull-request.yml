@@ -83,6 +83,7 @@ jobs:
         with:
           update: true
           install: mingw-w64-x86_64-gcc
+        if: runner.os == 'Windows'
       - name: Update Environment
         if: runner.os == 'Windows'
         run: echo "msys installed"
@@ -96,7 +97,10 @@ jobs:
         run: make test
       - name: Run Tests
         if: runner.os == 'Windows'
-        run: make test
+        shell: powershell
+        run: |
+          echo "$GITHUB_WORKSPACE\build\libs\x86_64\Debug\src" >> $GITHUB_PATH
+          make test
       - name: Make Release Build
         if: runner.os == 'Linux'
         env:
