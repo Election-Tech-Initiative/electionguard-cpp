@@ -7,6 +7,10 @@
 
 using namespace electionguard;
 
+unique_ptr<InternalElectionDescription> getFakeMetadata(const ElementModQ &descriptionHash);
+unique_ptr<CiphertextElectionContext> getFakeContext(const InternalElectionDescription &metadata,
+                                                     const ElementModP &publicKey);
+
 unique_ptr<InternalElectionDescription> getFakeMetadata(const ElementModQ &descriptionHash)
 {
     vector<unique_ptr<SelectionDescription>> selections1;
@@ -50,7 +54,6 @@ unique_ptr<InternalElectionDescription> getFakeMetadata(const ElementModQ &descr
       "contest-1-id", "district-1-id", 1UL, "n_of_m", numElected, numElected, "contest-1-name",
       move(title1), move(subtitle1), move(selections1)));
 
-    const auto numElected2 = 1UL;
     contests.push_back(make_unique<ContestDescription>(
       "contest-2-id", "district-1-id", 1UL, "n_of_m", numElected, numElected, "contest-2-name",
       move(title2), move(subtitle2), move(selections2)));
@@ -58,6 +61,13 @@ unique_ptr<InternalElectionDescription> getFakeMetadata(const ElementModQ &descr
     auto metadata = make_unique<InternalElectionDescription>(descriptionHash, move(contests));
     return metadata;
 }
+
+unique_ptr<PlaintextBallotSelection> selectionFrom(const SelectionDescription &description,
+                                                   bool choice);
+
+unique_ptr<PlaintextBallotContest> contestFrom(const ContestDescription &contest);
+
+unique_ptr<PlaintextBallot> getFakeBallot(const InternalElectionDescription &metadata);
 
 unique_ptr<CiphertextElectionContext> getFakeContext(const InternalElectionDescription &metadata,
                                                      const ElementModP &publicKey)
@@ -152,7 +162,8 @@ TEST_CASE("Encrypt Ballot with mediator succeeds")
     auto fromJson = CiphertextBallot::fromJson(json);
     CHECK(fromJson->getNonce()->toHex() == ZERO_MOD_Q().toHex());
 
-    auto jsonWithNonces = ciphertext->toJson(true); // serialize with nonce values
+    // serialize with nonce values
+    auto jsonWithNonces = ciphertext->toJson(true);
     auto fromJsonWithNonces = CiphertextBallot::fromJson(jsonWithNonces);
     CHECK(fromJsonWithNonces->getNonce()->toHex() == ciphertext->getNonce()->toHex());
 

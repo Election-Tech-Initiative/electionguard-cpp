@@ -64,8 +64,25 @@ target_compile_features(ElectionGuardCTests PRIVATE c_std_99)
 
 # ---- Link Libraries ----
 
-target_link_libraries(ElectionGuardTests PRIVATE doctest ${META_PROJECT_TARGET})
+if (WIN32)
+    # Statically link in libstdc++
+    set(CMAKE_EXE_LINKER_FLAGS " -static")
+    target_link_libraries(ElectionGuardTests PRIVATE doctest ${META_PROJECT_TARGET} -static-libstdc++)
+else()
+    target_link_libraries(ElectionGuardTests PRIVATE doctest ${META_PROJECT_TARGET})
+endif()
+
 target_link_libraries(ElectionGuardCTests PRIVATE ${META_PROJECT_TARGET})
+
+if (WIN32)
+    # sometimes windows struggles with paths (particularly in CI)
+    # so, copy the .dll file to the test execution folder
+    add_custom_command(
+        TARGET ElectionGuardTests POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        $<TARGET_FILE_DIR:${META_PROJECT_TARGET}>
+        $<TARGET_FILE_DIR:ElectionGuardTests>)
+endif()
 
 # ---- Add Tests ----
 

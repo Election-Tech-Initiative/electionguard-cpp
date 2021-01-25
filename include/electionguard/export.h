@@ -4,7 +4,7 @@
 /* Use the windows pattern to export symbols */
 
 #ifndef EG_API
-#    ifdef _WIN32
+#    if (defined(_WIN32) || defined(_WIN64))
 #        if defined(ELECTIONGUARD_BUILD_SHARED) /* build dll */
 #            define EG_API __declspec(dllexport)
 #            if defined(DEBUG)
@@ -27,7 +27,7 @@
 #            ifdef DEBUG
 #                define EG_INTERNAL_API __attribute__((visibility("default")))
 #            else
-#                define EG_INTERNAL_API
+#                define EG_INTERNAL_API __attribute__((visibility("hidden")))
 #            endif
 #        else
 #            define EG_API

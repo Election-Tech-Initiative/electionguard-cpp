@@ -62,9 +62,9 @@ namespace ElectionGuard
 
         // TODO: decrypt with secret
 
-        protected override unsafe void DisposeUnamanged()
+        protected override unsafe void DisposeUnmanaged()
         {
-            base.DisposeUnamanged();
+            base.DisposeUnmanaged();
             var status = NativeInterface.ElGamalCiphertext.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {

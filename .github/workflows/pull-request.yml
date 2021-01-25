@@ -35,6 +35,7 @@ jobs:
             "ubuntu-18.04-gcc-9.3.0",
             "ubuntu-18.04-clang-10.0.0",
             "macos-10.15-xcode-12.0",
+            "windows-2019-gcc-9.2.0",
           ]
         include:
           - name: ubuntu-18.04-gcc-9.3.0
@@ -49,6 +50,10 @@ jobs:
             os: macOS-10.15
             compiler: xcode
             version: "12"
+          - name: windows-2019-gcc-9.2.0
+            os: windows-2019
+            compiler: gcc
+            version: "9"
 
     steps:
       - name: Checkout Code
@@ -61,22 +66,38 @@ jobs:
           sudo apt-get update
 
           if [ "${{ matrix.compiler }}" = "gcc" ]; then
-            echo "::set-env name=CC::gcc-${{ matrix.version }}"
-            echo "::set-env name=CXX::g++-${{ matrix.version }}"
+            echo "CC=gcc-${{ matrix.version }}" >> $GITHUB_ENV
+            echo "CXX=g++-${{ matrix.version }}" >> $GITHUB_ENV
           else
             sudo apt-get install -y clang-${{ matrix.version }} g++-multilib
-            echo "::set-env name=CC::clang-${{ matrix.version }}"
-            echo "::set-env name=CXX::clang++-${{ matrix.version }}"
+            echo "CC=clang-${{ matrix.version }}" >> $GITHUB_ENV
+            echo "CXX=clang++-${{ matrix.version }}" >> $GITHUB_ENV
           fi
-
       - name: Update Environment
         if: runner.os == 'macOS'
         run: |
           ls -ls /Applications/
           ls -ls $ANDROID_SDK_ROOT/ndk
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
+      - uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: mingw-w64-x86_64-gcc
+        if: runner.os == 'Windows'
+      - name: Update Environment
+        if: runner.os == 'Windows'
+        run: echo "msys installed"
       - name: Configure Environment
         run: make environment
+      - name: Run Tests
+        if: runner.os == 'Linux'
+        run: make sanitize-asan
+      - name: Run Tests
+        if: runner.os == 'macOS'
+        run: make test
+      - name: Run Tests
+        if: runner.os == 'Windows'
+        run: make test
       - name: Make Release Build
         if: runner.os == 'Linux'
         env:
@@ -95,9 +116,3 @@ jobs:
           # make build-android
           # make build-ios
           # make build-netstandard
-      - name: Run Tests
-        if: runner.os == 'macOS'
-        run: make test
-      - name: Run Address Sanitizer
-        if: runner.os == 'Linux'
-        run: make sanitize-asan

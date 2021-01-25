@@ -59,7 +59,7 @@ namespace electionguard
         }
         static vector<uint8_t> getRandomBytes(uint32_t count = 256)
         {
-            // try using unique_ptr instead, or maybe even vector data explicitly
+            // TODO: use unique_ptr or vector instead of direct heap allocation
             auto *array = new uint8_t[count];
             if (Lib_RandomBuffer_System_randombytes(const_cast<uint8_t *>(array), count)) {
                 vector<uint8_t> result(array, array + count);
@@ -77,7 +77,13 @@ namespace electionguard
             struct tm now;
 
             stringstream stream;
+#ifdef _WIN32
+            // TODO: handle error
+            gmtime_s(&now, &now_seconds);
+            stream << put_time(&now, "%c");
+#else
             stream << put_time(gmtime_r(&now_seconds, &now), "%c");
+#endif
             return stream.str();
         }
         static const Spec_Hash_Definitions_hash_alg hashAlgo =

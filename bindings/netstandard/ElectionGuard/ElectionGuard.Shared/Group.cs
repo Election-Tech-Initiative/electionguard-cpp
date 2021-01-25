@@ -30,9 +30,9 @@ namespace ElectionGuard
             Handle = handle;
         }
 
-        protected override unsafe void DisposeUnamanged()
+        protected override unsafe void DisposeUnmanaged()
         {
-            base.DisposeUnamanged();
+            base.DisposeUnmanaged();
             var status = NativeInterface.ElementModP.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
@@ -136,9 +136,9 @@ namespace ElectionGuard
             return value;
         }
 
-        protected override unsafe void DisposeUnamanged()
+        protected override unsafe void DisposeUnmanaged()
         {
-            base.DisposeUnamanged();
+            base.DisposeUnmanaged();
             var status = NativeInterface.ElementModQ.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {

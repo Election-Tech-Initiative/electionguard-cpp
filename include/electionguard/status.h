@@ -33,7 +33,7 @@ static const char *const eg_electionguard_status_codes[] = {
   "ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR",
   "ELECTIONGUARD_STATUS_UNKNOWN"};
 
-EG_API static const char *eg_electionguard_get_status(eg_electionguard_status_t status)
+static const char *eg_electionguard_get_status(eg_electionguard_status_t status)
 {
     if (status >= ELECTIONGUARD_STATUS_UNKNOWN) {
         eg_electionguard_status_codes[ELECTIONGUARD_STATUS_UNKNOWN];

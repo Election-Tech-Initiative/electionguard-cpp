@@ -31,7 +31,8 @@ eg_plaintext_ballot_selection_new(const char *in_object_id, const char *in_vote,
                                   eg_plaintext_ballot_selection_t **out_handle)
 {
     try {
-        auto selection = make_unique<PlaintextBallotSelection>(in_object_id, in_vote);
+        auto selection =
+          make_unique<PlaintextBallotSelection>(in_object_id, in_vote, in_is_placeholder_selection);
         *out_handle = AS_TYPE(eg_plaintext_ballot_selection_t, selection.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
