@@ -36,7 +36,7 @@ namespace electionguard
         unique_ptr<Impl> pimpl;
     };
 
-    EG_API class InternationalizedText : public CryptoHashable
+    class EG_API InternationalizedText : public CryptoHashable
     {
       public:
         //vector<Language> text;

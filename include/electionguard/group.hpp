@@ -108,15 +108,15 @@ namespace electionguard
 
     // Common constants
 
-    const ElementModP &G();
-    const ElementModP &P();
-    const ElementModP &ZERO_MOD_P();
-    const ElementModP &ONE_MOD_P();
-    const ElementModP &TWO_MOD_P();
-    const ElementModQ &Q();
-    const ElementModQ &ZERO_MOD_Q();
-    const ElementModQ &ONE_MOD_Q();
-    const ElementModQ &TWO_MOD_Q();
+    EG_API const ElementModP &G();
+    EG_API const ElementModP &P();
+    EG_API const ElementModP &ZERO_MOD_P();
+    EG_API const ElementModP &ONE_MOD_P();
+    EG_API const ElementModP &TWO_MOD_P();
+    EG_API const ElementModQ &Q();
+    EG_API const ElementModQ &ZERO_MOD_Q();
+    EG_API const ElementModQ &ONE_MOD_Q();
+    EG_API const ElementModQ &TWO_MOD_Q();
 
     /// <summary>
     /// Adds together the left hand side and right hand side and returns the sum mod P
