@@ -9,6 +9,7 @@
 
 using namespace electionguard;
 using namespace hacl;
+using namespace std;
 
 namespace electionguard
 {

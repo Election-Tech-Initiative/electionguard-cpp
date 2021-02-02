@@ -15,6 +15,24 @@ extern "C" {
 #ifndef PlaintextBallotSelection
 
 struct eg_plaintext_ballot_selection_s;
+
+/**
+* A BallotSelection represents an individual selection on a ballot.
+*
+* This class accepts a `vote` string field which has no constraints
+* in the ElectionGuard Data Specification, but is constrained logically
+* in the application to resolve to `True` or `False`.  This implies that the
+* data specification supports passing any string that can be represented as
+* an integer, however only 0 and 1 is supported for now.
+*
+* This class can also be designated as `is_placeholder_selection` which has no
+* context to the data specification but is useful for running validity checks internally
+*
+* an `extended_data` field exists to support any arbitrary data to be associated
+* with the selection.  In practice, this field is the cleartext representation
+* of a write-in candidate value.  In the current implementation these values are
+* discarded when encrypting.
+*/
 typedef struct eg_plaintext_ballot_selection_s eg_plaintext_ballot_selection_t;
 
 EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_new(
@@ -36,13 +54,37 @@ eg_plaintext_ballot_selection_free(eg_plaintext_ballot_selection_t *handle);
 EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_get_object_id(
   eg_plaintext_ballot_selection_t *handle, char **out_object_id);
 
-// TODO: Add missing fields
+// TODO: ISSUE #129: Add missing fields
 
 #endif
 
 #ifndef CiphertextBallotSelection
 
 struct eg_ciphertext_ballot_selection_s;
+
+/**
+* A CiphertextBallotSelection represents an individual encrypted selection on a ballot.
+*
+* This class accepts a `description_hash` and a `ciphertext` as required parameters
+* in its constructor.
+*
+* When a selection is encrypted, the `description_hash` and `ciphertext` required fields must
+* be populated at construction however the `nonce` is also usually provided by convention.
+*
+* After construction, the `crypto_hash` field is populated automatically in the `__post_init__` cycle
+*
+* A consumer of this object has the option to discard the `nonce` and/or discard the `proof`,
+* or keep both values.
+*
+* By discarding the `nonce`, the encrypted representation and `proof`
+* can only be regenerated if the nonce was derived from the ballot's master nonce.  If the nonce
+* used for this selection is truly random, and it is discarded, then the proofs cannot be regenerated.
+*
+* By keeping the `nonce`, or deriving the selection nonce from the ballot nonce, an external system can
+* regenerate the proofs on demand.  This is useful for storage or memory constrained systems.
+*
+* By keeping the `proof` the nonce is not required fotor verify the encrypted selection.
+*/
 typedef struct eg_ciphertext_ballot_selection_s eg_ciphertext_ballot_selection_t;
 
 // no constructors defined.  use `eg_encrypt_selection` in encrypt.h
@@ -68,6 +110,9 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_crypto_hash(
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_nonce(
   eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t **out_nonce);
 
+/**
+ * The proof that demonstrates the selection is an encryption of 0 or 1, and was encrypted using the `nonce`
+ */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_proof(
   eg_ciphertext_ballot_selection_t *handle, eg_disjunctive_chaum_pedersen_proof_t **out_proof);
 
@@ -76,7 +121,7 @@ EG_API bool eg_ciphertext_ballot_selection_is_valid_encryption(
   eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash);
 
 // CiphertextBallotSelection::crypto_hash_with not provided
-// static CiphertextBallotSelection::make not provided
+// static CiphertextBallotSelection::make not provided, use eg_encrypt_selection
 
 #endif
 
@@ -135,7 +180,7 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_proof(
   eg_ciphertext_ballot_contest_t *handle, eg_disjunctive_chaum_pedersen_proof_t **out_proof);
 
 // CiphertextBallotContest::crypto_hash_with not provided
-// static CiphertextBallotContest::make not provided
+// static CiphertextBallotContest::make not provided, eg_encrypt_contest
 
 EG_API bool eg_ciphertext_ballot_contest_is_valid_encryption(
   eg_ciphertext_ballot_contest_t *handle, eg_element_mod_q_t *in_seed_hash,
@@ -218,7 +263,7 @@ EG_API eg_electionguard_status_t
 eg_ciphertext_ballot_get_crypto_hash(eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_hash);
 
 // CiphertextBallot::crypto_hash_with not provided
-// static CiphertextBallot::make not provided
+// static CiphertextBallot::make not provided, use eg_encrypt_ballot
 
 EG_API bool eg_ciphertext_ballot_is_valid_encryption(
   eg_ciphertext_ballot_t *handle, eg_element_mod_q_t *in_seed_hash,

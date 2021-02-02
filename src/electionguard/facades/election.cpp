@@ -20,7 +20,9 @@ using electionguard::InternalElectionDescription;
 using electionguard::Log;
 using electionguard::SelectionDescription;
 
+using std::make_unique;
 using std::string;
+using std::unique_ptr;
 using std::vector;
 
 #pragma region SelectionDescription

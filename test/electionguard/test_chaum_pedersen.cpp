@@ -6,6 +6,7 @@
 #include <electionguard/group.hpp>
 
 using namespace electionguard;
+using namespace std;
 
 class DisjunctiveChaumPedersenProofHarness : DisjunctiveChaumPedersenProof
 {

@@ -24,6 +24,9 @@ using electionguard::PlaintextBallot;
 using electionguard::PlaintextBallotSelection;
 using electionguard::SelectionDescription;
 
+using std::make_unique;
+using std::unique_ptr;
+
 #pragma region EncryptionDevice
 
 eg_electionguard_status_t eg_encryption_device_new(const uint64_t in_uuid, const char *in_location,

@@ -8,6 +8,7 @@
 #include <string>
 
 using namespace electionguard;
+using namespace std;
 
 #pragma region add_mod_q
 

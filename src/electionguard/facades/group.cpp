@@ -14,6 +14,7 @@ using electionguard::ElementModQ;
 using electionguard::Log;
 using electionguard::rand_q;
 
+using std::make_unique;
 using std::string;
 
 #pragma region ElementModP

@@ -4,6 +4,7 @@
 #include <electionguard/nonces.hpp>
 
 using namespace electionguard;
+using namespace std;
 
 TEST_CASE("Nonces with same seed generated same output")
 {

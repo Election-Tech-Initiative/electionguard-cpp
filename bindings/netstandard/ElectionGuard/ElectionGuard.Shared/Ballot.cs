@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -571,7 +571,7 @@ namespace ElectionGuard
                 Handle, seedHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
         }
 
-        // TODO: To bson
+        // TODO: ISSUE #129: To bson
 
         public unsafe string ToJson(bool withNonces = false)
         {

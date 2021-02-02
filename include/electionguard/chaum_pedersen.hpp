@@ -15,12 +15,15 @@ namespace electionguard
       public:
         DisjunctiveChaumPedersenProof(const DisjunctiveChaumPedersenProof &other);
         DisjunctiveChaumPedersenProof(const DisjunctiveChaumPedersenProof &&other);
-        DisjunctiveChaumPedersenProof(
-          unique_ptr<ElementModP> proof_zero_pad, unique_ptr<ElementModP> proof_zero_data,
-          unique_ptr<ElementModP> proof_one_pad, unique_ptr<ElementModP> proof_one_data,
-          unique_ptr<ElementModQ> proof_zero_challenge, unique_ptr<ElementModQ> proof_one_challenge,
-          unique_ptr<ElementModQ> challenge, unique_ptr<ElementModQ> proof_zero_response,
-          unique_ptr<ElementModQ> proof_one_response);
+        DisjunctiveChaumPedersenProof(std::unique_ptr<ElementModP> proof_zero_pad,
+                                      std::unique_ptr<ElementModP> proof_zero_data,
+                                      std::unique_ptr<ElementModP> proof_one_pad,
+                                      std::unique_ptr<ElementModP> proof_one_data,
+                                      std::unique_ptr<ElementModQ> proof_zero_challenge,
+                                      std::unique_ptr<ElementModQ> proof_one_challenge,
+                                      std::unique_ptr<ElementModQ> challenge,
+                                      std::unique_ptr<ElementModQ> proof_zero_response,
+                                      std::unique_ptr<ElementModQ> proof_one_response);
         ~DisjunctiveChaumPedersenProof();
 
         DisjunctiveChaumPedersenProof &operator=(DisjunctiveChaumPedersenProof other);
@@ -36,23 +39,23 @@ namespace electionguard
         ElementModQ *getProofZeroResponse() const;
         ElementModQ *getProofOneResponse() const;
 
-        static unique_ptr<DisjunctiveChaumPedersenProof>
+        static std::unique_ptr<DisjunctiveChaumPedersenProof>
         make(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
              const ElementModQ &q, const ElementModQ &seed, uint64_t plaintext);
 
         bool isValid(const ElGamalCiphertext &message, const ElementModP &k, const ElementModQ &q);
 
       protected:
-        static unique_ptr<DisjunctiveChaumPedersenProof>
+        static std::unique_ptr<DisjunctiveChaumPedersenProof>
         make_zero(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
                   const ElementModQ &q, const ElementModQ &seed);
-        static unique_ptr<DisjunctiveChaumPedersenProof>
+        static std::unique_ptr<DisjunctiveChaumPedersenProof>
         make_one(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
                  const ElementModQ &q, const ElementModQ &seed);
 
       private:
         class Impl;
-        unique_ptr<Impl> pimpl;
+        std::unique_ptr<Impl> pimpl;
     };
 
     class EG_API ConstantChaumPedersenProof
@@ -60,9 +63,10 @@ namespace electionguard
       public:
         ConstantChaumPedersenProof(const ConstantChaumPedersenProof &other);
         ConstantChaumPedersenProof(const ConstantChaumPedersenProof &&other);
-        ConstantChaumPedersenProof(unique_ptr<ElementModP> pad, unique_ptr<ElementModP> data,
-                                   unique_ptr<ElementModQ> challenge,
-                                   unique_ptr<ElementModQ> response, uint64_t constant);
+        ConstantChaumPedersenProof(std::unique_ptr<ElementModP> pad,
+                                   std::unique_ptr<ElementModP> data,
+                                   std::unique_ptr<ElementModQ> challenge,
+                                   std::unique_ptr<ElementModQ> response, uint64_t constant);
         ~ConstantChaumPedersenProof();
 
         ConstantChaumPedersenProof &operator=(ConstantChaumPedersenProof other);
@@ -74,7 +78,7 @@ namespace electionguard
         ElementModQ *getResponse() const;
         uint64_t getConstant() const;
 
-        static unique_ptr<ConstantChaumPedersenProof>
+        static std::unique_ptr<ConstantChaumPedersenProof>
         make(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
              const ElementModQ &seed, const ElementModQ &hash_header, uint64_t constant);
 
@@ -82,7 +86,7 @@ namespace electionguard
 
       private:
         class Impl;
-        unique_ptr<Impl> pimpl;
+        std::unique_ptr<Impl> pimpl;
     };
 } // namespace electionguard
 

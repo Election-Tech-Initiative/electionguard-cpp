@@ -211,7 +211,7 @@ namespace electionguard
 
         bool operator==(const Impl &other)
         {
-            // TODO: safety, specifically when the object underflows its max size
+            // TODO: ISSUE #137: safety, specifically when the object underflows its max size
             // e.g. if ((l == (uint64_t)0U) && (r == (uint64_t)0U))
             for (uint8_t i = 0; i < MAX_P_LEN; i++) {
                 auto l = data[i];
@@ -345,7 +345,7 @@ namespace electionguard
 
         bool operator==(const Impl &other)
         {
-            // TODO: safety, specifically when the object underflows its max size
+            // TODO: ISSUE #137: safety, specifically when the object underflows its max size
             // e.g. if ((l == (uint64_t)0U) && (r == (uint64_t)0U))
             for (uint8_t i = 0; i < MAX_Q_LEN; i++) {
                 auto l = data[i];
@@ -466,7 +466,7 @@ namespace electionguard
         // but the carry value is not set.  We still need to offset.
         if (carry > 0 || isMax(result)) {
 
-            // TODO: handle carry like in ElementModQ
+            // TODO: ISSUE #137: handle carry like in ElementModQ
         }
 
         uint64_t modResult[MAX_P_LEN] = {};
@@ -568,7 +568,7 @@ namespace electionguard
             if (big_a || big_b) {
 
                 uint64_t offset[MAX_Q_LEN] = {};
-                // TODO: precompute?
+                // TODO: ISSUE #135: precompute?
                 if (big_a) {
                     Hacl_Bignum256_add(static_cast<uint64_t *>(offset),
                                        const_cast<uint64_t *>(Q_ARRAY_INVERSE_REVERSE),
@@ -638,7 +638,7 @@ namespace electionguard
 
             if (big_a || big_b) {
 
-                // TODO: precompute
+                // TODO: ISSUE #135: precompute
 
                 uint64_t offset[MAX_Q_LEN] = {};
 

@@ -23,6 +23,8 @@ using electionguard::PlaintextBallot;
 using electionguard::PlaintextBallotContest;
 using electionguard::PlaintextBallotSelection;
 
+using std::make_unique;
+
 #pragma region PlaintextBallotSelection
 
 eg_electionguard_status_t

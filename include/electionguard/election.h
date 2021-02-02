@@ -39,7 +39,7 @@ EG_API eg_electionguard_status_t eg_selection_description_crypto_hash(
 struct eg_contest_description_s;
 typedef struct eg_contest_description_s eg_contest_description_t;
 
-// TODO: implement
+// TODO: ISSUE #129: implement
 
 // InternalElectionDescription
 
@@ -65,7 +65,7 @@ EG_API eg_electionguard_status_t eg_internal_election_description_to_json(
 EG_API eg_electionguard_status_t eg_internal_election_description_to_bson(
   eg_internal_election_description_t *handle, uint8_t **out_data, size_t *out_size);
 
-// TODO: implement
+// TODO: ISSUE #129: implement
 
 // CiphertextElectionContext
 

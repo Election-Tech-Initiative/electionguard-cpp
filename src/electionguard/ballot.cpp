@@ -11,8 +11,15 @@
 #include <string>
 #include <unordered_map>
 
+using std::invalid_argument;
+using std::make_unique;
+using std::ref;
+using std::reference_wrapper;
 using std::string;
 using std::time;
+using std::unique_ptr;
+using std::unordered_map;
+using std::vector;
 
 using PlaintextBallotSerializer = electionguard::Serialize::PlaintextBallot;
 using CiphertextBallotSerializer = electionguard::Serialize::CiphertextBallot;
@@ -31,7 +38,7 @@ namespace electionguard
             this->object_id = move(objectId);
         }
 
-        // TODO: secure erase the vote
+        // TODO: ISSUE #132: secure erase the vote
     };
 
     // Lifecycle Methods

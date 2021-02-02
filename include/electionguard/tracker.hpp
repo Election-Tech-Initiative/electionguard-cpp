@@ -12,14 +12,15 @@ namespace electionguard
     class EG_API Tracker
     {
       public:
-        static unique_ptr<ElementModQ> getHashForDevice(uint64_t uuid, const string &location);
+        static std::unique_ptr<ElementModQ> getHashForDevice(uint64_t uuid,
+                                                             const std::string &location);
 
         // TODO: use explicit time type
-        static unique_ptr<ElementModQ> getRotatingTrackerHash(const ElementModQ &previous,
-                                                              uint64_t timestamp,
-                                                              const ElementModQ &ballotHash);
+        static std::unique_ptr<ElementModQ> getRotatingTrackerHash(const ElementModQ &previous,
+                                                                   uint64_t timestamp,
+                                                                   const ElementModQ &ballotHash);
 
-        static string hashToWords(const ElementModQ &trackerHash, const char *separator = " ");
+        static std::string hashToWords(const ElementModQ &trackerHash, const char *separator = " ");
     };
 
 } // namespace electionguard

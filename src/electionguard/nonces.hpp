@@ -6,11 +6,10 @@
 #include <memory>
 #include <variant>
 #include <vector>
-using namespace std;
 
 namespace electionguard
 {
-    using NoncesHeaderType = variant<ElementModP *, ElementModQ *, string>;
+    using NoncesHeaderType = std::variant<ElementModP *, ElementModQ *, std::string>;
 
     class EG_INTERNAL_API Nonces
     {
@@ -24,14 +23,14 @@ namespace electionguard
         Nonces &operator=(Nonces rhs);
         Nonces &operator=(Nonces &&rhs);
 
-        unique_ptr<ElementModQ> get(uint64_t item);
-        unique_ptr<ElementModQ> get(uint64_t item, string headers);
-        vector<unique_ptr<ElementModQ>> get(uint64_t startItem, uint64_t count);
-        unique_ptr<ElementModQ> next();
+        std::unique_ptr<ElementModQ> get(uint64_t item);
+        std::unique_ptr<ElementModQ> get(uint64_t item, std::string headers);
+        std::vector<std::unique_ptr<ElementModQ>> get(uint64_t startItem, uint64_t count);
+        std::unique_ptr<ElementModQ> next();
 
       private:
         struct Impl;
-        unique_ptr<Impl> pimpl;
+        std::unique_ptr<Impl> pimpl;
     };
 } // namespace electionguard
 

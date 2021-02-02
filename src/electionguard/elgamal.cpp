@@ -4,6 +4,12 @@
 #include "electionguard/hash.hpp"
 #include "log.hpp"
 
+using std::invalid_argument;
+using std::make_unique;
+using std::move;
+using std::reference_wrapper;
+using std::unique_ptr;
+
 namespace electionguard
 {
 #pragma region ElgamalKeyPair
@@ -143,7 +149,7 @@ namespace electionguard
             return 0;
         }
 
-        // TODO: traverse a discrete_log lookup to find the result
+        // TODO: ISSUE #133: traverse a discrete_log lookup to find the result
         auto result_as_p = make_unique<ElementModP>(result);
         uint64_t retval = 0xffffffffffffffff;
         if (*result_as_p == ONE_MOD_P()) {

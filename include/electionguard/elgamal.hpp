@@ -16,7 +16,8 @@ namespace electionguard
       public:
         ElGamalKeyPair(const ElGamalKeyPair &other);
         ElGamalKeyPair(const ElGamalKeyPair &&other);
-        ElGamalKeyPair(unique_ptr<ElementModQ> secretKey, unique_ptr<ElementModP> publicKey);
+        ElGamalKeyPair(std::unique_ptr<ElementModQ> secretKey,
+                       std::unique_ptr<ElementModP> publicKey);
         ~ElGamalKeyPair();
 
         ElGamalKeyPair &operator=(ElGamalKeyPair rhs);
@@ -25,11 +26,11 @@ namespace electionguard
         ElementModQ *getSecretKey();
         ElementModP *getPublicKey();
 
-        static unique_ptr<ElGamalKeyPair> fromSecret(const ElementModQ &secretKey);
+        static std::unique_ptr<ElGamalKeyPair> fromSecret(const ElementModQ &secretKey);
 
       private:
         class Impl;
-        unique_ptr<Impl> pimpl;
+        std::unique_ptr<Impl> pimpl;
     };
 
     /// <summary>
@@ -42,7 +43,7 @@ namespace electionguard
       public:
         ElGamalCiphertext(const ElGamalCiphertext &other);
         ElGamalCiphertext(ElGamalCiphertext &&other);
-        ElGamalCiphertext(unique_ptr<ElementModP> pad, unique_ptr<ElementModP> data);
+        ElGamalCiphertext(std::unique_ptr<ElementModP> pad, std::unique_ptr<ElementModP> data);
         ~ElGamalCiphertext();
 
         ElGamalCiphertext &operator=(ElGamalCiphertext rhs);
@@ -53,16 +54,17 @@ namespace electionguard
         ElementModP *getData();
         ElementModP *getData() const;
 
-        virtual unique_ptr<ElementModQ> crypto_hash() override;
-        virtual unique_ptr<ElementModQ> crypto_hash() const override;
+        virtual std::unique_ptr<ElementModQ> crypto_hash() override;
+        virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
-        static unique_ptr<ElGamalCiphertext> make(const ElementModP &pad, const ElementModP &data);
+        static std::unique_ptr<ElGamalCiphertext> make(const ElementModP &pad,
+                                                       const ElementModP &data);
 
         uint64_t decrypt(const ElementModQ &secretKey);
 
       private:
         class Impl;
-        unique_ptr<Impl> pimpl;
+        std::unique_ptr<Impl> pimpl;
     };
 
     /// <summary>
@@ -73,11 +75,11 @@ namespace electionguard
     /// <param name="publicKey"> ElGamal public key. </param>
     /// <returns>A ciphertext tuple.</returns>
     /// </summary>
-    EG_API unique_ptr<ElGamalCiphertext> elgamalEncrypt(const uint64_t m, const ElementModQ &nonce,
-                                                        const ElementModP &publicKey);
+    EG_API std::unique_ptr<ElGamalCiphertext>
+    elgamalEncrypt(const uint64_t m, const ElementModQ &nonce, const ElementModP &publicKey);
 
-    EG_API unique_ptr<ElGamalCiphertext>
-    elgamalAdd(const vector<reference_wrapper<ElGamalCiphertext>> &ciphertexts);
+    EG_API std::unique_ptr<ElGamalCiphertext>
+    elgamalAdd(const std::vector<std::reference_wrapper<ElGamalCiphertext>> &ciphertexts);
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD__CORE_ELGAMAL_HPP_INCLUDED__ */

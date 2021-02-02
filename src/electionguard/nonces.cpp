@@ -4,6 +4,10 @@
 #include "log.hpp"
 #include "variant_cast.hpp"
 
+using std::make_unique;
+using std::string;
+using std::unique_ptr;
+
 namespace electionguard
 {
     struct Nonces::Impl {
@@ -62,7 +66,7 @@ namespace electionguard
 
     vector<unique_ptr<ElementModQ>> Nonces::get(uint64_t startItem, uint64_t count)
     {
-        // TODO: preallocate and address possible overflow
+        // TODO: ISSUE #137: preallocate and address possible overflow
         vector<unique_ptr<ElementModQ>> result;
         uint64_t endItem = startItem + count;
         for (uint64_t i(startItem); i < endItem; i++) {

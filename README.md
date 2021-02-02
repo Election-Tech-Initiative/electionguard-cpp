@@ -4,7 +4,7 @@
 
 This repository is a "reference implementation" of an ElectionGuard ballot encryption library written in c++ and includes a C-compatible API for referencing the library from pure-c application.  This core SDK performs ballot encryption and verification functions and is suitable for execution on voting system hardware and low powered devices.  It is designed to be integrated into existing (or new) voting system software.  
 
-This repository is `pre-release` software to showcase the ElectionGuard API implemented in a native language.
+This repository is `pre-release` software to showcase the ElectionGuard API implemented in a native language.  It is not feature complete and should not be used for production applications.
 
 ## 📁 In This Repository
 

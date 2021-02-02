@@ -59,7 +59,7 @@ namespace electionguard
         }
         static vector<uint8_t> getRandomBytes(uint32_t count = 256)
         {
-            // TODO: use unique_ptr or vector instead of direct heap allocation
+            // TODO: ISSUE #137: use unique_ptr or vector instead of direct heap allocation
             auto *array = new uint8_t[count];
             if (Lib_RandomBuffer_System_randombytes(const_cast<uint8_t *>(array), count)) {
                 vector<uint8_t> result(array, array + count);
