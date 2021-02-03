@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD_CORE_CHAUM_PEDERSEN_HPP_INCLUDED__
-#define __ELECTIONGUARD_CORE_CHAUM_PEDERSEN_HPP_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_CHAUM_PEDERSEN_HPP_INCLUDED__
+#define __ELECTIONGUARD_CPP_CHAUM_PEDERSEN_HPP_INCLUDED__
 
 #include "elgamal.hpp"
 #include "export.h"
@@ -90,4 +90,4 @@ namespace electionguard
     };
 } // namespace electionguard
 
-#endif /* __ELECTIONGUARD_CORE_CHAUM_PEDERSEN_HPP_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_CHAUM_PEDERSEN_HPP_INCLUDED__ */

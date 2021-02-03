@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD_CORE_HASH_HPP_INCLUDED__
-#define __ELECTIONGUARD_CORE_HASH_HPP_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_HASH_HPP_INCLUDED__
+#define __ELECTIONGUARD_CPP_HASH_HPP_INCLUDED__
 #include <electionguard/crypto_hashable.hpp>
 #include <electionguard/export.h>
 #include <electionguard/group.hpp>
@@ -28,4 +28,4 @@ namespace electionguard
     EG_API std::unique_ptr<ElementModQ> hash_elems(CryptoHashableType a);
 } // namespace electionguard
 
-#endif /* __ELECTIONGUARD_CORE_HASH_HPP_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_HASH_HPP_INCLUDED__ */

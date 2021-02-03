@@ -68,7 +68,7 @@ namespace ElectionGuard
             var status = NativeInterface.ElGamalCiphertext.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
+                Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
             }
             Handle = null;
         }

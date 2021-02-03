@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD_CORE_WORDS_HPP_INCLUDED__
-#define __ELECTIONGUARD_CORE_WORDS_HPP_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_WORDS_HPP_INCLUDED__
+#define __ELECTIONGUARD_CPP_WORDS_HPP_INCLUDED__
 
 #include <electionguard/export.h>
 #include <string>
@@ -14,4 +14,4 @@ namespace electionguard
     EG_INTERNAL_API int16_t getIndex(const string &word);
 } // namespace electionguard
 
-#endif /* __ELECTIONGUARD_CORE_WORDS_HPP_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_WORDS_HPP_INCLUDED__ */

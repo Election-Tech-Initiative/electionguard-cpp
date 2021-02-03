@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD_CORE_ELECTION_H_INCLUDED__
-#define __ELECTIONGUARD_CORE_ELECTION_H_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_ELECTION_H_INCLUDED__
+#define __ELECTIONGUARD_CPP_ELECTION_H_INCLUDED__
 
 #include "export.h"
 #include "group.h"
@@ -110,4 +110,4 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_to_bson(
 #ifdef __cplusplus
 }
 #endif
-#endif /* __ELECTIONGUARD_CORE_ELECTION_H_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_ELECTION_H_INCLUDED__ */

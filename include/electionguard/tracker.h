@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD_CORE_TRACKER_H_INCLUDED__
-#define __ELECTIONGUARD_CORE_TRACKER_H_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_TRACKER_H_INCLUDED__
+#define __ELECTIONGUARD_CPP_TRACKER_H_INCLUDED__
 
 #include "export.h"
 #include "group.h"
@@ -24,4 +24,4 @@ EG_API eg_electionguard_status_t eg_hash_to_words(eg_element_mod_q_t *in_tracker
 #ifdef __cplusplus
 }
 #endif
-#endif /* __ELECTIONGUARD_CORE_TRACKER_H_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_TRACKER_H_INCLUDED__ */

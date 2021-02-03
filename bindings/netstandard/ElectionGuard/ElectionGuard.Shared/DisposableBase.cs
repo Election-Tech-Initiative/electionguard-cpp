@@ -14,7 +14,7 @@ namespace ElectionGuard
             // dispose managed state (managed objects)
         }
 
-        protected virtual void DisposeUnamanged()
+        protected virtual void DisposeUnmanaged()
         {
             // free unmanaged resources (unmanaged objects) and override finalizer
             // set large fields to null
@@ -28,7 +28,7 @@ namespace ElectionGuard
                 {
                     DisposeManaged();
                 }
-                DisposeUnamanged();
+                DisposeUnmanaged();
                 disposedValue = true;
             }
         }

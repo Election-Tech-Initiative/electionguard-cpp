@@ -1,6 +1,6 @@
 ![Microsoft Defending Democracy Program: ElectionGuard Python][Banner Image]
 
-# 🗳 ElectionGuard Core
+# 🗳 ElectionGuard Cpp
 
 This repository is a "reference implementation" of an ElectionGuard ballot encryption library written in c++ and includes a C-compatible API for referencing the library from pure-c application.  This core SDK performs ballot encryption and verification functions and is suitable for execution on voting system hardware and low powered devices.  It is designed to be integrated into existing (or new) voting system software.  
 
@@ -43,7 +43,7 @@ This c++ implementation also includes a C API that can be consumed from anywhere
 
 - A [C++17](https://isocpp.org/get-started) standard compliant compiler is required to build the core library.  While any modern compiler should work, the library is tested on a subset.  Check out the [github actions](#) to see what is officially supported.
 - [GNU Make](https://www.gnu.org/software/make/manual/make.html) is used to simplify the commands and GitHub Actions. This approach is recommended to simplify the command line experience. This is built in for MacOS and Linux. For Windows, setup is simpler with [Chocolatey](https://chocolatey.org/install) and installing the provided [make package](https://chocolatey.org/packages/make). The other Windows option is [manually installing make](http://gnuwin32.sourceforge.net/packages/make.htm).
-- [CMake 3.14](https://cmake.org/) is used to simplify the build experience.
+- [CMake](https://cmake.org/) is used to simplify the build experience.
 
 ### 🤖 Android
 
@@ -67,6 +67,7 @@ A .Net Standard binding library is provided so that this package can be consumed
 To build for iOS you need XCode installed
 
 - [XCode](https://developer.apple.com/xcode/resources/) and the [Command Line Tools for XCode](#)
+- [CMake 3.19](https://cmake.org/) may be necessary, along with changes to the Makefile.  [See ISSUE #138](https://github.com/microsoft/electionguard-cpp/issues/138)
 
 ### 🖥️ Windows (using MSYS2)
 
@@ -225,10 +226,10 @@ A huge thank you to those who helped to contribute to this project so far, inclu
 <!-- Links -->
 [Banner Image]: https://raw.githubusercontent.com/microsoft/electionguard-python/main/images/electionguard-banner.svg
 
-[Pull Request Workflow]: https://github.com/microsoft/electionguard-core/blob/main/.github/workflows/pull_request.yml
+[Pull Request Workflow]: https://github.com/microsoft/electionguard-ccpp/blob/main/.github/workflows/pull_request.yml
 
-[Contributing]: https://github.com/microsoft/electionguard-core/blob/main/CONTRIBUTING.md
+[Contributing]: https://github.com/microsoft/electionguard-cpp/blob/main/CONTRIBUTING.md
 
-[Security]:https://github.com/microsoft/electionguard-core/blob/main/SECURITY.md
+[Security]:https://github.com/microsoft/electionguard-cpp/blob/main/SECURITY.md
 
-[MIT License]: https://github.com/microsoft/electionguard-core/blob/main/LICENSE
+[MIT License]: https://github.com/microsoft/electionguard-cpp/blob/main/LICENSE

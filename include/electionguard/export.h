@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD_CORE_EXPORT_H_INCLUDED__
-#define __ELECTIONGUARD_CORE_EXPORT_H_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_EXPORT_H_INCLUDED__
+#define __ELECTIONGUARD_CPP_EXPORT_H_INCLUDED__
 
 /* Use the windows pattern to export symbols */
 
@@ -36,4 +36,4 @@
 #    endif
 #endif
 
-#endif /* __ELECTIONGUARD_CORE_EXPORT_H_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_EXPORT_H_INCLUDED__ */

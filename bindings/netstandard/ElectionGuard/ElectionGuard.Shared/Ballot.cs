@@ -38,13 +38,13 @@ namespace ElectionGuard
             Handle = handle;
         }
 
-        protected override unsafe void DisposeUnamanged()
+        protected override unsafe void DisposeUnmanaged()
         {
-            base.DisposeUnamanged();
+            base.DisposeUnmanaged();
             var status = NativeInterface.PlaintextBallotSelection.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"PlaintextBallotSelection Error DisposeUnamanged: {status}");
+                Console.WriteLine($"PlaintextBallotSelection Error DisposeUnmanaged: {status}");
             }
             Handle = null;
         }
@@ -144,13 +144,13 @@ namespace ElectionGuard
                 Handle, seedHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
         }
 
-        protected override unsafe void DisposeUnamanged()
+        protected override unsafe void DisposeUnmanaged()
         {
-            base.DisposeUnamanged();
+            base.DisposeUnmanaged();
             var status = NativeInterface.CiphertextBallotSelection.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallotSelection Error DisposeUnamanged: {status}");
+                Console.WriteLine($"CiphertextBallotSelection Error DisposeUnmanaged: {status}");
             }
             Handle = null;
         }
@@ -204,13 +204,13 @@ namespace ElectionGuard
             return new PlaintextBallotSelection(value);
         }
 
-        protected override unsafe void DisposeUnamanged()
+        protected override unsafe void DisposeUnmanaged()
         {
-            base.DisposeUnamanged();
+            base.DisposeUnmanaged();
             var status = NativeInterface.PlaintextBallotContest.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"PlaintextBallotContest Error DisposeUnamanged: {status}");
+                Console.WriteLine($"PlaintextBallotContest Error DisposeUnmanaged: {status}");
             }
             Handle = null;
         }
@@ -316,13 +316,13 @@ namespace ElectionGuard
                 Handle, seedHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
         }
 
-        protected override unsafe void DisposeUnamanged()
+        protected override unsafe void DisposeUnmanaged()
         {
-            base.DisposeUnamanged();
+            base.DisposeUnmanaged();
             var status = NativeInterface.CiphertextBallotContest.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallotContest Error DisposeUnamanged: {status}");
+                Console.WriteLine($"CiphertextBallotContest Error DisposeUnmanaged: {status}");
             }
             Handle = null;
         }
@@ -394,13 +394,13 @@ namespace ElectionGuard
             return new PlaintextBallotContest(value);
         }
 
-        protected override unsafe void DisposeUnamanged()
+        protected override unsafe void DisposeUnmanaged()
         {
-            base.DisposeUnamanged();
+            base.DisposeUnmanaged();
             var status = NativeInterface.PlaintextBallot.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"PlaintextBallot Error DisposeUnamanged: {status}");
+                Console.WriteLine($"PlaintextBallot Error DisposeUnmanaged: {status}");
             }
             Handle = null;
         }
@@ -591,13 +591,13 @@ namespace ElectionGuard
             return json;
         }
 
-        protected override unsafe void DisposeUnamanged()
+        protected override unsafe void DisposeUnmanaged()
         {
-            base.DisposeUnamanged();
+            base.DisposeUnmanaged();
             var status = NativeInterface.CiphertextBallot.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallot Error DisposeUnamanged: {status}");
+                Console.WriteLine($"CiphertextBallot Error DisposeUnmanaged: {status}");
             }
             Handle = null;
         }

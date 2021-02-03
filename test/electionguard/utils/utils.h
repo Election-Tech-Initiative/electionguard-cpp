@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD_CORE_TEST_UTILS_H_INCLUDED__
-#define __ELECTIONGUARD_CORE_TEST_UTILS_H_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_TEST_UTILS_H_INCLUDED__
+#define __ELECTIONGUARD_CPP_TEST_UTILS_H_INCLUDED__
 
 #include <stdbool.h>
 
@@ -19,4 +19,4 @@ static bool strings_are_equal(char *expected, char *actual)
         return false;
     }
 }
-#endif /* __ELECTIONGUARD_CORE_TEST_UTILS_H_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_TEST_UTILS_H_INCLUDED__ */

@@ -9,6 +9,7 @@
     <RootNamespace>ElectionGuard.Tests.iOS</RootNamespace>
     <AssemblyName>ElectionGuard.Tests.iOS</AssemblyName>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <ReleaseVersion>0.0.1</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
