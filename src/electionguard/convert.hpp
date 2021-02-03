@@ -131,7 +131,14 @@ namespace electionguard
     inline string timePointToIsoString(const time_point &time, const string &format)
     {
         auto c_time = system_clock::to_time_t(time);
-        auto gmt = *gmtime(&c_time);
+        struct tm gmt;
+
+#ifdef _WIN32
+        // TODO: ISSUE #136: handle err
+        gmtime_s(&gmt, &c_time);
+#else
+        gmtime_r(&c_time, &gmt);
+#endif
         stringstream ss;
         ss << std::put_time(&gmt, format.c_str());
         return ss.str();
