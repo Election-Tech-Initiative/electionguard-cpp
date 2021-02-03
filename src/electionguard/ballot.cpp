@@ -88,7 +88,7 @@ namespace electionguard
             this->isPlaceholder = isPlaceholder;
         }
 
-        unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) const
+        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) const
         {
             return makeCryptoHash(objectId, seedHash, *ciphertext);
         }

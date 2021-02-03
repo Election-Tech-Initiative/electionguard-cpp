@@ -218,9 +218,9 @@ namespace electionguard
       public:
         GeopoliticalUnit(const GeopoliticalUnit &other);
         GeopoliticalUnit(const GeopoliticalUnit &&other);
-        explicit GeopoliticalUnit(const std::string &objectId, const std::string name,
+        explicit GeopoliticalUnit(const std::string &objectId, const std::string &name,
                                   const ReportingUnitType type);
-        explicit GeopoliticalUnit(const std::string &objectId, const std::string name,
+        explicit GeopoliticalUnit(const std::string &objectId, const std::string &name,
                                   const ReportingUnitType type,
                                   std::unique_ptr<ContactInformation> contactInformation);
         ~GeopoliticalUnit();
@@ -253,7 +253,7 @@ namespace electionguard
                              std::vector<std::string> geopoliticalUnitIds);
         explicit BallotStyle(const std::string &objectId,
                              std::vector<std::string> geopoliticalUnitIds,
-                             std::vector<std::string> partyIds, const std::string imageUri);
+                             std::vector<std::string> partyIds, const std::string &imageUri);
         ~BallotStyle();
 
         BallotStyle &operator=(BallotStyle other);
@@ -283,8 +283,8 @@ namespace electionguard
         Party(const Party &&other);
         explicit Party(const std::string &objectId);
         explicit Party(const std::string &objectId, std::unique_ptr<InternationalizedText> name,
-                       const std::string abbreviation, const std::string color,
-                       const std::string logoUri);
+                       const std::string &abbreviation, const std::string &color,
+                       const std::string &logoUri);
         ~Party();
 
         Party &operator=(Party other);
@@ -320,7 +320,7 @@ namespace electionguard
         Candidate(const Candidate &&other);
         explicit Candidate(const std::string &objectId, bool isWriteIn = false);
         explicit Candidate(const std::string &objectId, std::unique_ptr<InternationalizedText> name,
-                           const std::string &partyId, const std::string imageUri, bool isWriteIn);
+                           const std::string &partyId, const std::string &imageUri, bool isWriteIn);
         ~Candidate();
 
         Candidate &operator=(Candidate other);
@@ -396,14 +396,14 @@ namespace electionguard
                                     const std::string &electoralDistrictId,
                                     const uint64_t sequenceOrder,
                                     const VoteVariationType voteVariation,
-                                    const uint64_t numberElected, const std::string name,
+                                    const uint64_t numberElected, const std::string &name,
                                     std::vector<std::unique_ptr<SelectionDescription>> selections);
         explicit ContestDescription(const std::string &objectId,
                                     const std::string &electoralDistrictId,
                                     const uint64_t sequenceOrder,
                                     const VoteVariationType voteVariation,
                                     const uint64_t numberElected, const uint64_t votesAllowed,
-                                    const std::string name,
+                                    const std::string &name,
                                     std::unique_ptr<InternationalizedText> ballotTitle,
                                     std::unique_ptr<InternationalizedText> ballotSubtitle,
                                     std::vector<std::unique_ptr<SelectionDescription>> selections);
@@ -452,13 +452,13 @@ namespace electionguard
         explicit ContestDescriptionWithPlaceholders(
           const std::string &objectId, const std::string &electoralDistrictId,
           const uint64_t sequenceOrder, const VoteVariationType voteVariation,
-          const uint64_t numberElected, const std::string name,
+          const uint64_t numberElected, const std::string &name,
           std::vector<std::unique_ptr<SelectionDescription>> selections,
           std::vector<std::unique_ptr<SelectionDescription>> placeholderSelections);
         explicit ContestDescriptionWithPlaceholders(
           const std::string &objectId, const std::string &electoralDistrictId,
           const uint64_t sequenceOrder, const VoteVariationType voteVariation,
-          const uint64_t numberElected, const uint64_t votesAllowed, const std::string name,
+          const uint64_t numberElected, const uint64_t votesAllowed, const std::string &name,
           std::unique_ptr<InternationalizedText> ballotTitle,
           std::unique_ptr<InternationalizedText> ballotSubtitle,
           std::vector<std::unique_ptr<SelectionDescription>> selections,
@@ -498,7 +498,7 @@ namespace electionguard
         ElectionDescription(const ElectionDescription &other);
         ElectionDescription(const ElectionDescription &&other);
         explicit ElectionDescription(
-          std::string electionScopeId, ElectionType type,
+          const std::string &electionScopeId, ElectionType type,
           std::chrono::system_clock::time_point startDate,
           std::chrono::system_clock::time_point endDate,
           std::vector<std::unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
@@ -507,7 +507,7 @@ namespace electionguard
           std::vector<std::unique_ptr<ContestDescription>> contests,
           std::vector<std::unique_ptr<BallotStyle>> ballotStyles);
         explicit ElectionDescription(
-          std::string electionScopeId, ElectionType type,
+          const std::string &electionScopeId, ElectionType type,
           std::chrono::system_clock::time_point startDate,
           std::chrono::system_clock::time_point endDate,
           std::vector<std::unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
@@ -587,13 +587,13 @@ namespace electionguard
         static std::unique_ptr<InternalElectionDescription> fromBson(std::vector<uint8_t> data);
 
       protected:
-        std::vector<std::unique_ptr<ContestDescriptionWithPlaceholders>>
+        static std::vector<std::unique_ptr<ContestDescriptionWithPlaceholders>>
         generateContestsWithPlaceholders(const ElectionDescription &description);
 
-        std::vector<std::unique_ptr<GeopoliticalUnit>>
+        static std::vector<std::unique_ptr<GeopoliticalUnit>>
         copyGeopoliticalUnits(const ElectionDescription &description);
 
-        std::vector<std::unique_ptr<BallotStyle>>
+        static std::vector<std::unique_ptr<BallotStyle>>
         copyBallotStyles(const ElectionDescription &description);
 
       private:

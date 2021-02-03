@@ -8,7 +8,6 @@
 #include <iostream>
 #include <utility>
 
-using std::get;
 using std::make_unique;
 using std::map;
 using std::move;
@@ -18,7 +17,6 @@ using std::reference_wrapper;
 using std::string;
 using std::to_string;
 using std::unique_ptr;
-using std::variant;
 using std::vector;
 using std::chrono::system_clock;
 
@@ -180,13 +178,16 @@ namespace electionguard
         {
         }
 
-        unique_ptr<AnnotatedString::Impl> clone() const
+        [[nodiscard]] unique_ptr<AnnotatedString::Impl> clone() const
         {
             // TODO: verify string copy
             return make_unique<AnnotatedString::Impl>(*this);
         }
 
-        unique_ptr<ElementModQ> crypto_hash() const { return hash_elems({annotation, value}); }
+        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
+        {
+            return hash_elems({annotation, value});
+        }
     };
 
     // Lifecycle Methods
@@ -194,7 +195,7 @@ namespace electionguard
     AnnotatedString::AnnotatedString(const AnnotatedString &other) : pimpl(other.pimpl->clone()) {}
 
     AnnotatedString::AnnotatedString(string annotation, string value)
-        : pimpl(new Impl(annotation, value))
+        : pimpl(new Impl(move(annotation), move(value)))
     {
     }
 
@@ -202,6 +203,10 @@ namespace electionguard
 
     AnnotatedString &AnnotatedString::operator=(const AnnotatedString &other)
     {
+        if (this == &other) {
+            return *this;
+        }
+
         pimpl = other.pimpl->clone();
         return *this;
     }
@@ -234,25 +239,34 @@ namespace electionguard
         {
         }
 
-        unique_ptr<Language::Impl> clone() const
+        [[nodiscard]] unique_ptr<Language::Impl> clone() const
         {
             // TODO: verify string copy
             return make_unique<Language::Impl>(*this);
         }
 
-        unique_ptr<ElementModQ> crypto_hash() const { return hash_elems({value, language}); }
+        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
+        {
+            return hash_elems({value, language});
+        }
     };
 
     // Lifecycle Methods
 
     Language::Language(const Language &other) : pimpl(other.pimpl->clone()) {}
 
-    Language::Language(string value, string language) : pimpl(new Impl(value, language)) {}
+    Language::Language(string value, string language) : pimpl(new Impl(move(value), move(language)))
+    {
+    }
 
     Language::~Language() = default;
 
     Language &Language::operator=(const Language &other)
     {
+        if (this == &other) {
+            return *this;
+        }
+
         pimpl = other.pimpl->clone();
         return *this;
     }
@@ -282,18 +296,18 @@ namespace electionguard
 
         explicit Impl(vector<unique_ptr<Language>> text) : text(move(text)) {}
 
-        unique_ptr<InternationalizedText::Impl> clone() const
+        [[nodiscard]] unique_ptr<InternationalizedText::Impl> clone() const
         {
             vector<unique_ptr<Language>> _text;
             _text.reserve(text.size());
             for (const auto &element : text) {
-                _text.push_back(make_unique<Language>(*element.get()));
+                _text.push_back(make_unique<Language>(*element));
             }
 
             return make_unique<InternationalizedText::Impl>(move(_text));
         }
 
-        unique_ptr<ElementModQ> crypto_hash() const
+        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
         {
             vector<reference_wrapper<CryptoHashable>> refs;
             refs.reserve(this->text.size());
@@ -375,7 +389,7 @@ namespace electionguard
         {
         }
 
-        unique_ptr<ContactInformation::Impl> clone() const
+        [[nodiscard]] unique_ptr<ContactInformation::Impl> clone() const
         {
             vector<string> _addressLine;
             _addressLine.reserve(addressLine.size());
@@ -386,20 +400,20 @@ namespace electionguard
             vector<unique_ptr<AnnotatedString>> _email;
             _email.reserve(email.size());
             for (const auto &element : email) {
-                _email.push_back(make_unique<AnnotatedString>(*element.get()));
+                _email.push_back(make_unique<AnnotatedString>(*element));
             }
 
             vector<unique_ptr<AnnotatedString>> _phone;
             _phone.reserve(phone.size());
             for (const auto &element : phone) {
-                _phone.push_back(make_unique<AnnotatedString>(*element.get()));
+                _phone.push_back(make_unique<AnnotatedString>(*element));
             }
 
             return make_unique<ContactInformation::Impl>(move(_addressLine), move(_email),
                                                          move(_phone), name);
         }
 
-        unique_ptr<ElementModQ> crypto_hash() const
+        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
         {
             vector<reference_wrapper<CryptoHashable>> emailRefs;
             emailRefs.reserve(this->email.size());
@@ -506,10 +520,10 @@ namespace electionguard
             this->type = type;
         }
 
-        unique_ptr<GeopoliticalUnit::Impl> clone() const
+        [[nodiscard]] unique_ptr<GeopoliticalUnit::Impl> clone() const
         {
             if (contactInformation != nullptr) {
-                auto _contactInfo = make_unique<ContactInformation>(*contactInformation.get());
+                auto _contactInfo = make_unique<ContactInformation>(*contactInformation);
                 return make_unique<GeopoliticalUnit::Impl>(object_id, name, type,
                                                            move(_contactInfo));
             }
@@ -517,7 +531,7 @@ namespace electionguard
             return make_unique<GeopoliticalUnit::Impl>(object_id, name, type);
         }
 
-        unique_ptr<ElementModQ> crypto_hash() const
+        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
         {
             if (contactInformation != nullptr) {
                 return hash_elems(
@@ -534,16 +548,16 @@ namespace electionguard
     {
     }
 
-    GeopoliticalUnit::GeopoliticalUnit(const string &objectId, const string name,
+    GeopoliticalUnit::GeopoliticalUnit(const string &objectId, const string &name,
                                        const ReportingUnitType type)
-        : pimpl(new Impl(objectId, move(name), type))
+        : pimpl(new Impl(objectId, name, type))
     {
     }
 
-    GeopoliticalUnit::GeopoliticalUnit(const string &objectId, const string name,
+    GeopoliticalUnit::GeopoliticalUnit(const string &objectId, const string &name,
                                        const ReportingUnitType type,
                                        unique_ptr<ContactInformation> contactInformation)
-        : pimpl(new Impl(objectId, move(name), type, move(contactInformation)))
+        : pimpl(new Impl(objectId, name, type, move(contactInformation)))
     {
     }
 
@@ -586,14 +600,14 @@ namespace electionguard
         }
 
         explicit Impl(const string &objectId, vector<string> geopoliticalUnitIds,
-                      vector<string> partyIds, const string imageUri)
+                      vector<string> partyIds, const string &imageUri)
             : geopoliticalUnitIds(move(geopoliticalUnitIds)), partyIds(move(partyIds)),
-              imageUri(move(imageUri))
+              imageUri(imageUri)
         {
             this->object_id = objectId;
         }
 
-        unique_ptr<BallotStyle::Impl> clone() const
+        [[nodiscard]] unique_ptr<BallotStyle::Impl> clone() const
         {
             vector<string> _gpUnitIds;
             _gpUnitIds.reserve(geopoliticalUnitIds.size());
@@ -610,7 +624,7 @@ namespace electionguard
             return make_unique<BallotStyle::Impl>(object_id, _gpUnitIds, _partyIds, imageUri);
         }
 
-        unique_ptr<ElementModQ> crypto_hash() const
+        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
         {
             return hash_elems({object_id, geopoliticalUnitIds, geopoliticalUnitIds, imageUri});
         }
@@ -626,8 +640,8 @@ namespace electionguard
     }
 
     BallotStyle::BallotStyle(const string &objectId, vector<string> geopoliticalUnitIds,
-                             vector<string> partyIds, const string imageUri)
-        : pimpl(new Impl(objectId, move(geopoliticalUnitIds), move(partyIds), move(imageUri)))
+                             vector<string> partyIds, const string &imageUri)
+        : pimpl(new Impl(objectId, move(geopoliticalUnitIds), move(partyIds), imageUri))
     {
     }
 
@@ -666,32 +680,31 @@ namespace electionguard
 
         explicit Impl(const string &objectId) { this->object_id = objectId; }
 
-        explicit Impl(const string &objectId, const string abbreviation, const string color,
-                      const string logoUri)
-            : abbreviation(move(abbreviation)), color(move(color)), logoUri(move(logoUri))
+        explicit Impl(const string &objectId, const string &abbreviation, const string &color,
+                      const string &logoUri)
+            : abbreviation(abbreviation), color(color), logoUri(logoUri)
         {
             this->object_id = objectId;
         }
 
         explicit Impl(const string &objectId, unique_ptr<InternationalizedText> name,
-                      const string abbreviation, const string color, const string logoUri)
-            : name(move(name)), abbreviation(move(abbreviation)), color(move(color)),
-              logoUri(move(logoUri))
+                      const string &abbreviation, const string &color, const string &logoUri)
+            : name(move(name)), abbreviation(abbreviation), color(color), logoUri(logoUri)
         {
             this->object_id = objectId;
         }
 
-        unique_ptr<Party::Impl> clone() const
+        [[nodiscard]] unique_ptr<Party::Impl> clone() const
         {
             if (name != nullptr) {
-                auto _name = make_unique<InternationalizedText>(*name.get());
+                auto _name = make_unique<InternationalizedText>(*name);
                 return make_unique<Party::Impl>(object_id, move(_name), abbreviation, color,
                                                 logoUri);
             }
             return make_unique<Party::Impl>(object_id, abbreviation, color, logoUri);
         }
 
-        unique_ptr<ElementModQ> crypto_hash() const
+        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
         {
             if (name != nullptr) {
                 return hash_elems({object_id, name.get(), abbreviation, color, logoUri});
@@ -707,8 +720,8 @@ namespace electionguard
     Party::Party(const string &objectId) : pimpl(new Impl(objectId)) {}
 
     Party::Party(const string &objectId, unique_ptr<InternationalizedText> name,
-                 const string abbreviation, const string color, const string logoUri)
-        : pimpl(new Impl(objectId, move(name), move(abbreviation), move(color), move(logoUri)))
+                 const string &abbreviation, const string &color, const string &logoUri)
+        : pimpl(new Impl(objectId, move(name), abbreviation, color, logoUri))
     {
     }
 
@@ -749,28 +762,26 @@ namespace electionguard
             this->isWriteIn = isWriteIn;
         }
 
-        explicit Impl(const string &objectId, const string &partyId, const string imageUri,
+        explicit Impl(const string &objectId, const string &partyId, const string &imageUri,
                       bool isWriteIn)
-            : imageUri(move(imageUri))
+            : partyId(partyId), imageUri(imageUri)
         {
             this->object_id = objectId;
-            this->partyId = partyId;
             this->isWriteIn = isWriteIn;
         }
 
         explicit Impl(const string &objectId, unique_ptr<InternationalizedText> name,
-                      const string &partyId, const string imageUri, bool isWriteIn)
-            : name(move(name)), imageUri(move(imageUri))
+                      const string &partyId, const string &imageUri, bool isWriteIn)
+            : name(move(name)), partyId(partyId), imageUri(imageUri)
         {
             this->object_id = objectId;
-            this->partyId = partyId;
             this->isWriteIn = isWriteIn;
         }
 
-        unique_ptr<Candidate::Impl> clone() const
+        [[nodiscard]] unique_ptr<Candidate::Impl> clone() const
         {
             if (name != nullptr) {
-                auto _name = make_unique<InternationalizedText>(*name.get());
+                auto _name = make_unique<InternationalizedText>(*name);
                 return make_unique<Candidate::Impl>(object_id, move(_name), partyId, imageUri,
                                                     isWriteIn);
             }
@@ -778,7 +789,7 @@ namespace electionguard
             return make_unique<Candidate::Impl>(object_id, partyId, imageUri, isWriteIn);
         }
 
-        unique_ptr<ElementModQ> crypto_hash() const
+        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
         {
             if (name != nullptr) {
                 return hash_elems({object_id, name.get(), partyId, imageUri});
@@ -797,8 +808,8 @@ namespace electionguard
     }
 
     Candidate::Candidate(const string &objectId, unique_ptr<InternationalizedText> name,
-                         const string &partyId, const string imageUri, bool isWriteIn)
-        : pimpl(new Impl(objectId, move(name), partyId, move(imageUri), isWriteIn))
+                         const string &partyId, const string &imageUri, bool isWriteIn)
+        : pimpl(new Impl(objectId, move(name), partyId, imageUri, isWriteIn))
     {
     }
 
@@ -833,18 +844,18 @@ namespace electionguard
         uint64_t sequenceOrder;
 
         Impl(const string &objectId, const string &candidateId, const uint64_t sequenceOrder)
+            : candidateId(candidateId)
         {
             this->object_id = objectId;
-            this->candidateId = candidateId;
             this->sequenceOrder = sequenceOrder;
         }
 
-        unique_ptr<SelectionDescription::Impl> clone() const
+        [[nodiscard]] unique_ptr<SelectionDescription::Impl> clone() const
         {
             return make_unique<SelectionDescription::Impl>(object_id, candidateId, sequenceOrder);
         }
 
-        unique_ptr<ElementModQ> crypto_hash() const
+        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
         {
             return hash_elems({object_id, sequenceOrder, candidateId});
         }
@@ -902,46 +913,45 @@ namespace electionguard
 
         Impl(const string &objectId, const string &electoralDistrictId,
              const uint64_t sequenceOrder, const VoteVariationType voteVariation,
-             const uint64_t numberElected, const string name,
+             const uint64_t numberElected, const string &name,
              vector<unique_ptr<SelectionDescription>> selections)
-            : name(move(name)), selections(move(selections))
+            : electoralDistrictId(electoralDistrictId), name(name), selections(move(selections))
         {
             this->object_id = objectId;
-            this->electoralDistrictId = electoralDistrictId;
             this->sequenceOrder = sequenceOrder;
             this->voteVariation = voteVariation;
             this->numberElected = numberElected;
+            this->votesAllowed = 0UL;
         }
 
         Impl(const string &objectId, const string &electoralDistrictId,
              const uint64_t sequenceOrder, const VoteVariationType voteVariation,
-             const uint64_t numberElected, const uint64_t votesAllowed, const string name,
+             const uint64_t numberElected, const uint64_t votesAllowed, const string &name,
              unique_ptr<InternationalizedText> ballotTitle,
              unique_ptr<InternationalizedText> ballotSubtitle,
              vector<unique_ptr<SelectionDescription>> selections)
-            : name(move(name)), ballotTitle(move(ballotTitle)),
+            : electoralDistrictId(electoralDistrictId), name(name), ballotTitle(move(ballotTitle)),
               ballotSubtitle(move(ballotSubtitle)), selections(move(selections))
         {
             this->object_id = objectId;
-            this->electoralDistrictId = electoralDistrictId;
             this->sequenceOrder = sequenceOrder;
             this->voteVariation = voteVariation;
             this->numberElected = numberElected;
             this->votesAllowed = votesAllowed;
         }
 
-        unique_ptr<ContestDescription::Impl> clone() const
+        [[nodiscard]] unique_ptr<ContestDescription::Impl> clone() const
         {
             vector<unique_ptr<SelectionDescription>> _selections;
             _selections.reserve(selections.size());
             for (const auto &element : selections) {
-                _selections.push_back(make_unique<SelectionDescription>(*element.get()));
+                _selections.push_back(make_unique<SelectionDescription>(*element));
             }
 
             // TODO: handle optional values
             if (ballotTitle != nullptr) {
-                auto _ballotTitle = make_unique<InternationalizedText>(*ballotTitle.get());
-                auto _ballotSubtitle = make_unique<InternationalizedText>(*ballotSubtitle.get());
+                auto _ballotTitle = make_unique<InternationalizedText>(*ballotTitle);
+                auto _ballotSubtitle = make_unique<InternationalizedText>(*ballotSubtitle);
                 return make_unique<ContestDescription::Impl>(
                   object_id, electoralDistrictId, sequenceOrder, voteVariation, numberElected,
                   votesAllowed, name, move(_ballotTitle), move(_ballotSubtitle), move(_selections));
@@ -951,7 +961,7 @@ namespace electionguard
                                                          numberElected, name, move(_selections));
         }
 
-        unique_ptr<ElementModQ> crypto_hash() const
+        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
         {
             vector<reference_wrapper<CryptoHashable>> selectionRefs;
             selectionRefs.reserve(selections.size());
@@ -984,21 +994,24 @@ namespace electionguard
                                            const string &electoralDistrictId,
                                            const uint64_t sequenceOrder,
                                            const VoteVariationType voteVariation,
-                                           const uint64_t numberElected, const string name,
+                                           const uint64_t numberElected, const string &name,
                                            vector<unique_ptr<SelectionDescription>> selections)
         : pimpl(new Impl(objectId, electoralDistrictId, sequenceOrder, voteVariation, numberElected,
-                         move(name), move(selections)))
+                         name, move(selections)))
     {
     }
 
-    ContestDescription::ContestDescription(
-      const string &objectId, const string &electoralDistrictId, const uint64_t sequenceOrder,
-      const VoteVariationType voteVariation, const uint64_t numberElected,
-      const uint64_t votesAllowed, const string name, unique_ptr<InternationalizedText> ballotTitle,
-      unique_ptr<InternationalizedText> ballotSubtitle,
-      vector<unique_ptr<SelectionDescription>> selections)
+    ContestDescription::ContestDescription(const string &objectId,
+                                           const string &electoralDistrictId,
+                                           const uint64_t sequenceOrder,
+                                           const VoteVariationType voteVariation,
+                                           const uint64_t numberElected,
+                                           const uint64_t votesAllowed, const string &name,
+                                           unique_ptr<InternationalizedText> ballotTitle,
+                                           unique_ptr<InternationalizedText> ballotSubtitle,
+                                           vector<unique_ptr<SelectionDescription>> selections)
         : pimpl(new Impl(objectId, electoralDistrictId, sequenceOrder, voteVariation, numberElected,
-                         votesAllowed, move(name), move(ballotTitle), move(ballotSubtitle),
+                         votesAllowed, name, move(ballotTitle), move(ballotSubtitle),
                          move(selections)))
     {
     }
@@ -1051,7 +1064,7 @@ namespace electionguard
     struct ContestDescriptionWithPlaceholders::Impl : ElectionObjectBase {
         vector<unique_ptr<SelectionDescription>> placeholderSelections;
 
-        Impl(vector<unique_ptr<SelectionDescription>> placeholderSelections)
+        explicit Impl(vector<unique_ptr<SelectionDescription>> placeholderSelections)
             : placeholderSelections(move(placeholderSelections))
         {
         }
@@ -1068,11 +1081,11 @@ namespace electionguard
 
     ContestDescriptionWithPlaceholders::ContestDescriptionWithPlaceholders(
       const string &objectId, const string &electoralDistrictId, const uint64_t sequenceOrder,
-      const VoteVariationType voteVariation, const uint64_t numberElected, const string name,
+      const VoteVariationType voteVariation, const uint64_t numberElected, const string &name,
       vector<unique_ptr<SelectionDescription>> selections,
       vector<unique_ptr<SelectionDescription>> placeholderSelections)
         : ContestDescription(objectId, electoralDistrictId, sequenceOrder, voteVariation,
-                             numberElected, move(name), move(selections)),
+                             numberElected, name, move(selections)),
           pimpl(new Impl(move(placeholderSelections)))
     {
     }
@@ -1080,12 +1093,13 @@ namespace electionguard
     ContestDescriptionWithPlaceholders::ContestDescriptionWithPlaceholders(
       const string &objectId, const string &electoralDistrictId, const uint64_t sequenceOrder,
       const VoteVariationType voteVariation, const uint64_t numberElected,
-      const uint64_t votesAllowed, const string name, unique_ptr<InternationalizedText> ballotTitle,
+      const uint64_t votesAllowed, const string &name,
+      unique_ptr<InternationalizedText> ballotTitle,
       unique_ptr<InternationalizedText> ballotSubtitle,
       vector<unique_ptr<SelectionDescription>> selections,
       vector<unique_ptr<SelectionDescription>> placeholderSelections)
         : ContestDescription(objectId, electoralDistrictId, sequenceOrder, voteVariation,
-                             numberElected, votesAllowed, move(name), move(ballotTitle),
+                             numberElected, votesAllowed, name, move(ballotTitle),
                              move(ballotSubtitle), move(selections)),
           pimpl(new Impl(move(placeholderSelections)))
     {
@@ -1120,7 +1134,7 @@ namespace electionguard
     bool ContestDescriptionWithPlaceholders::IsPlaceholder(SelectionDescription &selection) const
     {
         for (const auto &placeholder : pimpl->placeholderSelections) {
-            if (selection.getObjectId() == placeholder.get()->getObjectId()) {
+            if (selection.getObjectId() == placeholder->getObjectId()) {
                 return true;
             }
         }
@@ -1162,33 +1176,39 @@ namespace electionguard
         unique_ptr<InternationalizedText> name;
         unique_ptr<ContactInformation> contactInformation;
 
-        Impl(string electionScopeId, ElectionType type, system_clock::time_point startDate,
+        Impl(const string &electionScopeId, ElectionType type, system_clock::time_point startDate,
              system_clock::time_point endDate,
              vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
              vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
              vector<unique_ptr<ContestDescription>> contests,
              vector<unique_ptr<BallotStyle>> ballotStyles)
-            : electionScopeId(move(electionScopeId)), geopoliticalUnits(move(geopoliticalUnits)),
+            : electionScopeId(electionScopeId), geopoliticalUnits(move(geopoliticalUnits)),
               parties(move(parties)), candidates(move(candidates)), contests(move(contests)),
               ballotStyles(move(ballotStyles))
         {
+            this->type = type;
+            this->startDate = startDate;
+            this->endDate = endDate;
         }
 
-        Impl(string electionScopeId, ElectionType type, system_clock::time_point startDate,
+        Impl(const string &electionScopeId, ElectionType type, system_clock::time_point startDate,
              system_clock::time_point endDate,
              vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
              vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
              vector<unique_ptr<ContestDescription>> contests,
              vector<unique_ptr<BallotStyle>> ballotStyles, unique_ptr<InternationalizedText> name,
              unique_ptr<ContactInformation> contactInformation)
-            : electionScopeId(move(electionScopeId)), geopoliticalUnits(move(geopoliticalUnits)),
+            : electionScopeId(electionScopeId), geopoliticalUnits(move(geopoliticalUnits)),
               parties(move(parties)), candidates(move(candidates)), contests(move(contests)),
               ballotStyles(move(ballotStyles)), name(move(name)),
               contactInformation(move(contactInformation))
         {
+            this->type = type;
+            this->startDate = startDate;
+            this->endDate = endDate;
         }
 
-        unique_ptr<ElementModQ> crypto_hash() const
+        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
         {
             vector<reference_wrapper<CryptoHashable>> geopoliticalUnitRefs;
             geopoliticalUnitRefs.reserve(geopoliticalUnits.size());
@@ -1234,22 +1254,22 @@ namespace electionguard
     // Lifecycle Methods
 
     ElectionDescription::ElectionDescription(
-      string electionScopeId, ElectionType type, system_clock::time_point startDate,
+      const string &electionScopeId, ElectionType type, system_clock::time_point startDate,
       system_clock::time_point endDate, vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
       vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
       vector<unique_ptr<ContestDescription>> contests, vector<unique_ptr<BallotStyle>> ballotStyles)
-        : pimpl(new Impl(move(electionScopeId), type, startDate, endDate, move(geopoliticalUnits),
+        : pimpl(new Impl(electionScopeId, type, startDate, endDate, move(geopoliticalUnits),
                          move(parties), move(candidates), move(contests), move(ballotStyles)))
     {
     }
 
     ElectionDescription::ElectionDescription(
-      string electionScopeId, ElectionType type, system_clock::time_point startDate,
+      const string &electionScopeId, ElectionType type, system_clock::time_point startDate,
       system_clock::time_point endDate, vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
       vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
       vector<unique_ptr<ContestDescription>> contests, vector<unique_ptr<BallotStyle>> ballotStyles,
       unique_ptr<InternationalizedText> name, unique_ptr<ContactInformation> contactInformation)
-        : pimpl(new Impl(move(electionScopeId), type, startDate, endDate, move(geopoliticalUnits),
+        : pimpl(new Impl(electionScopeId, type, startDate, endDate, move(geopoliticalUnits),
                          move(parties), move(candidates), move(contests), move(ballotStyles),
                          move(name), move(contactInformation)))
     {
