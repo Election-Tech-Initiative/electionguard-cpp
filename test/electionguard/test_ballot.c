@@ -9,7 +9,11 @@ bool strings_are_equal(char *expected, char *actual);
 static bool test_ballot_property_getters();
 static bool test_ballot_serialization(void);
 
-bool test_ballot(void) { return test_ballot_property_getters() && test_ballot_serialization(); }
+bool test_ballot(void)
+{
+    printf("\n -------- test_ballot.c --------- \n");
+    return test_ballot_property_getters() && test_ballot_serialization();
+}
 
 bool test_ballot_property_getters()
 {

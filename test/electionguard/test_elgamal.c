@@ -3,7 +3,11 @@
 
 static bool test_elgamal_encrypt_simple(void);
 
-bool test_elgamal(void) { return test_elgamal_encrypt_simple(); }
+bool test_elgamal(void)
+{
+    printf("\n -------- test_elgamal.c --------- \n");
+    return test_elgamal_encrypt_simple();
+}
 
 bool test_elgamal_encrypt_simple(void)
 {

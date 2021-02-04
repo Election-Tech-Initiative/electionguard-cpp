@@ -3,7 +3,11 @@
 
 static bool test_generate_tracking_code_rotates(void);
 
-bool test_tracker(void) { return test_generate_tracking_code_rotates(); }
+bool test_tracker(void)
+{
+    printf("\n -------- test_tracker.c --------- \n");
+    return test_generate_tracking_code_rotates();
+}
 
 bool test_generate_tracking_code_rotates(void)
 {

@@ -15,6 +15,8 @@ TEST_CASE("Can serialize ElectionDescription")
     auto subject = ElectionGenerator::getFakeElection();
     auto json = subject->toJson();
 
+    Log::debug(json);
+
     // Act
     auto result = ElectionDescription::fromJson(json);
 
@@ -22,17 +24,49 @@ TEST_CASE("Can serialize ElectionDescription")
     CHECK(subject->getElectionScopeId().compare(result->getElectionScopeId()) == 0);
 }
 
+TEST_CASE("Can deserialize ElectionDescription")
+{
+    const char *election_json =
+      "{\"ballot_styles\":[{\"geopolitical_unit_ids\":[\"some-geopoltical-unit-id\"],\"object_id\":"
+      "\"some-ballot-style-id\"}],\"candidates\":[{\"object_id\":\"some-candidate-id-1\"},{"
+      "\"object_id\":\"some-candidate-id-2\"},{\"object_id\":\"some-candidate-id-3\"}],"
+      "\"contests\":[{\"ballot_selections\":[{\"candidate_id\":\"some-candidate-id-1\",\"object_"
+      "id\":\"some-object-id-affirmative\",\"sequence_order\":0},{\"candidate_id\":\"some-"
+      "candidate-id-2\",\"object_id\":\"some-object-id-negative\",\"sequence_order\":1}],"
+      "\"electoral_district_id\":\"some-geopoltical-unit-id\",\"name\":\"some-referendum-contest-"
+      "name\",\"number_elected\":1,\"object_id\":\"some-referendum-contest-object-id\",\"sequence_"
+      "order\":0,\"vote_variation\":\"one_of_m\"},{\"ballot_selections\":[{\"candidate_id\":\"some-"
+      "candidate-id-1\",\"object_id\":\"some-object-id-candidate-1\",\"sequence_order\":0},{"
+      "\"candidate_id\":\"some-candidate-id-2\",\"object_id\":\"some-object-id-candidate-2\","
+      "\"sequence_order\":1},{\"candidate_id\":\"some-candidate-id-3\",\"object_id\":\"some-object-"
+      "id-candidate-3\",\"sequence_order\":2}],\"electoral_district_id\":\"some-geopoltical-unit-"
+      "id\",\"name\":\"some-candidate-contest-name\",\"number_elected\":2,\"object_id\":\"some-"
+      "candidate-contest-object-id\",\"sequence_order\":1,\"vote_variation\":\"one_of_m\"}],"
+      "\"election_scope_id\":\"some-scope-id\",\"end_date\":\"2021-02-04T13:30:10Z\","
+      "\"geopolitical_units\":[{\"name\":\"some-gp-unit-name\",\"object_id\":\"some-geopoltical-"
+      "unit-id\",\"type\":\"unknown\"}],\"parties\":[{\"object_id\":\"some-party-id-1\"},{\"object_"
+      "id\":\"some-party-id-2\"}],\"start_date\":\"2021-02-04T13:30:10Z\",\"type\":\"unknown\"}";
+
+    // Arrange
+
+    // Act
+    auto result = ElectionDescription::fromJson(election_json);
+
+    // Assert
+    CHECK(result->getElectionScopeId().compare("some-scope-id") == 0);
+}
+
 TEST_CASE("Can construct InternalElectionDescription from ElectionDescription")
 {
     // Arrange
-    auto subject = ElectionGenerator::getFakeElection();
+    auto data = ElectionGenerator::getFakeElection();
 
     // Act
-    auto result = make_unique<InternalElectionDescription>(*subject);
+    auto result = make_unique<InternalElectionDescription>(*data);
 
     // Assert
-    CHECK(subject->crypto_hash()->toHex() == result->getDescriptionHash().toHex());
-    CHECK(subject->getContests().size() == result->getContests().size());
+    CHECK(data->crypto_hash()->toHex() == result->getDescriptionHash().toHex());
+    CHECK(data->getContests().size() == result->getContests().size());
 }
 
 TEST_CASE("Can serialize InternalElectionDescription")
@@ -41,6 +75,8 @@ TEST_CASE("Can serialize InternalElectionDescription")
     auto metadata = ElectionGenerator::getFakeMetadata(TWO_MOD_Q());
     auto json = metadata->toJson();
     auto bson = metadata->toBson();
+
+    Log::debug(json);
 
     // Act
     auto fromJson = InternalElectionDescription::fromJson(json);
@@ -58,6 +94,8 @@ TEST_CASE("Can serialize CiphertextElectionContext")
     auto context = ElectionGenerator::getFakeContext(*metadata, *keypair->getPublicKey());
     auto json = context->toJson();
     auto bson = context->toBson();
+
+    Log::debug(json);
 
     // Act
     auto fromJson = CiphertextElectionContext::fromJson(json);

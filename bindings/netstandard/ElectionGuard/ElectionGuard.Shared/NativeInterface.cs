@@ -105,11 +105,51 @@ namespace ElectionGuard
 
         #endregion
 
-        #region Election
+        #region ElectionDescription
+
+        internal static unsafe class ElectionDescription
+        {
+            internal unsafe struct ElectionDescriptionType { };
+
+            [DllImport(DllName, EntryPoint = "eg_election_description_free")]
+            internal static extern Status Free(ElectionDescriptionType* handle);
+
+            [DllImport(DllName, EntryPoint = "eg_election_description_get_election_scope_id")]
+            internal static extern Status GetElectionScopeId(ElectionDescriptionType* handle, out IntPtr election_scope_id);
+
+            [DllImport(DllName, EntryPoint = "eg_election_description_crypto_hash")]
+            internal static extern Status CryptoHash(
+                ElectionDescriptionType* handle, out ElementModQ.ElementModQType* crypto_hash);
+
+            [DllImport(DllName, EntryPoint = "eg_election_description_from_json")]
+            internal static extern Status FromJson(
+                [MarshalAs(UnmanagedType.LPStr)] string data, out ElectionDescriptionType* handle);
+
+            [DllImport(DllName, EntryPoint = "eg_election_description_from_bson")]
+            internal static extern Status FromBson(
+                uint* data, ulong length, ElectionDescriptionType* handle);
+
+            [DllImport(DllName, EntryPoint = "eg_election_description_to_json")]
+            internal static extern Status ToJson(
+                ElectionDescriptionType* handle, out IntPtr data, out UIntPtr size);
+
+            [DllImport(DllName, EntryPoint = "eg_election_description_to_bson")]
+            internal static extern Status ToBson(
+                ElectionDescriptionType* handle, out uint* data, out UIntPtr size);
+        }
+
+        #endregion
+
+        #region InternalElectionDescription
 
         internal static unsafe class InternalElectionDescription
         {
             internal unsafe struct InternalElectionDescriptionType { };
+
+            [DllImport(DllName, EntryPoint = "eg_internal_election_description_new")]
+            internal static extern Status New(
+                ElectionDescription.ElectionDescriptionType* election_description,
+                out InternalElectionDescriptionType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_internal_election_description_free")]
             internal static extern Status Free(InternalElectionDescriptionType* handle);

@@ -3,10 +3,75 @@ using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
+    using NativeElectionDescription = NativeInterface.ElectionDescription.ElectionDescriptionType;
     using NativeInternalElectionDescription = NativeInterface.InternalElectionDescription.InternalElectionDescriptionType;
     using NativeCiphertextElectionContext = NativeInterface.CiphertextElectionContext.CiphertextElectionType;
     using NativeElementModP = NativeInterface.ElementModP.ElementModPType;
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQType;
+
+    public class ElectionDescription : DisposableBase
+    {
+        public unsafe string ElectionScopeId
+        {
+            get
+            {
+                var status = NativeInterface.ElectionDescription.GetElectionScopeId(Handle, out IntPtr value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"ElectionDescription Error ObjectId: {status}");
+                    return null;
+                }
+                return Marshal.PtrToStringAnsi(value);
+            }
+        }
+
+        internal unsafe NativeElectionDescription* Handle;
+
+        public unsafe ElectionDescription(string json)
+        {
+            var status = NativeInterface.ElectionDescription.FromJson(json, out Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"InternalElectionDescription Error Status: {status}");
+            }
+        }
+
+        protected override unsafe void DisposeUnmanaged()
+        {
+            base.DisposeUnmanaged();
+            var status = NativeInterface.ElectionDescription.Free(Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
+            }
+            Handle = null;
+        }
+
+        public unsafe ElementModQ CryptoHash()
+        {
+            var status = NativeInterface.ElectionDescription.CryptoHash(
+                    Handle, out NativeElementModQ* value);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"DescriptionHash Error Status: {status}");
+                return null;
+            }
+            return new ElementModQ(value);
+        }
+
+        public unsafe string ToJson()
+        {
+            var status = NativeInterface.ElectionDescription.ToJson(
+                Handle, out IntPtr pointer, out UIntPtr size);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"ToJson Error Status: {status}");
+                return null;
+            }
+            var json = Marshal.PtrToStringAnsi(pointer);
+            return json;
+        }
+    }
 
     public class InternalElectionDescription: DisposableBase
     {
@@ -26,6 +91,15 @@ namespace ElectionGuard
         }
 
         internal unsafe NativeInternalElectionDescription* Handle;
+
+        public unsafe InternalElectionDescription(ElectionDescription election)
+        {
+            var status = NativeInterface.InternalElectionDescription.New(election.Handle, out Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"InternalElectionDescription Error Status: {status}");
+            }
+        }
 
         public unsafe InternalElectionDescription(string json)
         {

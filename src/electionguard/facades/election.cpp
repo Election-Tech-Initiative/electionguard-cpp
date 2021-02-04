@@ -14,6 +14,7 @@ extern "C" {
 }
 
 using electionguard::CiphertextElectionContext;
+using electionguard::ElectionDescription;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
 using electionguard::InternalElectionDescription;
@@ -110,7 +111,139 @@ eg_electionguard_status_t eg_selection_description_crypto_hash(eg_selection_desc
 
 #pragma endregion
 
+#pragma region ElectionDescription
+
+eg_electionguard_status_t eg_election_description_free(eg_election_description_t *handle)
+{
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete AS_TYPE(ElectionDescription, handle);
+    handle = nullptr;
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_election_description_get_election_scope_id(eg_election_description_t *handle,
+                                              char **out_election_scope_id)
+{
+    try {
+        auto scopeId = AS_TYPE(ElectionDescription, handle)->getElectionScopeId();
+        auto data_size = scopeId.length() + 1;
+        auto *data_array = (char *)malloc(data_size);
+        strncpy(data_array, scopeId.c_str(), data_size);
+        *out_election_scope_id = data_array;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_election_description_get_election_scope_id", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_election_description_crypto_hash(eg_election_description_t *handle,
+                                                              eg_element_mod_q_t **out_owned_hash)
+{
+    try {
+        auto cryptoHash = AS_TYPE(ElectionDescription, handle)->crypto_hash();
+
+        *out_owned_hash = AS_TYPE(eg_element_mod_q_t, cryptoHash.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_election_description_crypto_hash", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_election_description_from_json(char *in_data,
+                                                            eg_election_description_t **out_handle)
+{
+    try {
+        auto data = string(in_data);
+        auto deserialized = ElectionDescription::fromJson(data);
+
+        *out_handle = AS_TYPE(eg_election_description_t, deserialized.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_election_description_from_json", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_election_description_from_bson(uint8_t *in_data, uint64_t in_length,
+                                                            eg_election_description_t **out_handle)
+{
+    try {
+        auto data_bytes = vector<uint8_t>(in_data, in_data + in_length);
+        auto deserialized = ElectionDescription::fromBson(data_bytes);
+
+        *out_handle = AS_TYPE(eg_election_description_t, deserialized.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_election_description_from_bson", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_election_description_to_json(eg_election_description_t *handle,
+                                                          char **out_data, size_t *out_size)
+{
+    try {
+        auto *domain_type = AS_TYPE(ElectionDescription, handle);
+        auto data_string = domain_type->toJson();
+
+        auto data_size = data_string.length() + 1;
+        auto *data_array = (char *)malloc(data_size);
+        strncpy(data_array, data_string.c_str(), data_size);
+        *out_data = data_array;
+        *out_size = data_size;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_election_description_to_json", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_election_description_to_bson(eg_election_description_t *handle,
+                                                          uint8_t **out_data, size_t *out_size)
+{
+    try {
+        auto *domain_type = AS_TYPE(ElectionDescription, handle);
+        auto data_bytes = domain_type->toBson();
+
+        auto *data_array = new uint8_t[data_bytes.size()];
+        copy(data_bytes.begin(), data_bytes.end(), data_array);
+        *out_data = data_array;
+        *out_size = data_bytes.size();
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_internal_election_description_to_bson", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+#pragma endregion
+
 #pragma region InternalElectionDescription
+
+eg_electionguard_status_t
+eg_internal_election_description_new(eg_election_description_t *in_election_description,
+                                     eg_internal_election_description_t **out_handle)
+{
+    try {
+        auto *domain_type = AS_TYPE(ElectionDescription, in_election_description);
+        auto pointer = make_unique<InternalElectionDescription>(*domain_type);
+
+        *out_handle = AS_TYPE(eg_internal_election_description_t, pointer.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_internal_election_description_new", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
 
 eg_electionguard_status_t
 eg_internal_election_description_free(eg_internal_election_description_t *handle)
@@ -128,11 +261,16 @@ eg_electionguard_status_t
 eg_internal_election_description_get_description_hash(eg_internal_election_description_t *handle,
                                                       eg_element_mod_q_t **out_description_hash)
 {
-    auto description = AS_TYPE(InternalElectionDescription, handle)->getDescriptionHash();
-    auto pointer = make_unique<ElementModQ>(description);
+    try {
+        auto description = AS_TYPE(InternalElectionDescription, handle)->getDescriptionHash();
+        auto pointer = make_unique<ElementModQ>(description);
 
-    *out_description_hash = AS_TYPE(eg_element_mod_q_t, pointer.release());
-    return ELECTIONGUARD_STATUS_SUCCESS;
+        *out_description_hash = AS_TYPE(eg_element_mod_q_t, pointer.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_internal_election_description_get_description_hash", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
 eg_electionguard_status_t

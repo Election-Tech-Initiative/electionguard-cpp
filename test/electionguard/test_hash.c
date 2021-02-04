@@ -3,7 +3,11 @@
 
 static bool test_hash_elems(void);
 
-bool test_hash(void) { return test_hash_elems(); }
+bool test_hash(void)
+{
+    printf("\n -------- test_hash.c --------- \n");
+    return test_hash_elems();
+}
 
 bool test_hash_elems(void)
 {
