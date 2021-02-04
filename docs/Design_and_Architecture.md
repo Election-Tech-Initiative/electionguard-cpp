@@ -80,7 +80,7 @@ This project aims to use structural patters similar to the python repository.  W
 
 ### 📦 Math Library
 
-This project uses the [HACL* Math Library](https://github.com/project-everest/hacl-star) from [Project Everest](https://project-everest.github.io/) for low-level math operations.  The low-level math operations are not exposed across any public API surface.
+This project uses the [HACL* Math Library](https://github.com/project-everest/hacl-star) from [Project Everest](https://project-everest.github.io/) for low-level math operations.  The low-level math operations are not exposed across any public API surface at this time.
 
 ### Linking
 
