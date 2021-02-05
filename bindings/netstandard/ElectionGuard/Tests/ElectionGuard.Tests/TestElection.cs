@@ -11,20 +11,15 @@ namespace ElectionGuard.Tests
         public void test_can_deserialize_election_description()
         {
             // Arrange
-            string old = "{\"ballot_styles\":[{\"geopolitical_unit_ids\":[\"some-geopoltical-unit-id\"],\"object_id\":\"some-ballot-style-id\"}],\"candidates\":[{\"object_id\":\"some-candidate-id-1\"},{\"object_id\":\"some-candidate-id-2\"},{\"object_id\":\"some-candidate-id-3\"}],\"contests\":[{\"ballot_selections\":[{\"candidate_id\":\"some-candidate-id-1\",\"object_id\":\"some-object-id-affirmative\",\"sequence_order\":0},{\"candidate_id\":\"some-candidate-id-2\",\"object_id\":\"some-object-id-negative\",\"sequence_order\":1}],\"electoral_district_id\":\"some-geopoltical-unit-id\",\"name\":\"some-referendum-contest-name\",\"number_elected\":1,\"object_id\":\"some-referendum-contest-object-id\",\"sequence_order\":0,\"vote_variation\":\"one_of_m\"},{\"ballot_selections\":[{\"candidate_id\":\"some-candidate-id-1\",\"object_id\":\"some-object-id-candidate-1\",\"sequence_order\":0},{\"candidate_id\":\"some-candidate-id-2\",\"object_id\":\"some-object-id-candidate-2\",\"sequence_order\":1},{\"candidate_id\":\"some-candidate-id-3\",\"object_id\":\"some-object-id-candidate-3\",\"sequence_order\":2}],\"electoral_district_id\":\"some-geopoltical-unit-id\",\"name\":\"some-candidate-contest-name\",\"number_elected\":2,\"object_id\":\"some-candidate-contest-object-id\",\"sequence_order\":1,\"vote_variation\":\"one_of_m\"}],\"election_scope_id\":\"some-scope-id\",\"end_date\":\"2021-02-04T17:19:34Z\",\"geopolitical_units\":[{\"name\":\"some-gp-unit-name\",\"object_id\":\"some-geopoltical-unit-id\",\"type\":\"unknown\"}],\"parties\":[{\"object_id\":\"some-party-id-1\"},{\"object_id\":\"some-party-id-2\"}],\"start_date\":\"2021-02-04T17:19:34Z\",\"type\":\"unknown\"}";
-
-
             string data = @"{""ballot_styles"":[{""geopolitical_unit_ids"":[""some-geopoltical-unit-id""],""object_id"":""some-ballot-style-id""}],""candidates"":[{""object_id"":""some-candidate-id-1""},{""object_id"":""some-candidate-id-2""},{""object_id"":""some-candidate-id-3""}],""contests"":[{""ballot_selections"":[{""candidate_id"":""some-candidate-id-1"",""object_id"":""some-object-id-affirmative"",""sequence_order"":0},{""candidate_id"":""some-candidate-id-2"",""object_id"":""some-object-id-negative"",""sequence_order"":1}],""electoral_district_id"":""some-geopoltical-unit-id"",""name"":""some-referendum-contest-name"",""number_elected"":1,""object_id"":""some-referendum-contest-object-id"",""sequence_order"":0,""vote_variation"":""one_of_m""},{""ballot_selections"":[{""candidate_id"":""some-candidate-id-1"",""object_id"":""some-object-id-candidate-1"",""sequence_order"":0},{""candidate_id"":""some-candidate-id-2"",""object_id"":""some-object-id-candidate-2"",""sequence_order"":1},{""candidate_id"":""some-candidate-id-3"",""object_id"":""some-object-id-candidate-3"",""sequence_order"":2}],""electoral_district_id"":""some-geopoltical-unit-id"",""name"":""some-candidate-contest-name"",""number_elected"":2,""object_id"":""some-candidate-contest-object-id"",""sequence_order"":1,""vote_variation"":""one_of_m""}],""election_scope_id"":""some-scope-id"",""end_date"":""2021-02-04T17:19:34Z"",""geopolitical_units"":[{""name"":""some-gp-unit-name"",""object_id"":""some-geopoltical-unit-id"",""type"":""unknown""}],""parties"":[{""object_id"":""some-party-id-1""},{""object_id"":""some-party-id-2""}],""start_date"":""2021-02-04T17:19:34Z"",""type"":""unknown""}";
 
             // Act
-
             var result = new ElectionDescription(data);
 
             // Assert
-
             Assert.That(result.ElectionScopeId == "some-scope-id");
 
-           
+
         }
 
         [Test]

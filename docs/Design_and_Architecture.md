@@ -103,7 +103,8 @@ When accessing properties of structures, a _raw pointer_ may be returned to indi
 Because the C API does not support smart pointers, consideration is given to using `make` functions where an object graph may be composed (analogous to the `make` functions in the C++ API and in python).  Some structures include `new` methods as well to construct primitive objects directly.  C objects alsy generally include `free` methods to release resources.  Because the C API is a facade over the C++ API, careful consideration must be given to freeing resources.
 
 Generally:
-1. if you built your object graph manuall using `new` then you must call `free` on each object you constructed.
+1. If you built your object graph manually using `new` then you must call `free` on each object you constructed.
 2. If you built your object graph using `make` or an out paramater was passed by function, you must only call `free` on the top-level object.
+3. If you read a property of an object then a copy is made and you must call `free` on the copy (e.g. the `eg_element_mod_q_t` returned from `eg_ciphertext_election_context_get_description_hash` is a copy owned by the caller).
 
 Refer to the C unit tests for examples.
