@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD__CORE_GROUP_HPP_INCLUDED__
-#define __ELECTIONGUARD__CORE_GROUP_HPP_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_GROUP_HPP_INCLUDED__
+#define __ELECTIONGUARD_CPP_GROUP_HPP_INCLUDED__
 
 #include "constants.h"
 #include "export.h"
@@ -183,4 +183,4 @@ namespace electionguard
 
 } // namespace electionguard
 
-#endif /* __ELECTIONGUARD__CORE_GROUP_HPP_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_GROUP_HPP_INCLUDED__ */

@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD_CORE_GROUP_H_INCLUDED__
-#define __ELECTIONGUARD_CORE_GROUP_H_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_GROUP_H_INCLUDED__
+#define __ELECTIONGUARD_CPP_GROUP_H_INCLUDED__
 
 #include "constants.h"
 #include "export.h"
@@ -58,4 +58,4 @@ EG_API eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t 
 #ifdef __cplusplus
 }
 #endif
-#endif /* __ELECTIONGUARD_CORE_GROUP_H_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_GROUP_H_INCLUDED__ */

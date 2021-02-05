@@ -1,6 +1,6 @@
 /// @file encrypt.h
-#ifndef __ELECTIONGUARD_CORE_ENCRYPT_H_INCLUDED__
-#define __ELECTIONGUARD_CORE_ENCRYPT_H_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_ENCRYPT_H_INCLUDED__
+#define __ELECTIONGUARD_CPP_ENCRYPT_H_INCLUDED__
 
 #include "ballot.h"
 #include "election.h"
@@ -87,4 +87,4 @@ EG_API eg_electionguard_status_t eg_encrypt_ballot_with_nonce(
 #ifdef __cplusplus
 }
 #endif
-#endif /* __ELECTIONGUARD_CORE_ENCRYPT_H_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_ENCRYPT_H_INCLUDED__ */

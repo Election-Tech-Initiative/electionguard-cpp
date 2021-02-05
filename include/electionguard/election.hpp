@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD_CORE_ELECTION_HPP_INCLUDED__
-#define __ELECTIONGUARD_CORE_ELECTION_HPP_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_ELECTION_HPP_INCLUDED__
+#define __ELECTIONGUARD_CPP_ELECTION_HPP_INCLUDED__
 
 #include "crypto_hashable.hpp"
 #include "election_object_base.hpp"
@@ -29,7 +29,7 @@ namespace electionguard
         other = 7
     };
 
-    EG_API const char *getElectionTypeString(const ElectionType &value);
+    EG_API const std::string getElectionTypeString(const ElectionType &value);
     EG_API ElectionType getElectionType(const std::string &value);
 
     /// <Summary>
@@ -68,7 +68,7 @@ namespace electionguard
         other = 28,
     };
 
-    EG_API const char *getReportingUnitTypeString(const ReportingUnitType &value);
+    EG_API const std::string getReportingUnitTypeString(const ReportingUnitType &value);
     EG_API ReportingUnitType getReportingUnitType(const std::string &value);
 
     /// <Summary>
@@ -91,7 +91,7 @@ namespace electionguard
         other = 12
     };
 
-    EG_API const char *getVoteVariationTypeString(const VoteVariationType &value);
+    EG_API const std::string getVoteVariationTypeString(const VoteVariationType &value);
     EG_API VoteVariationType getVoteVariationType(const std::string &value);
 
     /// <Summary>
@@ -577,7 +577,7 @@ namespace electionguard
         std::vector<std::reference_wrapper<ContestDescriptionWithPlaceholders>> getContests() const;
         std::vector<std::reference_wrapper<BallotStyle>> getBallotStyles() const;
 
-        const ElementModQ &getDescriptionHash() const;
+        const ElementModQ *getDescriptionHash() const;
 
         std::vector<uint8_t> toBson() const;
         std::string toJson();
@@ -658,4 +658,4 @@ namespace electionguard
 
 } // namespace electionguard
 
-#endif /* __ELECTIONGUARD_CORE_ELECTION_HPP_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_ELECTION_HPP_INCLUDED__ */

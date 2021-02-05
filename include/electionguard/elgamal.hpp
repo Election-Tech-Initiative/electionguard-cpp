@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD__CORE_ELGAMAL_HPP_INCLUDED__
-#define __ELECTIONGUARD__CORE_ELGAMAL_HPP_INCLUDED__
+#ifndef __ELECTIONGUARD__CPP_ELGAMAL_HPP_INCLUDED__
+#define __ELECTIONGUARD__CPP_ELGAMAL_HPP_INCLUDED__
 #include "crypto_hashable.hpp"
 #include "export.h"
 #include "group.hpp"
@@ -82,4 +82,4 @@ namespace electionguard
     elgamalAdd(const std::vector<std::reference_wrapper<ElGamalCiphertext>> &ciphertexts);
 } // namespace electionguard
 
-#endif /* __ELECTIONGUARD__CORE_ELGAMAL_HPP_INCLUDED__ */
+#endif /* __ELECTIONGUARD__CPP_ELGAMAL_HPP_INCLUDED__ */

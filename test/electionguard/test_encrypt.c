@@ -12,6 +12,7 @@ static bool test_encrypt_ballot(void);
 
 bool test_encrypt(void)
 {
+    printf("\n -------- test_encrypt.c --------- \n");
     return test_encrypt_selection() && test_encrypt_contest() && test_encrypt_ballot();
 }
 

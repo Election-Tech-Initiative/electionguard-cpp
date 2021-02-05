@@ -455,7 +455,7 @@ eg_electionguard_status_t eg_plaintext_ballot_to_bson(eg_plaintext_ballot_t *han
                                                       uint8_t **out_data, size_t *out_size)
 {
     try {
-        auto domain_type = AS_TYPE(PlaintextBallot, handle);
+        auto *domain_type = AS_TYPE(PlaintextBallot, handle);
         auto data_bytes = domain_type->toBson();
 
         auto *data_array = new uint8_t[data_bytes.size()];
@@ -562,7 +562,7 @@ eg_ciphertext_ballot_get_tracking_hash(eg_ciphertext_ballot_t *handle,
                                        eg_element_mod_q_t **out_tracking_hash)
 {
     try {
-        auto hash = AS_TYPE(CiphertextBallot, handle)->getTrackingHash();
+        auto *hash = AS_TYPE(CiphertextBallot, handle)->getTrackingHash();
         *out_tracking_hash = AS_TYPE(eg_element_mod_q_t, hash);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -616,10 +616,10 @@ bool eg_ciphertext_ballot_is_valid_encryption(eg_ciphertext_ballot_t *handle,
                                               eg_element_mod_p_t *in_public_key,
                                               eg_element_mod_q_t *in_crypto_extended_base_hash)
 {
-    auto ciphertext = AS_TYPE(CiphertextBallot, handle);
-    auto seed_hash = AS_TYPE(ElementModQ, in_seed_hash);
-    auto public_key = AS_TYPE(ElementModP, in_public_key);
-    auto extended_hash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
+    auto *ciphertext = AS_TYPE(CiphertextBallot, handle);
+    auto *seed_hash = AS_TYPE(ElementModQ, in_seed_hash);
+    auto *public_key = AS_TYPE(ElementModP, in_public_key);
+    auto *extended_hash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
 
     return ciphertext->isValidEncryption(*seed_hash, *public_key, *extended_hash);
 }
@@ -658,7 +658,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_json(eg_ciphertext_ballot_t *h
                                                        char **out_data, uint64_t *out_size)
 {
     try {
-        auto domain_type = AS_TYPE(CiphertextBallot, handle);
+        auto *domain_type = AS_TYPE(CiphertextBallot, handle);
         auto data_string = domain_type->toJson();
 
         auto data_size = data_string.length() + 1;
@@ -679,7 +679,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_json_with_nonces(eg_ciphertext
                                                                    uint64_t *out_size)
 {
     try {
-        auto domain_type = AS_TYPE(CiphertextBallot, handle);
+        auto *domain_type = AS_TYPE(CiphertextBallot, handle);
         auto data_string = domain_type->toJson(true);
 
         auto data_size = data_string.length() + 1;
@@ -699,7 +699,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_bson(eg_ciphertext_ballot_t *h
                                                        uint8_t **out_data, uint64_t *out_size)
 {
     try {
-        auto domain_type = AS_TYPE(CiphertextBallot, handle);
+        auto *domain_type = AS_TYPE(CiphertextBallot, handle);
         auto data_bytes = domain_type->toBson();
 
         auto *data_array = new uint8_t[data_bytes.size()];
@@ -719,7 +719,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_bson_with_nonces(eg_ciphertext
                                                                    uint64_t *out_size)
 {
     try {
-        auto domain_type = AS_TYPE(CiphertextBallot, handle);
+        auto *domain_type = AS_TYPE(CiphertextBallot, handle);
         auto data_bytes = domain_type->toBson(true);
 
         auto *data_array = new uint8_t[data_bytes.size()];

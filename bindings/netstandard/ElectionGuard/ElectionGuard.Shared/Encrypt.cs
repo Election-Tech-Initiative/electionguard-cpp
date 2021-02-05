@@ -25,7 +25,7 @@ namespace ElectionGuard
             var status = NativeInterface.EncryptionDevice.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
+                Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
             }
             Handle = null;
         }
@@ -80,7 +80,7 @@ namespace ElectionGuard
             var status = NativeInterface.EncryptionMediator.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
+                Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
             }
             Handle = null;
         }
@@ -104,7 +104,7 @@ namespace ElectionGuard
                     out NativeCiphertextBallot* ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"DisposeUnamanged Error Status: {status}");
+                    Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
                 }
                 return new CiphertextBallot(ciphertext);
             }
@@ -116,7 +116,7 @@ namespace ElectionGuard
                     out NativeCiphertextBallot* ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"DisposeUnamanged Error Status: {status}");
+                    Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
                 }
                 return new CiphertextBallot(ciphertext);
             }

@@ -307,13 +307,13 @@ namespace electionguard
         // similarly it expects that the fully hydrated representation of the ballot is provided.
 
         auto randomMasterNonce = nonce ? move(nonce) : rand_q();
-        auto nonceSeed = CiphertextBallot::nonceSeed(metadata.getDescriptionHash(),
+        auto nonceSeed = CiphertextBallot::nonceSeed(*metadata.getDescriptionHash(),
                                                      plaintext.getObjectId(), *randomMasterNonce);
 
         vector<unique_ptr<CiphertextBallotContest>> encryptedContests;
 
         Log::debugHex(": encryptBallot: for descriptionHash: ",
-                      metadata.getDescriptionHash().toHex());
+                      metadata.getDescriptionHash()->toHex());
 
         // TODO: ISSUE #36: improve performance, complete features
         for (const auto &contestDescription : metadata.getContests()) {
@@ -338,7 +338,7 @@ namespace electionguard
         // TODO: ISSUE #125: timestamp should be an optional param on the interface
         const uint64_t defaultTimestamp = 0;
         auto encryptedBallot = CiphertextBallot::make(
-          plaintext.getObjectId(), plaintext.getBallotStyle(), metadata.getDescriptionHash(),
+          plaintext.getObjectId(), plaintext.getBallotStyle(), *metadata.getDescriptionHash(),
           move(encryptedContests), move(nonceSeed), defaultTimestamp,
           make_unique<ElementModQ>(seedHash));
 
@@ -354,7 +354,7 @@ namespace electionguard
         }
 
         // verify the ballot.
-        if (encryptedBallot->isValidEncryption(metadata.getDescriptionHash(),
+        if (encryptedBallot->isValidEncryption(*metadata.getDescriptionHash(),
                                                *context.getElGamalPublicKey(),
                                                *context.getCryptoExtendedBaseHash())) {
             return encryptedBallot;

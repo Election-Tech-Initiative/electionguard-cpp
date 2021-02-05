@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD_CORE_SERIALIZE_HPP_INCLUDED__
-#define __ELECTIONGUARD_CORE_SERIALIZE_HPP_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_SERIALIZE_HPP_INCLUDED__
+#define __ELECTIONGUARD_CPP_SERIALIZE_HPP_INCLUDED__
 
 #include "convert.hpp"
 #include "electionguard/ballot.hpp"
@@ -104,8 +104,9 @@ namespace electionguard
 
     static unique_ptr<ContactInformation> contactInformationFromJson(const json &j)
     {
+        Log::debug(": deserializing");
         vector<string> addressLine;
-        if (!j["address_line"].is_null()) {
+        if (j.contains("address_line") && !j["address_line"].is_null()) {
             for (const auto &i : j["address_line"]) {
                 addressLine.push_back(i.get<string>());
             }
@@ -113,19 +114,15 @@ namespace electionguard
 
         vector<unique_ptr<AnnotatedString>> email;
         if (j.contains("email") && !j["email"].is_null()) {
-            if (!j["email"].is_null()) {
-                for (const auto &i : j["email"]) {
-                    email.push_back(annotatedStringFromJson(i));
-                }
+            for (const auto &i : j["email"]) {
+                email.push_back(annotatedStringFromJson(i));
             }
         }
 
         vector<unique_ptr<AnnotatedString>> phone;
         if (j.contains("phone") && !j["phone"].is_null()) {
-            if (!j["phone"].is_null()) {
-                for (const auto &i : j["phone"]) {
-                    phone.push_back(annotatedStringFromJson(i));
-                }
+            for (const auto &i : j["phone"]) {
+                phone.push_back(annotatedStringFromJson(i));
             }
         }
 
@@ -153,8 +150,8 @@ namespace electionguard
 
     static unique_ptr<GeopoliticalUnit> geopoliticalUnitFromJson(const json &j)
     {
+        Log::debug(": deserializing");
         if (j.contains("contact_information") && !j["contact_information"].is_null()) {
-
             return make_unique<GeopoliticalUnit>(
               j["object_id"].get<string>(), j["name"].get<string>(),
               getReportingUnitType(j["type"].get<string>()),
@@ -575,8 +572,12 @@ namespace electionguard
           private:
             static json fromObject(const electionguard::InternalElectionDescription &serializable)
             {
+                Log::debug(": serializing from object");
+
                 auto geopoliticalUnits =
                   geopoliticalUnitsToJson(serializable.getGeopoliticalUnits());
+
+                Log::debug(" serialized GeopoliticalUnits");
 
                 // Contests
                 json contests;
@@ -611,9 +612,13 @@ namespace electionguard
                     contests.push_back(contest_json);
                 }
 
+                Log::debug(" serialized Contests");
+
                 auto ballotStyles = ballotStylesToJson(serializable.getBallotStyles());
 
-                json result = {{"description_hash", serializable.getDescriptionHash().toHex()},
+                Log::debug(" serialized Ballot Styles");
+
+                json result = {{"description_hash", serializable.getDescriptionHash()->toHex()},
                                {"geopolitical_units", geopoliticalUnits},
                                {"contests", contests},
                                {"ballot_styles", ballotStyles}};
@@ -622,8 +627,11 @@ namespace electionguard
             }
             static unique_ptr<electionguard::InternalElectionDescription> toObject(json j)
             {
+                Log::debug(": deserializing");
 
                 auto geopoliticalUnits = geopoliticalUnitsFromJson(j["geopolitical_units"]);
+
+                Log::debug(": deserialized geopoliticalUnits");
 
                 auto contests = j["contests"];
 
@@ -665,10 +673,16 @@ namespace electionguard
                     }
                 }
 
+                Log::debug(" deserialized contests");
+
                 auto ballotStyles = ballotStylesFromJson(j["ballot_styles"]);
+
+                Log::debug(" deserialized ballotStyles");
 
                 auto description_hash = j["description_hash"].get<string>();
                 auto descriptionHash = ElementModQ::fromHex(description_hash);
+
+                Log::debug(" deserialized descriptionHash");
 
                 return make_unique<electionguard::InternalElectionDescription>(
                   move(geopoliticalUnits), move(contestDescriptions), move(ballotStyles),
@@ -1047,4 +1061,4 @@ namespace electionguard
     };
 } // namespace electionguard
 
-#endif /* __ELECTIONGUARD_CORE_SERIALIZE_HPP_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_SERIALIZE_HPP_INCLUDED__ */

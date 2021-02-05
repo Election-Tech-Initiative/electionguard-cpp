@@ -134,12 +134,12 @@ build-android:
 build-ios:
 	@echo 📱 BUILD IOS
 ifeq ($(OPERATING_SYSTEM),Darwin)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/ios/$(TARGET) -GXcode \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/ios/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_SYSTEM_NAME=iOS \
 		"-DCMAKE_OSX_ARCHITECTURES=arm64;arm64e;x86_64" \
-		-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 \
+		-DCMAKE_OSX_DEPLOYMENT_TARGET=12.4 \
 		-DCMAKE_INSTALL_PREFIX=$(ELECTIONGUARD_BUILD_LIBS_DIR)/ios/$(TARGET) \
 		-DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO \
 		-DCMAKE_IOS_INSTALL_COMBINED=YES
@@ -174,10 +174,6 @@ else
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR); fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/android" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/android; fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/android/arm64-v8a" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/arm64-v8a; fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/android/armeabi-v7a" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/armeabi-v7a; fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/android/x86" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/x86; fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/android/x86_64" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/x86_64; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/ios" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/ios; fi
 endif
 

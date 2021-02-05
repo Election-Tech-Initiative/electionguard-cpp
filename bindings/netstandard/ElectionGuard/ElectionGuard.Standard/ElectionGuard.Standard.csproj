@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>ElectionGuard</RootNamespace>
-    <AssemblyName>ElectionGuard.Core</AssemblyName>
+    <AssemblyName>ElectionGuard</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">

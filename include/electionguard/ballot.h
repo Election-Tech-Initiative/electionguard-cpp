@@ -1,6 +1,6 @@
 /// @file ballot.h
-#ifndef __ELECTIONGUARD_CORE_BALLOT_H_INCLUDED__
-#define __ELECTIONGUARD_CORE_BALLOT_H_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_BALLOT_H_INCLUDED__
+#define __ELECTIONGUARD_CPP_BALLOT_H_INCLUDED__
 
 #include "chaum_pedersen.h"
 #include "elgamal.h"
@@ -293,4 +293,4 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_to_bson_with_nonces(
 #ifdef __cplusplus
 }
 #endif
-#endif /* __ELECTIONGUARD_CORE_BALLOT_H_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_BALLOT_H_INCLUDED__ */

@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B327EC46-948E-4756-BF81-152B07BB2134}</ProjectGuid>
     <Description>ElectionGuard version from Nuget Project</Description>
-    <PackageId>Microsoft.ElectionGuard.Core</PackageId>
+    <PackageId>Microsoft.ElectionGuard</PackageId>
     <PackageVersion>0.0.25-alpha-$(Configuration)</PackageVersion>
     <Authors>Microsoft</Authors>
     <DevelopmentDependency>false</DevelopmentDependency>
@@ -14,8 +14,10 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>ElectionGuard</RootNamespace>
     <UsePartialTypes>false</UsePartialTypes>
-    <AssemblyName>ElectionGuard.Core</AssemblyName>
+    <AssemblyName>ElectionGuard</AssemblyName>
     <ReleaseVersion>0.0.1</ReleaseVersion>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+    <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

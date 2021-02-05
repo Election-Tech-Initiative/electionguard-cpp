@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD_CORE_STATUS_H_INCLUDED__
-#define __ELECTIONGUARD_CORE_STATUS_H_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_STATUS_H_INCLUDED__
+#define __ELECTIONGUARD_CPP_STATUS_H_INCLUDED__
 
 #include "export.h"
 
@@ -44,4 +44,4 @@ static const char *eg_electionguard_get_status(eg_electionguard_status_t status)
 #ifdef __cplusplus
 }
 #endif
-#endif /* __ELECTIONGUARD_CORE_STATUS_H_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_STATUS_H_INCLUDED__ */

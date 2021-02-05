@@ -1,6 +1,6 @@
 ![Microsoft Defending Democracy Program: ElectionGuard Python][Banner Image]
 
-# 🗳 ElectionGuard Core
+# 🗳 ElectionGuard Cpp
 
 This repository is a "reference implementation" of an ElectionGuard ballot encryption library written in c++ and includes a C-compatible API for referencing the library from pure-c application.  This core SDK performs ballot encryption and verification functions and is suitable for execution on voting system hardware and low powered devices.  It is designed to be integrated into existing (or new) voting system software.  
 
@@ -9,13 +9,13 @@ This repository is `pre-release` software to showcase the ElectionGuard API impl
 ## 📁 In This Repository
 
 | File/folder       | Description                                |
-|-------------------|--------------------------------------------|
+| ----------------- | ------------------------------------------ |
 | `.github`         | Github workflows and issue templates       |
 | `.vscode`         | VS Code configurations                     |
 | `/bindings`       | Binding interfaces for different languages |
 | `/cmake`          | `CMake` dependencies`                      |
 | `/include`        | Public include headers                     |
-| `/src`            | Electionguard source code                  |
+| `/src`            | ElectionGuard source code                  |
 | `/test`           | Unit tests                                 |
 | `.clang-format`   | Style guidelines                           |
 | `.gitignore`      | Define what to ignore at commit time.      |
@@ -33,7 +33,7 @@ Learn More in the [ElectionGuard Repository](https://github.com/microsoft/electi
 
 ## 🦸 How Can I use ElectionGuard?
 
-ElectionGuard supports a variety of use cases.  The Primary use case is to generate verifiable end-to-end (E2E) encrypted elections.  The Electionguard process can also be used for other use cases such as privacy enhanced risk-limiting audits (RLAs).  This implementation only includes encryption functions and cannot be used to generate election keys and it cannot decrypot tally results.
+ElectionGuard supports a variety of use cases.  The Primary use case is to generate verifiable end-to-end (E2E) encrypted elections.  The ElectionGuard process can also be used for other use cases such as privacy enhanced risk-limiting audits (RLAs).  This implementation only includes encryption functions and cannot be used to generate election keys and it cannot decrypt tally results.
 
 This c++ implementation also includes a C API that can be consumed from anywhere that can call C code directly.  A .Net Standard package is also provided.
 
@@ -41,9 +41,9 @@ This c++ implementation also includes a C API that can be consumed from anywhere
 
 ### All Platforms
 
-- A [C++17](https://isocpp.org/get-started) standard compliant compiler is required to build the core library.  While any modern compiler should work, the library is tested on a subset.  Check out the [github actions](#) to see what is officially supported.
+- A [C++17](https://isocpp.org/get-started) standard compliant compiler is required to build the core library.  While any modern compiler should work, the library is tested on a subset.  Check out the [GitHub actions](#) to see what is officially supported.
 - [GNU Make](https://www.gnu.org/software/make/manual/make.html) is used to simplify the commands and GitHub Actions. This approach is recommended to simplify the command line experience. This is built in for MacOS and Linux. For Windows, setup is simpler with [Chocolatey](https://chocolatey.org/install) and installing the provided [make package](https://chocolatey.org/packages/make). The other Windows option is [manually installing make](http://gnuwin32.sourceforge.net/packages/make.htm).
-- [CMake 3.14](https://cmake.org/) is used to simplify the build experience.
+- [CMake](https://cmake.org/) is used to simplify the build experience.
 
 ### 🤖 Android
 
@@ -54,9 +54,9 @@ To build for android, you need the Android SDK and platforms 21 and 26.  The eas
 - [SDK 26](https://developer.android.com/studio/releases/platforms#8.0)
 - [NDK 21](https://developer.android.com/ndk/downloads/)
 
-### 🌐 Dotnet
+### 🌐 .NET
 
-A .Net Standard binding library is provided so that this package can be consumed from C# applications.  At this time, only Android and iOS binaries are included and they can be consumed from a Xamarin application.  Building for Xamarin currently requires a Mac
+A .NET Standard binding library is provided so that this package can be consumed from C# applications.  At this time, only Android and iOS binaries are included and they can be consumed from a Xamarin application.  Building for Xamarin currently requires a Mac
 
 - Other dependencies for Android and iOS
 - [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/)
@@ -67,6 +67,7 @@ A .Net Standard binding library is provided so that this package can be consumed
 To build for iOS you need XCode installed
 
 - [XCode](https://developer.apple.com/xcode/resources/) and the [Command Line Tools for XCode](#)
+- [CMake 3.19](https://cmake.org/) may be necessary, along with changes to the Makefile.  [See ISSUE #138](https://github.com/microsoft/electionguard-cpp/issues/138)
 
 ### 🖥️ Windows (using MSYS2)
 
@@ -88,9 +89,9 @@ Building on windows is currently supported using the `MSYS2` toolchain.  `MSVC` 
     C:\msys64\usr\bin
     ```
 
-#### 🚧 The Procedure Entrypoint could not be located
+#### 🚧 The Procedure Entry Point Could not be Located
 
-when compiling using shared libraries, you may encounter an error when running the unit tests project.  This is likely due to windows resolving the incorrect implementation of `libstdc++-6.dll`.  Solving this depends on your use case, but you can either ensure that the path modifications made above appear before any other paths which include this library (e.g. c\Windows\System32\), or you can include a copy of the correct DLL in the output folder.  [See this StackOverflow post for more information](https://stackoverflow.com/questions/18668003/the-procedure-entry-point-gxx-personality-v0-could-not-be-located)
+When compiling with shared libraries, you may encounter an error running the unit tests project.  This is likely due to windows resolving the incorrect implementation of `libstdc++-6.dll`.  Solving this depends on your use case, but you can either ensure that the path modifications made above appear before any other paths which include this library (e.g. c\Windows\System32\), or you can include a copy of the correct DLL in the output folder.  [See this StackOverflow post for more information](https://stackoverflow.com/questions/18668003/the-procedure-entry-point-gxx-personality-v0-could-not-be-located)
 
 ## Build
 
@@ -128,7 +129,7 @@ export NDK_PATH=/Users/$USER/Library/Android/sdk/ndk/21.3.6528147 && make build-
 
 The iOS build currently targets iPhone OS 12 but can be configured by modifying the Makefile
 
-Creates a fat binary for the simulator and targets a recent version of ios
+Creates a fat binary for the simulator and targets a recent version of iOS
 
 ```sh
 make build-ios
@@ -142,9 +143,9 @@ make build
 
 ### Build for Xamarin
 
-Wraps the android and ios build artifacts in a NuGet packge to be consumed from a Xamarin application (classic or forms)
+Wraps the android and iOS build artifacts in a NuGet package to be consumed from a Xamarin application (classic or forms)
 
-Must be executed on OSX to successfully built the iOS project.
+Must be executed on OS X to successfully built the iOS project.
 
 ```sh
 make build-netstandard
@@ -185,7 +186,7 @@ Please report any bugs, feature requests, or enhancements using the [GitHub Issu
 
 ### Have Questions?
 
-Electionguard would love for you to ask questions out in the open using GitHub Issues. If you really want to email the ElectionGuard team, reach out at electionguard@microsoft.com.
+ElectionGuard would love for you to ask questions out in the open using GitHub Issues. If you really want to email the ElectionGuard team, reach out at electionguard@microsoft.com.
 
 ## License
 This repository is licensed under the [MIT License]
@@ -225,10 +226,10 @@ A huge thank you to those who helped to contribute to this project so far, inclu
 <!-- Links -->
 [Banner Image]: https://raw.githubusercontent.com/microsoft/electionguard-python/main/images/electionguard-banner.svg
 
-[Pull Request Workflow]: https://github.com/microsoft/electionguard-core/blob/main/.github/workflows/pull_request.yml
+[Pull Request Workflow]: https://github.com/microsoft/electionguard-ccpp/blob/main/.github/workflows/pull_request.yml
 
-[Contributing]: https://github.com/microsoft/electionguard-core/blob/main/CONTRIBUTING.md
+[Contributing]: https://github.com/microsoft/electionguard-cpp/blob/main/CONTRIBUTING.md
 
-[Security]:https://github.com/microsoft/electionguard-core/blob/main/SECURITY.md
+[Security]:https://github.com/microsoft/electionguard-cpp/blob/main/SECURITY.md
 
-[MIT License]: https://github.com/microsoft/electionguard-core/blob/main/LICENSE
+[MIT License]: https://github.com/microsoft/electionguard-cpp/blob/main/LICENSE

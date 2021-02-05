@@ -27,7 +27,8 @@ using ContextSerializer = electionguard::Serialize::CiphertextelectionContext;
 namespace electionguard
 {
 
-    template <typename K, typename V> K findByValue(const map<K, V> &collection, const V &value)
+    template <typename K, typename V>
+    K findByValue(const map<K, const V> &collection, const V &value)
     {
         for (auto &element : collection) {
             if (element.second == value) {
@@ -40,10 +41,10 @@ namespace electionguard
 #pragma region ElectionType
 
     template <typename> struct _election_type {
-        static const map<ElectionType, const char *> _map;
+        static const map<ElectionType, const string> _map;
     };
     template <typename T>
-    const map<ElectionType, const char *> _election_type<T>::_map = {
+    const map<ElectionType, const string> _election_type<T>::_map = {
       {ElectionType::unknown, "unknown"},
       {ElectionType::general, "general"},
       {ElectionType::partisanPrimaryClosed, "partisanPrimaryClosed"},
@@ -54,7 +55,7 @@ namespace electionguard
       {ElectionType::other, "other"},
     };
 
-    EG_API const char *getElectionTypeString(const ElectionType &value)
+    EG_API const string getElectionTypeString(const ElectionType &value)
     {
         return _election_type<ElectionType>::_map.find(value)->second;
     }
@@ -62,10 +63,10 @@ namespace electionguard
     EG_API ElectionType getElectionType(const string &value)
     {
         try {
-            auto item = findByValue(_election_type<ElectionType>::_map, value.c_str());
+            auto item = findByValue(_election_type<ElectionType>::_map, value);
             return item;
         } catch (const std::exception &e) {
-            std::cerr << e.what() << '\n';
+            Log::error(": error", e);
             return ElectionType::unknown;
         }
     }
@@ -75,10 +76,10 @@ namespace electionguard
 #pragma region ReportingUnitType
 
     template <typename> struct _reporting_unit_type {
-        static const map<ReportingUnitType, const char *> _map;
+        static const map<ReportingUnitType, const string> _map;
     };
     template <typename T>
-    const map<ReportingUnitType, const char *> _reporting_unit_type<T>::_map = {
+    const map<ReportingUnitType, const string> _reporting_unit_type<T>::_map = {
       {ReportingUnitType::unknown, "unknown"},
       {ReportingUnitType::ballotBatch, "ballotBatch"},
       {ReportingUnitType::ballotStyleArea, "ballotStyleArea"},
@@ -110,7 +111,7 @@ namespace electionguard
       {ReportingUnitType::other, "other"},
     };
 
-    EG_API const char *getReportingUnitTypeString(const ReportingUnitType &value)
+    EG_API const string getReportingUnitTypeString(const ReportingUnitType &value)
     {
         return _reporting_unit_type<ReportingUnitType>::_map.find(value)->second;
     }
@@ -118,10 +119,10 @@ namespace electionguard
     EG_API ReportingUnitType getReportingUnitType(const string &value)
     {
         try {
-            auto item = findByValue(_reporting_unit_type<ReportingUnitType>::_map, value.c_str());
+            auto item = findByValue(_reporting_unit_type<ReportingUnitType>::_map, value);
             return item;
         } catch (const std::exception &e) {
-            std::cerr << e.what() << '\n';
+            Log::error(": error", e);
             return ReportingUnitType::unknown;
         }
     }
@@ -131,10 +132,10 @@ namespace electionguard
 #pragma region VoteVariationType
 
     template <typename> struct _vote_variation_type {
-        static const map<VoteVariationType, const char *> _map;
+        static const map<VoteVariationType, const string> _map;
     };
     template <typename T>
-    const map<VoteVariationType, const char *> _vote_variation_type<T>::_map = {
+    const map<VoteVariationType, const string> _vote_variation_type<T>::_map = {
       {VoteVariationType::unknown, "unknown"},
       {VoteVariationType::one_of_m, "one_of_m"},
       {VoteVariationType::borda, "borda"},
@@ -149,7 +150,7 @@ namespace electionguard
       {VoteVariationType::other, "other"},
     };
 
-    EG_API const char *getVoteVariationTypeString(const VoteVariationType &value)
+    EG_API const string getVoteVariationTypeString(const VoteVariationType &value)
     {
         return _vote_variation_type<VoteVariationType>::_map.find(value)->second;
     }
@@ -157,10 +158,10 @@ namespace electionguard
     EG_API VoteVariationType getVoteVariationType(const string &value)
     {
         try {
-            auto item = findByValue(_vote_variation_type<VoteVariationType>::_map, value.c_str());
+            auto item = findByValue(_vote_variation_type<VoteVariationType>::_map, value);
             return item;
         } catch (const std::exception &e) {
-            std::cerr << e.what() << '\n';
+            Log::error(": error", e);
             return VoteVariationType::unknown;
         }
     }
@@ -1421,9 +1422,9 @@ namespace electionguard
 
     // Property Getters
 
-    const ElementModQ &InternalElectionDescription::getDescriptionHash() const
+    const ElementModQ *InternalElectionDescription::getDescriptionHash() const
     {
-        return *pimpl->descriptionHash;
+        return pimpl->descriptionHash.get();
     }
 
     vector<reference_wrapper<GeopoliticalUnit>>

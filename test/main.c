@@ -7,6 +7,7 @@
 
 bool test_ballot(void);
 bool test_chaum_pedersen_proof(void);
+bool test_election(void);
 bool test_elgamal(void);
 bool test_encrypt(void);
 bool test_hash(void);
@@ -16,6 +17,7 @@ int main(void)
 {
     assert(test_ballot() == true);
     assert(test_chaum_pedersen_proof() == true);
+    assert(test_election() == true);
     assert(test_elgamal() == true);
     assert(test_encrypt() == true);
     assert(test_hash() == true);

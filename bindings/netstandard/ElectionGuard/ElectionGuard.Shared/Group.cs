@@ -36,7 +36,7 @@ namespace ElectionGuard
             var status = NativeInterface.ElementModP.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
+                Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
             }
             Handle = null;
         }
@@ -142,7 +142,7 @@ namespace ElectionGuard
             var status = NativeInterface.ElementModQ.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"DisposeUnamanged Error Status: {status}");
+                Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
             }
             Handle = null;
         }

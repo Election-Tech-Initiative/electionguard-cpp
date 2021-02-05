@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD_CORE_TEST_GENERATORS_ELECTION_HPP_INCLUDED__
-#define __ELECTIONGUARD_CORE_TEST_GENERATORS_ELECTION_HPP_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_TEST_GENERATORS_ELECTION_HPP_INCLUDED__
+#define __ELECTIONGUARD_CPP_TEST_GENERATORS_ELECTION_HPP_INCLUDED__
 
 #include <electionguard/election.hpp>
 
@@ -174,10 +174,10 @@ namespace electionguard::test::generators
 
             auto context = CiphertextElectionContext::make(
               1UL, 1UL, make_unique<ElementModP>(publicKey),
-              make_unique<ElementModQ>(metadata.getDescriptionHash()));
+              make_unique<ElementModQ>(*metadata.getDescriptionHash()));
             return context;
         }
     };
 } // namespace electionguard::test::generators
 
-#endif /* __ELECTIONGUARD_CORE_SERIALIZE_HPP_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_SERIALIZE_HPP_INCLUDED__ */

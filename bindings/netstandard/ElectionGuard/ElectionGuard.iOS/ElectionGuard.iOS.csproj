@@ -9,8 +9,9 @@
     <OutputType>Library</OutputType>
     <RootNamespace>ElectionGuard</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-    <AssemblyName>ElectionGuard.Core</AssemblyName>
+    <AssemblyName>ElectionGuard</AssemblyName>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+    <ReleaseVersion>0.0.1</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

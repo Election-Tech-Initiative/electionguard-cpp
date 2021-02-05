@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD__CORE_VARIANT_CAST_HPP_INCLUDED__
-#define __ELECTIONGUARD__CORE_VARIANT_CAST_HPP_INCLUDED__
+#ifndef __ELECTIONGUARD__CPP_VARIANT_CAST_HPP_INCLUDED__
+#define __ELECTIONGUARD__CPP_VARIANT_CAST_HPP_INCLUDED__
 
 #include <electionguard/export.h>
 #include <variant>
@@ -26,4 +26,4 @@ namespace electionguard
     }
 } // namespace electionguard
 
-#endif /* __ELECTIONGUARD__CORE_VARIANT_CAST_HPP_INCLUDED__ */
+#endif /* __ELECTIONGUARD__CPP_VARIANT_CAST_HPP_INCLUDED__ */

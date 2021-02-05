@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 
 # ---- Project ----
 
-set(META_PROJECT_NAME        "ElectionGuard Core")
+set(META_PROJECT_NAME        "ElectionGuard")
 set(META_PROJECT_EXPORT      "ElectionGuard")
 set(META_PROJECT_TARGET      "electionguard")
 set(META_VERSION_MAJOR       "0")
