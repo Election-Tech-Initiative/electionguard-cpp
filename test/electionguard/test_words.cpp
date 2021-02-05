@@ -7,7 +7,7 @@
 #include <vector>
 
 using namespace electionguard;
-using std::string;
+using namespace std;
 
 TEST_CASE("Retrieving words from the words list succeeds")
 {

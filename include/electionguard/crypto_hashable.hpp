@@ -16,11 +16,11 @@ namespace electionguard
         /// <summary>
         /// Generates a hash given the fields on the implementing instance.
         /// </summary>
-        virtual unique_ptr<ElementModQ> crypto_hash()
+        virtual std::unique_ptr<ElementModQ> crypto_hash()
         {
             throw "CryptoHashable crypto_hash not implemented";
         };
-        virtual unique_ptr<ElementModQ> crypto_hash() const
+        virtual std::unique_ptr<ElementModQ> crypto_hash() const
         {
             throw "CryptoHashable const crypto_hash not implemented";
         };
@@ -33,12 +33,12 @@ namespace electionguard
         /// <summary>
         /// Generates a hash with a given seed that can be checked later against the seed and class metadata.
         /// </summary>
-        virtual unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash)
+        virtual std::unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash)
         {
             throw "CryptoHashCheckable crypto_hash_with not implemented";
         };
 
-        virtual unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) const
+        virtual std::unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) const
         {
             throw "CryptoHashCheckable const crypto_hash_with not implemented";
         };

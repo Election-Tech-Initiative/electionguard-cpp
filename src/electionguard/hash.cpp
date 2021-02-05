@@ -7,6 +7,17 @@
 #include <iomanip>
 #include <iostream>
 
+using std::exception;
+using std::get;
+using std::make_unique;
+using std::nullptr_t;
+using std::out_of_range;
+using std::reference_wrapper;
+using std::string;
+using std::to_string;
+using std::unique_ptr;
+using std::vector;
+
 namespace electionguard
 {
     template <typename T> string hash_inner_vector(vector<T> inner_vector);

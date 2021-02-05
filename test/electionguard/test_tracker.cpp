@@ -7,6 +7,7 @@
 #include <vector>
 
 using namespace electionguard;
+using namespace std;
 
 TEST_CASE("Get rotating tracker hash rotates")
 {

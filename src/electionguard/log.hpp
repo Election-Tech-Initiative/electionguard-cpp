@@ -9,11 +9,25 @@
 #include <string>
 #include <vector>
 
-using namespace std;
+using std::boolalpha;
+using std::cerr;
+using std::cout;
+using std::dec;
+using std::endl;
+using std::exception;
+using std::hex;
+using std::ios;
+using std::map;
+using std::put_time;
+using std::setfill;
+using std::setw;
+using std::string;
+using std::stringstream;
+using std::vector;
 
 namespace electionguard
 {
-    // TODO: cleanup
+    // TODO: ISSUE #136: cleanup
     class Log
     {
         static void prefix(const char *caller = "")
@@ -21,7 +35,7 @@ namespace electionguard
             auto now_seconds = time(nullptr);
             struct tm now;
 #ifdef _WIN32
-            // TODO: handle err
+            // TODO: ISSUE #136: handle err
             gmtime_s(&now, &now_seconds);
             cout << "[ " << put_time(&now, "%c") << " ]: " << caller << ": ";
 #else

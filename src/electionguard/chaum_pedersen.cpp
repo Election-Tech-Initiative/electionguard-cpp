@@ -8,8 +8,11 @@
 #include <electionguard/hash.hpp>
 #include <map>
 
+using std::invalid_argument;
+using std::make_unique;
 using std::map;
 using std::string;
+using std::unique_ptr;
 
 namespace electionguard
 {

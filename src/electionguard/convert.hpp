@@ -1,6 +1,7 @@
 #ifndef __ELECTIONGUARD_CORE_CONVERT_HPP_INCLUDED__
 #define __ELECTIONGUARD_CORE_CONVERT_HPP_INCLUDED__
 
+#include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <kremlin/lowstar_endianness.h>
@@ -8,7 +9,20 @@
 #include <string>
 #include <vector>
 
-using namespace std;
+using std::begin;
+using std::end;
+using std::hex;
+using std::setfill;
+using std::setw;
+using std::string;
+using std::vector;
+using time_point = std::chrono::system_clock::time_point;
+using std::get_time;
+using std::gmtime;
+using std::mktime;
+using std::stringstream;
+using std::uppercase;
+using std::chrono::system_clock;
 
 namespace electionguard
 {
@@ -20,7 +34,7 @@ namespace electionguard
         return container.capacity();
     }
 
-    void hex_to_bytes(const string &hex, uint8_t *bytesOut)
+    inline void hex_to_bytes(const string &hex, uint8_t *bytesOut)
     {
         const size_t baseHex = 16;
         for (size_t i(0); i < hex.size(); i += 2) {
@@ -31,7 +45,7 @@ namespace electionguard
         }
     }
 
-    void hex_to_bytes_be(const string &hex, uint8_t *bytesOut)
+    inline void hex_to_bytes_be(const string &hex, uint8_t *bytesOut)
     {
         const size_t baseHex = 16;
         for (size_t i(0); i < hex.size(); i += 2) {
@@ -42,7 +56,7 @@ namespace electionguard
         }
     }
 
-    vector<uint8_t> hex_to_bytes(const string &hexString)
+    inline vector<uint8_t> hex_to_bytes(const string &hexString)
     {
         vector<uint8_t> bytes;
         const size_t baseHex = 16;
@@ -57,7 +71,7 @@ namespace electionguard
         return bytes;
     }
 
-    vector<uint8_t> hex_to_bytes_be(const string &hexString)
+    inline vector<uint8_t> hex_to_bytes_be(const string &hexString)
     {
         vector<uint8_t> bytes;
         const size_t baseHex = 16;
@@ -73,7 +87,7 @@ namespace electionguard
         return bytes;
     }
 
-    string bytes_to_hex(const vector<uint8_t> &bytes)
+    inline string bytes_to_hex(const vector<uint8_t> &bytes)
     {
         // Iterate through the returned bytes to convert to Hex representation
         // while ignoring any initial 0-bytes
@@ -102,7 +116,7 @@ namespace electionguard
 
     const string LEADING_CHARS = "0 \n\r\t\f\v";
 
-    string sanitize_hex_string(const string &hexString)
+    inline string sanitize_hex_string(const string &hexString)
     {
         string sanitized;
         string leftTrimmed = hexString.substr(hexString.find_first_not_of(LEADING_CHARS));
@@ -112,6 +126,31 @@ namespace electionguard
         }
         sanitized.append(leftTrimmed);
         return sanitized;
+    }
+
+    inline string timePointToIsoString(const time_point &time, const string &format)
+    {
+        auto c_time = system_clock::to_time_t(time);
+        struct tm gmt;
+
+#ifdef _WIN32
+        // TODO: ISSUE #136: handle err
+        gmtime_s(&gmt, &c_time);
+#else
+        gmtime_r(&c_time, &gmt);
+#endif
+        stringstream ss;
+        ss << std::put_time(&gmt, format.c_str());
+        return ss.str();
+    }
+
+    inline time_point timePointFromIsoString(const string &time, const string &format)
+    {
+        std::tm tm = {};
+        stringstream ss(time);
+        ss >> get_time(&tm, format.c_str());
+        auto tp = system_clock::from_time_t(mktime(&tm));
+        return tp;
     }
 } // namespace electionguard
 

@@ -1,6 +1,7 @@
 #ifndef __ELECTIONGUARD_CORE_SERIALIZE_HPP_INCLUDED__
 #define __ELECTIONGUARD_CORE_SERIALIZE_HPP_INCLUDED__
 
+#include "convert.hpp"
 #include "electionguard/ballot.hpp"
 #include "electionguard/election.hpp"
 #include "electionguard/export.h"
@@ -12,68 +13,621 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 
+using std::make_unique;
+using std::reference_wrapper;
 using std::string;
+using std::to_string;
+using std::unique_ptr;
+using std::vector;
 
 using nlohmann::json;
 
 namespace electionguard
 {
+    // TODO: input sanitization and safety
+
+    static json annotatedStringToJson(const AnnotatedString &serializable)
+    {
+        return {{"annotation", serializable.getAnnotation()}, {"value", serializable.getValue()}};
+    }
+
+    static unique_ptr<AnnotatedString> annotatedStringFromJson(const json &j)
+    {
+        auto value = j["value"].get<string>();
+        auto annotation = j["annotation"].get<string>();
+        return make_unique<AnnotatedString>(annotation, value);
+    }
+
+    static json languageToJson(const Language &serializable)
+    {
+        return {{"value", serializable.getValue()}, {"language", serializable.getLanguage()}};
+    }
+
+    static unique_ptr<Language> languageFromJson(const json &j)
+    {
+        auto value = j["value"].get<string>();
+        auto language = j["language"].get<string>();
+        return make_unique<Language>(value, language);
+    }
+
+    static json internationalizedTextToJson(const InternationalizedText &serializable)
+    {
+        json serialized;
+        for (const auto &element : serializable.getText()) {
+            serialized.push_back(languageToJson(element.get()));
+        }
+        return serialized;
+    }
+
+    static unique_ptr<InternationalizedText> internationalizedTextFromJson(const json &j)
+    {
+        vector<unique_ptr<Language>> text;
+        for (const auto &i : j["text"]) {
+            text.push_back(languageFromJson(i));
+        }
+        return make_unique<InternationalizedText>(move(text));
+    }
+
+    static json contactInformationToJson(const ContactInformation &serializable)
+    {
+        json serialized = {};
+
+        if (!serializable.getName().empty()) {
+            serialized["name"] = serializable.getName();
+        }
+
+        if (!serializable.getAddressLine().empty()) {
+            json addressLine;
+            for (const auto &i : serializable.getAddressLine()) {
+                addressLine.push_back(i);
+            }
+            serialized["address_line"] = addressLine;
+        }
+
+        if (!serializable.getEmail().empty()) {
+            json email;
+            for (const auto &i : serializable.getEmail()) {
+                email.push_back(annotatedStringToJson(i));
+            }
+            serialized["email"] = email;
+        }
+        if (!serializable.getPhone().empty()) {
+            json phone;
+            for (const auto &i : serializable.getPhone()) {
+                phone.push_back(annotatedStringToJson(i));
+            }
+            serialized["phone"] = phone;
+        }
+
+        return serialized;
+    }
+
+    static unique_ptr<ContactInformation> contactInformationFromJson(const json &j)
+    {
+        vector<string> addressLine;
+        if (!j["address_line"].is_null()) {
+            for (const auto &i : j["address_line"]) {
+                addressLine.push_back(i.get<string>());
+            }
+        }
+
+        vector<unique_ptr<AnnotatedString>> email;
+        if (j.contains("email") && !j["email"].is_null()) {
+            if (!j["email"].is_null()) {
+                for (const auto &i : j["email"]) {
+                    email.push_back(annotatedStringFromJson(i));
+                }
+            }
+        }
+
+        vector<unique_ptr<AnnotatedString>> phone;
+        if (j.contains("phone") && !j["phone"].is_null()) {
+            if (!j["phone"].is_null()) {
+                for (const auto &i : j["phone"]) {
+                    phone.push_back(annotatedStringFromJson(i));
+                }
+            }
+        }
+
+        if (j.contains("name") && !j["name"].is_null()) {
+            return make_unique<ContactInformation>(move(addressLine), move(email), move(phone),
+                                                   j["name"].get<string>());
+        }
+        return make_unique<ContactInformation>(move(addressLine), move(email), move(phone));
+    }
+
+    static json geopoliticalUnitToJson(const GeopoliticalUnit &serializable)
+    {
+        json serialized = {};
+        serialized["object_id"] = serializable.getObjectId();
+        serialized["name"] = serializable.getName();
+        serialized["type"] = getReportingUnitTypeString(serializable.getType());
+
+        if (serializable.getContactInformation() != nullptr) {
+            serialized["contact_information"] =
+              contactInformationToJson(*serializable.getContactInformation());
+        }
+
+        return serialized;
+    }
+
+    static unique_ptr<GeopoliticalUnit> geopoliticalUnitFromJson(const json &j)
+    {
+        if (j.contains("contact_information") && !j["contact_information"].is_null()) {
+
+            return make_unique<GeopoliticalUnit>(
+              j["object_id"].get<string>(), j["name"].get<string>(),
+              getReportingUnitType(j["type"].get<string>()),
+              contactInformationFromJson(j["contact_information"]));
+        }
+        return make_unique<GeopoliticalUnit>(j["object_id"].get<string>(), j["name"].get<string>(),
+                                             getReportingUnitType(j["type"].get<string>()));
+    }
+
+    static json
+    geopoliticalUnitsToJson(const vector<reference_wrapper<GeopoliticalUnit>> &serializable)
+    {
+        json serialized;
+        for (const auto &element : serializable) {
+            serialized.push_back(geopoliticalUnitToJson(element));
+        }
+        return serialized;
+    }
+
+    static vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnitsFromJson(const json &j)
+    {
+        vector<unique_ptr<GeopoliticalUnit>> elements;
+        for (const auto &i : j) {
+            elements.push_back(geopoliticalUnitFromJson(i));
+        }
+        return elements;
+    }
+
+    static json partyToJson(const Party &serializable)
+    {
+        json serialized = {};
+        serialized["object_id"] = serializable.getObjectId();
+
+        if (!serializable.getAbbreviation().empty()) {
+            serialized["abbreviation"] = serializable.getAbbreviation();
+        }
+
+        if (!serializable.getColor().empty()) {
+            serialized["color"] = serializable.getColor();
+        }
+
+        if (!serializable.getLogoUri().empty()) {
+            serialized["logo_uri"] = serializable.getLogoUri();
+        }
+
+        if (serializable.getName() != nullptr) {
+            json names;
+            for (const auto &element : serializable.getName()->getText()) {
+                names.push_back(languageToJson(element.get()));
+            }
+            serialized["name"] = names;
+        }
+
+        return serialized;
+    }
+
+    static unique_ptr<Party> partyFromJson(const json &j)
+    {
+        // TODO: other cases
+        if (j.contains("name") && j["name"].is_null()) {
+            return make_unique<Party>(j["object_id"].get<string>(),
+                                      internationalizedTextFromJson(j["name"]),
+                                      j["abbreviation"].get<string>(), j["color"].get<string>(),
+                                      j["logo_uri"].get<string>());
+        }
+        return make_unique<Party>(j["object_id"].get<string>());
+    }
+
+    static json partiesToJson(const vector<reference_wrapper<Party>> &serializable)
+    {
+        json serialized;
+        for (const auto &element : serializable) {
+
+            serialized.push_back(partyToJson(element));
+        }
+        return serialized;
+    }
+
+    static vector<unique_ptr<Party>> partiesFromJson(json j)
+    {
+        vector<unique_ptr<Party>> elements;
+        for (const auto &i : j) {
+            elements.push_back(partyFromJson(i));
+        }
+        return elements;
+    }
+
+    static json candidateToJson(const Candidate &serializable)
+    {
+        json serialized = {};
+        serialized["object_id"] = serializable.getObjectId();
+
+        if (serializable.isWriteIn()) {
+            serialized["is_write_in"] = serializable.isWriteIn();
+        }
+
+        if (serializable.getName() != nullptr) {
+            serialized["name"] = internationalizedTextToJson(*serializable.getName());
+        }
+
+        if (!serializable.getPartyId().empty()) {
+            serialized["party_id"] = serializable.getPartyId();
+        }
+
+        if (!serializable.getImageUri().empty()) {
+            serialized["image_uri"] = serializable.getImageUri();
+        }
+
+        return serialized;
+    }
+
+    static unique_ptr<Candidate> candidateFromJson(const json &j)
+    {
+        // TODO: other cases
+        if (j.contains("name") && !j["name"].is_null()) {
+            return make_unique<Candidate>(j["object_id"].get<string>(),
+                                          internationalizedTextFromJson(j["name"]),
+                                          j["party_id"].get<string>(), j["image_uri"].get<string>(),
+                                          j["is_write_in"].get<bool>());
+        }
+        auto writeIn = j.contains("is_write_in") && !j["is_write_in"].is_null()
+                         ? j["is_write_in"].get<bool>()
+                         : false;
+        return make_unique<Candidate>(j["object_id"].get<string>(), writeIn);
+    }
+
+    static json candidatesToJson(const vector<reference_wrapper<Candidate>> &serializable)
+    {
+        json serialized;
+        for (const auto &element : serializable) {
+
+            serialized.push_back(candidateToJson(element));
+        }
+        return serialized;
+    }
+
+    static vector<unique_ptr<Candidate>> candidatesFromJson(const json &j)
+    {
+        vector<unique_ptr<Candidate>> elements;
+        for (const auto &i : j) {
+            elements.push_back(candidateFromJson(i));
+        }
+        return elements;
+    }
+
+    static json ballotStyleToJson(const BallotStyle &serializable)
+    {
+        json serialized = {};
+        serialized["object_id"] = serializable.getObjectId();
+
+        json gpUnitIds;
+        for (const auto &element : serializable.getGeopoliticalUnitIds()) {
+            gpUnitIds.push_back(element);
+        }
+
+        serialized["geopolitical_unit_ids"] = gpUnitIds;
+
+        if (!serializable.getPartyIds().empty()) {
+            json partyIds;
+            for (const auto &element : serializable.getPartyIds()) {
+                partyIds.push_back(element);
+            }
+            serialized["party_ids"] = partyIds;
+        }
+
+        if (!serializable.getImageUri().empty()) {
+            serialized["image_uri"] = serializable.getImageUri();
+        }
+
+        return serialized;
+    }
+
+    static unique_ptr<BallotStyle> ballotStyleFromJson(const json &j)
+    {
+        vector<string> gpUnitIds;
+        for (const auto &element : j["geopolitical_unit_ids"]) {
+            gpUnitIds.push_back(element);
+        }
+
+        vector<string> partyIds;
+        if (j.contains("party_ids") && !j["party_ids"].is_null()) {
+            for (const auto &element : j["party_ids"]) {
+                partyIds.push_back(element);
+            }
+        }
+
+        auto imageUri =
+          j.contains("image_uri") && !j["image_uri"].is_null() ? j["image_uri"].get<string>() : "";
+        return make_unique<BallotStyle>(j["object_id"].get<string>(), gpUnitIds, partyIds,
+                                        imageUri);
+    }
+
+    static json ballotStylesToJson(const vector<reference_wrapper<BallotStyle>> &serializable)
+    {
+        json serialized;
+        for (const auto &element : serializable) {
+            serialized.push_back(ballotStyleToJson(element));
+        }
+        return serialized;
+    }
+
+    static vector<unique_ptr<BallotStyle>> ballotStylesFromJson(const json &j)
+    {
+        vector<unique_ptr<BallotStyle>> elements;
+        for (const auto &i : j) {
+            elements.push_back(ballotStyleFromJson(i));
+        }
+        return elements;
+    }
+
+    static json selectionDescriptionToJson(const SelectionDescription &serializable)
+    {
+        return {
+          {"object_id", serializable.getObjectId()},
+          {"candidate_id", serializable.getCandidateId()},
+          {"sequence_order", serializable.getSequenceOrder()},
+        };
+    }
+
+    static unique_ptr<SelectionDescription> selectionDescriptionFromJson(const json &j)
+    {
+        return make_unique<SelectionDescription>(j["object_id"].get<string>(),
+                                                 j["candidate_id"].get<string>(),
+                                                 j["sequence_order"].get<uint64_t>());
+    }
+
+    static json
+    selectionDescriptionsToJson(const vector<reference_wrapper<SelectionDescription>> &serializable)
+    {
+        json serialized;
+        for (const auto &element : serializable) {
+            serialized.push_back(selectionDescriptionToJson(element));
+        }
+        return serialized;
+    }
+
+    static vector<unique_ptr<SelectionDescription>> selectionDescriptionsFromJson(const json &j)
+    {
+        vector<unique_ptr<SelectionDescription>> elements;
+        for (const auto &i : j) {
+            elements.push_back(selectionDescriptionFromJson(i));
+        }
+        return elements;
+    }
+
+    static json contestDescriptionToJson(const ContestDescription &serializable)
+    {
+        json serialized;
+        serialized["object_id"] = serializable.getObjectId();
+        serialized["electoral_district_id"] = serializable.getElectoralDistrictId();
+        serialized["sequence_order"] = serializable.getSequenceOrder();
+        serialized["vote_variation"] = getVoteVariationTypeString(serializable.getVoteVariation());
+        serialized["number_elected"] = serializable.getNumberElected();
+
+        if (serializable.getVotesAllowed() > 0) {
+            serialized["votes_allowed"] = serializable.getVotesAllowed();
+        }
+
+        serialized["name"] = serializable.getName();
+
+        if (serializable.getBallotTitle() != nullptr) {
+            serialized["ballot_title"] = {
+              {"text", internationalizedTextToJson(*serializable.getBallotTitle())}};
+        }
+
+        if (serializable.getBallotSubtitle() != nullptr) {
+            serialized["ballot_subtitle"] = {
+              {"text", internationalizedTextToJson(*serializable.getBallotSubtitle())}};
+        }
+
+        serialized["ballot_selections"] = selectionDescriptionsToJson(serializable.getSelections());
+
+        return serialized;
+    }
+
+    static unique_ptr<ContestDescription> contestDescriptionFromJson(const json &j)
+    {
+        // TODO: just a stub for now.
+        // we need to handle all of the otpional serilization cases.
+        if (j.contains("ballot_title") && !j["ballot_title"].is_null()) {
+
+            return make_unique<ContestDescription>(
+              j["object_id"].get<string>(), j["electoral_district_id"].get<string>(),
+              j["sequence_order"].get<uint64_t>(),
+              getVoteVariationType(j["vote_variation"].get<string>()),
+              j["number_elected"].get<uint64_t>(), j["votes_allowed"].get<uint64_t>(),
+              j["name"].get<string>(), internationalizedTextFromJson(j["ballot_title"]),
+              internationalizedTextFromJson(j["ballot_subtitle"]),
+              selectionDescriptionsFromJson(j["ballot_selections"]));
+        }
+        return make_unique<ContestDescription>(
+          j["object_id"].get<string>(), j["electoral_district_id"].get<string>(),
+          j["sequence_order"].get<uint64_t>(),
+          getVoteVariationType(j["vote_variation"].get<string>()),
+          j["number_elected"].get<uint64_t>(), j["name"].get<string>(),
+          selectionDescriptionsFromJson(j["ballot_selections"]));
+    }
+
+    static json
+    contestDescriptionsToJson(const vector<reference_wrapper<ContestDescription>> &serializable)
+    {
+        json serialized;
+        for (const auto &element : serializable) {
+            serialized.push_back(contestDescriptionToJson(element));
+        }
+        return serialized;
+    }
+
+    static vector<unique_ptr<ContestDescription>> contestDescriptionsFromJson(const json &j)
+    {
+        vector<unique_ptr<ContestDescription>> elements;
+        for (const auto &i : j) {
+            elements.push_back(contestDescriptionFromJson(i));
+        }
+        return elements;
+    }
+
     class Serialize
     {
       public:
+        class ElectionDescription
+        {
+          private:
+            static json fromObject(const electionguard::ElectionDescription &serializable)
+            {
+                json serialized;
+                serialized["election_scope_id"] = serializable.getElectionScopeId();
+                serialized["type"] = getElectionTypeString(serializable.getElectionType());
+                serialized["start_date"] =
+                  timePointToIsoString(serializable.getStartDate(), "%FT%TZ");
+                serialized["end_date"] = timePointToIsoString(serializable.getEndDate(), "%FT%TZ");
+
+                json geopoliticalUnits =
+                  geopoliticalUnitsToJson(serializable.getGeopoliticalUnits());
+                serialized["geopolitical_units"] = geopoliticalUnits;
+
+                json parties = partiesToJson(serializable.getParties());
+                serialized.push_back({"parties", parties});
+
+                json candidates = candidatesToJson(serializable.getCandidates());
+                serialized.push_back({"candidates", candidates});
+
+                json contests = contestDescriptionsToJson(serializable.getContests());
+                serialized.push_back({"contests", contests});
+
+                json ballotStyles = ballotStylesToJson(serializable.getBallotStyles());
+                serialized.push_back({"ballot_styles", ballotStyles});
+
+                if (serializable.getName() != nullptr) {
+                    json name = internationalizedTextToJson(*serializable.getName());
+                    serialized.push_back({"name", name});
+                }
+
+                if (serializable.getContactInformation() != nullptr) {
+                    json contactInformation =
+                      contactInformationToJson(*serializable.getContactInformation());
+                    serialized.push_back({"contact_information", contactInformation});
+                }
+
+                return serialized;
+            }
+
+            static unique_ptr<electionguard::ElectionDescription> toObject(json j)
+            {
+                auto electionScopeId = j["election_scope_id"].get<string>();
+                auto type = j["type"].get<string>();
+                auto startDate = j["start_date"].get<string>();
+                auto endDate = j["end_date"].get<string>();
+
+                auto geopoliticalUnits = geopoliticalUnitsFromJson(j["geopolitical_units"]);
+                auto parties = partiesFromJson(j["parties"]);
+                auto candidates = candidatesFromJson(j["candidates"]);
+                auto contests = contestDescriptionsFromJson(j["contests"]);
+                auto ballotStyles = ballotStylesFromJson(j["ballot_styles"]);
+
+                // TODO: just a stub for now.
+                // we need to handle all of the otpional serilization cases.
+                if (j.contains("name") && !j["name"].is_null()) {
+                    auto name = internationalizedTextFromJson(j["name"]);
+                    auto contactInformation = contactInformationFromJson(j["contact_information"]);
+
+                    return make_unique<electionguard::ElectionDescription>(
+                      electionScopeId, getElectionType(type),
+                      timePointFromIsoString(startDate, "%FT%TZ"),
+                      timePointFromIsoString(endDate, "%FT%TZ"), move(geopoliticalUnits),
+                      move(parties), move(candidates), move(contests), move(ballotStyles),
+                      move(name), move(contactInformation));
+                }
+                return make_unique<electionguard::ElectionDescription>(
+                  electionScopeId, getElectionType(type),
+                  timePointFromIsoString(startDate, "%FT%TZ"),
+                  timePointFromIsoString(endDate, "%FT%TZ"), move(geopoliticalUnits), move(parties),
+                  move(candidates), move(contests), move(ballotStyles));
+            }
+
+          public:
+            static vector<uint8_t> toBson(const electionguard::ElectionDescription &serializable)
+            {
+                return json::to_bson(fromObject(serializable));
+            }
+            static string toJson(const electionguard::ElectionDescription &serializable)
+            {
+                return fromObject(serializable).dump();
+            }
+
+            static unique_ptr<electionguard::ElectionDescription> fromBson(vector<uint8_t> data)
+            {
+                return toObject(json::from_bson(data));
+            }
+
+            static unique_ptr<electionguard::ElectionDescription> fromJson(string data)
+            {
+                return toObject(json::parse(data));
+            }
+        };
         class InternalElectionDescription
         {
           private:
             static json fromObject(const electionguard::InternalElectionDescription &serializable)
             {
-                json contests;
-                for (auto contest : serializable.getContests()) {
-                    json selections;
-                    for (auto selection : contest.get().getSelections()) {
-                        json s = {
-                          {"object_id", selection.get().getObjectId()},
-                          {"candidate_id", selection.get().getCandidateId()},
-                          {"sequence_order", selection.get().getSequenceOrder()},
-                        };
-                        selections.push_back(s);
-                    }
-                    json title_text;
-                    for (const auto &language : contest.get().getBallotTitle()->getText()) {
-                        json l = {{"value", language.get().getValue()},
-                                  {"language", language.get().getLanguage()}};
-                        title_text.push_back(l);
-                    }
-                    json subtitle_text;
-                    for (const auto &language : contest.get().getBallotTitle()->getText()) {
-                        json l = {{"value", language.get().getValue()},
-                                  {"language", language.get().getLanguage()}};
-                        subtitle_text.push_back(l);
-                    }
+                auto geopoliticalUnits =
+                  geopoliticalUnitsToJson(serializable.getGeopoliticalUnits());
 
-                    contests.push_back({
+                // Contests
+                json contests;
+                for (const auto &contest : serializable.getContests()) {
+                    auto selections = selectionDescriptionsToJson(contest.get().getSelections());
+                    auto placeholders =
+                      selectionDescriptionsToJson(contest.get().getPlaceholders());
+
+                    json contest_json = {
                       {"object_id", contest.get().getObjectId()},
                       {"electoral_district_id", contest.get().getElectoralDistrictId()},
                       {"sequence_order", contest.get().getSequenceOrder()},
-                      {"vote_variation", contest.get().getVoteVariation()},
+                      {"vote_variation",
+                       getVoteVariationTypeString(contest.get().getVoteVariation())},
                       {"number_elected", contest.get().getNumberElected()},
                       {"votes_allowed", contest.get().getVotesAllowed()},
                       {"name", contest.get().getName()},
-                      {"ballot_title", {{"text", title_text}}},
-                      {"ballot_subtitle", {{"text", subtitle_text}}},
                       {"ballot_selections", selections},
-                    });
+                      {"ballot_placeholders", placeholders}};
+
+                    if (contest.get().getBallotTitle() != nullptr) {
+                        contest_json["ballot_title"] = {
+                          {"text", internationalizedTextToJson(*contest.get().getBallotTitle())}};
+                    }
+
+                    if (contest.get().getBallotSubtitle() != nullptr) {
+                        contest_json["ballot_subtitle"] = {
+                          {"text",
+                           internationalizedTextToJson(*contest.get().getBallotSubtitle())}};
+                    }
+
+                    contests.push_back(contest_json);
                 }
 
+                auto ballotStyles = ballotStylesToJson(serializable.getBallotStyles());
+
                 json result = {{"description_hash", serializable.getDescriptionHash().toHex()},
-                               {"contests", contests}};
+                               {"geopolitical_units", geopoliticalUnits},
+                               {"contests", contests},
+                               {"ballot_styles", ballotStyles}};
 
                 return result;
             }
             static unique_ptr<electionguard::InternalElectionDescription> toObject(json j)
             {
+
+                auto geopoliticalUnits = geopoliticalUnitsFromJson(j["geopolitical_units"]);
+
                 auto contests = j["contests"];
 
-                vector<unique_ptr<ContestDescription>> contestDescriptions;
+                vector<unique_ptr<ContestDescriptionWithPlaceholders>> contestDescriptions;
                 contestDescriptions.reserve(contests.size());
                 for (auto &contest : contests) {
                     auto contest_object_id = contest["object_id"].get<string>();
@@ -81,60 +635,44 @@ namespace electionguard
                     auto contest_sequence_order = contest["sequence_order"].get<uint64_t>();
                     auto vote_variation = contest["vote_variation"].get<string>();
                     auto number_elected = contest["number_elected"].get<uint64_t>();
-                    auto votes_allowed = contest["votes_allowed"].get<uint64_t>();
                     auto name = contest["name"].get<string>();
 
-                    auto ballot_title = contest["ballot_title"];
-                    auto title_text = ballot_title["text"];
-                    vector<unique_ptr<Language>> ballotTitleText;
-                    ballotTitleText.reserve(title_text.size());
-                    for (auto &title : title_text) {
-                        auto value = title["value"].get<string>();
-                        auto language = title["language"].get<string>();
-                        ballotTitleText.push_back(make_unique<Language>(value, language));
+                    auto selections = selectionDescriptionsFromJson(contest["ballot_selections"]);
+                    auto placeholders =
+                      selectionDescriptionsFromJson(contest["ballot_placeholders"]);
+
+                    // TODO: ust a stub for now.
+                    // we need to handle all of the otpional serilization cases.
+                    if (contest.contains("ballot_title") && !contest["ballot_title"].is_null()) {
+                        auto votes_allowed = contest["votes_allowed"].get<uint64_t>();
+                        auto ballotTitle = internationalizedTextFromJson(contest["ballot_title"]);
+                        auto ballotSubtitle =
+                          internationalizedTextFromJson(contest["ballot_subtitle"]);
+
+                        contestDescriptions.push_back(
+                          make_unique<ContestDescriptionWithPlaceholders>(
+                            contest_object_id, electoral_district_id, contest_sequence_order,
+                            getVoteVariationType(vote_variation), number_elected, votes_allowed,
+                            name, move(ballotTitle), move(ballotSubtitle), move(selections),
+                            move(placeholders)));
+
+                    } else {
+                        contestDescriptions.push_back(
+                          make_unique<ContestDescriptionWithPlaceholders>(
+                            contest_object_id, electoral_district_id, contest_sequence_order,
+                            getVoteVariationType(vote_variation), number_elected, name,
+                            move(selections), move(placeholders)));
                     }
-
-                    auto ballot_subtitle = contest["ballot_subtitle"];
-                    auto subtitle_text = ballot_subtitle["text"];
-                    vector<unique_ptr<Language>> ballotSubTitleText;
-                    ballotSubTitleText.reserve(subtitle_text.size());
-                    for (auto &subtitle : subtitle_text) {
-                        auto value = subtitle["value"].get<string>();
-                        auto language = subtitle["language"].get<string>();
-                        ballotSubTitleText.push_back(make_unique<Language>(value, language));
-                    }
-
-                    auto selections = contest["ballot_selections"];
-                    vector<unique_ptr<SelectionDescription>> selectionDescriptions;
-                    selectionDescriptions.reserve(selections.size());
-                    for (auto &selection : selections) {
-                        auto selection_object_id = selection["object_id"].get<string>();
-                        auto candidate_id = selection["candidate_id"].get<string>();
-                        auto selection_sequence_order = selection["sequence_order"].get<uint64_t>();
-                        selectionDescriptions.push_back(make_unique<SelectionDescription>(
-                          selection_object_id, candidate_id, selection_sequence_order));
-                    }
-
-                    auto ballotTitle = make_unique<InternationalizedText>(move(ballotTitleText));
-                    auto ballotSubTitle =
-                      make_unique<InternationalizedText>(move(ballotSubTitleText));
-
-                    contestDescriptions.push_back(make_unique<ContestDescription>(
-                      contest_object_id, electoral_district_id, contest_sequence_order,
-                      vote_variation, number_elected, votes_allowed, name, move(ballotTitle),
-                      move(ballotSubTitle), move(selectionDescriptions)));
                 }
 
-                if (j["description_hash"] != nullptr) {
-                    auto description_hash = j["description_hash"].get<string>();
-                    auto descriptionHash = ElementModQ::fromHex(description_hash);
+                auto ballotStyles = ballotStylesFromJson(j["ballot_styles"]);
 
-                    return make_unique<electionguard::InternalElectionDescription>(
-                      *descriptionHash, move(contestDescriptions));
-                } else {
-                    return make_unique<electionguard::InternalElectionDescription>(
-                      ZERO_MOD_Q(), move(contestDescriptions));
-                }
+                auto description_hash = j["description_hash"].get<string>();
+                auto descriptionHash = ElementModQ::fromHex(description_hash);
+
+                return make_unique<electionguard::InternalElectionDescription>(
+                  move(geopoliticalUnits), move(contestDescriptions), move(ballotStyles),
+                  *descriptionHash);
             }
 
           public:

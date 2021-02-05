@@ -1,3 +1,4 @@
+/// @file encrypt.h
 #ifndef __ELECTIONGUARD_CORE_ENCRYPT_H_INCLUDED__
 #define __ELECTIONGUARD_CORE_ENCRYPT_H_INCLUDED__
 
@@ -45,28 +46,31 @@ EG_API eg_electionguard_status_t eg_encryption_mediator_encrypt_ballot_verify_pr
   eg_encryption_mediator_t *handle, eg_plaintext_ballot_t *in_plaintext,
   eg_ciphertext_ballot_t **out_ciphertext_handle);
 
-/// <summary>
-/// Encrypt a specific `BallotSelection` in the context of a specific `BallotContest`
-///
-/// <param name="plaintext">the selection in the valid input form</param>
-/// <param name="description">the `SelectionDescription` from the `ContestDescription`
-///                           which defines this selection's structure</param>
-/// <param name="elgamal_public_key">the public key (K) used to encrypt the ballot</param>
-/// <param name="crypto_extended_base_hash">the extended base hash of the election</param>
-/// <param name="nonce_seed">an `ElementModQ` used as a header to seed the `Nonce` generated
-///                          for this selection. this value can be (or derived from) the
-///                          BallotContest nonce, but no relationship is required</param>
-/// <param name="is_placeholder">specifies if this is a placeholder selection</param>
-/// <param name="should_verify_proofs">specify if the proofs should be verified prior to returning (default True)</param>
-/// <returns>A `CiphertextBallotSelection`</returns>
-/// </summary>
+/**
+* Encrypt a specific `BallotSelection` in the context of a specific `BallotContest`
+*
+* @param[in] in_plaintext the selection in the valid input form
+* @param[in] in_description the `eg_selection_description_t` from the `ContestDescription`
+*                           which defines this selection's structure
+* @param[in] in_public_key the `eg_element_mod_p_t` public key (K) used to encrypt the ballot
+* @param[in] in_crypto_extended_base_hash the `eg_element_mod_q_t` extended base hash of the election
+* @param[in] in_nonce_seed an `eg_element_mod_q_t` used as a header to seed the `Nonce` generated
+*                          for this selection. this value can be (or derived from) the
+*                          BallotContest nonce, but no relationship is required
+* @param[in] in_is_placeholder specifies if this is a placeholder selection
+* @param[in] in_should_verify_proofs specify if the proofs should be verified prior to returning (default True)
+* @param[out] out_handle a handle to a 1eg_ciphertext_ballot_selection_t`
+* @return eg_electionguard_status_t indicating success or failure
+* @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
+* @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
+*/
 EG_API eg_electionguard_status_t eg_encrypt_selection(
   eg_plaintext_ballot_selection_t *in_plaintext, eg_selection_description_t *in_description,
   eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash,
   eg_element_mod_q_t *in_nonce_seed, bool in_is_placeholder, bool in_should_verify_proofs,
   eg_ciphertext_ballot_selection_t **out_handle);
 
-// TODO: eg_encrypt_contest
+// TODO: ISSUE #129: eg_encrypt_contest
 
 EG_API eg_electionguard_status_t eg_encrypt_ballot(eg_plaintext_ballot_t *in_plaintext,
                                                    eg_internal_election_description_t *in_metadata,

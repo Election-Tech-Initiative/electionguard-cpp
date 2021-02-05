@@ -8,6 +8,7 @@
 #include <vector>
 
 using namespace electionguard;
+using namespace std;
 
 TEST_CASE("Same ElementModQs with same Zero data produce same Hash")
 {

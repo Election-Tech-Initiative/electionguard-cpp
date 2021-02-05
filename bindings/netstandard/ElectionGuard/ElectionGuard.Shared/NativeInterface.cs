@@ -194,7 +194,7 @@ namespace ElectionGuard
             internal unsafe struct PlaintextBallotSelectionType { };
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_new")]
-            internal static extern Status New([MarshalAs(UnmanagedType.LPStr)] string objectId, 
+            internal static extern Status New([MarshalAs(UnmanagedType.LPStr)] string objectId,
             [MarshalAs(UnmanagedType.LPStr)] string vote, bool isPlaceholderSelection, out PlaintextBallotSelectionType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_free")]
@@ -203,7 +203,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_get_object_id")]
             internal static extern Status GetObjectId(PlaintextBallotSelectionType* handle, out IntPtr object_id);
 
-            // TODO: Is placeholder and toint
+            // TODO: ISSUE #129: Is placeholder and toint
 
         }
 
@@ -221,7 +221,7 @@ namespace ElectionGuard
             internal static extern Status GetDescriptionHash(
                 CiphertextBallotSelectionType* handle, out ElementModQ.ElementModQType* description_hash);
 
-            // TODO: get is palceholder
+            // TODO: ISSUE #129: get is palceholder
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_get_ciphertext")]
             internal static extern Status GetCiphertext(
@@ -235,7 +235,7 @@ namespace ElectionGuard
             internal static extern Status GetNonce(
                 CiphertextBallotSelectionType* handle, out ElementModQ.ElementModQType* nonce);
 
-            // TODO: get proof
+            // TODO: ISSUE #129: get proof
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_is_valid_encryption")]
             internal static extern bool IsValidEncryption(CiphertextBallotSelectionType* handle,
@@ -259,7 +259,7 @@ namespace ElectionGuard
             internal static extern ulong GetSelectionsSize(PlaintextBallotContestType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_get_selection_at_index")]
-            internal static extern Status GetSelectionAtIndex(PlaintextBallotContestType* handle, ulong index, 
+            internal static extern Status GetSelectionAtIndex(PlaintextBallotContestType* handle, ulong index,
                 out PlaintextBallotSelection.PlaintextBallotSelectionType* selection);
         }
 
@@ -281,7 +281,7 @@ namespace ElectionGuard
             internal static extern ulong GetSelectionsSize(CiphertextBallotContestType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_get_selection_at_index")]
-            internal static extern Status GetSelectionAtIndex(CiphertextBallotContestType* handle, ulong index, 
+            internal static extern Status GetSelectionAtIndex(CiphertextBallotContestType* handle, ulong index,
                 out CiphertextBallotSelection.CiphertextBallotSelectionType* selection);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_get_crypto_hash")]
@@ -292,7 +292,7 @@ namespace ElectionGuard
             internal static extern Status GetNonce(
                 CiphertextBallotContestType* handle, out ElementModQ.ElementModQType* nonce);
 
-            // TODO: get proof
+            // TODO: ISSUE #129: get proof
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_is_valid_encryption")]
             internal static extern bool IsValidEncryption(CiphertextBallotContestType* handle,
@@ -318,7 +318,7 @@ namespace ElectionGuard
             internal static extern ulong GetContestsSize(PlaintextBallotType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_contest_at_index")]
-            internal static extern Status GetContestAtIndex(PlaintextBallotType* handle, ulong index, 
+            internal static extern Status GetContestAtIndex(PlaintextBallotType* handle, ulong index,
                 out PlaintextBallotContest.PlaintextBallotContestType* contest);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_from_json")]
@@ -363,7 +363,7 @@ namespace ElectionGuard
             internal static extern ulong GetContestsSize(CiphertextBallotType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_contest_at_index")]
-            internal static extern Status GetContestAtIndex(CiphertextBallotType* handle, ulong index, 
+            internal static extern Status GetContestAtIndex(CiphertextBallotType* handle, ulong index,
                 out CiphertextBallotContest.CiphertextBallotContestType* contest);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_tracking_hash")]
@@ -373,7 +373,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_tracking_code")]
             internal static extern Status GetTrackingCode(CiphertextBallotType* handle, out IntPtr tracking_code);
 
-            // TODO: get timestamp
+            // TODO: ISSUE #129: get timestamp
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_nonce")]
             internal static extern Status GetNonce(

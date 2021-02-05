@@ -31,7 +31,7 @@ EG_API eg_electionguard_status_t eg_element_mod_p_get_data(eg_element_mod_p_t *h
 EG_API eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle,
                                                          char **out_hex);
 
-// TODO: finish implementation
+// TODO: ISSUE #129: finish implementation
 
 // ElementModQ
 
@@ -53,7 +53,7 @@ EG_API eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *han
 
 EG_API eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle);
 
-// TODO: finish implementation
+// TODO: ISSUE #129: finish implementation
 
 #ifdef __cplusplus
 }

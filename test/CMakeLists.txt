@@ -30,8 +30,11 @@ CPMAddPackage(
 # C++ Tests
 add_executable(ElectionGuardTests 
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/ballot.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/election.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/constants.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_election.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_group.cpp

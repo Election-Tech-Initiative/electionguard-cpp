@@ -60,7 +60,7 @@ namespace ElectionGuard
             Handle = handle;
         }
 
-        // TODO: decrypt with secret
+        // TODO: ISSUE #129: decrypt with secret
 
         protected override unsafe void DisposeUnmanaged()
         {
