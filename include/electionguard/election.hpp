@@ -577,7 +577,7 @@ namespace electionguard
         std::vector<std::reference_wrapper<ContestDescriptionWithPlaceholders>> getContests() const;
         std::vector<std::reference_wrapper<BallotStyle>> getBallotStyles() const;
 
-        const ElementModQ &getDescriptionHash() const;
+        const ElementModQ *getDescriptionHash() const;
 
         std::vector<uint8_t> toBson() const;
         std::string toJson();

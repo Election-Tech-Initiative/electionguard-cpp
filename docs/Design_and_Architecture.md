@@ -100,11 +100,44 @@ When accessing properties of structures, a _raw pointer_ may be returned to indi
 
 #### C API Lifecycle
 
-Because the C API does not support smart pointers, consideration is given to using `make` functions where an object graph may be composed (analogous to the `make` functions in the C++ API and in python).  Some structures include `new` methods as well to construct primitive objects directly.  C objects alsy generally include `free` methods to release resources.  Because the C API is a facade over the C++ API, careful consideration must be given to freeing resources.
+Because the C API does not support smart pointers, consideration is given to using `make` functions where an object graph may be composed (analogous to the `make` functions in the C++ API and in python).  Some structures include `new` methods as well to construct primitive objects directly.  C types also generally include `free` methods to release resources.  _Property getter_ methods usually include `get` in the function signature (e.g. `_get_description_hash`). Because the C API is a facade over the C++ API, careful consideration must be given to freeing resources.
 
 Generally:
-1. If you built your object graph manually using `new` then you must call `free` on each object you constructed.
+1. If you built your object graph manually using `new` then you must call `free` on each object you constructed. (such as an array of `eg_selection_description_t[]`).
 2. If you built your object graph using `make` or an out paramater was passed by function, you must only call `free` on the top-level object.
-3. If you read a property of an object then a copy is made and you must call `free` on the copy (e.g. the `eg_element_mod_q_t` returned from `eg_ciphertext_election_context_get_description_hash` is a copy owned by the caller).
+3. If the corresponding c++ returns a `unique_ptr` to a domain type then it is owned by the caller and must be freed.
+4. If the corresponding C++ returns a standard pointer (`*`) it is owned by the callee and should not be freed.
+5. If the corresponding c++ returns a primitive type it is owned by the caller and must be freed.
+6. If the corresponding c++ returns a `std::string` then a copy is made using `malloc` and the caller caller must free.
+
+Example:
+
+```c
+// A new object is created
+eg_ciphertext_election_context_t *result = NULL;
+if (eg_ciphertext_election_context_from_json("{some:json}", &result)) {
+    // handle error state
+}
+
+// A property accessor returns a pointer to a domain type member
+eg_element_mod_q_t *crypto_base_hash = NULL;
+if (eg_ciphertext_election_context_get_crypto_base_hash(result, &crypto_base_hash)) {
+    // handle error state
+}
+
+// The property is read out as a null-terminated string
+char *crypto_base_hash_hex;
+if (eg_element_mod_q_to_hex(crypto_base_hash, &crypto_base_hash_hex)) {
+    // handle error state
+}
+
+// do stuff...
+
+// Clean Up resources
+free(crypto_base_hash_hex);                     // clean up the string that we malloc'd
+eg_ciphertext_election_context_free(result);    // clean up the object we created   
+eg_element_mod_q_free(crypto_base_hash);        // ERROR! Use after free
+
+```
 
 Refer to the C unit tests for examples.

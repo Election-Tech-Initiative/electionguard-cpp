@@ -1422,9 +1422,9 @@ namespace electionguard
 
     // Property Getters
 
-    const ElementModQ &InternalElectionDescription::getDescriptionHash() const
+    const ElementModQ *InternalElectionDescription::getDescriptionHash() const
     {
-        return *pimpl->descriptionHash;
+        return pimpl->descriptionHash.get();
     }
 
     vector<reference_wrapper<GeopoliticalUnit>>

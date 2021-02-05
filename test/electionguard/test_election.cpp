@@ -65,7 +65,7 @@ TEST_CASE("Can construct InternalElectionDescription from ElectionDescription")
     auto result = make_unique<InternalElectionDescription>(*data);
 
     // Assert
-    CHECK(data->crypto_hash()->toHex() == result->getDescriptionHash().toHex());
+    CHECK(data->crypto_hash()->toHex() == result->getDescriptionHash()->toHex());
     CHECK(data->getContests().size() == result->getContests().size());
 }
 
@@ -83,7 +83,7 @@ TEST_CASE("Can serialize InternalElectionDescription")
     //auto fromBson = InternalElectionDescription::fromBson(bson);
 
     // Assert
-    CHECK(metadata->getDescriptionHash().toHex() == fromJson->getDescriptionHash().toHex());
+    CHECK(metadata->getDescriptionHash()->toHex() == fromJson->getDescriptionHash()->toHex());
 }
 
 TEST_CASE("Can serialize CiphertextElectionContext")

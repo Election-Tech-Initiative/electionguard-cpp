@@ -61,6 +61,8 @@ bool test_can_deserialize_election_description(void)
     // Clean Up
     eg_election_description_free(result);
 
+    free(election_scope_id);
+
     return true;
 }
 
@@ -109,7 +111,6 @@ bool test_can_construct_internal_election_description_from_election_description(
 
     // Clean Up
     eg_element_mod_q_free(expected);
-    eg_element_mod_q_free(actual);
     eg_election_description_free(data);
     eg_internal_election_description_free(result);
 
@@ -171,7 +172,6 @@ bool test_can_deserlialze_internal_election_description(void)
     assert(actual_hash_data[0] == 02);
 
     // Clean Up
-    eg_element_mod_q_free(actual);
     eg_internal_election_description_free(result);
 
     return true;
@@ -215,6 +215,10 @@ bool test_can_deserialize_ciphertext_election_context(void)
 
     assert(strings_are_equal("B8CF9A8915BDB19C681AFBCDD1797F2CF360F723843D977D0E1B280CA2B24245",
                              crypto_base_hash_hex) == true);
+
+    // Clean Up
+    eg_ciphertext_election_context_free(result);
+    free(crypto_base_hash_hex);
 
     return true;
 }

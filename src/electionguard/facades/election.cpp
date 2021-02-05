@@ -261,16 +261,9 @@ eg_electionguard_status_t
 eg_internal_election_description_get_description_hash(eg_internal_election_description_t *handle,
                                                       eg_element_mod_q_t **out_description_hash)
 {
-    try {
-        auto description = AS_TYPE(InternalElectionDescription, handle)->getDescriptionHash();
-        auto pointer = make_unique<ElementModQ>(description);
-
-        *out_description_hash = AS_TYPE(eg_element_mod_q_t, pointer.release());
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(":eg_internal_election_description_get_description_hash", e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
-    }
+    auto *description = AS_TYPE(InternalElectionDescription, handle)->getDescriptionHash();
+    *out_description_hash = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(description));
+    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 eg_electionguard_status_t
@@ -496,7 +489,7 @@ eg_ciphertext_election_context_to_bson(eg_ciphertext_election_context_t *handle,
                                        size_t *out_size)
 {
     try {
-        auto domain_type = AS_TYPE(CiphertextElectionContext, handle);
+        auto *domain_type = AS_TYPE(CiphertextElectionContext, handle);
         auto data_bytes = domain_type->toBson();
 
         auto *data_array = new uint8_t[data_bytes.size()];

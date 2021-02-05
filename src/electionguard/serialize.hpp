@@ -618,7 +618,7 @@ namespace electionguard
 
                 Log::debug(" serialized Ballot Styles");
 
-                json result = {{"description_hash", serializable.getDescriptionHash().toHex()},
+                json result = {{"description_hash", serializable.getDescriptionHash()->toHex()},
                                {"geopolitical_units", geopoliticalUnits},
                                {"contests", contests},
                                {"ballot_styles", ballotStyles}};
