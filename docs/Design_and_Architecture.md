@@ -1,10 +1,10 @@
 # Design & Architecture
 
-This describes the design and architecture of the `electionguard-cpp` project.
+This page describes the design and architecture of the `electionguard-cpp` project.
 
 ## Design
 
-The C++ project only implements a subset of the full ElectionGuard specification.  The C++ implementation is designed solely to support ballot encryption and verification on "lower pwered" hardware.  This library only implements the objects and functions necessary to generate and verify ballots.
+This C++ project only implements a subset of the full ElectionGuard specification.  The C++ implementation is designed solely to support ballot encryption and verification on "lower powered" hardware.  This library only implements the objects and functions necessary to generate and verify ballots.
 
 ### ✅ Cross Platform
 
@@ -16,11 +16,11 @@ This project uses C++17 and requires a compiler capable of interpreting the C++1
 
 ### ✅ Extensibility
 
-The library is intentionally general-purpose to support the different use cases of "end to end verifiable" voting systems. Different projects may wish to use different layers of the library, including math primitives, encryption functions, and more.  The library exposes a C++ Interface as well as a C Interface and both are treated as first-class citizens.  Binding layers are also provided to simplify consuming the library from other languages.
+The library is intentionally general to support the multiple use cases of end to end verifiable voting systems. Different projects may wish to use different layers of the library, including math primitives, encryption functions, and more.  The library exposes a C++ Interface as well as a C Interface; both are treated as first-class citizens.  Binding layers are also provided to simplify consuming the library from other languages.
 
 ### ✅ Object Oriented Design (OOD) & Functional Methods
 
-An additional goal is to structure the code using familiar object-oriented design patterns while exposing underlying immutable and functional-style methods. Higher-order functions are also included to simplify using the library for common use cases.  This allows users to both construct high-level objects in an OOP fashion and pass them to a single function call (such as `encryptBallot`), or compose a domain-specific object graph and directly call the underlying methods in a functional way (such as `encryptSelection`). 
+An additional goal of this effort is to structure the code using familiar object-oriented design patterns while exposing underlying immutable and functional-style methods. Higher-order functions are also included to simplify using the library for common use cases.  This allows users to both construct high-level objects in an OOP fashion and pass them to a single function call (such as `encryptBallot`), or compose a domain-specific object graph and directly call the underlying methods in a functional way (such as `encryptSelection`). 
 
 Class methods are used for simplicity, but sophistication with regard to inheritance, object encapsulation, or design patterns is intentionally avoided. These class methods usually rely on the aforementioned functional methods unless the class contains state.
 
@@ -32,7 +32,7 @@ The library prefers immutable objects where possible to encourage simple data st
 
 ### ✅ Concurrency
 
-While this library is not yet explicitly guaranteed to be _thread-safe_, it's definitely meant to work properly when the caller wants to run more than one thing at a time. This means there is intentionally minimal global, mutable state in the library.  If global mutable state is added, such as a discrete-log function doing internal memoization, thread-safety will be considered.
+While this library is not yet explicitly guaranteed to be _thread-safe_, it's definitely meant to work properly when the caller wants to run more than one thing at a time. This means there is intentionally minimal global, mutable state in the library.  If global mutable state is added, such as a discrete-log function doing internal memoization, thread safety will be considered.
 
 ### ✅ Exceptions
 
@@ -40,11 +40,11 @@ This library uses exceptions internally, and public C++ API's may throw exceptio
 
 ### ✅ Safety
 
-This project attempts to use modern c++ features and tools to catch memory issues at compiletime and during release cycles.  Smart Pointers and move semantics are used throughout to help the consumer understand when the caller is responsible for managing object lifecycles.  The CI/CD pipelines also run static and dynamic analysis to help catch leaks.  Because of the variety of nuance between targets, processor architectures, toolchains, and operating systems, it is possible gaps exist on some platformjs.  Please open an issue if a gap is found.
+This project attempts to use modern C++ features and tools to catch memory issues at compile time and during release cycles.  Smart Pointers and move semantics are used throughout to help the consumer understand when the caller is responsible for managing object lifecycles.  The CI/CD pipelines also run static and dynamic analysis to help catch leaks.  Because of the nuances across targets, processor architectures, toolchains, and operating systems, it is possible gaps exist on some platforms.  Please open an issue if a gap is found.
 
 ### 🚫 Multiple Inheritance
 
-Although a handy c++ feature, for implementation simplicity this feature is not used and should be avoided wherever possible.
+Although a handy C++ feature, for implementation simplicity this feature is not used and should be avoided whenever possible.
 
 ## Project Practices
 
@@ -54,15 +54,15 @@ Github actions are used to execute a variety of tools and tests across a broad s
 
 ### 🧹 Clean Code
 
-The library uses several tools to assist developers in maintaining clean code. Visual Studio Code is recommended for easier setup.
+The library uses several tools to assist developers in maintaining clean code. [Visual Studio Code](https://code.visualstudio.com/) is recommended for easier setup.
 
 #### Typing
 
-This library uses both complete and opaque types depending on the circumstances.  Where possible, all objects consumed and returned across the C++ API are complete types.  Internally the C++ header files use opaque class types to implement the `pimpl` idiom.  The types used by the C API are completetly opaque.
+This library uses both complete and opaque types depending on the circumstances.  Where possible, all objects consumed and returned across the C++ API are complete types.  Internally the C++ header files use opaque class types to implement the `pimpl` idiom.  The types used by the C API are completely opaque.
 
 #### Formatting
 
-[Clang Format](https://clang.llvm.org/docs/ClangFormat.html) is used for auto-formatting and checkiung the formatting of the code.
+[Clang Format](https://clang.llvm.org/docs/ClangFormat.html) is used for auto-formatting and checking the formatting of the code.
 
 #### Linting
 
@@ -76,11 +76,11 @@ The goal of the project is 100% code coverage with an understanding that there a
 
 ### Layout
 
-This project aims to use structural patters similar to the python repository.  While it is not a direct port, many of the interfaces and paradigms found in the python library also apply to this project.
+This project aims to use structural patterns similar to the Python repository.  While it is not a direct port, many of the interfaces and paradigms found in the Python library also apply to this project.
 
 ### 📦 Math Library
 
-This project uses the [HACL* Math Library](https://github.com/project-everest/hacl-star) from [Project Everest](https://project-everest.github.io/) for low-level math operations.  The low-level math operations are not exposed across any public API surface at this time.
+This project uses the [HACL* Math Library](https://github.com/project-everest/hacl-star) from [Project Everest](https://project-everest.github.io/) for low-level math operations.  The low-level math operations are not exposed across any public API surface at this time. We are indebted to both Jonathan Protsenko (@protz) and Marina Polubelova (@polubelova) for their help supporting this important ElectionGuard initiative.  
 
 ### Linking
 
@@ -92,9 +92,9 @@ If you have any questions about consuming objects from this library, please [che
 
 #### C++ API Lifecycle
 
-The C++ API is based on smart pointers that demonstrate intention to the consumer how to consider lifecycle.  Move semantics are used throughout.  All public-facing C++ objects can be constructed directly, however some objects include special `make` functions that are used in a similar fashion to the python library.  Standard library types and primitive types are usually copied when constructing new objects, while domain types are usually moved.  The indended behavior should be well-defined depending if a property is passed by reference or by value.
+The C++ API is based on smart pointers that demonstrate intention to the consumer how to consider lifecycle.  Move semantics are used throughout.  All public-facing C++ objects can be constructed directly, however some objects include special `make` functions that are used in a similar fashion to the Python library.  Standard library types and primitive types are usually copied when constructing new objects, while domain types are usually moved.  The intended behavior should be well-defined depending whether a property is passed by reference or by value.
 
-Effort is given to follow the [Rule of Five](https://cpppatterns.com/patterns/rule-of-five.html) however this is not always guaranteed.
+We endeavor to follow the [Rule of Five](https://cpppatterns.com/patterns/rule-of-five.html), however this is not always guaranteed.
 
 When accessing properties of structures, a _raw pointer_ may be returned to indicate the caller does not own the object (e.g. `ElementModQ *getCryptoHash()`), while a Smart pointer is returned if the object is owned (e.g. `std::unique_ptr<ElementModQ> crypto_hash_with`) by the caller.  The [std::reference_wrapper](https://en.cppreference.com/w/cpp/utility/functional/reference_wrapper) is used when returning vectors of objects owned by the callee (e.g. `std::vector<std::reference_wrapper<PlaintextBallotSelection>> getSelections()`).  
 
@@ -104,7 +104,7 @@ Because the C API does not support smart pointers, consideration is given to usi
 
 Generally:
 1. If you built your object graph manually using `new` then you must call `free` on each object you constructed. (such as an array of `eg_selection_description_t[]`).
-2. If you built your object graph using `make` or an out paramater was passed by function, you must only call `free` on the top-level object.
+2. If you built your object graph using `make` or an out parameter was passed by function, you must only call `free` on the top-level object.
 3. If the corresponding c++ returns a `unique_ptr` to a domain type then it is owned by the caller and must be freed.
 4. If the corresponding C++ returns a standard pointer (`*`) it is owned by the callee and should not be freed.
 5. If the corresponding c++ returns a primitive type it is owned by the caller and must be freed.
