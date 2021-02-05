@@ -1,6 +1,6 @@
 ![Microsoft Defending Democracy Program: ElectionGuard Python][Banner Image]
 
-# 🗳 ElectionGuard Cpp
+# 🗳 ElectionGuard C++
 
 This repository is a "reference implementation" of an ElectionGuard ballot encryption library written in c++ and includes a C-compatible API for referencing the library from pure-c application.  This core SDK performs ballot encryption and verification functions and is suitable for execution on voting system hardware and low powered devices.  It is designed to be integrated into existing (or new) voting system software.  
 
@@ -62,7 +62,7 @@ A .NET Standard binding library is provided so that this package can be consumed
 - [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/)
 - [NuGet Command Line (CLI)](https://docs.microsoft.com/en-us/nuget/reference/nuget-exe-cli-reference#macoslinux)
 
-### 🤖 iOS
+### 🍏 iOS
 
 To build for iOS you need XCode installed
 
