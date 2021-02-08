@@ -210,7 +210,7 @@ A huge thank you to those who helped to contribute to this project so far, inclu
 
 <a href="https://www.cs.rice.edu/~dwallach/"><img src="https://avatars2.githubusercontent.com/u/743029?v=4" title="danwallach" width="80" height="80"></a>
 
-**[Marina Polubelova](https://polubelova.github.io/) [_(INRA Paris)_](https://prosecco.gforge.inria.fr/)**
+**[Marina Polubelova](https://polubelova.github.io/) [_(INRIA Paris)_](https://prosecco.gforge.inria.fr/)**
 
 <a href="https://polubelova.github.io/"><img src="https://polubelova.github.io/authors/admin/avatar_hu562f921c0165de84dfdc53044b574fa1_846381_270x270_fill_q90_lanczos_center.jpg" title="polubelova" width="80" height="80"></a>
 
