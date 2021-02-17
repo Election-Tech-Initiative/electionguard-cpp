@@ -40,7 +40,7 @@ namespace ElectionGuard
                 var status = NativeInterface.PlaintextBallotSelection.GetObjectId(Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"PlaintextBallotContest Error ObjectId: {status}");
+                    Console.WriteLine($"PlaintextBallotSelection Error ObjectId: {status}");
                     return null;
                 }
                 return Marshal.PtrToStringAnsi(value);
@@ -72,7 +72,7 @@ namespace ElectionGuard
                 objectId, vote, isPlaceholder, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"InternalElectionDescription Error Status: {status}");
+                Console.WriteLine($"PlaintextBallotSelection Error Status: {status}");
             }
         }
 
@@ -83,7 +83,7 @@ namespace ElectionGuard
                 objectId, vote, isPlaceholder, extendedData, extendedData.Length, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"InternalElectionDescription Error Status: {status}");
+                Console.WriteLine($"PlaintextBallotSelection Error Status: {status}");
             }
         }
 
@@ -100,7 +100,7 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null) return;
+            if (Handle == null || Handle.IsInvalid) return;
             Handle.Dispose();
             Handle = null;
         }
@@ -324,7 +324,7 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null) return;
+            if (Handle == null || Handle.IsInvalid) return;
             Handle.Dispose();
             Handle = null;
         }
@@ -514,7 +514,7 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null) return;
+            if (Handle == null || Handle.IsInvalid) return;
             Handle.Dispose();
             Handle = null;
         }

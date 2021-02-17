@@ -128,7 +128,7 @@ namespace electionguard
         return sanitized;
     }
 
-    /// Copy the string to a heap-llocated null-termianted array
+    /// Copy the string to a heap-allocated null-termianted array
     inline char *dynamicCopy(const string &data, size_t *out_size)
     {
         auto data_size = data.length() + 1;
@@ -138,14 +138,14 @@ namespace electionguard
         return data_array;
     }
 
-    /// Copy the string to a heap-llocated null-termianted array
+    /// Copy the string to a heap-allocated null-termianted array
     inline char *dynamicCopy(const string &data)
     {
         size_t size = 0;
         return dynamicCopy(data, &size);
     }
 
-    /// Copy the vector byte array to a heap-llocated byte array
+    /// Copy the vector byte array to a heap-allocated byte array
     inline uint8_t *dynamicCopy(vector<uint8_t> &data, size_t *out_size)
     {
         auto *data_array = new uint8_t[data.size()];

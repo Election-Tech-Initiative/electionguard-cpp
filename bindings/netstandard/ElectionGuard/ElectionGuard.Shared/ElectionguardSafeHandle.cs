@@ -8,15 +8,19 @@ namespace ElectionGuard
         : SafeHandleZeroOrMinusOneIsInvalid
         where T : unmanaged
     {
+        // Objects constructed with the default constructor
+        // own the context
         public ElectionguardSafeHandle()
-            : base(true)
+            : base(ownsHandle: true)
         {
 
         }
 
+        // Objects constructed from a structure pointer
+        // do not own the context
         public unsafe ElectionguardSafeHandle(
             T* handle)
-            : base(false)
+            : base(ownsHandle: false)
         {
             SetHandle((IntPtr)handle);
         }
