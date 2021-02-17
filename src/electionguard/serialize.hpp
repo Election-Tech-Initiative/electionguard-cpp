@@ -775,9 +775,13 @@ namespace electionguard
                 json contests;
                 for (auto contest : serializable.getContests()) {
                     json selections;
+
+                    // TODO: #134 extended data
+
                     for (auto selection : contest.get().getSelections()) {
                         json s = {{"object_id", selection.get().getObjectId()},
-                                  {"vote", to_string(selection.get().toInt())}};
+                                  {"vote", selection.get().getVote()},
+                                  {"is_placeholder_selection", selection.get().getIsPlaceholder()}};
                         selections.push_back(s);
                     }
                     contests.push_back({
@@ -809,10 +813,19 @@ namespace electionguard
                     plaintextSelections.reserve(selections.size());
                     for (auto &selection : selections) {
                         auto selection_object_id = selection["object_id"].get<string>();
-                        auto vote = selection["vote"].get<string>();
+                        auto vote = selection["vote"].get<uint64_t>();
+
+                        bool isPlaceholder = false;
+                        if (selection.contains("is_placeholder_selection") &&
+                            !selection["is_placeholder_selection"].is_null()) {
+                            isPlaceholder = selection["is_placeholder_selection"].get<bool>();
+                        }
+
+                        // TODO: #134 extended data
+
                         plaintextSelections.push_back(
-                          make_unique<electionguard::PlaintextBallotSelection>(selection_object_id,
-                                                                               vote));
+                          make_unique<electionguard::PlaintextBallotSelection>(
+                            selection_object_id, vote, isPlaceholder));
                     }
 
                     plaintextContests.push_back(make_unique<electionguard::PlaintextBallotContest>(

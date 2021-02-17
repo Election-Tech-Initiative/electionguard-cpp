@@ -235,7 +235,12 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_new")]
             internal static extern Status New([MarshalAs(UnmanagedType.LPStr)] string objectId,
-            [MarshalAs(UnmanagedType.LPStr)] string vote, bool isPlaceholderSelection, out PlaintextBallotSelectionType* handle);
+            long vote, bool isPlaceholderSelection, out PlaintextBallotSelectionType* handle);
+
+            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_new_with_extended_data")]
+            internal static extern Status New([MarshalAs(UnmanagedType.LPStr)] string objectId,
+            long vote, bool isPlaceholderSelection, [MarshalAs(UnmanagedType.LPStr)] string extendedData,
+            long extendedDataLength, out PlaintextBallotSelectionType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_free")]
             internal static extern Status Free(PlaintextBallotSelectionType* handle);
@@ -243,8 +248,12 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_get_object_id")]
             internal static extern Status GetObjectId(PlaintextBallotSelectionType* handle, out IntPtr object_id);
 
-            // TODO: ISSUE #129: Is placeholder and toint
+            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_get_is_placeholder")]
+            internal static extern bool GetIsPlaceholder(PlaintextBallotSelectionType* handle);
 
+            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_is_valid")]
+            internal static extern bool IsValid(PlaintextBallotSelectionType* handle,
+                [MarshalAs(UnmanagedType.LPStr)] string expectedObjectId);
         }
 
         internal static unsafe class CiphertextBallotSelection
@@ -261,7 +270,8 @@ namespace ElectionGuard
             internal static extern Status GetDescriptionHash(
                 CiphertextBallotSelectionType* handle, out ElementModQ.ElementModQType* description_hash);
 
-            // TODO: ISSUE #129: get is palceholder
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_get_is_placeholder")]
+            internal static extern bool GetIsPlaceholder(CiphertextBallotSelectionType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_get_ciphertext")]
             internal static extern Status GetCiphertext(

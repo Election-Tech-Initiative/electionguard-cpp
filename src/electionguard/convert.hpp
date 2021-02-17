@@ -128,6 +128,32 @@ namespace electionguard
         return sanitized;
     }
 
+    /// Copy the string to a heap-llocated null-termianted array
+    inline char *dynamicCopy(const string &data, size_t *out_size)
+    {
+        auto data_size = data.length() + 1;
+        auto *data_array = static_cast<char *>(malloc(data_size));
+        strncpy(data_array, data.c_str(), data_size);
+        *out_size = data_size;
+        return data_array;
+    }
+
+    /// Copy the string to a heap-llocated null-termianted array
+    inline char *dynamicCopy(const string &data)
+    {
+        size_t size = 0;
+        return dynamicCopy(data, &size);
+    }
+
+    /// Copy the vector byte array to a heap-llocated byte array
+    inline uint8_t *dynamicCopy(vector<uint8_t> &data, size_t *out_size)
+    {
+        auto *data_array = new uint8_t[data.size()];
+        copy(data.begin(), data.end(), data_array);
+        *out_size = data.size();
+        return data_array;
+    }
+
     inline string timePointToIsoString(const time_point &time, const string &format)
     {
         auto c_time = system_clock::to_time_t(time);

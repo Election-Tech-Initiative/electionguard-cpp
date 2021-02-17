@@ -1,6 +1,8 @@
 #ifndef __ELECTIONGUARD_CPP_TEST_GENERATORS_BALLOT_HPP_INCLUDED__
 #define __ELECTIONGUARD_CPP_TEST_GENERATORS_BALLOT_HPP_INCLUDED__
 
+#include "../../../src/electionguard/random.hpp"
+
 #include <electionguard/ballot.hpp>
 #include <electionguard/election.hpp>
 
@@ -13,10 +15,19 @@ namespace electionguard::test::generators
     {
       public:
         static unique_ptr<PlaintextBallotSelection>
+        randomSelectionFrom(const SelectionDescription &description)
+        {
+            auto random = Random::getBytes(ByteSize::CHAR);
+            auto choice = random.at(0) % 2UL;
+
+            return make_unique<PlaintextBallotSelection>(description.getObjectId(), choice);
+        }
+
+        static unique_ptr<PlaintextBallotSelection>
         selectionFrom(const SelectionDescription &description, bool choice)
         {
             return make_unique<PlaintextBallotSelection>(description.getObjectId(),
-                                                         choice ? "1" : "0");
+                                                         choice ? 1UL : 0UL);
         }
 
         static unique_ptr<PlaintextBallotContest> contestFrom(const ContestDescription &contest,

@@ -15,11 +15,12 @@ TEST_CASE("Encrypt Selection with generic data succeeds")
 {
     // Arrange
     const auto *candidateId = "some-candidate-id";
+    const auto *selection_id = "some-selection-object_id";
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
     auto nonce = rand_q();
-    auto metadata = make_unique<SelectionDescription>("some-selection-object_id", candidateId, 1UL);
+    auto metadata = make_unique<SelectionDescription>(selection_id, candidateId, 1UL);
     auto hashContext = metadata->crypto_hash();
-    auto plaintext = make_unique<PlaintextBallotSelection>(candidateId, "1");
+    auto plaintext = make_unique<PlaintextBallotSelection>(selection_id, 1UL);
 
     // Act
     auto result = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),

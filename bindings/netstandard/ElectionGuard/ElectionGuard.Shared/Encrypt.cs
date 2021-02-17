@@ -22,6 +22,8 @@ namespace ElectionGuard
         protected override unsafe void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
+
+            if (Handle == null) return;
             var status = NativeInterface.EncryptionDevice.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
@@ -77,6 +79,8 @@ namespace ElectionGuard
         protected override unsafe void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
+
+            if (Handle == null) return;
             var status = NativeInterface.EncryptionMediator.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {

@@ -14,8 +14,7 @@ namespace electionguard
 
         template <class... ToArgs> operator std::variant<ToArgs...>() const
         {
-            return std::visit(
-              [](auto &&arg) -> std::variant<ToArgs...> { return arg; }, v);
+            return std::visit([](auto &&arg) -> std::variant<ToArgs...> { return arg; }, v);
         }
     };
 

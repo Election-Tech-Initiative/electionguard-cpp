@@ -29,23 +29,25 @@ namespace electionguard
 #pragma region PlaintextBallotSelection
 
     struct PlaintextBallotSelection::Impl : public ElectionObjectBase {
-        string vote;
+        uint64_t vote;
         bool isPlaceholderSelection;
+        unique_ptr<ExtendedData> extendedData;
 
-        Impl(string objectId, string vote, bool isPlaceholderSelection /* = false */)
-            : vote(move(vote)), isPlaceholderSelection(isPlaceholderSelection)
+        Impl(string objectId, uint64_t vote, bool isPlaceholderSelection /* = false */,
+             unique_ptr<ExtendedData> extendedData /* = nullptr*/)
+            : vote(vote), isPlaceholderSelection(isPlaceholderSelection),
+              extendedData(move(extendedData))
         {
             this->object_id = move(objectId);
         }
-
-        // TODO: ISSUE #132: secure erase the vote
     };
 
     // Lifecycle Methods
 
-    PlaintextBallotSelection::PlaintextBallotSelection(string objectId, string vote,
-                                                       bool isPlaceholderSelection /* = false */)
-        : pimpl(new Impl(move(objectId), move(vote), isPlaceholderSelection))
+    PlaintextBallotSelection::PlaintextBallotSelection(
+      string objectId, uint64_t vote, bool isPlaceholderSelection /* = false */,
+      unique_ptr<ExtendedData> extendedData /* = nullptr*/)
+        : pimpl(new Impl(move(objectId), vote, isPlaceholderSelection, move(extendedData)))
     {
     }
 
@@ -59,8 +61,26 @@ namespace electionguard
 
     // Property Getters
 
-    uint64_t PlaintextBallotSelection::toInt() const { return stoul(pimpl->vote); }
     string PlaintextBallotSelection::getObjectId() const { return pimpl->object_id; }
+    uint64_t PlaintextBallotSelection::getVote() const { return pimpl->vote; }
+    bool PlaintextBallotSelection::getIsPlaceholder() const
+    {
+        return pimpl->isPlaceholderSelection;
+    }
+
+    bool PlaintextBallotSelection::isValid(const std::string &expectedObjectId) const
+    {
+        if (pimpl->object_id != expectedObjectId) {
+            Log::debug("invalid object_id: expected: " + expectedObjectId +
+                       " actual: " + pimpl->object_id);
+            return false;
+        }
+        if (pimpl->vote > 1) {
+            Log::debug("Currently only supporting choices of 0 or 1");
+            return false;
+        }
+        return true;
+    }
 
 #pragma endregion
 
@@ -440,7 +460,7 @@ namespace electionguard
         }
         vector<CryptoHashableType> elems = {objectId, &const_cast<ElementModQ &>(seedHash)};
         for (const auto &selection : selections) {
-            elems.push_back(ref(*selection.get().getCryptoHash()));
+            elems.emplace_back(ref(*selection.get().getCryptoHash()));
         }
         return hash_elems(elems);
     }
@@ -733,7 +753,7 @@ namespace electionguard
 
         vector<CryptoHashableType> elems = {objectId, &const_cast<ElementModQ &>(seedHash)};
         for (const auto &contest : contests) {
-            elems.push_back(ref(*contest.get().getCryptoHash()));
+            elems.emplace_back(ref(*contest.get().getCryptoHash()));
         }
         return hash_elems(elems);
     }

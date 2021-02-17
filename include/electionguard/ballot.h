@@ -36,7 +36,12 @@ struct eg_plaintext_ballot_selection_s;
 typedef struct eg_plaintext_ballot_selection_s eg_plaintext_ballot_selection_t;
 
 EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_new(
-  const char *in_object_id, const char *in_vote, bool in_is_placeholder_selection,
+  const char *in_object_id, const uint64_t in_vote, bool in_is_placeholder_selection,
+  eg_plaintext_ballot_selection_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_new_with_extended_data(
+  const char *in_object_id, const uint64_t in_vote, bool in_is_placeholder_selection,
+  const char *in_extended_data_value, uint64_t in_extended_data_length,
   eg_plaintext_ballot_selection_t **out_handle);
 
 EG_API eg_electionguard_status_t
@@ -54,7 +59,20 @@ eg_plaintext_ballot_selection_free(eg_plaintext_ballot_selection_t *handle);
 EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_get_object_id(
   eg_plaintext_ballot_selection_t *handle, char **out_object_id);
 
-// TODO: ISSUE #129: Add missing fields
+// getVote() not provided.
+
+/**
+ * Determines if this is a placeholder selection
+ */
+EG_API bool
+eg_plaintext_ballot_selection_get_is_placeholder(eg_plaintext_ballot_selection_t *handle);
+
+/**
+ * Given a PlaintextBallotSelection validates that the object matches an expected object
+ * and that the plaintext value can resolve to a valid representation
+ */
+EG_API bool eg_plaintext_ballot_selection_is_valid(eg_plaintext_ballot_selection_t *handle,
+                                                   char *in_object_id);
 
 #endif
 
@@ -95,18 +113,33 @@ eg_ciphertext_ballot_selection_free(eg_ciphertext_ballot_selection_t *handle);
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_object_id(
   eg_ciphertext_ballot_selection_t *handle, char **out_object_id);
 
+/**
+ * The SelectionDescription hash
+ */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_description_hash(
   eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t **out_hash);
 
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_is_placeholder(
-  eg_ciphertext_ballot_selection_t *handle, bool out_is_placeholder);
+/**
+ * Determines if this is a placeholder selection
+ */
+EG_API bool
+eg_ciphertext_ballot_selection_get_is_placeholder(eg_ciphertext_ballot_selection_t *handle);
 
+/**
+ * The encrypted representation of the vote field
+ */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_ciphertext(
   eg_ciphertext_ballot_selection_t *handle, eg_elgamal_ciphertext_t **out_ciphertext);
 
+/**
+ * The hash of the encrypted values
+ */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_crypto_hash(
   eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t **out_hash);
 
+/**
+ * The nonce used to generate the encryption. Sensitive &amp; should be treated as a secret
+ */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_nonce(
   eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t **out_nonce);
 
@@ -116,6 +149,18 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_nonce(
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_proof(
   eg_ciphertext_ballot_selection_t *handle, eg_disjunctive_chaum_pedersen_proof_t **out_proof);
 
+/**
+* Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key.
+* Calling this function expects that the object is in a well-formed encrypted state
+* with the elgamal encrypted `message` field populated along with
+* the DisjunctiveChaumPedersenProof`proof` populated.
+* the ElementModQ `description_hash` and the ElementModQ `crypto_hash` are also checked.
+*
+* @param[in] seed_hash The hash of the SelectionDescription, or
+*                      whatever `ElementModQ` was used to populate the `description_hash` field.
+* @param[in] elgamalPublicKey The election public key
+* @param[in] cryptoExtendedBaseHash The extended base hash of the election
+*/
 EG_API bool eg_ciphertext_ballot_selection_is_valid_encryption(
   eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t *in_seed_hash,
   eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash);
@@ -256,8 +301,8 @@ eg_ciphertext_ballot_get_tracking_code(eg_ciphertext_ballot_t *handle, char **ou
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_timestamp(eg_ciphertext_ballot_t *handle,
                                                                     uint64_t *out_timestamp);
 
-EG_API bool eg_ciphertext_ballot_get_nonce(eg_ciphertext_ballot_t *handle,
-                                           eg_element_mod_q_t **out_nonce);
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_nonce(eg_ciphertext_ballot_t *handle,
+                                                                eg_element_mod_q_t **out_nonce);
 
 EG_API eg_electionguard_status_t
 eg_ciphertext_ballot_get_crypto_hash(eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_hash);

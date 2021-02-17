@@ -114,7 +114,7 @@ namespace electionguard
                                                        bool isAffirmative = false)
     {
         return make_unique<PlaintextBallotSelection>(description.getObjectId(),
-                                                     isAffirmative ? "1" : "0", isPlaceholder);
+                                                     isAffirmative ? 1UL : 0UL, isPlaceholder);
     }
 
     unique_ptr<PlaintextBallotContest> contestFrom(const ContestDescription &description)
@@ -133,7 +133,11 @@ namespace electionguard
                      const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &nonceSeed,
                      bool isPlaceholder /* = false */, bool shouldVerifyProofs /* = true */)
     {
-        // TODO: ISSUE #119: Validate Input
+        // Validate Input
+        if (!plaintext.isValid(description.getObjectId())) {
+            // todo: include plaintext data in log output
+            throw invalid_argument("malformed input selection " + plaintext.getObjectId());
+        }
 
         auto descriptionHash = description.crypto_hash();
         auto nonceSequence =
@@ -141,13 +145,11 @@ namespace electionguard
         auto selectionNonce = nonceSequence->get(description.getSequenceOrder());
         auto proofNonce = nonceSequence->next();
 
-        uint64_t plaintext_ = plaintext.toInt();
-
         Log::debugHex(": encryptSelection: for " + description.getObjectId() + " hash: ",
                       descriptionHash->toHex());
 
         // Generate the encryption
-        auto ciphertext = elgamalEncrypt(plaintext_, *selectionNonce, elgamalPublicKey);
+        auto ciphertext = elgamalEncrypt(plaintext.getVote(), *selectionNonce, elgamalPublicKey);
         if (ciphertext == nullptr) {
             throw runtime_error("encryptSelection:: Error generating ciphertext");
         }
@@ -156,7 +158,8 @@ namespace electionguard
 
         auto encryptedSelection = CiphertextBallotSelection::make(
           plaintext.getObjectId(), *descriptionHash, move(ciphertext), elgamalPublicKey,
-          cryptoExtendedBaseHash, *proofNonce, plaintext_, isPlaceholder, move(selectionNonce));
+          cryptoExtendedBaseHash, *proofNonce, plaintext.getVote(), isPlaceholder,
+          move(selectionNonce));
 
         if (encryptedSelection == nullptr || encryptedSelection->getProof() == nullptr) {
             throw runtime_error("encryptSelection:: Error constructing encrypted selection");
@@ -211,7 +214,7 @@ namespace electionguard
                     // track the selection count so we can append the
                     // appropriate number of true placeholder votes
                     hasSelection = true;
-                    selectionCount += selection.get().toInt();
+                    selectionCount += selection.get().getVote();
 
                     auto encrypted = encryptSelection(selection.get(), selectionDescription.get(),
                                                       elgamalPublicKey, cryptoExtendedBaseHash,
