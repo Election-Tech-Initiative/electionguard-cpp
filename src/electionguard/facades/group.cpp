@@ -1,6 +1,7 @@
 #include "electionguard/group.hpp"
 
 #include "../log.hpp"
+#include "convert.hpp"
 #include "variant_cast.hpp"
 
 extern "C" {
@@ -9,6 +10,7 @@ extern "C" {
 
 #include <cstring>
 
+using electionguard::dynamicCopy;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
 using electionguard::Log;
@@ -53,7 +55,7 @@ eg_electionguard_status_t eg_element_mod_p_new_unchecked(const uint64_t in_data[
     }
 }
 
-EG_API eg_electionguard_status_t eg_element_mod_p_free(eg_element_mod_p_t *handle)
+eg_electionguard_status_t eg_element_mod_p_free(eg_element_mod_p_t *handle)
 {
     if (handle == nullptr) {
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
@@ -82,10 +84,7 @@ eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle, ch
 {
     try {
         auto hex_rep = AS_TYPE(ElementModP, handle)->toHex();
-        auto data_size = hex_rep.length() + 1;
-        auto *data_array = (char *)malloc(data_size);
-        strncpy(data_array, hex_rep.c_str(), data_size);
-        *out_hex = data_array;
+        *out_hex = dynamicCopy(hex_rep);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -132,7 +131,7 @@ eg_electionguard_status_t eg_element_mod_q_new_unchecked(const uint64_t in_data[
     }
 }
 
-EG_API eg_electionguard_status_t eg_element_mod_q_free(eg_element_mod_q_t *handle)
+eg_electionguard_status_t eg_element_mod_q_free(eg_element_mod_q_t *handle)
 {
     if (handle == nullptr) {
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
@@ -161,10 +160,7 @@ eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *handle, ch
 {
     try {
         auto hex_rep = AS_TYPE(ElementModQ, handle)->toHex();
-        auto data_size = hex_rep.length() + 1;
-        auto *data_array = (char *)malloc(data_size);
-        strncpy(data_array, hex_rep.c_str(), data_size);
-        *out_hex = data_array;
+        *out_hex = dynamicCopy(hex_rep);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {

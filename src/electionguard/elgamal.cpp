@@ -76,7 +76,10 @@ namespace electionguard
         {
         }
 
-        unique_ptr<ElementModQ> crypto_hash() const { return hash_elems({pad.get(), data.get()}); }
+        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
+        {
+            return hash_elems({pad.get(), data.get()});
+        }
 
         bool operator==(const Impl &other) { return *pad == *other.pad && *data == *other.data; }
     };

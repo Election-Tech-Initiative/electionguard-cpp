@@ -250,7 +250,7 @@ eg_electionguard_status_t
 eg_internal_election_description_get_description_hash(eg_internal_election_description_t *handle,
                                                       eg_element_mod_q_t **out_description_hash)
 {
-    auto *description = AS_TYPE(InternalElectionDescription, handle)->getDescriptionHash();
+    const auto *description = AS_TYPE(InternalElectionDescription, handle)->getDescriptionHash();
     *out_description_hash = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(description));
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
