@@ -53,7 +53,7 @@ namespace electionguard
         static vector<uint8_t> getBytes(ByteSize size = SHA256)
         {
             // Get some random bytes from the operating system
-            auto entropy = getRandomBytes(size * 2U);
+            auto entropy = getRandomBytes(static_cast<uint32_t>(size * 2));
 
             // Allocate the DRBG
             Hacl_HMAC_DRBG_state state = Hacl_HMAC_DRBG_create_in(hashAlgo);
