@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+using std::bad_cast;
 using std::begin;
 using std::end;
 using std::hex;
@@ -34,12 +35,20 @@ namespace electionguard
         return container.capacity();
     }
 
+    inline uint32_t convert(size_t size)
+    {
+        if (size > UINT32_MAX) {
+            throw bad_cast();
+        }
+        return static_cast<uint32_t>(size);
+    }
+
     inline void hex_to_bytes(const string &hex, uint8_t *bytesOut)
     {
         const size_t baseHex = 16;
         for (size_t i(0); i < hex.size(); i += 2) {
             string byteString = hex.substr(i, 2);
-            auto as_int = stoi(byteString, nullptr, baseHex);
+            uint16_t as_int = stoi(byteString, nullptr, baseHex);
             uint8_t byte = static_cast<uint8_t>(as_int);
             bytesOut[i / 2] = byte;
         }
@@ -50,9 +59,9 @@ namespace electionguard
         const size_t baseHex = 16;
         for (size_t i(0); i < hex.size(); i += 2) {
             string byteString = hex.substr(i, 2);
-            auto as_int = stoi(byteString, nullptr, baseHex);
+            uint16_t as_int = stoi(byteString, nullptr, baseHex);
             uint16_t bigEndian = htobe16(as_int);
-            bytesOut[i / 2] = (uint8_t)bigEndian;
+            bytesOut[i / 2] = static_cast<uint8_t>(bigEndian);
         }
     }
 
@@ -77,7 +86,7 @@ namespace electionguard
         const size_t baseHex = 16;
         for (size_t i = 0; i < hexString.size(); i += 2) {
             auto byteString = hexString.substr(i, 2);
-            auto as_int = stoi(byteString, nullptr, baseHex);
+            uint16_t as_int = stoi(byteString, nullptr, baseHex);
             uint8_t array[sizeof(uint16_t)];
             uint16_t bigEndian = htobe16(as_int);
             memmove(&array, &bigEndian, sizeof(bigEndian));
@@ -99,7 +108,7 @@ namespace electionguard
                 detectedFirstNonZeroBytes = true;
             }
             if (detectedFirstNonZeroBytes) {
-                stream << setw(2) << setfill('0') << (uint16_t)byte;
+                stream << setw(2) << setfill('0') << static_cast<uint16_t>(byte);
             }
         }
 
