@@ -313,6 +313,11 @@ namespace ElectionGuard
                 CiphertextElectionContextHandle handle,
                 out ElementModP.ElementModPHandle elgamal_public_key);
 
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_get_commitment_hash")]
+            internal static extern Status GetCommitmentHash(
+                CiphertextElectionContextHandle handle,
+                out ElementModQ.ElementModQHandle commitment_hash);
+
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_get_description_hash")]
             internal static extern Status GetDescriptionHash(
                 CiphertextElectionContextHandle handle,

@@ -248,10 +248,10 @@ eg_internal_election_description_free(eg_internal_election_description_t *handle
 
 eg_electionguard_status_t
 eg_internal_election_description_get_description_hash(eg_internal_election_description_t *handle,
-                                                      eg_element_mod_q_t **out_description_hash)
+                                                      eg_element_mod_q_t **out_description_hash_ref)
 {
     const auto *description = AS_TYPE(InternalElectionDescription, handle)->getDescriptionHash();
-    *out_description_hash = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(description));
+    *out_description_hash_ref = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(description));
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -341,55 +341,67 @@ eg_ciphertext_election_context_free(eg_ciphertext_election_context_t *handle)
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_electionguard_status_t
-eg_ciphertext_election_context_get_elgamal_public_key(eg_ciphertext_election_context_t *handle,
-                                                      eg_element_mod_p_t **out_elgamal_public_key)
+eg_electionguard_status_t eg_ciphertext_election_context_get_elgamal_public_key(
+  eg_ciphertext_election_context_t *handle, eg_element_mod_p_t **out_elgamal_public_key_ref)
 {
     const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getElGamalPublicKey();
-    *out_elgamal_public_key = AS_TYPE(eg_element_mod_p_t, const_cast<ElementModP *>(pointer));
+    *out_elgamal_public_key_ref = AS_TYPE(eg_element_mod_p_t, const_cast<ElementModP *>(pointer));
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_ciphertext_election_context_get_commitment_hash(eg_ciphertext_election_context_t *handle,
+                                                   eg_element_mod_q_t **out_commitment_hash_ref)
+{
+    const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getCommitmentHash();
+    *out_commitment_hash_ref = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(pointer));
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 eg_electionguard_status_t
 eg_ciphertext_election_context_get_description_hash(eg_ciphertext_election_context_t *handle,
-                                                    eg_element_mod_q_t **out_description_hash)
+                                                    eg_element_mod_q_t **out_description_hash_ref)
 {
     const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getDescriptionHash();
-    *out_description_hash = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(pointer));
+    *out_description_hash_ref = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(pointer));
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 eg_electionguard_status_t
 eg_ciphertext_election_context_get_crypto_base_hash(eg_ciphertext_election_context_t *handle,
-                                                    eg_element_mod_q_t **out_crypto_base_hash)
+                                                    eg_element_mod_q_t **out_crypto_base_hash_ref)
 {
     const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getCryptoBaseHash();
-    *out_crypto_base_hash = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(pointer));
+    *out_crypto_base_hash_ref = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(pointer));
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 eg_electionguard_status_t eg_ciphertext_election_context_get_crypto_extended_base_hash(
-  eg_ciphertext_election_context_t *handle, eg_element_mod_q_t **out_crypto_extended_base_hash)
+  eg_ciphertext_election_context_t *handle, eg_element_mod_q_t **out_crypto_extended_base_hash_ref)
 {
     const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getCryptoExtendedBaseHash();
-    *out_crypto_extended_base_hash =
+    *out_crypto_extended_base_hash_ref =
       AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(pointer));
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 eg_electionguard_status_t eg_ciphertext_election_context_make(
   uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
-  eg_element_mod_q_t *in_description_hash, eg_ciphertext_election_context_t **out_handle)
+  eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_description_hash,
+  eg_ciphertext_election_context_t **out_handle)
 {
     try {
         auto *publicKeyPtr = AS_TYPE(ElementModP, in_elgamal_public_key);
-        auto *hashPtr = AS_TYPE(ElementModQ, in_description_hash);
+        auto *commitmentHashPtr = AS_TYPE(ElementModQ, in_description_hash);
+        auto *descriptionHashPtr = AS_TYPE(ElementModQ, in_description_hash);
 
         unique_ptr<ElementModP> elGamalPublicKey{publicKeyPtr};
-        unique_ptr<ElementModQ> descriptionHash{hashPtr};
+        unique_ptr<ElementModQ> commitmentHash{commitmentHashPtr};
+        unique_ptr<ElementModQ> descriptionHash{descriptionHashPtr};
 
-        auto context = CiphertextElectionContext::make(
-          in_number_of_guardians, in_quorum, move(elGamalPublicKey), move(descriptionHash));
+        auto context =
+          CiphertextElectionContext::make(in_number_of_guardians, in_quorum, move(elGamalPublicKey),
+                                          move(commitmentHash), move(descriptionHash));
 
         *out_handle = AS_TYPE(eg_ciphertext_election_context_t, context.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -401,14 +413,16 @@ eg_electionguard_status_t eg_ciphertext_election_context_make(
 
 eg_electionguard_status_t eg_ciphertext_election_context_make_from_hex(
   uint64_t in_number_of_guardians, uint64_t in_quorum, const char *in_elgamal_public_key,
-  const char *in_description_hash, eg_ciphertext_election_context_t **out_handle)
+  const char *in_commitment_hash, const char *in_description_hash,
+  eg_ciphertext_election_context_t **out_handle)
 {
     try {
         auto elGamalPublicKey = string(in_elgamal_public_key);
+        auto commitmentHash = string(in_commitment_hash);
         auto descriptionHash = string(in_description_hash);
 
-        auto context = CiphertextElectionContext::make(in_number_of_guardians, in_quorum,
-                                                       elGamalPublicKey, descriptionHash);
+        auto context = CiphertextElectionContext::make(
+          in_number_of_guardians, in_quorum, elGamalPublicKey, commitmentHash, descriptionHash);
         *out_handle = AS_TYPE(eg_ciphertext_election_context_t, context.release());
 
         return ELECTIONGUARD_STATUS_SUCCESS;

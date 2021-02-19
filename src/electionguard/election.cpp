@@ -212,7 +212,7 @@ namespace electionguard
         return *this;
     }
 
-    AnnotatedString &AnnotatedString::operator=(AnnotatedString &&other) noexcept
+    AnnotatedString &AnnotatedString::operator=(AnnotatedString &&other)
     {
         swap(pimpl, other.pimpl);
         return *this;
@@ -272,7 +272,7 @@ namespace electionguard
         return *this;
     }
 
-    Language &Language::operator=(Language &&other) noexcept
+    Language &Language::operator=(Language &&other)
     {
         swap(pimpl, other.pimpl);
         return *this;
@@ -1551,15 +1551,16 @@ namespace electionguard
         uint64_t numberOfGuardians;
         uint64_t quorum;
         unique_ptr<ElementModP> elGamalPublicKey;
+        unique_ptr<ElementModQ> commitmentHash;
         unique_ptr<ElementModQ> descriptionHash;
         unique_ptr<ElementModQ> cryptoBaseHash;
         unique_ptr<ElementModQ> cryptoExtendedBaseHash;
 
         Impl(uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
-             unique_ptr<ElementModQ> descriptionHash, unique_ptr<ElementModQ> cryptoBaseHash,
-             unique_ptr<ElementModQ> cryptoExtendedBaseHash)
-            : elGamalPublicKey(move(elGamalPublicKey)), descriptionHash(move(descriptionHash)),
-              cryptoBaseHash(move(cryptoBaseHash)),
+             unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> descriptionHash,
+             unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash)
+            : elGamalPublicKey(move(elGamalPublicKey)), commitmentHash(move(commitmentHash)),
+              descriptionHash(move(descriptionHash)), cryptoBaseHash(move(cryptoBaseHash)),
               cryptoExtendedBaseHash(move(cryptoExtendedBaseHash))
         {
             this->numberOfGuardians = numberOfGuardians;
@@ -1571,10 +1572,10 @@ namespace electionguard
 
     CiphertextElectionContext::CiphertextElectionContext(
       uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
-      unique_ptr<ElementModQ> descriptionHash, unique_ptr<ElementModQ> cryptoBaseHash,
-      unique_ptr<ElementModQ> cryptoExtendedBaseHash)
-        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(descriptionHash),
-                         move(cryptoBaseHash), move(cryptoExtendedBaseHash)))
+      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> descriptionHash,
+      unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash)
+        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+                         move(descriptionHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash)))
     {
     }
     CiphertextElectionContext::~CiphertextElectionContext() = default;
@@ -1595,6 +1596,10 @@ namespace electionguard
     const ElementModP *CiphertextElectionContext::getElGamalPublicKey() const
     {
         return pimpl->elGamalPublicKey.get();
+    }
+    const ElementModQ *CiphertextElectionContext::getCommitmentHash() const
+    {
+        return pimpl->commitmentHash.get();
     }
     const ElementModQ *CiphertextElectionContext::getDescriptionHash() const
     {
@@ -1630,31 +1635,31 @@ namespace electionguard
 
     // Public Static Methods
 
-    unique_ptr<CiphertextElectionContext>
-    CiphertextElectionContext::make(uint64_t numberOfGuardians, uint64_t quorum,
-                                    unique_ptr<ElementModP> elGamalPublicKey,
-                                    unique_ptr<ElementModQ> descriptionHash)
+    unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
+      uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
+      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> descriptionHash)
     {
         auto cryptoBaseHash = hash_elems(
           {&const_cast<ElementModP &>(P()), &const_cast<ElementModQ &>(Q()),
            &const_cast<ElementModP &>(G()), numberOfGuardians, quorum, descriptionHash.get()});
 
-        auto cryptoExtendedBaseHash = hash_elems({cryptoBaseHash.get(), elGamalPublicKey.get()});
+        auto cryptoExtendedBaseHash = hash_elems({cryptoBaseHash.get(), commitmentHash.get()});
 
         return make_unique<CiphertextElectionContext>(
-          numberOfGuardians, quorum, move(elGamalPublicKey), move(descriptionHash),
-          move(cryptoBaseHash), move(cryptoExtendedBaseHash));
+          numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+          move(descriptionHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash));
     }
 
-    unique_ptr<CiphertextElectionContext>
-    CiphertextElectionContext::make(uint64_t numberOfGuardians, uint64_t quorum,
-                                    const string &elGamalPublicKeyInHex,
-                                    const string &descriptionHashInHex)
+    unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
+      uint64_t numberOfGuardians, uint64_t quorum, const string &elGamalPublicKeyInHex,
+      const string &commitmentHashInHex, const string &descriptionHashInHex)
     {
         auto elGamalPublicKey = ElementModP::fromHex(elGamalPublicKeyInHex);
+        auto commitmentHash = ElementModQ::fromHex(commitmentHashInHex);
         auto descriptionHash = ElementModQ::fromHex(descriptionHashInHex);
 
-        return make(numberOfGuardians, quorum, move(elGamalPublicKey), move(descriptionHash));
+        return make(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+                    move(descriptionHash));
     }
 
 #pragma endregion

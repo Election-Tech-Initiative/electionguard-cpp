@@ -720,6 +720,7 @@ namespace electionguard
                 json j = {
                   {"crypto_base_hash", serializable.getCryptoBaseHash()->toHex()},
                   {"crypto_extended_base_hash", serializable.getCryptoExtendedBaseHash()->toHex()},
+                  {"commitment_hash", serializable.getCommitmentHash()->toHex()},
                   {"description_hash", serializable.getDescriptionHash()->toHex()},
                   {"elgamal_public_key", serializable.getElGamalPublicKey()->toHex()},
                   {"number_of_guardians", serializable.getNumberOfGuardians()},
@@ -731,19 +732,21 @@ namespace electionguard
             {
                 auto crypto_base_hash = j["crypto_base_hash"].get<string>();
                 auto crypto_extended_base_hash = j["crypto_extended_base_hash"].get<string>();
+                auto commitment_hash = j["commitment_hash"].get<string>();
                 auto description_hash = j["description_hash"].get<string>();
                 auto elgamal_public_key = j["elgamal_public_key"].get<string>();
                 auto number_of_guardians = j["number_of_guardians"].get<uint64_t>();
                 auto quorum = j["quorum"].get<uint64_t>();
 
+                auto commitmentHash = ElementModQ::fromHex(commitment_hash);
                 auto descriptionHash = ElementModQ::fromHex(description_hash);
                 auto cryptoBaseHash = ElementModQ::fromHex(crypto_base_hash);
                 auto cryptoExtendedBaseHash = ElementModQ::fromHex(crypto_extended_base_hash);
                 auto elGamalPublicKey = ElementModP::fromHex(elgamal_public_key);
 
                 return make_unique<CiphertextElectionContext>(
-                  number_of_guardians, quorum, move(elGamalPublicKey), move(descriptionHash),
-                  move(cryptoBaseHash), move(cryptoExtendedBaseHash));
+                  number_of_guardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+                  move(descriptionHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash));
             }
 
           public:

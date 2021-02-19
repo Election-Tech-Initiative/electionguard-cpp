@@ -577,6 +577,9 @@ namespace electionguard
         std::vector<std::reference_wrapper<ContestDescriptionWithPlaceholders>> getContests() const;
         std::vector<std::reference_wrapper<BallotStyle>> getBallotStyles() const;
 
+        /// <summary>
+        /// The hash of the election metadata
+        /// </summary>
         const ElementModQ *getDescriptionHash() const;
 
         std::vector<uint8_t> toBson() const;
@@ -619,6 +622,7 @@ namespace electionguard
         CiphertextElectionContext(const CiphertextElectionContext &&other);
         explicit CiphertextElectionContext(const uint64_t numberOfGuardians, const uint64_t quorum,
                                            std::unique_ptr<ElementModP> elGamalPublicKey,
+                                           std::unique_ptr<ElementModQ> commitmentHash,
                                            std::unique_ptr<ElementModQ> descriptionHash,
                                            std::unique_ptr<ElementModQ> cryptoBaseHash,
                                            std::unique_ptr<ElementModQ> cryptoExtendedBaseHash);
@@ -627,21 +631,70 @@ namespace electionguard
         CiphertextElectionContext &operator=(CiphertextElectionContext other);
         CiphertextElectionContext &operator=(CiphertextElectionContext &&other);
 
+        /// <summary>
+        /// The number of guardians necessary to generate the public key
+        /// </summary>
         uint64_t getNumberOfGuardians() const;
+
+        /// <summary>
+        /// The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians`
+        /// </summary>
         uint64_t getQuorum() const;
+
+        /// <summary>
+        /// the `joint public key (K)` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
+        /// </summary>
         const ElementModP *getElGamalPublicKey() const;
+
+        /// <summary>
+        /// the `commitment hash H(K 1,0 , K 2,0 ... , K n,0 )` of the public commitments
+        /// guardians make to each other in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
+        /// </summary>
+        const ElementModQ *getCommitmentHash() const;
+
+        /// <summary>
+        /// The hash of the election metadata
+        /// </summary>
         const ElementModQ *getDescriptionHash() const;
+
+        /// <summary>
+        /// the `base hash code (𝑄)` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
+        /// </summary>
         const ElementModQ *getCryptoBaseHash() const;
+
+        /// <summary>
+        /// the `extended base hash code (𝑄')` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
+        /// </summary>
         const ElementModQ *getCryptoExtendedBaseHash() const;
 
+        /// <summary>
+        ///  Makes a CiphertextElectionContext object.
+        ///
+        /// <param name="number_of_guardians"> The number of guardians necessary to generate the public key </param>
+        /// <param name="quorum"> The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians` </param>
+        /// <param name="elGamalPublicKey"> the public key of the election </param>
+        /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
+        /// <param name="descriptionHash"> the hash of the election metadata </param>
+        /// </summary>
         static std::unique_ptr<CiphertextElectionContext>
         make(const uint64_t numberOfGuardians, const uint64_t quorum,
              std::unique_ptr<ElementModP> elGamalPublicKey,
+             std::unique_ptr<ElementModQ> commitmentHash,
              std::unique_ptr<ElementModQ> descriptionHash);
 
+        /// <summary>
+        ///  Makes a CiphertextElectionContext object from hex string representations.
+        ///
+        /// <param name="number_of_guardians"> The number of guardians necessary to generate the public key </param>
+        /// <param name="quorum"> The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians` </param>
+        /// <param name="elGamalPublicKeyInHex"> the public key of the election </param>
+        /// <param name="commitmentHashInHex"> the hash of the commitments the guardians make to each other </param>
+        /// <param name="descriptionHashInHex"> the hash of the election metadata </param>
+        /// </summary>
         static std::unique_ptr<CiphertextElectionContext>
         make(const uint64_t numberOfGuardians, const uint64_t quorum,
-             const std::string &elGamalPublicKeyInHex, const std::string &descriptionHashInHex);
+             const std::string &elGamalPublicKeyInHex, const std::string &commitmentHashInHex,
+             const std::string &descriptionHashInHex);
 
         std::vector<uint8_t> toBson() const;
         std::string toJson() const;
