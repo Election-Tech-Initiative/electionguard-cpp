@@ -55,7 +55,7 @@ namespace electionguard
       {ElectionType::other, "other"},
     };
 
-    string getElectionTypeString(const ElectionType &value)
+    const string getElectionTypeString(const ElectionType &value)
     {
         return _election_type<ElectionType>::_map.find(value)->second;
     }
@@ -111,7 +111,7 @@ namespace electionguard
       {ReportingUnitType::other, "other"},
     };
 
-    string getReportingUnitTypeString(const ReportingUnitType &value)
+    const string getReportingUnitTypeString(const ReportingUnitType &value)
     {
         return _reporting_unit_type<ReportingUnitType>::_map.find(value)->second;
     }
@@ -150,7 +150,7 @@ namespace electionguard
       {VoteVariationType::other, "other"},
     };
 
-    string getVoteVariationTypeString(const VoteVariationType &value)
+    const string getVoteVariationTypeString(const VoteVariationType &value)
     {
         return _vote_variation_type<VoteVariationType>::_map.find(value)->second;
     }
