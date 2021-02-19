@@ -221,6 +221,11 @@ namespace electionguard
             Log::debugHex(": actual: ", pimpl->cryptoHash->toHex());
             return false;
         }
+
+        if (pimpl->proof == nullptr) {
+            Log::debug(": No proof exists for: " + pimpl->objectId);
+            return false;
+        }
         return pimpl->proof->isValid(*pimpl->ciphertext, elgamalPublicKey, cryptoExtendedBaseHash);
     }
 
@@ -285,15 +290,17 @@ namespace electionguard
         unique_ptr<ElementModQ> descriptionHash;
         vector<unique_ptr<CiphertextBallotSelection>> selections;
         unique_ptr<ElementModQ> nonce;
+        unique_ptr<ElGamalCiphertext> ciphertextAccumulation;
         unique_ptr<ElementModQ> cryptoHash;
         unique_ptr<ConstantChaumPedersenProof> proof;
 
         Impl(const string &objectId, unique_ptr<ElementModQ> descriptionHash,
              vector<unique_ptr<CiphertextBallotSelection>> selections,
-             unique_ptr<ElementModQ> nonce, unique_ptr<ElementModQ> cryptoHash,
-             unique_ptr<ConstantChaumPedersenProof> proof)
+             unique_ptr<ElementModQ> nonce, unique_ptr<ElGamalCiphertext> ciphertextAccumulation,
+             unique_ptr<ElementModQ> cryptoHash, unique_ptr<ConstantChaumPedersenProof> proof)
             : descriptionHash(move(descriptionHash)), selections(move(selections)),
-              nonce(move(nonce)), cryptoHash(move(cryptoHash)), proof(move(proof))
+              nonce(move(nonce)), ciphertextAccumulation(move(ciphertextAccumulation)),
+              cryptoHash(move(cryptoHash)), proof(move(proof))
         {
             this->object_id = objectId;
         }
@@ -304,9 +311,10 @@ namespace electionguard
     CiphertextBallotContest::CiphertextBallotContest(
       const string &objectId, const ElementModQ &descriptionHash,
       vector<unique_ptr<CiphertextBallotSelection>> selections, unique_ptr<ElementModQ> nonce,
-      unique_ptr<ElementModQ> cryptoHash, unique_ptr<ConstantChaumPedersenProof> proof)
+      unique_ptr<ElGamalCiphertext> ciphertextAccumulation, unique_ptr<ElementModQ> cryptoHash,
+      unique_ptr<ConstantChaumPedersenProof> proof)
         : pimpl(new Impl(objectId, make_unique<ElementModQ>(descriptionHash), move(selections),
-                         move(nonce), move(cryptoHash), move(proof)))
+                         move(nonce), move(ciphertextAccumulation), move(cryptoHash), move(proof)))
     {
     }
     CiphertextBallotContest::~CiphertextBallotContest() = default;
@@ -338,6 +346,11 @@ namespace electionguard
     }
 
     ElementModQ *CiphertextBallotContest::getNonce() const { return pimpl->nonce.get(); }
+
+    ElGamalCiphertext *CiphertextBallotContest::getCiphertextAccumulation() const
+    {
+        return pimpl->ciphertextAccumulation.get();
+    }
 
     ElementModQ *CiphertextBallotContest::getCryptoHash() const { return pimpl->cryptoHash.get(); }
 
@@ -374,16 +387,18 @@ namespace electionguard
             auto crypto_hash = makeCryptoHash(objectId, selectionReferences, descriptionHash);
             cryptoHash = move(crypto_hash);
         }
+
+        auto accumulation = elgamalAccumulate(selectionReferences);
         if (proof == nullptr) {
-            auto accumulated = elgamalAccumulate(selectionReferences);
             auto aggregate = aggregateNonce(selectionReferences);
             auto owned_proof =
-              ConstantChaumPedersenProof::make(*accumulated, *aggregate, elgamalPublicKey,
+              ConstantChaumPedersenProof::make(*accumulation, *aggregate, elgamalPublicKey,
                                                proofSeed, cryptoExtendedBaseHash, numberElected);
             proof = move(owned_proof);
         }
         return make_unique<CiphertextBallotContest>(objectId, descriptionHash, move(selections),
-                                                    move(nonce), move(cryptoHash), move(proof));
+                                                    move(nonce), move(accumulation),
+                                                    move(cryptoHash), move(proof));
     }
 
     // Public Methods
@@ -417,13 +432,28 @@ namespace electionguard
             return false;
         }
 
+        // NOTE: this check does not verify the proofs of the individual selections by design.
+
         if (!pimpl->proof) {
             Log::debug(": no proof exists for: " + pimpl->object_id);
             return false;
         }
 
-        auto accumulation = this->elgamalAccumulate();
-        return pimpl->proof->isValid(*accumulation, elgamalPublicKey, cryptoExtendedBaseHash);
+        auto computedAccumulation = this->elgamalAccumulate();
+
+        // Verify that the contest ciphertext matches the elgamal accumulation of all selections
+        if (*pimpl->ciphertextAccumulation != *computedAccumulation) {
+            Log::debug(": ciphertext does not equal elgamal accumulation for : " +
+                       pimpl->object_id);
+            Log::debugHex(": expected (pad): ", computedAccumulation->getPad()->toHex());
+            Log::debugHex(": expected (data): ", computedAccumulation->getData()->toHex());
+            Log::debugHex(": actual (pad): ", pimpl->ciphertextAccumulation->getPad()->toHex());
+            Log::debugHex(": actual (data): ", pimpl->ciphertextAccumulation->getData()->toHex());
+            return false;
+        }
+
+        return pimpl->proof->isValid(*computedAccumulation, elgamalPublicKey,
+                                     cryptoExtendedBaseHash);
     }
 
     // Protected Members

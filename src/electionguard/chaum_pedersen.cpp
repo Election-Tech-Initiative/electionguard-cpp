@@ -227,6 +227,16 @@ namespace electionguard
         return success;
     }
 
+    std::unique_ptr<DisjunctiveChaumPedersenProof> DisjunctiveChaumPedersenProof::clone() const
+    {
+        return make_unique<DisjunctiveChaumPedersenProof>(
+          pimpl->proof_zero_pad->clone(), pimpl->proof_zero_data->clone(),
+          pimpl->proof_one_pad->clone(), pimpl->proof_one_pad->clone(),
+          pimpl->proof_zero_challenge->clone(), pimpl->proof_one_challenge->clone(),
+          pimpl->challenge->clone(), pimpl->proof_zero_response->clone(),
+          pimpl->proof_one_response->clone());
+    }
+
     // Protected Methods
 
     unique_ptr<DisjunctiveChaumPedersenProof>

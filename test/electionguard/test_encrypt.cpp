@@ -11,16 +11,16 @@ using namespace electionguard;
 using namespace electionguard::test::generators;
 using namespace std;
 
-TEST_CASE("Encrypt Selection with generic data succeeds")
+TEST_CASE("Encrypt simple selection succeeds")
 {
     // Arrange
     const auto *candidateId = "some-candidate-id";
-    const auto *selection_id = "some-selection-object_id";
+    const auto *selectionId = "some-selection-object-id";
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
     auto nonce = rand_q();
-    auto metadata = make_unique<SelectionDescription>(selection_id, candidateId, 1UL);
+    auto metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
     auto hashContext = metadata->crypto_hash();
-    auto plaintext = make_unique<PlaintextBallotSelection>(selection_id, 1UL);
+    auto plaintext = BallotGenerator::selectionFrom(*metadata);
 
     // Act
     auto result = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
@@ -32,6 +32,41 @@ TEST_CASE("Encrypt Selection with generic data succeeds")
     CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
     CHECK(result->getProof()->isValid(*result->getCiphertext(), *keypair->getPublicKey(),
                                       ONE_MOD_Q()) == true);
+}
+
+TEST_CASE("Encrypt simple selection malformed data fails")
+{
+    // Arrange
+    const auto *candidateId = "some-candidate-id";
+    const auto *selectionId = "some-selection-object-id";
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto nonce = rand_q();
+    auto metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
+    auto hashContext = metadata->crypto_hash();
+    auto plaintext = BallotGenerator::selectionFrom(*metadata);
+
+    // Act
+    auto result = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
+                                   *nonce, false, true);
+
+    // tamper with the description_hash
+    auto malformedDescriptionHash = make_unique<CiphertextBallotSelection>(
+      result->getObjectId(), TWO_MOD_Q(), result->getCiphertext()->clone(),
+      result->getIsPlaceholder(), result->getNonce()->clone(), result->getCryptoHash()->clone(),
+      result->getProof()->clone());
+
+    // remove the proof
+    auto missingProof = make_unique<CiphertextBallotSelection>(
+      result->getObjectId(), *result->getDescriptionHash(), result->getCiphertext()->clone(),
+      result->getIsPlaceholder(), result->getNonce()->clone(), result->getCryptoHash()->clone(),
+      nullptr);
+
+    // Assert
+    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
+    CHECK(malformedDescriptionHash->isValidEncryption(*hashContext, *keypair->getPublicKey(),
+                                                      ONE_MOD_Q()) == false);
+    CHECK(missingProof->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) ==
+          false);
 }
 
 TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "

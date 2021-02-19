@@ -40,6 +40,8 @@ namespace electionguard
         std::vector<uint8_t> toBytes() const;
         std::string toHex() const;
 
+        std::unique_ptr<ElementModP> clone() const;
+
         /// <summary>
         /// Converts the binary value stored by the hex string
         /// to its big num representation stored as ElementModQ
@@ -83,6 +85,8 @@ namespace electionguard
         bool isInBounds() const;
         std::vector<uint8_t> toBytes() const;
         std::string toHex() const;
+
+        std::unique_ptr<ElementModQ> clone() const;
 
         /// <summary>
         /// Converts the binary value stored by the hex string

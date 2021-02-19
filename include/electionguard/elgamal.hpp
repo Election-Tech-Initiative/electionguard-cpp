@@ -48,6 +48,8 @@ namespace electionguard
 
         ElGamalCiphertext &operator=(ElGamalCiphertext rhs);
         ElGamalCiphertext &operator=(ElGamalCiphertext &&rhs);
+        bool operator==(const ElGamalCiphertext &other);
+        bool operator!=(const ElGamalCiphertext &other);
 
         ElementModP *getPad();
         ElementModP *getPad() const;
@@ -61,6 +63,8 @@ namespace electionguard
                                                        const ElementModP &data);
 
         uint64_t decrypt(const ElementModQ &secretKey);
+
+        std::unique_ptr<ElGamalCiphertext> clone() const;
 
       private:
         class Impl;

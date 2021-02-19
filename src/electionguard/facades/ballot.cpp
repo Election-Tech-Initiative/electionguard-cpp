@@ -136,51 +136,51 @@ eg_ciphertext_ballot_selection_get_object_id(eg_ciphertext_ballot_selection_t *h
 
 eg_electionguard_status_t
 eg_ciphertext_ballot_selection_get_description_hash(eg_ciphertext_ballot_selection_t *handle,
-                                                    eg_element_mod_q_t **out_hash)
+                                                    eg_element_mod_q_t **out_hash_ref)
 {
     auto *descriptionHash = AS_TYPE(CiphertextBallotSelection, handle)->getDescriptionHash();
-    *out_hash = AS_TYPE(eg_element_mod_q_t, descriptionHash);
+    *out_hash_ref = AS_TYPE(eg_element_mod_q_t, descriptionHash);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-EG_API bool
-eg_ciphertext_ballot_selection_get_is_placeholder(eg_ciphertext_ballot_selection_t *handle)
+bool eg_ciphertext_ballot_selection_get_is_placeholder(eg_ciphertext_ballot_selection_t *handle)
 {
     return AS_TYPE(CiphertextBallotSelection, handle)->getIsPlaceholder();
 }
 
 eg_electionguard_status_t
 eg_ciphertext_ballot_selection_get_ciphertext(eg_ciphertext_ballot_selection_t *handle,
-                                              eg_elgamal_ciphertext_t **out_ciphertext)
+                                              eg_elgamal_ciphertext_t **out_ciphertext_ref)
 {
     auto *ciphertext = AS_TYPE(CiphertextBallotSelection, handle)->getCiphertext();
-    *out_ciphertext = AS_TYPE(eg_elgamal_ciphertext_t, ciphertext);
+    *out_ciphertext_ref = AS_TYPE(eg_elgamal_ciphertext_t, ciphertext);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 eg_electionguard_status_t
 eg_ciphertext_ballot_selection_get_crypto_hash(eg_ciphertext_ballot_selection_t *handle,
-                                               eg_element_mod_q_t **out_hash)
+                                               eg_element_mod_q_t **out_hash_ref)
 {
     auto *hash = AS_TYPE(CiphertextBallotSelection, handle)->getCryptoHash();
-    *out_hash = AS_TYPE(eg_element_mod_q_t, hash);
+    *out_hash_ref = AS_TYPE(eg_element_mod_q_t, hash);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_nonce(
-  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t **out_nonce)
+eg_electionguard_status_t
+eg_ciphertext_ballot_selection_get_nonce(eg_ciphertext_ballot_selection_t *handle,
+                                         eg_element_mod_q_t **out_nonce_ref)
 {
     auto *nonce = AS_TYPE(CiphertextBallotSelection, handle)->getNonce();
-    *out_nonce = AS_TYPE(eg_element_mod_q_t, nonce);
+    *out_nonce_ref = AS_TYPE(eg_element_mod_q_t, nonce);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 eg_electionguard_status_t
 eg_ciphertext_ballot_selection_get_proof(eg_ciphertext_ballot_selection_t *handle,
-                                         eg_disjunctive_chaum_pedersen_proof_t **out_proof)
+                                         eg_disjunctive_chaum_pedersen_proof_t **out_proof_ref)
 {
     auto *proof = AS_TYPE(CiphertextBallotSelection, handle)->getProof();
-    *out_proof = AS_TYPE(eg_disjunctive_chaum_pedersen_proof_t, proof);
+    *out_proof_ref = AS_TYPE(eg_disjunctive_chaum_pedersen_proof_t, proof);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -225,21 +225,22 @@ eg_plaintext_ballot_contest_get_object_id(eg_plaintext_ballot_contest_t *handle,
     }
 }
 
-EG_API size_t eg_plaintext_ballot_contest_get_selections_size(eg_plaintext_ballot_contest_t *handle)
+size_t eg_plaintext_ballot_contest_get_selections_size(eg_plaintext_ballot_contest_t *handle)
 {
     auto contests = AS_TYPE(PlaintextBallotContest, handle)->getSelections();
     return contests.size();
 }
 
-EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_get_selection_at_index(
-  eg_plaintext_ballot_contest_t *handle, size_t in_index,
-  eg_plaintext_ballot_selection_t **out_selection)
+eg_electionguard_status_t
+eg_plaintext_ballot_contest_get_selection_at_index(eg_plaintext_ballot_contest_t *handle,
+                                                   size_t in_index,
+                                                   eg_plaintext_ballot_selection_t **out_selection_ref)
 {
     try {
         auto selections = AS_TYPE(PlaintextBallotContest, handle)->getSelections();
         auto *selection = &selections.at(in_index).get();
 
-        *out_selection = AS_TYPE(eg_plaintext_ballot_selection_t, selection);
+        *out_selection_ref = AS_TYPE(eg_plaintext_ballot_selection_t, selection);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -280,29 +281,28 @@ eg_ciphertext_ballot_contest_get_object_id(eg_ciphertext_ballot_contest_t *handl
 
 eg_electionguard_status_t
 eg_ciphertext_ballot_contest_get_description_hash(eg_ciphertext_ballot_contest_t *handle,
-                                                  eg_element_mod_q_t **out_hash)
+                                                  eg_element_mod_q_t **out_hash_ref)
 {
     auto *descriptionHash = AS_TYPE(CiphertextBallotContest, handle)->getDescriptionHash();
-    *out_hash = AS_TYPE(eg_element_mod_q_t, descriptionHash);
+    *out_hash_ref = AS_TYPE(eg_element_mod_q_t, descriptionHash);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-EG_API size_t
-eg_ciphertext_ballot_contest_get_selections_size(eg_ciphertext_ballot_contest_t *handle)
+size_t eg_ciphertext_ballot_contest_get_selections_size(eg_ciphertext_ballot_contest_t *handle)
 {
     auto contests = AS_TYPE(CiphertextBallotContest, handle)->getSelections();
     return contests.size();
 }
 
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_selection_at_index(
+eg_electionguard_status_t eg_ciphertext_ballot_contest_get_selection_at_index(
   eg_ciphertext_ballot_contest_t *handle, size_t in_index,
-  eg_ciphertext_ballot_selection_t **out_selection)
+  eg_ciphertext_ballot_selection_t **out_selection_ref)
 {
     try {
         auto selections = AS_TYPE(CiphertextBallotContest, handle)->getSelections();
         auto *selection = &selections.at(in_index).get();
 
-        *out_selection = AS_TYPE(eg_ciphertext_ballot_selection_t, selection);
+        *out_selection_ref = AS_TYPE(eg_ciphertext_ballot_selection_t, selection);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -311,29 +311,39 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_selection_at_i
     }
 }
 
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_nonce(
-  eg_ciphertext_ballot_contest_t *handle, eg_element_mod_q_t **out_nonce)
+eg_electionguard_status_t
+eg_ciphertext_ballot_contest_get_nonce(eg_ciphertext_ballot_contest_t *handle,
+                                       eg_element_mod_q_t **out_nonce_ref)
 {
     auto *nonce = AS_TYPE(CiphertextBallotContest, handle)->getNonce();
-    *out_nonce = AS_TYPE(eg_element_mod_q_t, nonce);
+    *out_nonce_ref = AS_TYPE(eg_element_mod_q_t, nonce);
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_ciphertext_ballot_contest_get_ciphertext_accumulation(
+  eg_ciphertext_ballot_contest_t *handle, eg_elgamal_ciphertext_t **out_ciphertext_accumulation_ref)
+{
+    auto *ciphertext_accumulation =
+      AS_TYPE(CiphertextBallotContest, handle)->getCiphertextAccumulation();
+    *out_ciphertext_accumulation_ref = AS_TYPE(eg_elgamal_ciphertext_t, ciphertext_accumulation);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 eg_electionguard_status_t
 eg_ciphertext_ballot_contest_get_crypto_hash(eg_ciphertext_ballot_contest_t *handle,
-                                             eg_element_mod_q_t **out_hash)
+                                             eg_element_mod_q_t **out_hash_ref)
 {
     auto *hash = AS_TYPE(CiphertextBallotContest, handle)->getCryptoHash();
-    *out_hash = AS_TYPE(eg_element_mod_q_t, hash);
+    *out_hash_ref = AS_TYPE(eg_element_mod_q_t, hash);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 eg_electionguard_status_t
 eg_ciphertext_ballot_contest_get_proof(eg_ciphertext_ballot_selection_t *handle,
-                                       eg_disjunctive_chaum_pedersen_proof_t **out_proof)
+                                       eg_disjunctive_chaum_pedersen_proof_t **out_proof_ref)
 {
     auto *proof = AS_TYPE(CiphertextBallotContest, handle)->getProof();
-    *out_proof = AS_TYPE(eg_disjunctive_chaum_pedersen_proof_t, proof);
+    *out_proof_ref = AS_TYPE(eg_disjunctive_chaum_pedersen_proof_t, proof);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -377,8 +387,8 @@ eg_electionguard_status_t eg_plaintext_ballot_get_object_id(eg_plaintext_ballot_
     }
 }
 
-EG_API eg_electionguard_status_t eg_plaintext_ballot_get_ballot_style(eg_plaintext_ballot_t *handle,
-                                                                      char **out_ballot_style)
+eg_electionguard_status_t eg_plaintext_ballot_get_ballot_style(eg_plaintext_ballot_t *handle,
+                                                               char **out_ballot_style)
 {
     try {
         auto ballotStyle = AS_TYPE(PlaintextBallot, handle)->getBallotStyle();
@@ -391,20 +401,21 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_get_ballot_style(eg_plainte
     }
 }
 
-EG_API size_t eg_plaintext_ballot_get_contests_size(eg_plaintext_ballot_t *handle)
+size_t eg_plaintext_ballot_get_contests_size(eg_plaintext_ballot_t *handle)
 {
     auto contests = AS_TYPE(PlaintextBallot, handle)->getContests();
     return contests.size();
 }
 
-EG_API eg_electionguard_status_t eg_plaintext_ballot_get_contest_at_index(
-  eg_plaintext_ballot_t *handle, size_t in_index, eg_plaintext_ballot_contest_t **out_contest)
+eg_electionguard_status_t
+eg_plaintext_ballot_get_contest_at_index(eg_plaintext_ballot_t *handle, size_t in_index,
+                                         eg_plaintext_ballot_contest_t **out_contest_ref)
 {
     try {
         auto contests = AS_TYPE(PlaintextBallot, handle)->getContests();
         auto *contest = &contests.at(in_index).get();
 
-        *out_contest = AS_TYPE(eg_plaintext_ballot_contest_t, contest);
+        *out_contest_ref = AS_TYPE(eg_plaintext_ballot_contest_t, contest);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -507,8 +518,8 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_object_id(eg_ciphertext_ballo
     }
 }
 
-EG_API eg_electionguard_status_t
-eg_ciphertext_ballot_get_ballot_style(eg_ciphertext_ballot_t *handle, char **out_ballot_style)
+eg_electionguard_status_t eg_ciphertext_ballot_get_ballot_style(eg_ciphertext_ballot_t *handle,
+                                                                char **out_ballot_style)
 {
     try {
         auto ballotStyle = AS_TYPE(CiphertextBallot, handle)->getBallotStyle();
@@ -521,36 +532,38 @@ eg_ciphertext_ballot_get_ballot_style(eg_ciphertext_ballot_t *handle, char **out
     }
 }
 
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_description_hash(
-  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_hash)
+eg_electionguard_status_t eg_ciphertext_ballot_get_description_hash(eg_ciphertext_ballot_t *handle,
+                                                                    eg_element_mod_q_t **out_hash_ref)
 {
     auto *descriptionHash = AS_TYPE(CiphertextBallot, handle)->getDescriptionHash();
-    *out_hash = AS_TYPE(eg_element_mod_q_t, descriptionHash);
+    *out_hash_ref = AS_TYPE(eg_element_mod_q_t, descriptionHash);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_previous_tracking_hash(
-  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_hash)
+eg_electionguard_status_t
+eg_ciphertext_ballot_get_previous_tracking_hash(eg_ciphertext_ballot_t *handle,
+                                                eg_element_mod_q_t **out_hash_ref)
 {
     auto *previousTrackingHash = AS_TYPE(CiphertextBallot, handle)->getPreviousTrackingHash();
-    *out_hash = AS_TYPE(eg_element_mod_q_t, previousTrackingHash);
+    *out_hash_ref = AS_TYPE(eg_element_mod_q_t, previousTrackingHash);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-EG_API size_t eg_ciphertext_ballot_get_contests_size(eg_ciphertext_ballot_t *handle)
+size_t eg_ciphertext_ballot_get_contests_size(eg_ciphertext_ballot_t *handle)
 {
     auto contests = AS_TYPE(CiphertextBallot, handle)->getContests();
     return contests.size();
 }
 
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_contest_at_index(
-  eg_ciphertext_ballot_t *handle, size_t in_index, eg_ciphertext_ballot_contest_t **out_contest)
+eg_electionguard_status_t
+eg_ciphertext_ballot_get_contest_at_index(eg_ciphertext_ballot_t *handle, size_t in_index,
+                                          eg_ciphertext_ballot_contest_t **out_contest_ref)
 {
     try {
         auto contests = AS_TYPE(CiphertextBallot, handle)->getContests();
         auto *contest = &contests.at(in_index).get();
 
-        *out_contest = AS_TYPE(eg_ciphertext_ballot_contest_t, contest);
+        *out_contest_ref = AS_TYPE(eg_ciphertext_ballot_contest_t, contest);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -561,11 +574,11 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_contest_at_index(
 
 eg_electionguard_status_t
 eg_ciphertext_ballot_get_tracking_hash(eg_ciphertext_ballot_t *handle,
-                                       eg_element_mod_q_t **out_tracking_hash)
+                                       eg_element_mod_q_t **out_tracking_hash_ref)
 {
     try {
         auto *hash = AS_TYPE(CiphertextBallot, handle)->getTrackingHash();
-        *out_tracking_hash = AS_TYPE(eg_element_mod_q_t, hash);
+        *out_tracking_hash_ref = AS_TYPE(eg_element_mod_q_t, hash);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -594,19 +607,19 @@ uint64_t eg_ciphertext_ballot_get_timestamp(eg_ciphertext_ballot_t *ciphertext)
     return timestamp;
 }
 
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_nonce(eg_ciphertext_ballot_t *handle,
-                                                                eg_element_mod_q_t **out_nonce)
+eg_electionguard_status_t eg_ciphertext_ballot_get_nonce(eg_ciphertext_ballot_t *handle,
+                                                         eg_element_mod_q_t **out_nonce_ref)
 {
     auto *nonce = AS_TYPE(CiphertextBallot, handle)->getNonce();
-    *out_nonce = AS_TYPE(eg_element_mod_q_t, nonce);
+    *out_nonce_ref = AS_TYPE(eg_element_mod_q_t, nonce);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-EG_API eg_electionguard_status_t
-eg_ciphertext_ballot_get_crypto_hash(eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_hash)
+eg_electionguard_status_t eg_ciphertext_ballot_get_crypto_hash(eg_ciphertext_ballot_t *handle,
+                                                               eg_element_mod_q_t **out_hash_ref)
 {
     auto *cryptoHash = AS_TYPE(CiphertextBallot, handle)->getCryptoHash();
-    *out_hash = AS_TYPE(eg_element_mod_q_t, cryptoHash);
+    *out_hash_ref = AS_TYPE(eg_element_mod_q_t, cryptoHash);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 

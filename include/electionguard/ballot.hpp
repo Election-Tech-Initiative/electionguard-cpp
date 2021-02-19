@@ -196,9 +196,6 @@ namespace electionguard
                                const ElementModQ &cryptoExtendedBaseHash);
 
       protected:
-        // TODO: determine if these shouild be public or protected static functions
-        // since the python code exposes these, but marks them with an underscore
-        // to indicate they are internal library functions.
         static std::unique_ptr<ElementModQ> makeCryptoHash(const std::string &objectId,
                                                            const ElementModQ &seedHash,
                                                            const ElGamalCiphertext &ciphertext);
@@ -236,6 +233,20 @@ namespace electionguard
         std::unique_ptr<Impl> pimpl;
     };
 
+    /// <summary>
+    /// A CiphertextBallotContest represents the selections made by a voter for a specific ContestDescription
+    ///
+    /// CiphertextBallotContest can only be a complete representation of a contest dataset.  While
+    /// PlaintextBallotContest supports a partial representation, a CiphertextBallotContest includes all data
+    /// necessary for a verifier to verify the contest.  Specifically, it includes both explicit affirmative
+    /// and negative selections of the contest, as well as the placeholder selections that satisfy
+    /// the ConstantChaumPedersen proof.
+    ///
+    /// Similar to `CiphertextBallotSelection` the consuming application can choose to discard or keep both
+    /// the `nonce` and the `proof` in some circumstances.  For deterministic nonce's derived from the
+    /// master nonce, both values can be regenerated.  If the `nonce` for this contest is completely random,
+    /// then it is required in order to regenerate the proof.
+    /// </summary>
     class EG_API CiphertextBallotContest : public CryptoHashCheckable
     {
       public:
@@ -244,6 +255,7 @@ namespace electionguard
         CiphertextBallotContest(const std::string &objectId, const ElementModQ &descriptionHash,
                                 std::vector<std::unique_ptr<CiphertextBallotSelection>> selections,
                                 std::unique_ptr<ElementModQ> nonce,
+                                std::unique_ptr<ElGamalCiphertext> ciphertextAccumulation,
                                 std::unique_ptr<ElementModQ> cryptoHash,
                                 std::unique_ptr<ConstantChaumPedersenProof> proof);
         ~CiphertextBallotContest();
@@ -252,15 +264,57 @@ namespace electionguard
         CiphertextBallotContest &operator=(CiphertextBallotContest &&other);
 
         std::string getObjectId() const;
+
+        /// <summary>
+        /// Hash from contestDescription
+        /// </summary>
         ElementModQ *getDescriptionHash() const;
+
+        /// <summary>
+        /// Collection of ballot selections
+        /// </summary>
         std::vector<std::reference_wrapper<CiphertextBallotSelection>> getSelections() const;
+
+        /// <summary>
+        /// The nonce used to generate the encryption. Sensitive & should be treated as a secret
+        /// </summary>
         ElementModQ *getNonce() const;
+
+        /// <summary>
+        /// The encrypted representation of all of the vote fields (the contest total)
+        /// </summary>
+        ElGamalCiphertext *getCiphertextAccumulation() const;
+
+        /// <summary>
+        /// Hash of the encrypted values
+        /// </summary>
         ElementModQ *getCryptoHash() const;
+
+        /// <summary>
+        /// The proof demonstrates the sum of the selections does not exceed the maximum
+        /// available selections for the contest, and that the proof was generated with the nonce
+        /// </summary>
         ConstantChaumPedersenProof *getProof() const;
 
+        /// <summary>
+        /// Given an encrypted BallotContest, generates a hash, suitable for rolling up
+        /// into a hash / tracking code for an entire ballot. Of note, this particular hash examines
+        /// the `seed_hash` and `ballot_selections`, but not the proof.
+        /// This is deliberate, allowing for the possibility of ElectionGuard variants running on
+        /// much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed
+        /// later on.
+        ///
+        /// In most cases, the seed_hash is the description_hash
+        /// </summary>
         virtual std::unique_ptr<ElementModQ>
         crypto_hash_with(const ElementModQ &seedHash) const override;
 
+        /// <summary>
+        /// Constructs a `CipherTextBallotContest` object. Most of the parameters here match up to fields
+        /// in the class, but this helper function will optionally compute a Chaum-Pedersen proof if the
+        /// ballot selections include their encryption nonces. Likewise, if a crypto_hash is not provided,
+        /// it will be derived from the other fields.
+        /// </summary>
         static std::unique_ptr<CiphertextBallotContest>
         make(const std::string &objectId, const ElementModQ &descriptionHash,
              std::vector<std::unique_ptr<CiphertextBallotSelection>> selections,
@@ -270,21 +324,35 @@ namespace electionguard
              std::unique_ptr<ElementModQ> cryptoHash = nullptr,
              std::unique_ptr<ConstantChaumPedersenProof> proof = nullptr);
 
+        /// <summary>
+        /// an aggregate nonce for the contest composed of the nonces of the selections
+        /// </summary>
         std::unique_ptr<ElementModQ> aggregateNonce() const;
+
+        /// <summary>
+        /// Add the individual ballot_selections `message` fields together, suitable for use
+        /// in a Chaum-Pedersen proof.
+        /// </summary>
         std::unique_ptr<ElGamalCiphertext> elgamalAccumulate() const;
 
+        /// <summary>
+        /// Given an encrypted BallotContest, validates the encryption state against a specific seed hash and public key
+        /// by verifying the accumulated sum of selections match the proof.
+        /// Calling this function expects that the object is in a well-formed encrypted state
+        /// with the `ballot_selections` populated with valid encrypted ballot selections,
+        /// the ElementModQ `description_hash`, the ElementModQ `crypto_hash`,
+        /// and the ConstantChaumPedersenProof all populated.
+        /// Specifically, the seed hash in this context is the hash of the ContestDescription,
+        /// or whatever `ElementModQ` was used to populate the `description_hash` field.
+        /// </summary>
         bool isValidEncryption(const ElementModQ &seedHash, const ElementModP &elgamalPublicKey,
                                const ElementModQ &cryptoExtendedBaseHash);
 
-        //protected:
-        // TODO: ISSUE #36: make this member protected or private
-        // once the public api surface supports encrypt_contest
+      protected:
         static std::unique_ptr<ElementModQ> makeCryptoHash(
           std::string objectId,
           const std::vector<std::reference_wrapper<CiphertextBallotSelection>> &selections,
           const ElementModQ &seedHash);
-
-      protected:
         static std::unique_ptr<ElementModQ> aggregateNonce(
           const std::vector<std::reference_wrapper<CiphertextBallotSelection>> &selections);
         static std::unique_ptr<ElGamalCiphertext> elgamalAccumulate(
@@ -295,6 +363,11 @@ namespace electionguard
         std::unique_ptr<Impl> pimpl;
     };
 
+    /// <summary>
+    /// A PlaintextBallot represents a voters selections for a given ballot and ballot style
+    ///
+    /// <param name="object_id"> A unique Ballot ID that is relevant to the external system </param>
+    /// </summary>
     class EG_API PlaintextBallot
     {
       public:
@@ -322,6 +395,16 @@ namespace electionguard
         std::unique_ptr<Impl> pimpl;
     };
 
+    /// <summary>
+    /// A CiphertextBallot represents a voters encrypted selections for a given ballot and ballot style.
+    ///
+    /// When a ballot is in it's complete, encrypted state, the `nonce` is the master nonce
+    /// from which all other nonces can be derived to encrypt the ballot.  Allong with the `nonce`
+    /// fields on `Ballotcontest` and `BallotSelection`, this value is sensitive.
+    ///
+    /// Don't make this directly. Use `make_ciphertext_ballot` instead.
+    /// <param name="object_id"> A unique Ballot ID that is relevant to the external system </param>
+    /// </summary>
     class EG_API CiphertextBallot : public CryptoHashCheckable
     {
       public:
@@ -377,9 +460,7 @@ namespace electionguard
         static std::unique_ptr<CiphertextBallot> fromJson(std::string data);
         static std::unique_ptr<CiphertextBallot> fromBson(std::vector<uint8_t> data);
 
-        //protected:
-        // TODO: ISSUE #36: make this member protected or private
-        // once the public api surface supports encrypt_contest
+      protected:
         static std::unique_ptr<ElementModQ>
         makeCryptoHash(std::string objectId,
                        const std::vector<std::reference_wrapper<CiphertextBallotContest>> &contests,

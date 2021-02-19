@@ -2,13 +2,13 @@
 
 namespace ElectionGuard
 {
-    using NativeEncryptionDevice = NativeInterface.EncryptionDevice.EncryptionDeviceType;
-    using NativeEncryptionMediator = NativeInterface.EncryptionMediator.EncryptionMediatorType;
-    using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotType;
+    using NativeEncryptionDevice = NativeInterface.EncryptionDevice.EncryptionDeviceHandle;
+    using NativeEncryptionMediator = NativeInterface.EncryptionMediator.EncryptionMediatorHandle;
+    using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotHandle;
 
     public class EncryptionDevice: DisposableBase
     {
-        internal unsafe NativeEncryptionDevice* Handle;
+        internal unsafe NativeEncryptionDevice Handle;
 
         public unsafe EncryptionDevice(ulong uuid, string location)
         {
@@ -23,19 +23,15 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null) return;
-            var status = NativeInterface.EncryptionDevice.Free(Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
-            }
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
             Handle = null;
         }
     }
 
     public class EncryptionMediator: DisposableBase
     {
-        internal unsafe NativeEncryptionMediator* Handle;
+        internal unsafe NativeEncryptionMediator Handle;
 
         public unsafe EncryptionMediator(
             InternalElectionDescription metadata,
@@ -56,7 +52,7 @@ namespace ElectionGuard
             if (verifyProofs)
             {
                 var status = NativeInterface.EncryptionMediator.EncryptAndVerify(
-                Handle, plaintext.Handle, out NativeCiphertextBallot* ciphertext);
+                Handle, plaintext.Handle, out NativeCiphertextBallot ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     Console.WriteLine($"InternalElectionDescription Error Status: {status}");
@@ -66,7 +62,7 @@ namespace ElectionGuard
             else
             {
                 var status = NativeInterface.EncryptionMediator.Encrypt(
-                Handle, plaintext.Handle, out NativeCiphertextBallot* ciphertext);
+                Handle, plaintext.Handle, out NativeCiphertextBallot ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     Console.WriteLine($"InternalElectionDescription Error Status: {status}");
@@ -80,12 +76,8 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null) return;
-            var status = NativeInterface.EncryptionMediator.Free(Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
-            }
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
             Handle = null;
         }
     }
@@ -105,10 +97,10 @@ namespace ElectionGuard
                 var status = NativeInterface.Encrypt.Ballot(
                     ballot.Handle, metadata.Handle, context.Handle,
                     seedHash.Handle, verifyProofs,
-                    out NativeCiphertextBallot* ciphertext);
+                    out NativeCiphertextBallot ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
+                    Console.WriteLine($"Encrypt Error Status: {status}");
                 }
                 return new CiphertextBallot(ciphertext);
             }
@@ -117,10 +109,10 @@ namespace ElectionGuard
                 var status = NativeInterface.Encrypt.Ballot(
                     ballot.Handle, metadata.Handle, context.Handle,
                     seedHash.Handle, nonce.Handle, verifyProofs,
-                    out NativeCiphertextBallot* ciphertext);
+                    out NativeCiphertextBallot ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
+                    Console.WriteLine($"EncryptWithNonce Error Status: {status}");
                 }
                 return new CiphertextBallot(ciphertext);
             }
