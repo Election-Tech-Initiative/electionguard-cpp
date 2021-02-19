@@ -1,6 +1,7 @@
 #include "electionguard/election.hpp"
 
 #include "../log.hpp"
+#include "convert.hpp"
 #include "variant_cast.hpp"
 
 #include <cstring>
@@ -14,6 +15,7 @@ extern "C" {
 }
 
 using electionguard::CiphertextElectionContext;
+using electionguard::dynamicCopy;
 using electionguard::ElectionDescription;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
@@ -63,10 +65,7 @@ eg_electionguard_status_t eg_selection_description_get_object_id(eg_selection_de
 {
     try {
         auto objectId = AS_TYPE(SelectionDescription, handle)->getObjectId();
-        auto data_size = objectId.length() + 1;
-        auto *data_array = (char *)malloc(data_size);
-        strncpy(data_array, objectId.c_str(), data_size);
-        *out_object_id = data_array;
+        *out_object_id = dynamicCopy(objectId);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -80,11 +79,8 @@ eg_selection_description_get_candidate_id(eg_selection_description_t *handle,
                                           const char **out_candidate_id)
 {
     try {
-        auto objectId = AS_TYPE(SelectionDescription, handle)->getCandidateId();
-        auto data_size = objectId.length() + 1;
-        auto *data_array = (char *)malloc(data_size);
-        strncpy(data_array, objectId.c_str(), data_size);
-        *out_candidate_id = data_array;
+        auto candidateId = AS_TYPE(SelectionDescription, handle)->getCandidateId();
+        *out_candidate_id = dynamicCopy(candidateId);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -130,10 +126,7 @@ eg_election_description_get_election_scope_id(eg_election_description_t *handle,
 {
     try {
         auto scopeId = AS_TYPE(ElectionDescription, handle)->getElectionScopeId();
-        auto data_size = scopeId.length() + 1;
-        auto *data_array = (char *)malloc(data_size);
-        strncpy(data_array, scopeId.c_str(), data_size);
-        *out_election_scope_id = data_array;
+        *out_election_scope_id = dynamicCopy(scopeId);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -147,7 +140,6 @@ eg_electionguard_status_t eg_election_description_crypto_hash(eg_election_descri
 {
     try {
         auto cryptoHash = AS_TYPE(ElectionDescription, handle)->crypto_hash();
-
         *out_owned_hash = AS_TYPE(eg_element_mod_q_t, cryptoHash.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -193,11 +185,9 @@ eg_electionguard_status_t eg_election_description_to_json(eg_election_descriptio
         auto *domain_type = AS_TYPE(ElectionDescription, handle);
         auto data_string = domain_type->toJson();
 
-        auto data_size = data_string.length() + 1;
-        auto *data_array = (char *)malloc(data_size);
-        strncpy(data_array, data_string.c_str(), data_size);
-        *out_data = data_array;
-        *out_size = data_size;
+        size_t size = 0;
+        *out_data = dynamicCopy(data_string, &size);
+        *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -213,10 +203,9 @@ eg_electionguard_status_t eg_election_description_to_bson(eg_election_descriptio
         auto *domain_type = AS_TYPE(ElectionDescription, handle);
         auto data_bytes = domain_type->toBson();
 
-        auto *data_array = new uint8_t[data_bytes.size()];
-        copy(data_bytes.begin(), data_bytes.end(), data_array);
-        *out_data = data_array;
-        *out_size = data_bytes.size();
+        size_t size = 0;
+        *out_data = dynamicCopy(data_bytes, &size);
+        *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -306,11 +295,9 @@ eg_internal_election_description_to_json(eg_internal_election_description_t *han
         auto *domain_type = AS_TYPE(InternalElectionDescription, handle);
         auto data_string = domain_type->toJson();
 
-        auto data_size = data_string.length() + 1;
-        auto *data_array = (char *)malloc(data_size);
-        strncpy(data_array, data_string.c_str(), data_size);
-        *out_data = data_array;
-        *out_size = data_size;
+        size_t size = 0;
+        *out_data = dynamicCopy(data_string, &size);
+        *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -327,10 +314,9 @@ eg_internal_election_description_to_bson(eg_internal_election_description_t *han
         auto *domain_type = AS_TYPE(InternalElectionDescription, handle);
         auto data_bytes = domain_type->toBson();
 
-        auto *data_array = new uint8_t[data_bytes.size()];
-        copy(data_bytes.begin(), data_bytes.end(), data_array);
-        *out_data = data_array;
-        *out_size = data_bytes.size();
+        size_t size = 0;
+        *out_data = dynamicCopy(data_bytes, &size);
+        *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -471,11 +457,9 @@ eg_ciphertext_election_context_to_json(eg_ciphertext_election_context_t *handle,
         auto *domain_type = AS_TYPE(CiphertextElectionContext, handle);
         auto data_string = domain_type->toJson();
 
-        auto data_size = data_string.length() + 1;
-        auto *data_array = (char *)malloc(data_size);
-        strncpy(data_array, data_string.c_str(), data_size);
-        *out_data = data_array;
-        *out_size = data_size;
+        size_t size = 0;
+        *out_data = dynamicCopy(data_string, &size);
+        *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -492,10 +476,9 @@ eg_ciphertext_election_context_to_bson(eg_ciphertext_election_context_t *handle,
         auto *domain_type = AS_TYPE(CiphertextElectionContext, handle);
         auto data_bytes = domain_type->toBson();
 
-        auto *data_array = new uint8_t[data_bytes.size()];
-        copy(data_bytes.begin(), data_bytes.end(), data_array);
-        *out_data = data_array;
-        *out_size = data_bytes.size();
+        size_t size = 0;
+        *out_data = dynamicCopy(data_bytes, &size);
+        *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {

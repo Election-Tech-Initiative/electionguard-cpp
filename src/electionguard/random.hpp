@@ -13,18 +13,20 @@
 #include <string>
 #include <vector>
 
-using namespace std;
+using std::bad_alloc;
+using std::stringstream;
+using std::vector;
 
 namespace electionguard
 {
     enum ByteSize {
-        CHAR = 8,
-        SHORT = 16,
-        INT = 32,
-        LONG = 64,
-        SHA256 = 256,
-        SHA384 = 384,
-        SHA512 = 512
+        CHAR = 8U,
+        SHORT = 16U,
+        INT = 32U,
+        LONG = 64U,
+        SHA256 = 256U,
+        SHA384 = 384U,
+        SHA512 = 512U
     };
 
     /// <summary>
@@ -51,7 +53,7 @@ namespace electionguard
         static vector<uint8_t> getBytes(ByteSize size = SHA256)
         {
             // Get some random bytes from the operating system
-            auto entropy = getRandomBytes(size * 2);
+            auto entropy = getRandomBytes(size * 2U);
 
             // Allocate the DRBG
             Hacl_HMAC_DRBG_state state = Hacl_HMAC_DRBG_create_in(hashAlgo);
@@ -63,15 +65,17 @@ namespace electionguard
             auto personalization = getTime();
 
             // Instantiate the DRBG
-            Hacl_HMAC_DRBG_instantiate(hashAlgo, state, entropy.size(), entropy.data(),
-                                       nonce.size(), nonce.data(), personalization.size(),
+            Hacl_HMAC_DRBG_instantiate(hashAlgo, state, convert(entropy.size()), entropy.data(),
+                                       convert(nonce.size()), nonce.data(),
+                                       convert(personalization.size()),
                                        reinterpret_cast<uint8_t *>(personalization.data()));
 
             auto *array = new uint8_t[size];
             auto input = getRandomBytes(size);
 
             // Try to generate some random bits
-            if (Hacl_HMAC_DRBG_generate(hashAlgo, array, state, size, input.size(), input.data())) {
+            if (Hacl_HMAC_DRBG_generate(hashAlgo, array, state, size, convert(input.size()),
+                                        input.data())) {
                 vector<uint8_t> result(array, array + size);
                 cleanup(state, entropy, nonce);
                 delete[] array;
@@ -103,7 +107,7 @@ namespace electionguard
         {
             // TODO: ISSUE #137: use unique_ptr or vector instead of a direct heap allocation
             auto *array = new uint8_t[count];
-            if (Lib_RandomBuffer_System_randombytes(const_cast<uint8_t *>(array), count)) {
+            if (Lib_RandomBuffer_System_randombytes(array, count)) {
                 vector<uint8_t> result(array, array + count);
                 delete[] array;
                 return result;
@@ -131,7 +135,7 @@ namespace electionguard
 
         // statically pin the hashing algorithm to SHA256
         static const Spec_Hash_Definitions_hash_alg hashAlgo =
-          (Spec_Hash_Definitions_hash_alg)Spec_Hash_Definitions_SHA2_256;
+          static_cast<Spec_Hash_Definitions_hash_alg>(Spec_Hash_Definitions_SHA2_256);
     };
 } // namespace electionguard
 
