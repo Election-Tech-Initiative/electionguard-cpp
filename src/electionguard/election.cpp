@@ -212,7 +212,7 @@ namespace electionguard
         return *this;
     }
 
-    AnnotatedString &AnnotatedString::operator=(AnnotatedString &&other)
+    AnnotatedString &AnnotatedString::operator=(AnnotatedString &&other) noexcept
     {
         swap(pimpl, other.pimpl);
         return *this;
@@ -272,7 +272,7 @@ namespace electionguard
         return *this;
     }
 
-    Language &Language::operator=(Language &&other)
+    Language &Language::operator=(Language &&other) noexcept
     {
         swap(pimpl, other.pimpl);
         return *this;
