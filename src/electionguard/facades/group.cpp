@@ -13,8 +13,17 @@ extern "C" {
 using electionguard::dynamicCopy;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
+using electionguard::G;
 using electionguard::Log;
+using electionguard::ONE_MOD_P;
+using electionguard::ONE_MOD_Q;
+using electionguard::P;
+using electionguard::Q;
 using electionguard::rand_q;
+using electionguard::TWO_MOD_P;
+using electionguard::TWO_MOD_Q;
+using electionguard::ZERO_MOD_P;
+using electionguard::ZERO_MOD_Q;
 
 using std::make_unique;
 using std::string;
@@ -171,7 +180,67 @@ eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *handle, ch
 
 #pragma endregion
 
-#pragma region ElementModQ Functions
+#pragma region Group Constants
+
+eg_electionguard_status_t eg_element_mod_p_constant_g(eg_element_mod_p_t **out_constant_ref)
+{
+    *out_constant_ref = AS_TYPE(eg_element_mod_p_t, const_cast<ElementModP *>(&G()));
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_element_mod_p_constant_p(eg_element_mod_p_t **out_constant_ref)
+{
+    *out_constant_ref = AS_TYPE(eg_element_mod_p_t, const_cast<ElementModP *>(&P()));
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_element_mod_p_constant_zero_mod_p(eg_element_mod_p_t **out_constant_ref)
+{
+    *out_constant_ref = AS_TYPE(eg_element_mod_p_t, const_cast<ElementModP *>(&ZERO_MOD_P()));
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_element_mod_p_constant_one_mod_p(eg_element_mod_p_t **out_constant_ref)
+{
+    *out_constant_ref = AS_TYPE(eg_element_mod_p_t, const_cast<ElementModP *>(&ONE_MOD_P()));
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_element_mod_p_constant_two_mod_p(eg_element_mod_p_t **out_constant_ref)
+{
+    *out_constant_ref = AS_TYPE(eg_element_mod_p_t, const_cast<ElementModP *>(&TWO_MOD_P()));
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_element_mod_q_constant_q(eg_element_mod_q_t **out_constant_ref)
+{
+    *out_constant_ref = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(&Q()));
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_element_mod_q_constant_zero_mod_q(eg_element_mod_q_t **out_constant_ref)
+{
+    *out_constant_ref = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(&ZERO_MOD_Q()));
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_element_mod_q_constant_one_mod_q(eg_element_mod_q_t **out_constant_ref)
+{
+    *out_constant_ref = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(&ONE_MOD_Q()));
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_element_mod_q_constant_two_mod_q(eg_element_mod_q_t **out_constant_ref)
+{
+    *out_constant_ref = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(&TWO_MOD_Q()));
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+#pragma endregion
+
+#pragma region Group Math Functions
 
 eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle)
 {

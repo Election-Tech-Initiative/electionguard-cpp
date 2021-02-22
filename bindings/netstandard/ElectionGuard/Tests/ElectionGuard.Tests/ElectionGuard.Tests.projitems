@@ -11,5 +11,6 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)TestBallot.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestElection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestElGamal.cs" />
   </ItemGroup>
 </Project>
