@@ -32,6 +32,12 @@ EG_API eg_electionguard_status_t eg_elgamal_keypair_get_secret_key(
 #ifndef ElGamalCiphertext
 
 struct eg_elgamal_ciphertext_s;
+
+/**
+* An "exponential ElGamal ciphertext" (i.e., with the plaintext in the exponent to allow for
+* homomorphic addition). Create one with `elgamal_encrypt`. Add them with `elgamal_add`.
+* Decrypt using one of the supplied instance methods.
+*/
 typedef struct eg_elgamal_ciphertext_s eg_elgamal_ciphertext_t;
 
 // no constructors defined.  use `eg_elgamal_encrypt`
@@ -53,6 +59,14 @@ EG_API eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_with_secret(
 
 #ifndef ElgamalEncrypt
 
+/**
+ * Encrypts a message with a given random nonce and an ElGamal public key.
+*
+* @param[in] m Message to elgamal_encrypt; must be an integer in [0,Q).
+* @param[in] nonce Randomly chosen nonce in [1,Q).
+* @param[in] public_key ElGamal public key.
+* @param[out] out_ciphertext the ciphertext result.  Caller is responsible for lifecycle
+*/
 EG_API eg_electionguard_status_t eg_elgamal_encrypt(uint64_t in_plaintext,
                                                     eg_element_mod_q_t *in_nonce,
                                                     eg_element_mod_p_t *in_public_key,
