@@ -6,15 +6,31 @@ namespace ElectionGuard
     // Declare native types for convenience
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQType;
     using NativeElGamalCiphertext = NativeInterface.ElGamalCiphertext.ElGamalCiphertextType;
-    using NativePlaintextBallotSelection = NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionType;
+    using NativePlaintextBallotSelection = NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle;
     using NativeCiphertextBallotSelection = NativeInterface.CiphertextBallotSelection.CiphertextBallotSelectionType;
-    using NativePlaintextBallotContest = NativeInterface.PlaintextBallotContest.PlaintextBallotContestType;
+    using NativePlaintextBallotContest = NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle;
     using NativeCiphertextBallotContest = NativeInterface.CiphertextBallotContest.CiphertextBallotContestType;
-    using NativePlaintextBallot = NativeInterface.PlaintextBallot.PlaintextBallotType;
+    using NativePlaintextBallot = NativeInterface.PlaintextBallot.PlaintextBallotHandle;
     using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotType;
 
     #region PlaintextBallotSelction
 
+    /// <summary>
+    /// A BallotSelection represents an individual selection on a ballot.
+    ///
+    /// This class accepts a `vote` integer field which has no constraints
+    /// in the ElectionGuard Data Specification, but is constrained logically
+    /// in the application to resolve to `True` or `False`aka only 0 and 1 is
+    /// supported for now.
+    ///
+    /// This class can also be designated as `isPlaceholderSelection` which has no
+    /// context to the data specification but is useful for running validity checks internally
+    ///
+    /// an `extendedData` field exists to support any arbitrary data to be associated
+    /// with the selection.  In practice, this field is the cleartext representation
+    /// of a write-in candidate value.  In the current implementation these values are
+    /// discarded when encrypting.
+    /// </summary>
     public class PlaintextBallotSelection : DisposableBase
     {
         public unsafe string ObjectId
@@ -24,28 +40,68 @@ namespace ElectionGuard
                 var status = NativeInterface.PlaintextBallotSelection.GetObjectId(Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"PlaintextBallotContest Error ObjectId: {status}");
+                    Console.WriteLine($"PlaintextBallotSelection Error ObjectId: {status}");
                     return null;
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
         }
 
-        internal unsafe NativePlaintextBallotSelection* Handle;
+        /// <summary>
+        /// Determines if this is a placeholder selection
+        /// </summary>
+        public unsafe bool IsPlaceholder
+        {
+            get
+            {
+                return NativeInterface.PlaintextBallotSelection.GetIsPlaceholder(Handle);
+            }
+        }
 
-        unsafe internal PlaintextBallotSelection(NativePlaintextBallotSelection* handle)
+        internal unsafe NativePlaintextBallotSelection Handle;
+
+        unsafe internal PlaintextBallotSelection(NativePlaintextBallotSelection handle)
         {
             Handle = handle;
+        }
+
+        public unsafe PlaintextBallotSelection(
+            string objectId, long vote, bool isPlaceholder = false)
+        {
+            var status = NativeInterface.PlaintextBallotSelection.New(
+                objectId, vote, isPlaceholder, out Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"PlaintextBallotSelection Error Status: {status}");
+            }
+        }
+
+        public unsafe PlaintextBallotSelection(
+            string objectId, long vote, bool isPlaceholder, string extendedData)
+        {
+            var status = NativeInterface.PlaintextBallotSelection.New(
+                objectId, vote, isPlaceholder, extendedData, extendedData.Length, out Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"PlaintextBallotSelection Error Status: {status}");
+            }
+        }
+
+        /// <summary>
+        /// Given a PlaintextBallotSelection validates that the object matches an expected object
+        /// and that the plaintext value can resolve to a valid representation
+        /// </summary>
+        public unsafe bool IsValid(string expectedObjectId)
+        {
+            return NativeInterface.PlaintextBallotSelection.IsValid(Handle, expectedObjectId);
         }
 
         protected override unsafe void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
-            var status = NativeInterface.PlaintextBallotSelection.Free(Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"PlaintextBallotSelection Error DisposeUnmanaged: {status}");
-            }
+
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
             Handle = null;
         }
     }
@@ -54,6 +110,29 @@ namespace ElectionGuard
 
     #region CiphertextBallotSelection
 
+    /// <summary>
+    /// A CiphertextBallotSelection represents an individual encrypted selection on a ballot.
+    ///
+    /// This class accepts a `description_hash` and a `ciphertext` as required parameters
+    /// in its constructor.
+    ///
+    /// When a selection is encrypted, the `description_hash` and `ciphertext` required fields must
+    /// be populated at construction however the `nonce` is also usually provided by convention.
+    ///
+    /// After construction, the `crypto_hash` field is populated automatically in the `__post_init__` cycle
+    ///
+    /// A consumer of this object has the option to discard the `nonce` and/or discard the `proof`,
+    /// or keep both values.
+    ///
+    /// By discarding the `nonce`, the encrypted representation and `proof`
+    /// can only be regenerated if the nonce was derived from the ballot's master nonce.  If the nonce
+    /// used for this selection is truly random, and it is discarded, then the proofs cannot be regenerated.
+    ///
+    /// By keeping the `nonce`, or deriving the selection nonce from the ballot nonce, an external system can
+    /// regenerate the proofs on demand.  This is useful for storage or memory constrained systems.
+    ///
+    /// By keeping the `proof` the nonce is not required fotor verify the encrypted selection.
+    /// </summary>
     public class CiphertextBallotSelection : DisposableBase
     {
         public unsafe string ObjectId
@@ -70,6 +149,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// The SelectionDescription hash
+        /// </summary>
         public unsafe ElementModQ DescriptionHash
         {
             get
@@ -85,6 +167,20 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Determines if this is a placeholder selection
+        /// </summary>
+        public unsafe bool IsPlaceholder
+        {
+            get
+            {
+                return NativeInterface.CiphertextBallotSelection.GetIsPlaceholder(Handle);
+            }
+        }
+
+        /// <summary>
+        /// The encrypted representation of the vote field
+        /// </summary>
         public unsafe ElGamalCiphertext Ciphertext
         {
             get
@@ -100,6 +196,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// The hash of the encrypted values
+        /// </summary>
         public unsafe ElementModQ CryptoHash
         {
             get
@@ -115,6 +214,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// The nonce used to generate the encryption. Sensitive &amp; should be treated as a secret
+        /// </summary>
         public unsafe ElementModQ Nonce
         {
             get
@@ -137,6 +239,18 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <sumary>
+        /// Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key.
+        /// Calling this function expects that the object is in a well-formed encrypted state
+        /// with the elgamal encrypted `message` field populated along with
+        /// the DisjunctiveChaumPedersenProof`proof` populated.
+        /// the ElementModQ `description_hash` and the ElementModQ `crypto_hash` are also checked.
+        ///
+        /// <param name="seed_hash">The hash of the SelectionDescription, or
+        ///                         whatever `ElementModQ` was used to populate the `description_hash` field. </param>
+        /// <param name="elgamalPublicKey">The election public key</param>
+        /// <param name="cryptoExtendedBaseHash">The extended base hash of the election</param>
+        /// </summary>
         public unsafe bool IsValidEncryption(
             ElementModQ seedHash, ElementModP elGamalPublicKey, ElementModQ cryptoExtendedBaseHash)
         {
@@ -147,6 +261,8 @@ namespace ElectionGuard
         protected override unsafe void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
+
+            if (Handle == null) return;
             var status = NativeInterface.CiphertextBallotSelection.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
@@ -160,7 +276,7 @@ namespace ElectionGuard
 
     #region PlaintextBallotContest
 
-    public class PlaintextBallotContest: DisposableBase
+    public class PlaintextBallotContest : DisposableBase
     {
         public unsafe string ObjectId
         {
@@ -185,9 +301,9 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativePlaintextBallotContest* Handle;
+        internal unsafe NativePlaintextBallotContest Handle;
 
-        unsafe internal PlaintextBallotContest(NativePlaintextBallotContest* handle)
+        unsafe internal PlaintextBallotContest(NativePlaintextBallotContest handle)
         {
             Handle = handle;
         }
@@ -195,7 +311,7 @@ namespace ElectionGuard
         public unsafe PlaintextBallotSelection GetSelectionAt(ulong index)
         {
             var status = NativeInterface.PlaintextBallotContest.GetSelectionAtIndex(
-                Handle, index, out NativePlaintextBallotSelection* value);
+                Handle, index, out NativePlaintextBallotSelection value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"PlaintextBallotContest Error GetSelectionAt: {status}");
@@ -207,11 +323,9 @@ namespace ElectionGuard
         protected override unsafe void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
-            var status = NativeInterface.PlaintextBallotContest.Free(Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"PlaintextBallotContest Error DisposeUnmanaged: {status}");
-            }
+
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
             Handle = null;
         }
     }
@@ -319,6 +433,8 @@ namespace ElectionGuard
         protected override unsafe void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
+
+            if (Handle == null) return;
             var status = NativeInterface.CiphertextBallotContest.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
@@ -332,7 +448,7 @@ namespace ElectionGuard
 
     #region PlaintextBallot
 
-    public class PlaintextBallot: DisposableBase
+    public class PlaintextBallot : DisposableBase
     {
         public unsafe string ObjectId
         {
@@ -371,7 +487,7 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativePlaintextBallot* Handle;
+        internal unsafe NativePlaintextBallot Handle;
 
         public unsafe PlaintextBallot(string json)
         {
@@ -385,7 +501,7 @@ namespace ElectionGuard
         public unsafe PlaintextBallotContest GetContestAt(ulong index)
         {
             var status = NativeInterface.PlaintextBallot.GetContestAtIndex(
-                Handle, index, out NativePlaintextBallotContest* value);
+                Handle, index, out NativePlaintextBallotContest value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"PlaintextBallot Error BallotStyle: {status}");
@@ -397,11 +513,9 @@ namespace ElectionGuard
         protected override unsafe void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
-            var status = NativeInterface.PlaintextBallot.Free(Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"PlaintextBallot Error DisposeUnmanaged: {status}");
-            }
+
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
             Handle = null;
         }
 
@@ -423,7 +537,7 @@ namespace ElectionGuard
 
     #region CiphertextBallot
 
-    public class CiphertextBallot: DisposableBase
+    public class CiphertextBallot : DisposableBase
     {
         internal unsafe NativeCiphertextBallot* Handle;
 
@@ -594,6 +708,8 @@ namespace ElectionGuard
         protected override unsafe void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
+
+            if (Handle == null) return;
             var status = NativeInterface.CiphertextBallot.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {

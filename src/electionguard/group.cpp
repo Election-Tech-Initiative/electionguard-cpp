@@ -17,6 +17,18 @@
 #include <stdexcept>
 #include <vector>
 
+using std::copy;
+using std::get;
+using std::holds_alternative;
+using std::invalid_argument;
+using std::make_unique;
+using std::out_of_range;
+using std::overflow_error;
+using std::reference_wrapper;
+using std::runtime_error;
+using std::to_string;
+using std::unique_ptr;
+
 #pragma region UtilityHelpers
 
 /// <summary>

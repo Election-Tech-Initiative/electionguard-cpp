@@ -33,6 +33,7 @@ add_executable(ElectionGuardTests
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/ballot.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/election.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/constants.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_election.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.cpp
@@ -54,6 +55,7 @@ endif()
 # C Tests
 add_executable(ElectionGuardCTests
     ${CMAKE_CURRENT_SOURCE_DIR}/main.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_election.c
@@ -61,7 +63,6 @@ add_executable(ElectionGuardCTests
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_tracker.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h
 )
 
 target_compile_features(ElectionGuardCTests PRIVATE c_std_99)

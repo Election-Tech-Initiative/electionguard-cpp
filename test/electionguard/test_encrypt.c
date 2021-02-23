@@ -20,6 +20,7 @@ bool test_encrypt_selection(void)
 {
     // Arrange
     const char *candidate_id = "some-candidate-id";
+    const char *selection_id = "some-selection-object_id";
     eg_element_mod_q_t *one_mod_q = NULL;
     if (eg_element_mod_q_new(ONE_MOD_Q_ARRAY, &one_mod_q)) {
         assert(false);
@@ -41,7 +42,7 @@ bool test_encrypt_selection(void)
     }
 
     eg_selection_description_t *metadata = NULL;
-    if (eg_selection_description_new("some-selection-object_id", candidate_id, 1UL, &metadata)) {
+    if (eg_selection_description_new(selection_id, candidate_id, 1UL, &metadata)) {
         assert(false);
     }
 
@@ -51,7 +52,7 @@ bool test_encrypt_selection(void)
     }
 
     eg_plaintext_ballot_selection_t *plaintext = NULL;
-    if (eg_plaintext_ballot_selection_new(candidate_id, "1", false, &plaintext)) {
+    if (eg_plaintext_ballot_selection_new(selection_id, 1UL, false, &plaintext)) {
         assert(false);
     }
 

@@ -18,9 +18,3 @@ _A clear and concise description of the actual behavior._
 **Environment**
 - OS: [e.g. OSX 10.13.4, Windows 10]
 - Version: [e.g. 1.0.1]
-
-**Possible Solution**
-<!--- Only if you have suggestions on a fix for the bug -->
-
-**Additional context/Screenshots**
-Add any other context about the problem here. If applicable, add screenshots to help explain.

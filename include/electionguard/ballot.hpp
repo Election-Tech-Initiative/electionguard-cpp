@@ -14,18 +14,30 @@
 namespace electionguard
 {
     /// <summary>
+    /// ExtendedData represents any arbitrary data expressible as a string with a length.
+    ///
+    ///  This class is used primarily as a field on a selection to indicate a write-in candidate text value
+    /// </summary>
+    struct ExtendedData {
+      public:
+        std::string value;
+        uint64_t length;
+
+        ExtendedData(std::string value, uint64_t length) : value(value), length(length) {}
+    };
+
+    /// <summary>
     /// A BallotSelection represents an individual selection on a ballot.
     ///
-    /// This class accepts a `vote` string field which has no constraints
+    /// This class accepts a `vote` integer field which has no constraints
     /// in the ElectionGuard Data Specification, but is constrained logically
-    /// in the application to resolve to `True` or `False`.  This implies that the
-    /// data specification supports passing any string that can be represented as
-    /// an integer, however only 0 and 1 is supported for now.
+    /// in the application to resolve to `True` or `False`aka only 0 and 1 is
+    /// supported for now.
     ///
-    /// This class can also be designated as `is_placeholder_selection` which has no
+    /// This class can also be designated as `isPlaceholderSelection` which has no
     /// context to the data specification but is useful for running validity checks internally
     ///
-    /// an `extended_data` field exists to support any arbitrary data to be associated
+    /// an `extendedData` field exists to support any arbitrary data to be associated
     /// with the selection.  In practice, this field is the cleartext representation
     /// of a write-in candidate value.  In the current implementation these values are
     /// discarded when encrypting.
@@ -35,15 +47,32 @@ namespace electionguard
       public:
         PlaintextBallotSelection(const PlaintextBallotSelection &other);
         PlaintextBallotSelection(const PlaintextBallotSelection &&other);
-        PlaintextBallotSelection(std::string objectId, std::string vote,
-                                 bool isPlaceholderSelection = false);
+        PlaintextBallotSelection(std::string objectId, uint64_t vote,
+                                 bool isPlaceholderSelection = false,
+                                 std::unique_ptr<ExtendedData> extendedData = nullptr);
         ~PlaintextBallotSelection();
 
         PlaintextBallotSelection &operator=(PlaintextBallotSelection other);
         PlaintextBallotSelection &operator=(PlaintextBallotSelection &&other);
 
-        uint64_t toInt() const;
         std::string getObjectId() const;
+        uint64_t getVote() const;
+
+        /// <summary>
+        /// Determines if this is a placeholder selection
+        /// </summary>
+        bool getIsPlaceholder() const;
+
+        /// <summary>
+        /// an optional field of arbitrary data, such as the value of a write-in candidate
+        /// </summary>
+        ExtendedData *getExtendedData() const;
+
+        /// <summary>
+        /// Given a PlaintextBallotSelection validates that the object matches an expected object
+        /// and that the plaintext value can resolve to a valid representation
+        /// </summary>
+        bool isValid(const std::string &expectedObjectId) const;
 
       private:
         class Impl;
@@ -96,16 +125,29 @@ namespace electionguard
         /// </summary>
         ElementModQ *getDescriptionHash() const;
 
+        /// <summary>
+        /// Determines if this is a placeholder selection
+        /// </summary>
         bool getIsPlaceholder() const;
 
+        /// <summary>
         /// The encrypted representation of the vote field
+        /// </summary>
         ElGamalCiphertext *getCiphertext() const;
 
+        /// <summary>
+        /// The hash of the encrypted values
+        /// </summary>
         ElementModQ *getCryptoHash() const;
 
+        /// <summary>
+        /// The nonce used to generate the encryption. Sensitive &amp; should be treated as a secret
+        /// </summary>
         ElementModQ *getNonce();
 
+        /// <summary>
         /// The proof that demonstrates the selection is an encryption of 0 or 1, and was encrypted using the `nonce`
+        /// </summary>
         DisjunctiveChaumPedersenProof *getProof() const;
 
         /// <summary>
@@ -138,6 +180,18 @@ namespace electionguard
              std::unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr,
              std::unique_ptr<ElGamalCiphertext> extendedData = nullptr);
 
+        /// <sumary>
+        /// Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key.
+        /// Calling this function expects that the object is in a well-formed encrypted state
+        /// with the elgamal encrypted `message` field populated along with
+        /// the DisjunctiveChaumPedersenProof`proof` populated.
+        /// the ElementModQ `description_hash` and the ElementModQ `crypto_hash` are also checked.
+        ///
+        /// <param name="seed_hash">The hash of the SelectionDescription, or
+        ///                         whatever `ElementModQ` was used to populate the `description_hash` field. </param>
+        /// <param name="elgamalPublicKey">The election public key</param>
+        /// <param name="cryptoExtendedBaseHash">The extended base hash of the election</param>
+        /// </summary>
         bool isValidEncryption(const ElementModQ &seedHash, const ElementModP &elgamalPublicKey,
                                const ElementModQ &cryptoExtendedBaseHash);
 

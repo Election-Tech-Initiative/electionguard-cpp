@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Runtime.ConstrainedExecution;
 
 namespace ElectionGuard
 {
@@ -233,18 +234,44 @@ namespace ElectionGuard
         {
             internal unsafe struct PlaintextBallotSelectionType { };
 
+            internal class PlaintextBallotSelectionHandle
+                : ElectionguardSafeHandle<PlaintextBallotSelectionType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = PlaintextBallotSelection.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"PlaintextBallotSelection Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_new")]
             internal static extern Status New([MarshalAs(UnmanagedType.LPStr)] string objectId,
-            [MarshalAs(UnmanagedType.LPStr)] string vote, bool isPlaceholderSelection, out PlaintextBallotSelectionType* handle);
+            long vote, bool isPlaceholderSelection, out PlaintextBallotSelectionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_new_with_extended_data")]
+            internal static extern Status New([MarshalAs(UnmanagedType.LPStr)] string objectId,
+            long vote, bool isPlaceholderSelection, [MarshalAs(UnmanagedType.LPStr)] string extendedData,
+            long extendedDataLength, out PlaintextBallotSelectionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_free")]
-            internal static extern Status Free(PlaintextBallotSelectionType* handle);
+            internal static extern Status Free(PlaintextBallotSelectionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_get_object_id")]
-            internal static extern Status GetObjectId(PlaintextBallotSelectionType* handle, out IntPtr object_id);
+            internal static extern Status GetObjectId(PlaintextBallotSelectionHandle handle, out IntPtr object_id);
 
-            // TODO: ISSUE #129: Is placeholder and toint
+            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_get_is_placeholder")]
+            internal static extern bool GetIsPlaceholder(PlaintextBallotSelectionHandle handle);
 
+            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_is_valid")]
+            internal static extern bool IsValid(PlaintextBallotSelectionHandle handle,
+                [MarshalAs(UnmanagedType.LPStr)] string expectedObjectId);
         }
 
         internal static unsafe class CiphertextBallotSelection
@@ -261,7 +288,8 @@ namespace ElectionGuard
             internal static extern Status GetDescriptionHash(
                 CiphertextBallotSelectionType* handle, out ElementModQ.ElementModQType* description_hash);
 
-            // TODO: ISSUE #129: get is palceholder
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_get_is_placeholder")]
+            internal static extern bool GetIsPlaceholder(CiphertextBallotSelectionType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_get_ciphertext")]
             internal static extern Status GetCiphertext(
@@ -289,18 +317,36 @@ namespace ElectionGuard
         {
             internal unsafe struct PlaintextBallotContestType { };
 
+            internal class PlaintextBallotContestHandle
+                : ElectionguardSafeHandle<PlaintextBallotContestType>
+            {
+                [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = PlaintextBallotContest.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"PlaintextBallotContest Error DisposeUnmanaged: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_free")]
-            internal static extern Status Free(PlaintextBallotContestType* handle);
+            internal static extern Status Free(PlaintextBallotContestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_get_object_id")]
-            internal static extern Status GetObjectId(PlaintextBallotContestType* handle, out IntPtr object_id);
+            internal static extern Status GetObjectId(PlaintextBallotContestHandle handle, out IntPtr object_id);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_get_selections_size")]
-            internal static extern ulong GetSelectionsSize(PlaintextBallotContestType* handle);
+            internal static extern ulong GetSelectionsSize(PlaintextBallotContestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_get_selection_at_index")]
-            internal static extern Status GetSelectionAtIndex(PlaintextBallotContestType* handle, ulong index,
-                out PlaintextBallotSelection.PlaintextBallotSelectionType* selection);
+            internal static extern Status GetSelectionAtIndex(PlaintextBallotContestHandle handle, ulong index,
+                out PlaintextBallotSelection.PlaintextBallotSelectionHandle selection);
         }
 
         internal static unsafe class CiphertextBallotContest
@@ -345,37 +391,55 @@ namespace ElectionGuard
         {
             internal unsafe struct PlaintextBallotType { };
 
+            internal class PlaintextBallotHandle
+                : ElectionguardSafeHandle<PlaintextBallotType>
+            {
+                [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = PlaintextBallot.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"PlaintextBallot Error DisposeUnmanaged: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_free")]
-            internal static extern Status Free(PlaintextBallotType* handle);
+            internal static extern Status Free(PlaintextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_object_id")]
-            internal static extern Status GetObjectId(PlaintextBallotType* handle, out IntPtr object_id);
+            internal static extern Status GetObjectId(PlaintextBallotHandle handle, out IntPtr object_id);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_ballot_style")]
-            internal static extern Status GetBallotStyle(PlaintextBallotType* handle, out IntPtr ballot_style);
+            internal static extern Status GetBallotStyle(PlaintextBallotHandle handle, out IntPtr ballot_style);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_contests_size")]
-            internal static extern ulong GetContestsSize(PlaintextBallotType* handle);
+            internal static extern ulong GetContestsSize(PlaintextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_contest_at_index")]
-            internal static extern Status GetContestAtIndex(PlaintextBallotType* handle, ulong index,
-                out PlaintextBallotContest.PlaintextBallotContestType* contest);
+            internal static extern Status GetContestAtIndex(PlaintextBallotHandle handle, ulong index,
+                out PlaintextBallotContest.PlaintextBallotContestHandle contest);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_from_json")]
             internal static extern Status FromJson(
-                [MarshalAs(UnmanagedType.LPStr)] string data, out PlaintextBallotType* handle);
+                [MarshalAs(UnmanagedType.LPStr)] string data, out PlaintextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_from_bson")]
             internal static extern Status FromBson(
-                uint* data, ulong length, PlaintextBallotType* handle);
+                uint* data, ulong length, PlaintextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_to_json")]
             internal static extern Status ToJson(
-                PlaintextBallotType* handle, out IntPtr data, out UIntPtr size);
+                PlaintextBallotHandle handle, out IntPtr data, out UIntPtr size);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_to_bson")]
             internal static extern Status ToBson(
-                PlaintextBallotType* handle, out uint* data, out UIntPtr size);
+                PlaintextBallotHandle handle, out uint* data, out UIntPtr size);
         }
 
         internal static unsafe class CiphertextBallot
@@ -486,13 +550,13 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_encryption_mediator_encrypt_ballot")]
             internal static extern Status Encrypt(
                 EncryptionMediatorType* handle,
-                PlaintextBallot.PlaintextBallotType* plainutext,
+                PlaintextBallot.PlaintextBallotHandle plainutext,
                 out CiphertextBallot.CiphertextBallotType* ciphertext);
 
             [DllImport(DllName, EntryPoint = "eg_encryption_mediator_encrypt_ballot_verify_proofs")]
             internal static extern Status EncryptAndVerify(
                 EncryptionMediatorType* handle,
-                PlaintextBallot.PlaintextBallotType* plainutext,
+                PlaintextBallot.PlaintextBallotHandle plainutext,
                 out CiphertextBallot.CiphertextBallotType* ciphertext);
         }
 
@@ -501,7 +565,7 @@ namespace ElectionGuard
         {
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot")]
             internal static extern Status Ballot(
-                PlaintextBallot.PlaintextBallotType* plaintext,
+                PlaintextBallot.PlaintextBallotHandle plaintext,
                  InternalElectionDescription.InternalElectionDescriptionType* metadata,
                  CiphertextElectionContext.CiphertextElectionType* context,
                  ElementModQ.ElementModQType* seedHash, bool shouldVerifyProofs,
@@ -509,7 +573,7 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot_with_nonce")]
             internal static extern Status Ballot(
-                PlaintextBallot.PlaintextBallotType* plaintext,
+                PlaintextBallot.PlaintextBallotHandle plaintext,
                  InternalElectionDescription.InternalElectionDescriptionType* metadata,
                  CiphertextElectionContext.CiphertextElectionType* context,
                  ElementModQ.ElementModQType* seedHash,

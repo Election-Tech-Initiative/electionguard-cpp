@@ -9,7 +9,7 @@
     <Import_RootNamespace>ElectionGuard.Tests</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Tests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestBallot.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestElection.cs" />
   </ItemGroup>
 </Project>

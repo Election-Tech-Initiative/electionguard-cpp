@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -39,6 +39,8 @@ namespace ElectionGuard
         protected override unsafe void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
+
+            if (Handle == null) return;
             var status = NativeInterface.ElectionDescription.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
@@ -113,6 +115,8 @@ namespace ElectionGuard
         protected override unsafe void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
+
+            if (Handle == null) return;
             var status = NativeInterface.InternalElectionDescription.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
@@ -211,6 +215,8 @@ namespace ElectionGuard
         protected override unsafe void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
+
+            if (Handle == null) return;
             var status = NativeInterface.CiphertextElectionContext.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
