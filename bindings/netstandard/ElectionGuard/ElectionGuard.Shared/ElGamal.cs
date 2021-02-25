@@ -2,9 +2,9 @@
 namespace ElectionGuard
 {
     // Declare native types for convenience
-    using NativeElementModP = NativeInterface.ElementModP.ElementModPType;
-    using NativeElementModQ = NativeInterface.ElementModQ.ElementModQType;
-    using NativeElGamalCiphertext = NativeInterface.ElGamalCiphertext.ElGamalCiphertextType;
+    using NativeElementModP = NativeInterface.ElementModP.ElementModPHandle;
+    using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
+    using NativeElGamalCiphertext = NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
 
     public class ElGamalCiphertext : DisposableBase
     {
@@ -13,7 +13,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ElGamalCiphertext.GetPad(
-                    Handle, out NativeElementModP* value);
+                    Handle, out NativeElementModP value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     Console.WriteLine($"Pad Error Status: {status}");
@@ -28,7 +28,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ElGamalCiphertext.GetData(
-                    Handle, out NativeElementModP* value);
+                    Handle, out NativeElementModP value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     Console.WriteLine($"Data Error Status: {status}");
@@ -43,7 +43,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ElGamalCiphertext.GetCryptoHash(
-                    Handle, out NativeElementModQ* value);
+                    Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     Console.WriteLine($"CryptoHash Error Status: {status}");
@@ -53,9 +53,9 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeElGamalCiphertext* Handle;
+        internal unsafe NativeElGamalCiphertext Handle;
 
-        unsafe internal ElGamalCiphertext(NativeElGamalCiphertext* handle)
+        unsafe internal ElGamalCiphertext(NativeElGamalCiphertext handle)
         {
             Handle = handle;
         }
@@ -66,12 +66,8 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null) return;
-            var status = NativeInterface.ElGamalCiphertext.Free(Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
-            }
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
             Handle = null;
         }
     }

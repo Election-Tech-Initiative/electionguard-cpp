@@ -49,7 +49,7 @@ namespace electionguard
             stream << wordPart << separator;
 
             for (auto i : hexPart) {
-                stream << hex << uppercase << setw(1) << (uint32_t)i;
+                stream << hex << uppercase << setw(1) << static_cast<uint32_t>(i);
             }
 
             if (fourth == bytes.back()) {

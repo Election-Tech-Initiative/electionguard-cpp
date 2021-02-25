@@ -107,7 +107,7 @@ namespace electionguard
         ~AnnotatedString();
 
         AnnotatedString &operator=(const AnnotatedString &other);
-        AnnotatedString &operator=(AnnotatedString &&other);
+        AnnotatedString &operator=(AnnotatedString &&other) noexcept;
 
         std::string getAnnotation() const;
         std::string getValue() const;
@@ -133,7 +133,7 @@ namespace electionguard
         ~Language();
 
         Language &operator=(const Language &other);
-        Language &operator=(Language &&other);
+        Language &operator=(Language &&other) noexcept;
 
         std::string getValue() const;
         std::string getLanguage() const;

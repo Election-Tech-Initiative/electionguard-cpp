@@ -307,6 +307,11 @@ namespace electionguard
         return bytes_to_hex(byteResult);
     }
 
+    std::unique_ptr<ElementModP> ElementModP::clone() const
+    {
+        return make_unique<ElementModP>(pimpl->data);
+    }
+
     // Static Methods
 
     unique_ptr<ElementModP> ElementModP::fromHex(const string &representation)
@@ -460,6 +465,11 @@ namespace electionguard
         uint64_t p4096[MAX_P_LEN] = {};
         memcpy(static_cast<uint64_t *>(p4096), static_cast<uint64_t *>(pimpl->data), MAX_Q_SIZE);
         return make_unique<ElementModP>(p4096, true);
+    }
+
+    std::unique_ptr<ElementModQ> ElementModQ::clone() const
+    {
+        return make_unique<ElementModQ>(pimpl->data);
     }
 
 #pragma endregion

@@ -894,6 +894,11 @@ namespace electionguard
                         }
                         selections.push_back(selection_props);
                     }
+
+                    json ciphertext = {
+                      {"pad", contest.get().getCiphertextAccumulation()->getPad()->toHex()},
+                      {"data", contest.get().getCiphertextAccumulation()->getData()->toHex()}};
+
                     auto *p = contest.get().getProof();
                     json contest_proof = {
                       {"pad", p->getPad()->toHex()},
@@ -906,6 +911,7 @@ namespace electionguard
                       {"object_id", contest.get().getObjectId()},
                       {"description_hash", contest.get().getDescriptionHash()->toHex()},
                       {"ballot_selections", selections},
+                      {"ciphertext_accumulation", ciphertext},
                       {"crypto_hash", contest.get().getCryptoHash()->toHex()},
                       {"proof", contest_proof},
                     };
@@ -951,6 +957,14 @@ namespace electionguard
                     auto contest_description_hash = contest["description_hash"].get<string>();
                     auto contest_nonce =
                       contest["nonce"].is_null() ? "" : contest["nonce"].get<string>();
+                    auto contest_ciphertext = contest["ciphertext_accumulation"];
+                    auto contest_ciphertext_pad = contest_ciphertext["pad"].get<string>();
+                    auto contest_ciphertext_data = contest_ciphertext["data"].get<string>();
+
+                    auto deserialized_contest_ciphertext =
+                      make_unique<electionguard::ElGamalCiphertext>(
+                        ElementModP::fromHex(contest_ciphertext_pad),
+                        ElementModP::fromHex(contest_ciphertext_data));
                     auto contest_crypto_hash = contest["crypto_hash"].get<string>();
 
                     auto proof = contest["proof"];
@@ -1038,6 +1052,7 @@ namespace electionguard
                       make_unique<electionguard::CiphertextBallotContest>(
                         contest_object_id, *ElementModQ::fromHex(contest_description_hash),
                         move(ciphertextSelections), move(nonce),
+                        move(deserialized_contest_ciphertext),
                         ElementModQ::fromHex(contest_crypto_hash), move(deserializedProof)));
                 }
 

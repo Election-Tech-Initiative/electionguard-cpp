@@ -3,15 +3,15 @@ using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
-    using NaiveElementModP = NativeInterface.ElementModP.ElementModPType;
-    using NaiveElementModQ = NativeInterface.ElementModQ.ElementModQType;
+    using NaiveElementModP = NativeInterface.ElementModP.ElementModPHandle;
+    using NaiveElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
 
     public class ElementModP : DisposableBase
     {
         public static readonly ulong MAX_SIZE = 64;
 
         public ulong[] Data { get { return GetNative(); } set { NewNative(value); } }
-        internal unsafe NaiveElementModP* Handle;
+        internal unsafe NaiveElementModP Handle;
 
         public ElementModP(ulong[] data)
         {
@@ -25,7 +25,7 @@ namespace ElectionGuard
             }
         }
 
-        unsafe internal ElementModP(NaiveElementModP* handle)
+        unsafe internal ElementModP(NaiveElementModP handle)
         {
             Handle = handle;
         }
@@ -34,12 +34,8 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null) return;
-            var status = NativeInterface.ElementModP.Free(Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
-            }
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
             Handle = null;
         }
 
@@ -109,7 +105,7 @@ namespace ElectionGuard
         public static readonly ulong MAX_SIZE = 4;
 
         public ulong[] Data { get { return GetNative(); } set { NewNative(value); } }
-        internal unsafe NaiveElementModQ* Handle;
+        internal unsafe NaiveElementModQ Handle;
 
         public ElementModQ(ulong[] data)
         {
@@ -122,7 +118,7 @@ namespace ElectionGuard
             }
         }
 
-        unsafe internal ElementModQ(NaiveElementModQ* handle)
+        unsafe internal ElementModQ(NaiveElementModQ handle)
         {
             Handle = handle;
         }
@@ -142,12 +138,8 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null) return;
-            var status = NativeInterface.ElementModQ.Free(Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
-            }
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
             Handle = null;
         }
 

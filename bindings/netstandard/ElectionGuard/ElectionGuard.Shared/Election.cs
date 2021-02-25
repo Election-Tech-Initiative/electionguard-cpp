@@ -3,11 +3,11 @@ using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
-    using NativeElectionDescription = NativeInterface.ElectionDescription.ElectionDescriptionType;
-    using NativeInternalElectionDescription = NativeInterface.InternalElectionDescription.InternalElectionDescriptionType;
-    using NativeCiphertextElectionContext = NativeInterface.CiphertextElectionContext.CiphertextElectionType;
-    using NativeElementModP = NativeInterface.ElementModP.ElementModPType;
-    using NativeElementModQ = NativeInterface.ElementModQ.ElementModQType;
+    using NativeElectionDescription = NativeInterface.ElectionDescription.ElectionDescriptionHandle;
+    using NativeInternalElectionDescription = NativeInterface.InternalElectionDescription.InternalElectionDescriptionHandle;
+    using NativeCiphertextElectionContext = NativeInterface.CiphertextElectionContext.CiphertextElectionContextHandle;
+    using NativeElementModP = NativeInterface.ElementModP.ElementModPHandle;
+    using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
 
     public class ElectionDescription : DisposableBase
     {
@@ -15,7 +15,8 @@ namespace ElectionGuard
         {
             get
             {
-                var status = NativeInterface.ElectionDescription.GetElectionScopeId(Handle, out IntPtr value);
+                var status = NativeInterface.ElectionDescription.GetElectionScopeId(
+                    Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     Console.WriteLine($"ElectionDescription Error ObjectId: {status}");
@@ -25,7 +26,7 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeElectionDescription* Handle;
+        internal unsafe NativeElectionDescription Handle;
 
         public unsafe ElectionDescription(string json)
         {
@@ -40,19 +41,15 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null) return;
-            var status = NativeInterface.ElectionDescription.Free(Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
-            }
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
             Handle = null;
         }
 
         public unsafe ElementModQ CryptoHash()
         {
             var status = NativeInterface.ElectionDescription.CryptoHash(
-                    Handle, out NativeElementModQ* value);
+                    Handle, out NativeElementModQ value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"DescriptionHash Error Status: {status}");
@@ -82,7 +79,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.InternalElectionDescription.GetDescriptionHash(
-                    Handle, out NativeElementModQ* value);
+                    Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     Console.WriteLine($"DescriptionHash Error Status: {status}");
@@ -92,7 +89,7 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeInternalElectionDescription* Handle;
+        internal unsafe NativeInternalElectionDescription Handle;
 
         public unsafe InternalElectionDescription(ElectionDescription election)
         {
@@ -116,12 +113,8 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null) return;
-            var status = NativeInterface.InternalElectionDescription.Free(Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
-            }
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
             Handle = null;
         }
 
@@ -146,7 +139,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetElGamalPublicKey(
-                    Handle, out NativeElementModP* value);
+                    Handle, out NativeElementModP value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     Console.WriteLine($"ElGamalPublicKey Error Status: {status}");
@@ -161,7 +154,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetDescriptionHash(
-                    Handle, out NativeElementModQ* value);
+                    Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     Console.WriteLine($"DescriptionHash Error Status: {status}");
@@ -176,7 +169,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetCryptoBaseHash(
-                     Handle, out NativeElementModQ* value);
+                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     Console.WriteLine($"CryptoBaseHash Error Status: {status}");
@@ -191,7 +184,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetCryptoExtendedBaseHash(
-                    Handle, out NativeElementModQ* value);
+                    Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     Console.WriteLine($"CryptoExtendedBaseHash Error Status: {status}");
@@ -201,7 +194,7 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeCiphertextElectionContext* Handle;
+        internal unsafe NativeCiphertextElectionContext Handle;
 
         public unsafe CiphertextElectionContext(string json)
         {

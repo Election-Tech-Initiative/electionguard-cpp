@@ -55,12 +55,12 @@ namespace electionguard
       {ElectionType::other, "other"},
     };
 
-    EG_API const string getElectionTypeString(const ElectionType &value)
+    const string getElectionTypeString(const ElectionType &value)
     {
         return _election_type<ElectionType>::_map.find(value)->second;
     }
 
-    EG_API ElectionType getElectionType(const string &value)
+    ElectionType getElectionType(const string &value)
     {
         try {
             auto item = findByValue(_election_type<ElectionType>::_map, value);
@@ -111,12 +111,12 @@ namespace electionguard
       {ReportingUnitType::other, "other"},
     };
 
-    EG_API const string getReportingUnitTypeString(const ReportingUnitType &value)
+    const string getReportingUnitTypeString(const ReportingUnitType &value)
     {
         return _reporting_unit_type<ReportingUnitType>::_map.find(value)->second;
     }
 
-    EG_API ReportingUnitType getReportingUnitType(const string &value)
+    ReportingUnitType getReportingUnitType(const string &value)
     {
         try {
             auto item = findByValue(_reporting_unit_type<ReportingUnitType>::_map, value);
@@ -150,12 +150,12 @@ namespace electionguard
       {VoteVariationType::other, "other"},
     };
 
-    EG_API const string getVoteVariationTypeString(const VoteVariationType &value)
+    const string getVoteVariationTypeString(const VoteVariationType &value)
     {
         return _vote_variation_type<VoteVariationType>::_map.find(value)->second;
     }
 
-    EG_API VoteVariationType getVoteVariationType(const string &value)
+    VoteVariationType getVoteVariationType(const string &value)
     {
         try {
             auto item = findByValue(_vote_variation_type<VoteVariationType>::_map, value);
@@ -212,7 +212,7 @@ namespace electionguard
         return *this;
     }
 
-    AnnotatedString &AnnotatedString::operator=(AnnotatedString &&other)
+    AnnotatedString &AnnotatedString::operator=(AnnotatedString &&other) noexcept
     {
         swap(pimpl, other.pimpl);
         return *this;
@@ -272,7 +272,7 @@ namespace electionguard
         return *this;
     }
 
-    Language &Language::operator=(Language &&other)
+    Language &Language::operator=(Language &&other) noexcept
     {
         swap(pimpl, other.pimpl);
         return *this;

@@ -24,10 +24,11 @@ namespace electionguard::test::generators
         }
 
         static unique_ptr<PlaintextBallotSelection>
-        selectionFrom(const SelectionDescription &description, bool choice)
+        selectionFrom(const SelectionDescription &description, bool isAffirmative = false,
+                      bool isPlaceholder = false)
         {
             return make_unique<PlaintextBallotSelection>(description.getObjectId(),
-                                                         choice ? 1UL : 0UL);
+                                                         isAffirmative ? 1UL : 0UL, isPlaceholder);
         }
 
         static unique_ptr<PlaintextBallotContest> contestFrom(const ContestDescription &contest,

@@ -1,6 +1,7 @@
 #include "electionguard/tracker.hpp"
 
 #include "../log.hpp"
+#include "convert.hpp"
 #include "variant_cast.hpp"
 
 extern "C" {
@@ -9,6 +10,7 @@ extern "C" {
 
 #include <cstring>
 
+using electionguard::dynamicCopy;
 using electionguard::ElementModQ;
 using electionguard::Log;
 using electionguard::Tracker;
@@ -60,10 +62,7 @@ eg_electionguard_status_t eg_hash_to_words(eg_element_mod_q_t *in_tracker_hash,
     try {
         auto *trackerHash = AS_TYPE(ElementModQ, in_tracker_hash);
         auto words = Tracker::hashToWords(*trackerHash, in_separator);
-        auto data_size = words.length() + 1;
-        auto *data_array = (char *)malloc(data_size);
-        strncpy(data_array, words.c_str(), data_size);
-        *out_hash_words = data_array;
+        *out_hash_words = dynamicCopy(words);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {

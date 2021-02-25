@@ -7,7 +7,6 @@
 #include <iomanip>
 #include <iostream>
 
-using std::exception;
 using std::get;
 using std::make_unique;
 using std::nullptr_t;
@@ -241,7 +240,7 @@ namespace electionguard
             input_string = null_string;
         }
 
-        const uint8_t *input = reinterpret_cast<const uint8_t *>(input_string.c_str());
+        const auto *input = reinterpret_cast<const uint8_t *>(input_string.c_str());
         Hacl_Streaming_SHA2_update_256(p, const_cast<uint8_t *>(input), input_string.size());
         Hacl_Streaming_SHA2_update_256(p, static_cast<uint8_t *>(delimiter), sizeof(delimiter));
     }

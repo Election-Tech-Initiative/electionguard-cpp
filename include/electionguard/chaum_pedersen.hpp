@@ -45,6 +45,8 @@ namespace electionguard
 
         bool isValid(const ElGamalCiphertext &message, const ElementModP &k, const ElementModQ &q);
 
+        std::unique_ptr<DisjunctiveChaumPedersenProof> clone() const;
+
       protected:
         static std::unique_ptr<DisjunctiveChaumPedersenProof>
         make_zero(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,

@@ -36,43 +36,85 @@ namespace ElectionGuard
         {
             internal unsafe struct ElementModPType { };
 
+            internal class ElementModPHandle
+                : ElectionguardSafeHandle<ElementModPType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = ElementModP.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"ElementModP Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_new")]
-            internal static extern Status New(ulong* in_data, out ElementModPType* handle);
+            internal static extern Status New(
+                ulong* in_data, out ElementModPHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_new_unchecked")]
-            internal static extern Status NewUnchecked(ulong* in_data, out ElementModPType* handle);
+            internal static extern Status NewUnchecked(
+                ulong* in_data, out ElementModPHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_free")]
-            internal static extern Status Free(ElementModPType* handle);
+            internal static extern Status Free(ElementModPHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_get_data")]
-            internal static extern Status GetData(ElementModPType* handle, ulong** out_data, out UIntPtr out_size);
+            internal static extern Status GetData(
+                ElementModPHandle handle, ulong** out_data, out UIntPtr out_size);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_to_hex")]
-            internal static extern Status ToHex(ElementModPType* handle, out IntPtr data);
+            internal static extern Status ToHex(
+                ElementModPHandle handle, out IntPtr data);
         }
 
         internal static unsafe class ElementModQ
         {
             internal unsafe struct ElementModQType { };
 
+            internal class ElementModQHandle
+                : ElectionguardSafeHandle<ElementModQType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = ElementModQ.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"ElementModQ Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_new")]
-            internal static extern Status New(ulong* in_data, out ElementModQType* handle);
+            internal static extern Status New(
+                ulong* in_data, out ElementModQHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_new_unchecked")]
-            internal static extern Status NewUnchecked(ulong* in_data, out ElementModQType* handle);
+            internal static extern Status NewUnchecked(
+                ulong* in_data, out ElementModQHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_free")]
-            internal static extern Status Free(ElementModQType* handle);
+            internal static extern Status Free(ElementModQHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_get_data")]
-            internal static extern Status GetData(ElementModQType* handle, ulong** out_data, out UIntPtr out_size);
+            internal static extern Status GetData(
+                ElementModQHandle handle, ulong** out_data, out UIntPtr out_size);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_to_hex")]
-            internal static extern Status ToHex(ElementModQType* handle, out IntPtr out_hex);
+            internal static extern Status ToHex(
+                ElementModQHandle handle, out IntPtr out_hex);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_rand_q_new")]
-            internal static extern Status Random(out ElementModQType* handle);
+            internal static extern Status Random(out ElementModQHandle handle);
         }
 
         #endregion
@@ -83,24 +125,46 @@ namespace ElectionGuard
         {
             internal unsafe struct ElGamalCiphertextType { };
 
+            internal class ElGamalCiphertextHandle
+                : ElectionguardSafeHandle<ElGamalCiphertextType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = ElGamalCiphertext.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"ElGamalCiphertext Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
             [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_free")]
-            internal static extern Status Free(ElGamalCiphertextType* handle);
+            internal static extern Status Free(ElGamalCiphertextHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_get_pad")]
             internal static extern Status GetPad(
-                ElGamalCiphertextType* handle, out ElementModP.ElementModPType* elgamal_public_key);
+                ElGamalCiphertextHandle handle,
+                out ElementModP.ElementModPHandle elgamal_public_key);
 
             [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_get_data")]
             internal static extern Status GetData(
-                ElGamalCiphertextType* handle, out ElementModP.ElementModPType* elgamal_public_key);
+                ElGamalCiphertextHandle handle,
+                out ElementModP.ElementModPHandle elgamal_public_key);
 
             [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_crypto_hash")]
             internal static extern Status GetCryptoHash(
-                ElGamalCiphertextType* handle, out ElementModQ.ElementModQType* crypto_base_hash);
+                ElGamalCiphertextHandle handle,
+                out ElementModQ.ElementModQHandle crypto_base_hash);
 
-            [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_crypto_hash")]
+            [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_decrypt_with_secret")]
             internal static extern Status DecryptWithSecret(
-                ElGamalCiphertextType* handle, in ElementModQ.ElementModQType* crypto_base_hash, out ulong plaintext);
+                ElGamalCiphertextHandle handle,
+                in ElementModQ.ElementModQHandle crypto_base_hash,
+                out ulong plaintext);
 
         }
 
@@ -112,31 +176,51 @@ namespace ElectionGuard
         {
             internal unsafe struct ElectionDescriptionType { };
 
+            internal class ElectionDescriptionHandle
+                : ElectionguardSafeHandle<ElectionDescriptionType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = ElectionDescription.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"ElectionDescription Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
             [DllImport(DllName, EntryPoint = "eg_election_description_free")]
-            internal static extern Status Free(ElectionDescriptionType* handle);
+            internal static extern Status Free(ElectionDescriptionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_description_get_election_scope_id")]
-            internal static extern Status GetElectionScopeId(ElectionDescriptionType* handle, out IntPtr election_scope_id);
+            internal static extern Status GetElectionScopeId(
+                ElectionDescriptionHandle handle, out IntPtr election_scope_id);
 
             [DllImport(DllName, EntryPoint = "eg_election_description_crypto_hash")]
             internal static extern Status CryptoHash(
-                ElectionDescriptionType* handle, out ElementModQ.ElementModQType* crypto_hash);
+                ElectionDescriptionHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
 
             [DllImport(DllName, EntryPoint = "eg_election_description_from_json")]
             internal static extern Status FromJson(
-                [MarshalAs(UnmanagedType.LPStr)] string data, out ElectionDescriptionType* handle);
+                [MarshalAs(UnmanagedType.LPStr)] string data,
+                out ElectionDescriptionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_description_from_bson")]
             internal static extern Status FromBson(
-                uint* data, ulong length, ElectionDescriptionType* handle);
+                uint* data, ulong length, ElectionDescriptionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_description_to_json")]
             internal static extern Status ToJson(
-                ElectionDescriptionType* handle, out IntPtr data, out UIntPtr size);
+                ElectionDescriptionHandle handle, out IntPtr data, out UIntPtr size);
 
             [DllImport(DllName, EntryPoint = "eg_election_description_to_bson")]
             internal static extern Status ToBson(
-                ElectionDescriptionType* handle, out uint* data, out UIntPtr size);
+                ElectionDescriptionHandle handle, out uint* data, out UIntPtr size);
         }
 
         #endregion
@@ -147,83 +231,134 @@ namespace ElectionGuard
         {
             internal unsafe struct InternalElectionDescriptionType { };
 
+            internal class InternalElectionDescriptionHandle
+                : ElectionguardSafeHandle<InternalElectionDescriptionType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = InternalElectionDescription.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"InternalElectionDescription Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
             [DllImport(DllName, EntryPoint = "eg_internal_election_description_new")]
             internal static extern Status New(
-                ElectionDescription.ElectionDescriptionType* election_description,
-                out InternalElectionDescriptionType* handle);
+                ElectionDescription.ElectionDescriptionHandle election_description,
+                out InternalElectionDescriptionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_internal_election_description_free")]
-            internal static extern Status Free(InternalElectionDescriptionType* handle);
+            internal static extern Status Free(
+                InternalElectionDescriptionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_internal_election_description_get_description_hash")]
             internal static extern Status GetDescriptionHash(
-                InternalElectionDescriptionType* handle, out ElementModQ.ElementModQType* description_hash);
+                InternalElectionDescriptionHandle handle,
+                out ElementModQ.ElementModQHandle description_hash);
 
             [DllImport(DllName, EntryPoint = "eg_internal_election_description_from_json")]
             internal static extern Status FromJson(
-                [MarshalAs(UnmanagedType.LPStr)] string data, out InternalElectionDescriptionType* handle);
+                [MarshalAs(UnmanagedType.LPStr)] string data,
+                out InternalElectionDescriptionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_internal_election_description_from_bson")]
             internal static extern Status FromBson(
-                uint* data, ulong length, InternalElectionDescriptionType* handle);
+                uint* data, ulong length, InternalElectionDescriptionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_internal_election_description_to_json")]
             internal static extern Status ToJson(
-                InternalElectionDescriptionType* handle, out IntPtr data, out UIntPtr size);
+                InternalElectionDescriptionHandle handle, out IntPtr data, out UIntPtr size);
 
             [DllImport(DllName, EntryPoint = "eg_internal_election_description_to_bson")]
             internal static extern Status ToBson(
-                InternalElectionDescriptionType* handle, out uint* data, out UIntPtr size);
+                InternalElectionDescriptionHandle handle, out uint* data, out UIntPtr size);
         }
+
+        #endregion
+
+        #region CiphertextElectionContext
 
         internal static unsafe class CiphertextElectionContext
         {
             internal unsafe struct CiphertextElectionType { };
 
+            internal class CiphertextElectionContextHandle
+                : ElectionguardSafeHandle<CiphertextElectionType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = CiphertextElectionContext.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"CiphertextElectionContext Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_free")]
-            internal static extern Status Free(CiphertextElectionType* handle);
+            internal static extern Status Free(CiphertextElectionContextHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_get_elgamal_public_key")]
             internal static extern Status GetElGamalPublicKey(
-                CiphertextElectionType* handle, out ElementModP.ElementModPType* elgamal_public_key);
+                CiphertextElectionContextHandle handle,
+                out ElementModP.ElementModPHandle elgamal_public_key);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_get_description_hash")]
             internal static extern Status GetDescriptionHash(
-                CiphertextElectionType* handle, out ElementModQ.ElementModQType* description_hash);
+                CiphertextElectionContextHandle handle,
+                out ElementModQ.ElementModQHandle description_hash);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_get_crypto_base_hash")]
             internal static extern Status GetCryptoBaseHash(
-                CiphertextElectionType* handle, out ElementModQ.ElementModQType* crypto_base_hash);
+                CiphertextElectionContextHandle handle,
+                out ElementModQ.ElementModQHandle crypto_base_hash);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_get_crypto_extended_base_hash")]
             internal static extern Status GetCryptoExtendedBaseHash(
-                CiphertextElectionType* handle, out ElementModQ.ElementModQType* crypto_extended_base_has);
+                CiphertextElectionContextHandle handle,
+                out ElementModQ.ElementModQHandle crypto_extended_base_has);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make")]
             internal static extern Status Make(
-                ulong number_of_guardians, ulong quorum, ElementModP.ElementModPType* elgamal_public_key,
-                ElementModQ.ElementModQType* description_hash, out CiphertextElectionType* handle);
+                ulong number_of_guardians,
+                ulong quorum,
+                ElementModP.ElementModPHandle elgamal_public_key,
+                ElementModQ.ElementModQHandle description_hash,
+                out CiphertextElectionContextHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_from_hex")]
             internal static extern Status Make(
-                ulong number_of_guardians, ulong quorum, [MarshalAs(UnmanagedType.LPStr)] string hex_elgamal_public_key,
-                [MarshalAs(UnmanagedType.LPStr)] string hex_description_hash, out CiphertextElectionType* handle);
+                ulong number_of_guardians,
+                ulong quorum, [MarshalAs(UnmanagedType.LPStr)] string hex_elgamal_public_key,
+                [MarshalAs(UnmanagedType.LPStr)] string hex_description_hash,
+                out CiphertextElectionContextHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_from_json")]
             internal static extern Status FromJson(
-                [MarshalAs(UnmanagedType.LPStr)] string data, out CiphertextElectionType* handle);
+                [MarshalAs(UnmanagedType.LPStr)] string data,
+                out CiphertextElectionContextHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_from_bson")]
             internal static extern Status FromBson(
-                uint* data, ulong length, CiphertextElectionType* handle);
+                uint* data, ulong length, CiphertextElectionContextHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_to_json")]
             internal static extern Status ToJson(
-                CiphertextElectionType* handle, out IntPtr data, out UIntPtr size);
+                CiphertextElectionContextHandle handle, out IntPtr data, out UIntPtr size);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_to_bson")]
             internal static extern Status ToBson(
-                CiphertextElectionType* handle, out uint* data, out UIntPtr size);
+                CiphertextElectionContextHandle handle, out uint* data, out UIntPtr size);
         }
 
         #endregion
@@ -252,25 +387,35 @@ namespace ElectionGuard
             }
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_new")]
-            internal static extern Status New([MarshalAs(UnmanagedType.LPStr)] string objectId,
-            long vote, bool isPlaceholderSelection, out PlaintextBallotSelectionHandle handle);
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                long vote,
+                bool isPlaceholderSelection,
+                out PlaintextBallotSelectionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_new_with_extended_data")]
-            internal static extern Status New([MarshalAs(UnmanagedType.LPStr)] string objectId,
-            long vote, bool isPlaceholderSelection, [MarshalAs(UnmanagedType.LPStr)] string extendedData,
-            long extendedDataLength, out PlaintextBallotSelectionHandle handle);
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                long vote,
+                bool isPlaceholderSelection,
+                [MarshalAs(UnmanagedType.LPStr)] string extendedData,
+                long extendedDataLength,
+                out PlaintextBallotSelectionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_free")]
             internal static extern Status Free(PlaintextBallotSelectionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_get_object_id")]
-            internal static extern Status GetObjectId(PlaintextBallotSelectionHandle handle, out IntPtr object_id);
+            internal static extern Status GetObjectId(
+                PlaintextBallotSelectionHandle handle, out IntPtr object_id);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_get_is_placeholder")]
-            internal static extern bool GetIsPlaceholder(PlaintextBallotSelectionHandle handle);
+            internal static extern bool GetIsPlaceholder(
+                PlaintextBallotSelectionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_is_valid")]
-            internal static extern bool IsValid(PlaintextBallotSelectionHandle handle,
+            internal static extern bool IsValid(
+                PlaintextBallotSelectionHandle handle,
                 [MarshalAs(UnmanagedType.LPStr)] string expectedObjectId);
         }
 
@@ -278,38 +423,61 @@ namespace ElectionGuard
         {
             internal unsafe struct CiphertextBallotSelectionType { };
 
+            internal class CiphertextBallotSelectionHandle
+                : ElectionguardSafeHandle<CiphertextBallotSelectionType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = CiphertextBallotSelection.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"CiphertextBallotSelection Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_free")]
-            internal static extern Status Free(CiphertextBallotSelectionType* handle);
+            internal static extern Status Free(CiphertextBallotSelectionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_get_object_id")]
-            internal static extern Status GetObjectId(CiphertextBallotSelectionType* handle, out IntPtr object_id);
+            internal static extern Status GetObjectId(
+                CiphertextBallotSelectionHandle handle, out IntPtr object_id);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_get_description_hash")]
             internal static extern Status GetDescriptionHash(
-                CiphertextBallotSelectionType* handle, out ElementModQ.ElementModQType* description_hash);
+                CiphertextBallotSelectionHandle handle,
+                out ElementModQ.ElementModQHandle description_hash);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_get_is_placeholder")]
-            internal static extern bool GetIsPlaceholder(CiphertextBallotSelectionType* handle);
+            internal static extern bool GetIsPlaceholder(CiphertextBallotSelectionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_get_ciphertext")]
             internal static extern Status GetCiphertext(
-                CiphertextBallotSelectionType* handle, out ElGamalCiphertext.ElGamalCiphertextType* ciphertext);
+                CiphertextBallotSelectionHandle handle,
+                out ElGamalCiphertext.ElGamalCiphertextHandle ciphertext);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_get_crypto_hash")]
             internal static extern Status GetCryptoHash(
-                CiphertextBallotSelectionType* handle, out ElementModQ.ElementModQType* cryptoHash);
+                CiphertextBallotSelectionHandle handle,
+                out ElementModQ.ElementModQHandle cryptoHash);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_get_nonce")]
             internal static extern Status GetNonce(
-                CiphertextBallotSelectionType* handle, out ElementModQ.ElementModQType* nonce);
+                CiphertextBallotSelectionHandle handle,
+                out ElementModQ.ElementModQHandle nonce);
 
             // TODO: ISSUE #129: get proof
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_is_valid_encryption")]
-            internal static extern bool IsValidEncryption(CiphertextBallotSelectionType* handle,
-                ElementModQ.ElementModQType* seed_hash,
-                ElementModP.ElementModPType* public_key,
-                ElementModQ.ElementModQType* crypto_extended_base_hash);
+            internal static extern bool IsValidEncryption(
+                CiphertextBallotSelectionHandle handle,
+                ElementModQ.ElementModQHandle seed_hash,
+                ElementModP.ElementModPHandle public_key,
+                ElementModQ.ElementModQHandle crypto_extended_base_hash);
 
         }
 
@@ -328,7 +496,7 @@ namespace ElectionGuard
                     var status = PlaintextBallotContest.Free(this);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"PlaintextBallotContest Error DisposeUnmanaged: {status}");
+                        Console.WriteLine($"PlaintextBallotContest Error Free: {status}");
                         return false;
                     }
                     return true;
@@ -339,13 +507,17 @@ namespace ElectionGuard
             internal static extern Status Free(PlaintextBallotContestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_get_object_id")]
-            internal static extern Status GetObjectId(PlaintextBallotContestHandle handle, out IntPtr object_id);
+            internal static extern Status GetObjectId(
+                PlaintextBallotContestHandle handle, out IntPtr object_id);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_get_selections_size")]
-            internal static extern ulong GetSelectionsSize(PlaintextBallotContestHandle handle);
+            internal static extern ulong GetSelectionsSize(
+                PlaintextBallotContestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_get_selection_at_index")]
-            internal static extern Status GetSelectionAtIndex(PlaintextBallotContestHandle handle, ulong index,
+            internal static extern Status GetSelectionAtIndex(
+                PlaintextBallotContestHandle handle,
+                ulong index,
                 out PlaintextBallotSelection.PlaintextBallotSelectionHandle selection);
         }
 
@@ -353,38 +525,69 @@ namespace ElectionGuard
         {
             internal unsafe struct CiphertextBallotContestType { };
 
+            internal class CiphertextBallotContestHandle
+                : ElectionguardSafeHandle<CiphertextBallotContestType>
+            {
+                [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = CiphertextBallotContest.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"CiphertextBallotContest Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_free")]
-            internal static extern Status Free(CiphertextBallotContestType* handle);
+            internal static extern Status Free(CiphertextBallotContestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_get_object_id")]
-            internal static extern Status GetObjectId(CiphertextBallotContestType* handle, out IntPtr object_id);
+            internal static extern Status GetObjectId(
+                CiphertextBallotContestHandle handle, out IntPtr object_id);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_get_description_hash")]
             internal static extern Status GetDescriptionHash(
-                CiphertextBallotContestType* handle, out ElementModQ.ElementModQType* description_hash);
+                CiphertextBallotContestHandle handle,
+                out ElementModQ.ElementModQHandle description_hash);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_get_selections_size")]
-            internal static extern ulong GetSelectionsSize(CiphertextBallotContestType* handle);
+            internal static extern ulong GetSelectionsSize(
+                CiphertextBallotContestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_get_selection_at_index")]
-            internal static extern Status GetSelectionAtIndex(CiphertextBallotContestType* handle, ulong index,
-                out CiphertextBallotSelection.CiphertextBallotSelectionType* selection);
-
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_get_crypto_hash")]
-            internal static extern Status GetCryptoHash(
-                CiphertextBallotContestType* handle, out ElementModQ.ElementModQType* cryptoHash);
+            internal static extern Status GetSelectionAtIndex(
+                CiphertextBallotContestHandle handle,
+                ulong index,
+                out CiphertextBallotSelection.CiphertextBallotSelectionHandle selection);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_get_nonce")]
             internal static extern Status GetNonce(
-                CiphertextBallotContestType* handle, out ElementModQ.ElementModQType* nonce);
+                CiphertextBallotContestHandle handle,
+                out ElementModQ.ElementModQHandle nonce);
+
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_get_ciphertext_accumulation")]
+            internal static extern Status GetCiphertextAccumulation(
+                CiphertextBallotContestHandle handle,
+                out ElGamalCiphertext.ElGamalCiphertextHandle nonce);
+
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_get_crypto_hash")]
+            internal static extern Status GetCryptoHash(
+                CiphertextBallotContestHandle handle,
+                out ElementModQ.ElementModQHandle cryptoHash);
 
             // TODO: ISSUE #129: get proof
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_is_valid_encryption")]
-            internal static extern bool IsValidEncryption(CiphertextBallotContestType* handle,
-                ElementModQ.ElementModQType* seed_hash,
-                ElementModP.ElementModPType* public_key,
-                ElementModQ.ElementModQType* crypto_extended_base_hash);
+            internal static extern bool IsValidEncryption(
+                CiphertextBallotContestHandle handle,
+                ElementModQ.ElementModQHandle seed_hash,
+                ElementModP.ElementModPHandle public_key,
+                ElementModQ.ElementModQHandle crypto_extended_base_hash);
         }
 
         internal static unsafe class PlaintextBallot
@@ -402,7 +605,7 @@ namespace ElectionGuard
                     var status = PlaintextBallot.Free(this);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"PlaintextBallot Error DisposeUnmanaged: {status}");
+                        Console.WriteLine($"PlaintextBallot Error Free: {status}");
                         return false;
                     }
                     return true;
@@ -413,21 +616,26 @@ namespace ElectionGuard
             internal static extern Status Free(PlaintextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_object_id")]
-            internal static extern Status GetObjectId(PlaintextBallotHandle handle, out IntPtr object_id);
+            internal static extern Status GetObjectId(
+                PlaintextBallotHandle handle, out IntPtr object_id);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_ballot_style")]
-            internal static extern Status GetBallotStyle(PlaintextBallotHandle handle, out IntPtr ballot_style);
+            internal static extern Status GetBallotStyle(
+                PlaintextBallotHandle handle, out IntPtr ballot_style);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_contests_size")]
             internal static extern ulong GetContestsSize(PlaintextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_contest_at_index")]
-            internal static extern Status GetContestAtIndex(PlaintextBallotHandle handle, ulong index,
+            internal static extern Status GetContestAtIndex(
+                PlaintextBallotHandle handle,
+                ulong index,
                 out PlaintextBallotContest.PlaintextBallotContestHandle contest);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_from_json")]
             internal static extern Status FromJson(
-                [MarshalAs(UnmanagedType.LPStr)] string data, out PlaintextBallotHandle handle);
+                [MarshalAs(UnmanagedType.LPStr)] string data,
+                out PlaintextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_from_bson")]
             internal static extern Status FromBson(
@@ -446,72 +654,101 @@ namespace ElectionGuard
         {
             internal unsafe struct CiphertextBallotType { };
 
+            internal class CiphertextBallotHandle
+                : ElectionguardSafeHandle<CiphertextBallotType>
+            {
+                [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = CiphertextBallot.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"CiphertextBallot Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_free")]
-            internal static extern Status Free(CiphertextBallotType* handle);
+            internal static extern Status Free(CiphertextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_object_id")]
-            internal static extern Status GetObjectId(CiphertextBallotType* handle, out IntPtr object_id);
+            internal static extern Status GetObjectId(
+                CiphertextBallotHandle handle, out IntPtr object_id);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_ballot_style")]
-            internal static extern Status GetBallotStyle(CiphertextBallotType* handle, out IntPtr ballot_style);
+            internal static extern Status GetBallotStyle(
+                CiphertextBallotHandle handle, out IntPtr ballot_style);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_description_hash")]
             internal static extern Status GetDescriptionHash(
-                CiphertextBallotType* handle, out ElementModQ.ElementModQType* description_hash);
+                CiphertextBallotHandle handle,
+                out ElementModQ.ElementModQHandle description_hash);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_previous_tracking_hash")]
             internal static extern Status GetPreviousTrackingHash(
-                CiphertextBallotType* handle, out ElementModQ.ElementModQType* tracking_hash);
+                CiphertextBallotHandle handle,
+                out ElementModQ.ElementModQHandle tracking_hash);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_contests_size")]
-            internal static extern ulong GetContestsSize(CiphertextBallotType* handle);
+            internal static extern ulong GetContestsSize(CiphertextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_contest_at_index")]
-            internal static extern Status GetContestAtIndex(CiphertextBallotType* handle, ulong index,
-                out CiphertextBallotContest.CiphertextBallotContestType* contest);
+            internal static extern Status GetContestAtIndex(
+                CiphertextBallotHandle handle,
+                ulong index,
+                out CiphertextBallotContest.CiphertextBallotContestHandle contest);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_tracking_hash")]
             internal static extern Status GetTrackingHash(
-                CiphertextBallotType* handle, out ElementModQ.ElementModQType* tracking_hash);
+                CiphertextBallotHandle handle,
+                out ElementModQ.ElementModQHandle tracking_hash);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_tracking_code")]
-            internal static extern Status GetTrackingCode(CiphertextBallotType* handle, out IntPtr tracking_code);
+            internal static extern Status GetTrackingCode(
+                CiphertextBallotHandle handle, out IntPtr tracking_code);
 
             // TODO: ISSUE #129: get timestamp
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_nonce")]
             internal static extern Status GetNonce(
-                CiphertextBallotType* handle, out ElementModQ.ElementModQType* nonce);
+                CiphertextBallotHandle handle,
+                out ElementModQ.ElementModQHandle nonce);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_is_valid_encryption")]
-            internal static extern bool IsValidEncryption(CiphertextBallotType* handle,
-                ElementModQ.ElementModQType* seed_hash,
-                ElementModP.ElementModPType* public_key,
-                ElementModQ.ElementModQType* crypto_extended_base_hash);
+            internal static extern bool IsValidEncryption(
+                CiphertextBallotHandle handle,
+                ElementModQ.ElementModQHandle seed_hash,
+                ElementModP.ElementModPHandle public_key,
+                ElementModQ.ElementModQHandle crypto_extended_base_hash);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_from_json")]
             internal static extern Status FromJson(
-                [MarshalAs(UnmanagedType.LPStr)] string data, out CiphertextBallotType* handle);
+                [MarshalAs(UnmanagedType.LPStr)] string data,
+                out CiphertextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_from_bson")]
             internal static extern Status FromBson(
-                uint* data, ulong length, CiphertextBallotType* handle);
+                uint* data, ulong length, CiphertextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_to_json")]
             internal static extern Status ToJson(
-                CiphertextBallotType* handle, out IntPtr data, out UIntPtr size);
+                CiphertextBallotHandle handle, out IntPtr data, out UIntPtr size);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_to_json_with_nonces")]
             internal static extern Status ToJsonWithNonces(
-                CiphertextBallotType* handle, out IntPtr data, out UIntPtr size);
+                CiphertextBallotHandle handle, out IntPtr data, out UIntPtr size);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_to_bson")]
             internal static extern Status ToBson(
-                CiphertextBallotType* handle, out uint* data, out UIntPtr size);
+                CiphertextBallotHandle handle, out uint* data, out UIntPtr size);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_to_bson_with_nonces")]
             internal static extern Status ToBsonWithNonces(
-                CiphertextBallotType* handle, out uint* data, out UIntPtr size);
+                CiphertextBallotHandle handle, out uint* data, out UIntPtr size);
         }
 
         #endregion
@@ -522,42 +759,82 @@ namespace ElectionGuard
         {
             internal unsafe struct EncryptionDeviceType { };
 
+            internal class EncryptionDeviceHandle
+                : ElectionguardSafeHandle<EncryptionDeviceType>
+            {
+                [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = EncryptionDevice.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"EncryptionDevice Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
             [DllImport(DllName, EntryPoint = "eg_encryption_device_new")]
             internal static extern Status New(
-                ulong uuid, [MarshalAs(UnmanagedType.LPStr)] string location, out EncryptionDeviceType* handle);
+                ulong uuid,
+                [MarshalAs(UnmanagedType.LPStr)] string location,
+                out EncryptionDeviceHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encryption_device_free")]
-            internal static extern Status Free(EncryptionDeviceType* handle);
+            internal static extern Status Free(EncryptionDeviceHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encryption_device_get_hash")]
             internal static extern Status GetHash(
-                EncryptionDeviceType* handle, out ElementModQ.ElementModQType* device_hash);
+                EncryptionDeviceHandle handle,
+                out ElementModQ.ElementModQHandle device_hash);
         }
 
         internal static unsafe class EncryptionMediator
         {
             internal unsafe struct EncryptionMediatorType { };
 
+            internal class EncryptionMediatorHandle
+                : ElectionguardSafeHandle<EncryptionMediatorType>
+            {
+                [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = EncryptionMediator.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"EncryptionMediator Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
             [DllImport(DllName, EntryPoint = "eg_encryption_mediator_new")]
             internal static extern Status New(
-                InternalElectionDescription.InternalElectionDescriptionType* metadata,
-                CiphertextElectionContext.CiphertextElectionType* context,
-                EncryptionDevice.EncryptionDeviceType* device, out EncryptionMediatorType* handle);
+                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                CiphertextElectionContext.CiphertextElectionContextHandle context,
+                EncryptionDevice.EncryptionDeviceHandle device,
+                out EncryptionMediatorHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encryption_mediator_free")]
-            internal static extern Status Free(EncryptionMediatorType* handle);
+            internal static extern Status Free(EncryptionMediatorHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encryption_mediator_encrypt_ballot")]
             internal static extern Status Encrypt(
-                EncryptionMediatorType* handle,
+                EncryptionMediatorHandle handle,
                 PlaintextBallot.PlaintextBallotHandle plainutext,
-                out CiphertextBallot.CiphertextBallotType* ciphertext);
+                out CiphertextBallot.CiphertextBallotHandle ciphertext);
 
             [DllImport(DllName, EntryPoint = "eg_encryption_mediator_encrypt_ballot_verify_proofs")]
             internal static extern Status EncryptAndVerify(
-                EncryptionMediatorType* handle,
+                EncryptionMediatorHandle handle,
                 PlaintextBallot.PlaintextBallotHandle plainutext,
-                out CiphertextBallot.CiphertextBallotType* ciphertext);
+                out CiphertextBallot.CiphertextBallotHandle ciphertext);
         }
 
 
@@ -566,19 +843,21 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot")]
             internal static extern Status Ballot(
                 PlaintextBallot.PlaintextBallotHandle plaintext,
-                 InternalElectionDescription.InternalElectionDescriptionType* metadata,
-                 CiphertextElectionContext.CiphertextElectionType* context,
-                 ElementModQ.ElementModQType* seedHash, bool shouldVerifyProofs,
-                 out CiphertextBallot.CiphertextBallotType* handle);
+                 InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                 CiphertextElectionContext.CiphertextElectionContextHandle context,
+                 ElementModQ.ElementModQHandle seedHash,
+                 bool shouldVerifyProofs,
+                 out CiphertextBallot.CiphertextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot_with_nonce")]
             internal static extern Status Ballot(
                 PlaintextBallot.PlaintextBallotHandle plaintext,
-                 InternalElectionDescription.InternalElectionDescriptionType* metadata,
-                 CiphertextElectionContext.CiphertextElectionType* context,
-                 ElementModQ.ElementModQType* seedHash,
-                 ElementModQ.ElementModQType* nonce, bool shouldVerifyProofs,
-                 out CiphertextBallot.CiphertextBallotType* handle);
+                 InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                 CiphertextElectionContext.CiphertextElectionContextHandle context,
+                 ElementModQ.ElementModQHandle seedHash,
+                 ElementModQ.ElementModQHandle nonce,
+                 bool shouldVerifyProofs,
+                 out CiphertextBallot.CiphertextBallotHandle handle);
         }
     }
 

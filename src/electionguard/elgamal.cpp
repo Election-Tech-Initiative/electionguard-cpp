@@ -76,7 +76,12 @@ namespace electionguard
         {
         }
 
-        unique_ptr<ElementModQ> crypto_hash() const { return hash_elems({pad.get(), data.get()}); }
+        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
+        {
+            return hash_elems({pad.get(), data.get()});
+        }
+
+        bool operator==(const Impl &other) { return *pad == *other.pad && *data == *other.data; }
     };
 
     // Lifecycle Methods
@@ -95,6 +100,13 @@ namespace electionguard
         swap(pimpl, rhs.pimpl);
         return *this;
     }
+
+    bool ElGamalCiphertext::operator==(const ElGamalCiphertext &other)
+    {
+        return *pimpl == *other.pimpl;
+    }
+
+    bool ElGamalCiphertext::operator!=(const ElGamalCiphertext &other) { return !(*this == other); }
 
     // Property Getters
 
@@ -162,6 +174,11 @@ namespace electionguard
 
         // if it is anything else no result found (decrypt failed)
         return retval;
+    }
+
+    unique_ptr<ElGamalCiphertext> ElGamalCiphertext::clone() const
+    {
+        return make_unique<ElGamalCiphertext>(pimpl->pad->clone(), pimpl->data->clone());
     }
 
 #pragma endregion
