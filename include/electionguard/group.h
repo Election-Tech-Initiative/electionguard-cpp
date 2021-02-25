@@ -15,6 +15,8 @@ extern "C" {
 
 // ElementModP
 
+#ifndef ElementModP
+
 struct eg_element_mod_p_s;
 typedef struct eg_element_mod_p_s eg_element_mod_p_t;
 
@@ -33,7 +35,9 @@ EG_API eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *han
 
 // TODO: ISSUE #129: finish implementation
 
-// ElementModQ
+#endif
+
+#ifndef ElementModQ
 
 struct eg_element_mod_q_s;
 typedef struct eg_element_mod_q_s eg_element_mod_q_t;
@@ -51,9 +55,38 @@ EG_API eg_electionguard_status_t eg_element_mod_q_get_data(eg_element_mod_q_t *h
 EG_API eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *handle,
                                                          char **out_hex);
 
-EG_API eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle);
+// TODO: ISSUE #129: finish implementation
+
+#endif
+
+#ifndef Group Constants
+
+EG_API eg_electionguard_status_t eg_element_mod_p_constant_g(eg_element_mod_p_t **out_constant_ref);
+EG_API eg_electionguard_status_t eg_element_mod_p_constant_p(eg_element_mod_p_t **out_constant_ref);
+EG_API eg_electionguard_status_t
+eg_element_mod_p_constant_zero_mod_p(eg_element_mod_p_t **out_constant_ref);
+EG_API eg_electionguard_status_t
+eg_element_mod_p_constant_one_mod_p(eg_element_mod_p_t **out_constant_ref);
+EG_API eg_electionguard_status_t
+eg_element_mod_p_constant_two_mod_p(eg_element_mod_p_t **out_constant_ref);
+
+EG_API eg_electionguard_status_t eg_element_mod_q_constant_q(eg_element_mod_q_t **out_constant_ref);
+EG_API eg_electionguard_status_t
+eg_element_mod_q_constant_zero_mod_q(eg_element_mod_q_t **out_constant_ref);
+EG_API eg_electionguard_status_t
+eg_element_mod_q_constant_one_mod_q(eg_element_mod_q_t **out_constant_ref);
+EG_API eg_electionguard_status_t
+eg_element_mod_q_constant_two_mod_q(eg_element_mod_q_t **out_constant_ref);
+
+#endif
+
+#ifndef Group Math Functions
 
 // TODO: ISSUE #129: finish implementation
+
+EG_API eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle);
+
+#endif
 
 #ifdef __cplusplus
 }

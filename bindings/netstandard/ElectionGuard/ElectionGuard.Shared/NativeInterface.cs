@@ -117,9 +117,80 @@ namespace ElectionGuard
             internal static extern Status Random(out ElementModQHandle handle);
         }
 
+        internal static unsafe class Constants
+        {
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_constant_g")]
+            internal static extern Status G(out ElementModP.ElementModPHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_constant_p")]
+            internal static extern Status P(out ElementModP.ElementModPHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_constant_zero_mod_p")]
+            internal static extern Status ZERO_MOD_P(out ElementModP.ElementModPHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_constant_one_mod_p")]
+            internal static extern Status ONE_MOD_P(out ElementModP.ElementModPHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_constant_two_mod_p")]
+            internal static extern Status TWO_MOD_P(out ElementModP.ElementModPHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_constant_p")]
+            internal static extern Status Q(out ElementModQ.ElementModQHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_q_constant_zero_mod_q")]
+            internal static extern Status ZERO_MOD_Q(out ElementModQ.ElementModQHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_q_constant_one_mod_q")]
+            internal static extern Status ONE_MOD_Q(out ElementModQ.ElementModQHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_q_constant_two_mod_q")]
+            internal static extern Status TWO_MOD_Q(out ElementModQ.ElementModQHandle handle);
+        }
+
         #endregion
 
         #region Elgamal
+
+        internal static unsafe class ElGamalKeyPair
+        {
+            internal unsafe struct ElGamalKeyPairType { };
+
+            internal class ElGamalKeyPairHandle
+                : ElectionguardSafeHandle<ElGamalKeyPairType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = ElGamalKeyPair.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"ElGamalKeyPair Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_elgamal_keypair_from_secret_new")]
+            internal static extern Status New(
+                ElementModQ.ElementModQHandle in_secret_key,
+                out ElGamalKeyPairHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_elgamal_keypair_free")]
+            internal static extern Status Free(ElGamalKeyPairHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_elgamal_keypair_get_public_key")]
+            internal static extern Status GetPublicKey(
+                ElGamalKeyPairHandle handle,
+                out ElementModP.ElementModPHandle out_public_key);
+
+            [DllImport(DllName, EntryPoint = "eg_elgamal_keypair_get_secret_key")]
+            internal static extern Status GetSecretKey(
+                ElGamalKeyPairHandle handle,
+                out ElementModQ.ElementModQHandle out_secret_key);
+
+        }
 
         internal static unsafe class ElGamalCiphertext
         {
@@ -163,9 +234,19 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_decrypt_with_secret")]
             internal static extern Status DecryptWithSecret(
                 ElGamalCiphertextHandle handle,
-                in ElementModQ.ElementModQHandle crypto_base_hash,
-                out ulong plaintext);
+                ElementModQ.ElementModQHandle secret_key,
+                ref ulong plaintext);
 
+        }
+
+        internal static unsafe class ElGamal
+        {
+            [DllImport(DllName, EntryPoint = "eg_elgamal_encrypt")]
+            internal static extern Status Encrypt(
+                ulong plaintext,
+                ElementModQ.ElementModQHandle nonce,
+                ElementModP.ElementModPHandle public_key,
+                out ElGamalCiphertext.ElGamalCiphertextHandle handle);
         }
 
         #endregion
@@ -331,7 +412,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_get_crypto_extended_base_hash")]
             internal static extern Status GetCryptoExtendedBaseHash(
                 CiphertextElectionContextHandle handle,
-                out ElementModQ.ElementModQHandle crypto_extended_base_has);
+                out ElementModQ.ElementModQHandle crypto_extended_base_hash);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make")]
             internal static extern Status Make(

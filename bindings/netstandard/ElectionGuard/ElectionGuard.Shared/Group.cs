@@ -10,7 +10,7 @@ namespace ElectionGuard
     {
         public static readonly ulong MAX_SIZE = 64;
 
-        public ulong[] Data { get { return GetNative(); } set { NewNative(value); } }
+        public ulong[] Data { get { return GetNative(); } internal set { NewNative(value); } }
         internal unsafe NaiveElementModP Handle;
 
         public ElementModP(ulong[] data)
@@ -104,7 +104,7 @@ namespace ElectionGuard
     {
         public static readonly ulong MAX_SIZE = 4;
 
-        public ulong[] Data { get { return GetNative(); } set { NewNative(value); } }
+        public ulong[] Data { get { return GetNative(); } internal set { NewNative(value); } }
         internal unsafe NaiveElementModQ Handle;
 
         public ElementModQ(ulong[] data)
@@ -190,6 +190,126 @@ namespace ElectionGuard
             }
 
             return data;
+        }
+    }
+
+    public static class Constants
+    {
+        public unsafe static ElementModP G
+        {
+            get
+            {
+                var status = NativeInterface.Constants.G(out NaiveElementModP handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"G Error Status: {status}");
+                }
+                return new ElementModP(handle);
+            }
+        }
+
+        public unsafe static ElementModP P
+        {
+            get
+            {
+                var status = NativeInterface.Constants.P(out NaiveElementModP handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"P Error Status: {status}");
+                }
+                return new ElementModP(handle);
+            }
+        }
+
+        public unsafe static ElementModP ZERO_MOD_P
+        {
+            get
+            {
+                var status = NativeInterface.Constants.ZERO_MOD_P(out NaiveElementModP handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"ZERO_MOD_P Error Status: {status}");
+                }
+                return new ElementModP(handle);
+            }
+        }
+
+        public unsafe static ElementModP ONE_MOD_P
+        {
+            get
+            {
+                var status = NativeInterface.Constants.ZERO_MOD_P(out NaiveElementModP handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"ONE_MOD_P Error Status: {status}");
+                }
+                return new ElementModP(handle);
+            }
+        }
+
+        public unsafe static ElementModP TWO_MOD_P
+        {
+            get
+            {
+                var status = NativeInterface.Constants.ZERO_MOD_P(out NaiveElementModP handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"TWO_MOD_P Error Status: {status}");
+                }
+                return new ElementModP(handle);
+            }
+        }
+
+        public unsafe static ElementModQ Q
+        {
+            get
+            {
+                var status = NativeInterface.Constants.Q(out NaiveElementModQ handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"Q Error Status: {status}");
+                }
+                return new ElementModQ(handle);
+            }
+        }
+
+        public unsafe static ElementModQ ZERO_MOD_Q
+        {
+            get
+            {
+                var status = NativeInterface.Constants.ZERO_MOD_Q(out NaiveElementModQ handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"ZERO_MOD_Q Error Status: {status}");
+                }
+                return new ElementModQ(handle);
+            }
+        }
+
+        public unsafe static ElementModQ ONE_MOD_Q
+        {
+            get
+            {
+                var status = NativeInterface.Constants.ONE_MOD_Q(out NaiveElementModQ handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"ONE_MOD_Q Error Status: {status}");
+                }
+                return new ElementModQ(handle);
+            }
+        }
+
+        public unsafe static ElementModQ TWO_MOD_Q
+        {
+            get
+            {
+                var status = NativeInterface.Constants.TWO_MOD_Q(out NaiveElementModQ handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"TWO_MOD_Q Error Status: {status}");
+                }
+                return new ElementModQ(handle);
+            }
         }
     }
 }

@@ -135,6 +135,7 @@ namespace electionguard
         // and is only capable of decrypting boolean results (0/1)
         // it should be extended with a discrete_log search to decrypt
         // values other than 0 or 1
+
         const auto &p = P();
         auto secret = secretKey.toElementModP();
         uint64_t divisor[MAX_P_LEN] = {};
@@ -197,7 +198,10 @@ namespace electionguard
         auto pubkey_pow_n = pow_mod_p(publicKey, *nonce4096);
         auto data = mul_mod_p(*gpowp_m, *pubkey_pow_n);
 
-        Log::debug(":ElgGamal: Generated Encryption");
+        Log::debug(": Generated Encryption");
+        Log::debugHex(": publicKey: ", publicKey.toHex());
+        Log::debugHex(": pad: ", pad->toHex());
+        Log::debugHex(": data: ", data->toHex());
 
         return make_unique<ElGamalCiphertext>(move(pad), move(data));
     }

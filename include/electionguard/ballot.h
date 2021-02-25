@@ -396,8 +396,9 @@ EG_API size_t eg_ciphertext_ballot_get_contests_size(eg_ciphertext_ballot_t *han
  * @param[out] out_contest_ref An opaque pointer to the contest.  
  *                             The value is a reference and is not owned by the caller
  */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_contest_at_index(
-  eg_ciphertext_ballot_t *handle, size_t in_index, eg_ciphertext_ballot_contest_t **out_contest_ref);
+EG_API eg_electionguard_status_t
+eg_ciphertext_ballot_get_contest_at_index(eg_ciphertext_ballot_t *handle, size_t in_index,
+                                          eg_ciphertext_ballot_contest_t **out_contest_ref);
 
 /**
  * Unique ballot tracking hash for this ballot
@@ -429,8 +430,8 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_nonce(eg_ciphertext_ba
  * @param[out] out_hash_ref An opaque pointer to the crypto hash.  
  *                          The value is a reference and is not owned by the caller
  */
-EG_API eg_electionguard_status_t
-eg_ciphertext_ballot_get_crypto_hash(eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_hash_ref);
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_crypto_hash(
+  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_hash_ref);
 
 // CiphertextBallot::crypto_hash_with not provided
 // static CiphertextBallot::make not provided, use eg_encrypt_ballot
