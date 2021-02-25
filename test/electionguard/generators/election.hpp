@@ -174,6 +174,7 @@ namespace electionguard::test::generators
 
             auto context = CiphertextElectionContext::make(
               1UL, 1UL, make_unique<ElementModP>(publicKey),
+              make_unique<ElementModQ>(TWO_MOD_Q()),
               make_unique<ElementModQ>(*metadata.getDescriptionHash()));
             return context;
         }

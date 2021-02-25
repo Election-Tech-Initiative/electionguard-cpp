@@ -78,7 +78,8 @@ EG_API eg_electionguard_status_t eg_election_description_get_election_scope_id(
  * 
  * @param[in] handle the `eg_election_description_t`
  * @param[out] out_owned_hash the `eg_element_mod_q_t` crypto hash.  
- *                            Caller must call `eg_element_mod_q_free`
+ *                            Caller is responsible fo the lifecycle and 
+ *                            must call `eg_element_mod_q_free`
  */
 EG_API eg_electionguard_status_t eg_election_description_crypto_hash(
   eg_election_description_t *handle, eg_element_mod_q_t **out_owned_hash);
@@ -115,7 +116,7 @@ typedef struct eg_internal_election_description_s eg_internal_election_descripti
  * constructor
  * 
  * @param[in] in_election_description the `eg_election_description_t`
- * @param[out] out_handle the `eg_internal_election_description_t`
+ * @param[out] out_handle An opaque pointer to the object.  Caller is responsible for lifecycle.
  */
 EG_API eg_electionguard_status_t
 eg_internal_election_description_new(eg_election_description_t *in_election_description,
@@ -125,14 +126,13 @@ EG_API eg_electionguard_status_t
 eg_internal_election_description_free(eg_internal_election_description_t *handle);
 
 /**
- * Get a hash of the metadata components of the `ElectionDescription` used to construct
- * the `InternalElectionDescription`
+ * The hash of the election metadata
  * 
- * @param[in] handle the `eg_internal_election_description_t`
- * @param[out] out_owned_hash the `eg_element_mod_q_t` crypto hash.
+ * @param[out] out_description_hash_ref An opaque pointer to the description hash.  
+ *                                      The value is a reference and is not owned by the caller
  */
 EG_API eg_electionguard_status_t eg_internal_election_description_get_description_hash(
-  eg_internal_election_description_t *handle, eg_element_mod_q_t **out_description_hash);
+  eg_internal_election_description_t *handle, eg_element_mod_q_t **out_description_hash_ref);
 
 // TODO: ISSUE #129: implement missing members
 
@@ -159,25 +159,81 @@ typedef struct eg_ciphertext_election_context_s eg_ciphertext_election_context_t
 EG_API eg_electionguard_status_t
 eg_ciphertext_election_context_free(eg_ciphertext_election_context_t *handle);
 
+/**
+ * The `joint public key (K)` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
+ * 
+ * @param[out] out_elgamal_public_key_ref An opaque pointer to the public key.  
+ *                                        The value is a reference and is not owned by the caller
+ */
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_get_elgamal_public_key(
-  eg_ciphertext_election_context_t *handle, eg_element_mod_p_t **out_elgamal_public_key);
+  eg_ciphertext_election_context_t *handle, eg_element_mod_p_t **out_elgamal_public_key_ref);
 
+/**
+ * The `commitment hash H(K 1,0 , K 2,0 ... , K n,0 )` of the public commitments
+ * guardians make to each other in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
+ * 
+ * @param[out] out_commitment_hash_ref An opaque pointer to the commitment hash.  
+ *                                     The value is a reference and is not owned by the caller
+ */
+EG_API eg_electionguard_status_t eg_ciphertext_election_context_get_commitment_hash(
+  eg_ciphertext_election_context_t *handle, eg_element_mod_q_t **out_commitment_hash_ref);
+
+/**
+ * The hash of the election metadata
+ * 
+ * @param[out] out_description_hash_ref An opaque pointer to the description hash.  
+ *                                      The value is a reference and is not owned by the caller
+ */
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_get_description_hash(
-  eg_ciphertext_election_context_t *handle, eg_element_mod_q_t **out_description_hash);
+  eg_ciphertext_election_context_t *handle, eg_element_mod_q_t **out_description_hash_ref);
 
+/**
+ * The `base hash code (𝑄)` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
+ * 
+ * @param[out] out_crypto_base_hash_ref An opaque pointer to the ciphertext.  
+ *                                      The value is a reference and is not owned by the caller
+ */
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_get_crypto_base_hash(
-  eg_ciphertext_election_context_t *handle, eg_element_mod_q_t **out_crypto_base_hash);
+  eg_ciphertext_election_context_t *handle, eg_element_mod_q_t **out_crypto_base_hash_ref);
 
+/**
+ * The `extended base hash code (𝑄')` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
+ * 
+ * @param[out] out_crypto_extended_base_hash_ref An opaque pointer to the ciphertext.  
+ *                                               The value is a reference and is not owned by the caller
+ */
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_get_crypto_extended_base_hash(
-  eg_ciphertext_election_context_t *handle, eg_element_mod_q_t **out_crypto_extended_base_hash);
+  eg_ciphertext_election_context_t *handle, eg_element_mod_q_t **out_crypto_extended_base_hash_ref);
 
+/**
+ * Makes a CiphertextElectionContext object.
+ * 
+ * @param[in] in_number_of_guardians The number of guardians necessary to generate the public key
+ * @param[in] in_quorum The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians`
+ * @param[in] in_elgamal_public_key the public key of the election
+ * @param[in] in_commitment_hash the hash of the commitments the guardians make to each other
+ * @param[in] in_description_hash the hash of the election metadata
+ * @param[out] out_handle An opaque pointer to the object.  Caller is responsible for lifecycle.
+ */
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_make(
   uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
-  eg_element_mod_q_t *in_description_hash, eg_ciphertext_election_context_t **out_handle);
+  eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_description_hash,
+  eg_ciphertext_election_context_t **out_handle);
 
+/**
+ * Makes a CiphertextElectionContext object from the hex string representations.
+ * 
+ * @param[in] in_number_of_guardians The number of guardians necessary to generate the public key
+ * @param[in] in_quorum The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians`
+ * @param[in] in_elgamal_public_key the public key of the election
+ * @param[in] in_commitment_hash the hash of the commitments the guardians make to each other
+ * @param[in] in_description_hash the hash of the election metadata
+ * @param[out] out_handle An opaque pointer to the object.  Caller is responsible for lifecycle.
+ */
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_make_from_hex(
   uint64_t in_number_of_guardians, uint64_t in_quorum, const char *in_elgamal_public_key,
-  const char *in_description_hash, eg_ciphertext_election_context_t **out_handle);
+  const char *in_commitment_hash, const char *in_description_hash,
+  eg_ciphertext_election_context_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_from_json(
   char *in_data, eg_ciphertext_election_context_t **out_handle);

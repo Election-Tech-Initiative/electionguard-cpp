@@ -9,6 +9,18 @@ namespace ElectionGuard
     using NativeElementModP = NativeInterface.ElementModP.ElementModPHandle;
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
 
+    /// <summary>
+    /// Use this entity for defining the structure of the election and associated
+    /// information such as candidates, contests, and vote counts.  This class is
+    /// based on the NIST Election Common Standard Data Specification.  Some deviations
+    /// from the standard exist.
+    ///
+    /// This structure is considered an immutable input object and should not be changed
+    /// through the course of an election, as it's hash representation is the basis for all
+    /// other hash representations within an ElectionGuard election context.
+    ///
+    /// See: https://developers.google.com/elections-data/reference/election
+    /// </summary>
     public class ElectionDescription : DisposableBase
     {
         public unsafe string ElectionScopeId
@@ -72,8 +84,16 @@ namespace ElectionGuard
         }
     }
 
-    public class InternalElectionDescription: DisposableBase
+    /// <summary>
+    /// `InternalElectionDescription` is a subset of the `ElectionDescription` structure that specifies
+    /// the components that ElectionGuard uses for conducting an election.  The key component is the
+    /// `contests` collection, which applies placeholder selections to the `ElectionDescription` contests
+    /// </summary>
+    public class InternalElectionDescription : DisposableBase
     {
+        /// <summary>
+        /// The hash of the election metadata
+        /// </summary>
         public unsafe ElementModQ DescriptionHash
         {
             get
@@ -132,8 +152,22 @@ namespace ElectionGuard
         }
     }
 
-    public class CiphertextElectionContext: DisposableBase
+    /// <summary>
+    /// `CiphertextElectionContext` is the ElectionGuard representation of a specific election
+    /// Note: The ElectionGuard Data Spec deviates from the NIST model in that
+    /// this object includes fields that are populated in the course of encrypting an election
+    /// Specifically, `crypto_base_hash`, `crypto_extended_base_hash` and `elgamal_public_key`
+    /// are populated with election-specific information necessary for encrypting the election.
+    /// Refer to the [Electionguard Specification](https://github.com/microsoft/electionguard) for more information.
+    ///
+    /// To make an instance of this class, don't construct it directly. Use
+    /// `make_ciphertext_election_context` instead.
+    /// </summary>
+    public class CiphertextElectionContext : DisposableBase
     {
+        /// <summary>
+        /// the `joint public key (K)` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
+        /// </summary>
         public unsafe ElementModP ElGamalPublicKey
         {
             get
@@ -149,6 +183,28 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// the `commitment hash H(K 1,0 , K 2,0 ... , K n,0 )` of the public commitments
+        /// guardians make to each other in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
+        /// </summary>
+        public unsafe ElementModQ CommitmentHash
+        {
+            get
+            {
+                var status = NativeInterface.CiphertextElectionContext.GetCommitmentHash(
+                    Handle, out NativeElementModQ value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"CommitmentHash Error Status: {status}");
+                    return null;
+                }
+                return new ElementModQ(value);
+            }
+        }
+
+        /// <summary>
+        /// The hash of the election metadata
+        /// </summary>
         public unsafe ElementModQ DescriptionHash
         {
             get
@@ -164,6 +220,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// the `base hash code (𝑄)` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
+        /// </summary>
         public unsafe ElementModQ CryptoBaseHash
         {
             get
@@ -179,6 +238,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// the `extended base hash code (𝑄')` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
+        /// </summary>
         public unsafe ElementModQ CryptoExtendedBaseHash
         {
             get
@@ -209,12 +271,8 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null) return;
-            var status = NativeInterface.CiphertextElectionContext.Free(Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"DisposeUnmanaged Error Status: {status}");
-            }
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
             Handle = null;
         }
 
