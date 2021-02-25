@@ -14,13 +14,14 @@ namespace ElectionGuard.Tests
             var secret = Constants.TWO_MOD_Q;
             var keyPair = ElGamalKeyPair.FromSecret(secret);
             var publicKey = keyPair.PublicKey;
+            var vote = 1;
 
             // Act
-            var ciphertext = Elgamal.Encrypt(1, nonce, publicKey);
+            var ciphertext = Elgamal.Encrypt(vote, nonce, publicKey);
             var plaintext = ciphertext.Decrypt(keyPair.SecretKey);
 
             // Assert
-            Assert.That(plaintext == 1);
+            Assert.That(plaintext == vote);
         }
     }
 }
