@@ -12,7 +12,9 @@ namespace electionguard
     class EG_API Tracker
     {
       public:
-        static std::unique_ptr<ElementModQ> getHashForDevice(uint64_t uuid,
+        static std::unique_ptr<ElementModQ> getHashForDevice(uint64_t deviceUuid,
+                                                             uint64_t sessionUuid,
+                                                             uint64_t launchCode,
                                                              const std::string &location);
 
         // TODO: use explicit time type

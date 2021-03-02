@@ -15,13 +15,15 @@ namespace electionguard
       public:
         EncryptionDevice(const EncryptionDevice &other);
         EncryptionDevice(const EncryptionDevice &&other);
-        EncryptionDevice(const uint64_t uuid, const std::string &location);
+        EncryptionDevice(const uint64_t deviceUuid, const uint64_t sessionUuid,
+                         const uint64_t launchCode, const std::string &location);
         ~EncryptionDevice();
 
         EncryptionDevice &operator=(EncryptionDevice other);
         EncryptionDevice &operator=(EncryptionDevice &&other);
 
         std::unique_ptr<ElementModQ> getHash() const;
+        uint64_t getTimestamp() const;
 
       private:
         class Impl;
@@ -43,6 +45,9 @@ namespace electionguard
 
         std::unique_ptr<CiphertextBallot> encrypt(const PlaintextBallot &ballot,
                                                   bool shouldVerifyProofs = true) const;
+
+        std::unique_ptr<CompactCiphertextBallot>
+        compactEncrypt(const PlaintextBallot &ballot, bool shouldVerifyProofs = true) const;
 
       private:
         class Impl;
@@ -116,7 +121,24 @@ namespace electionguard
     EG_API std::unique_ptr<CiphertextBallot>
     encryptBallot(const PlaintextBallot &plaintext, const InternalElectionDescription &metadata,
                   const CiphertextElectionContext &context, const ElementModQ &seedHash,
-                  std::unique_ptr<ElementModQ> nonce = nullptr, bool shouldVerifyProofs = true);
+                  std::unique_ptr<ElementModQ> nonce = nullptr, uint64_t timestamp = 0,
+                  bool shouldVerifyProofs = true);
+
+    EG_API std::unique_ptr<CompactCiphertextBallot>
+    encryptCompactBallot(const PlaintextBallot &plaintext,
+                         const InternalElectionDescription &metadata,
+                         const CiphertextElectionContext &context, const ElementModQ &seedHash,
+                         std::unique_ptr<ElementModQ> nonce = nullptr, uint64_t timestamp = 0,
+                         bool shouldVerifyProofs = true);
+
+    std::unique_ptr<PlaintextBallot>
+    expandCompactPlaintextBallot(const CompactPlaintextBallot &compactPlaintext,
+                                 const InternalElectionDescription &description);
+
+    std::unique_ptr<CiphertextBallot>
+    expandCompactCiphertextBallot(const CompactCiphertextBallot &compactCiphertext,
+                                  const InternalElectionDescription &metadata,
+                                  const CiphertextElectionContext &context);
 
 } // namespace electionguard
 

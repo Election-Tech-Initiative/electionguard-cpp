@@ -926,24 +926,44 @@ namespace ElectionGuard
 
         internal static unsafe class Encrypt
         {
+            [DllImport(DllName, EntryPoint = "eg_encrypt_ballot_with_nonce")]
+            internal static extern Status Selection(
+                PlaintextBallotSelection.PlaintextBallotSelectionHandle plaintext,
+                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                CiphertextElectionContext.CiphertextElectionContextHandle context,
+                ElementModQ.ElementModQHandle seedHash,
+                ElementModQ.ElementModQHandle nonce,
+                bool shouldVerifyProofs,
+                out CiphertextBallot.CiphertextBallotHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_encrypt_ballot_with_nonce")]
+            internal static extern Status Contest(
+                PlaintextBallotContest.PlaintextBallotContestHandle plaintext,
+                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                CiphertextElectionContext.CiphertextElectionContextHandle context,
+                ElementModQ.ElementModQHandle seedHash,
+                ElementModQ.ElementModQHandle nonce,
+                bool shouldVerifyProofs,
+                out CiphertextBallot.CiphertextBallotHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot")]
             internal static extern Status Ballot(
                 PlaintextBallot.PlaintextBallotHandle plaintext,
-                 InternalElectionDescription.InternalElectionDescriptionHandle metadata,
-                 CiphertextElectionContext.CiphertextElectionContextHandle context,
-                 ElementModQ.ElementModQHandle seedHash,
-                 bool shouldVerifyProofs,
-                 out CiphertextBallot.CiphertextBallotHandle handle);
+                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                CiphertextElectionContext.CiphertextElectionContextHandle context,
+                ElementModQ.ElementModQHandle seedHash,
+                bool shouldVerifyProofs,
+                out CiphertextBallot.CiphertextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot_with_nonce")]
             internal static extern Status Ballot(
                 PlaintextBallot.PlaintextBallotHandle plaintext,
-                 InternalElectionDescription.InternalElectionDescriptionHandle metadata,
-                 CiphertextElectionContext.CiphertextElectionContextHandle context,
-                 ElementModQ.ElementModQHandle seedHash,
-                 ElementModQ.ElementModQHandle nonce,
-                 bool shouldVerifyProofs,
-                 out CiphertextBallot.CiphertextBallotHandle handle);
+                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                CiphertextElectionContext.CiphertextElectionContextHandle context,
+                ElementModQ.ElementModQHandle seedHash,
+                ElementModQ.ElementModQHandle nonce,
+                bool shouldVerifyProofs,
+                out CiphertextBallot.CiphertextBallotHandle handle);
         }
     }
 

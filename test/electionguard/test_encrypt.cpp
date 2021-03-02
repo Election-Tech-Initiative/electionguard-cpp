@@ -76,7 +76,7 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
     auto election = ElectionGenerator::getFakeElection();
     auto metadata = make_unique<InternalElectionDescription>(*election);
     auto context = ElectionGenerator::getFakeContext(*metadata, *keypair->getPublicKey());
-    auto device = make_unique<EncryptionDevice>(12345UL, "Location");
+    auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
     auto mediator = make_unique<EncryptionMediator>(*metadata, *context, *device);
 
@@ -97,7 +97,7 @@ TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
     auto election = ElectionGenerator::getFakeElection();
     auto metadata = make_unique<InternalElectionDescription>(*election);
     auto context = ElectionGenerator::getFakeContext(*metadata, *keypair->getPublicKey());
-    auto device = make_unique<EncryptionDevice>(12345UL, "Location");
+    auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
     auto mediator = make_unique<EncryptionMediator>(*metadata, *context, *device);
 
@@ -117,7 +117,7 @@ TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds")
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
     auto metadata = ElectionGenerator::getFakeMetadata(TWO_MOD_Q());
     auto context = ElectionGenerator::getFakeContext(*metadata, *keypair->getPublicKey());
-    auto device = make_unique<EncryptionDevice>(12345UL, "Location");
+    auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
     auto mediator = make_unique<EncryptionMediator>(*metadata, *context, *device);
 
@@ -140,24 +140,63 @@ TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds")
     auto fromJsonWithNonces = CiphertextBallot::fromJson(jsonWithNonces);
     CHECK(fromJsonWithNonces->getNonce()->toHex() == ciphertext->getNonce()->toHex());
 
-    CHECK(plaintext->getObjectId() == plaintext->getObjectId());
+    CHECK(plaintext->getObjectId() == ciphertext->getObjectId());
 
     auto bson = ciphertext->toBson();
     auto fromBson = CiphertextBallot::fromBson(bson);
+    CHECK(fromBson->getNonce()->toHex() == ZERO_MOD_Q().toHex());
 }
 
-TEST_CASE("Can serialize PlaintextBallot")
+TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeeds")
 {
-    // Arrange
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
     auto metadata = ElectionGenerator::getFakeMetadata(TWO_MOD_Q());
+    auto context = ElectionGenerator::getFakeContext(*metadata, *keypair->getPublicKey());
+    auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
+    auto mediator = make_unique<EncryptionMediator>(*metadata, *context, *device);
     auto plaintext = BallotGenerator::getFakeBallot(*metadata);
-    auto json = plaintext->toJson();
-    auto bson = plaintext->toBson();
 
     // Act
-    auto fromJson = PlaintextBallot::fromJson(json);
-    auto fromBson = PlaintextBallot::fromBson(bson);
+    auto compactCiphertext = mediator->compactEncrypt(*plaintext);
 
     // Assert
-    CHECK(plaintext->getObjectId() == plaintext->getObjectId());
+    CHECK(compactCiphertext->getObjectId() == plaintext->getObjectId());
+
+    SUBCASE("Can Serialize CompactCiphertextBallot")
+    {
+        auto json = compactCiphertext->toJson();
+        Log::debug(json);
+        // Assert
+        auto msgpack = compactCiphertext->toMsgPack();
+        auto fromMsgpack = CompactCiphertextBallot::fromMsgPack(msgpack);
+        CHECK(fromMsgpack->getNonce()->toHex() == compactCiphertext->getNonce()->toHex());
+    }
+
+    SUBCASE("Can Expand Plaintext")
+    {
+        auto expandedPlaintext =
+          expandCompactPlaintextBallot(*compactCiphertext->getPlaintext(), *metadata);
+
+        // Assert
+        CHECK(expandedPlaintext->getObjectId() == compactCiphertext->getObjectId());
+
+        auto msgpack = expandedPlaintext->toMsgPack();
+        auto fromMsgPack = PlaintextBallot::fromMsgPack(msgpack);
+        CHECK(fromMsgPack->getObjectId() == expandedPlaintext->getObjectId());
+    }
+
+    SUBCASE("Can Expand Ciphertext")
+    {
+        auto json = compactCiphertext->toJson();
+        Log::debug(json);
+
+        auto expandedCiphertext =
+          expandCompactCiphertextBallot(*compactCiphertext, *metadata, *context);
+
+        // Assert
+        CHECK(expandedCiphertext->getNonce()->toHex() == compactCiphertext->getNonce()->toHex());
+        CHECK(expandedCiphertext->isValidEncryption(*context->getDescriptionHash(),
+                                                    *keypair->getPublicKey(),
+                                                    *context->getCryptoExtendedBaseHash()) == true);
+    }
 }

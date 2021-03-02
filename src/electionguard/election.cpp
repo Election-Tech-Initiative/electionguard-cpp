@@ -3,6 +3,7 @@
 #include "electionguard/hash.hpp"
 #include "log.hpp"
 #include "serialize.hpp"
+#include "utils.cpp"
 
 #include <cstring>
 #include <iostream>
@@ -14,6 +15,7 @@ using std::move;
 using std::out_of_range;
 using std::ref;
 using std::reference_wrapper;
+using std::runtime_error;
 using std::string;
 using std::to_string;
 using std::unique_ptr;
@@ -26,17 +28,6 @@ using ContextSerializer = electionguard::Serialize::CiphertextelectionContext;
 
 namespace electionguard
 {
-
-    template <typename K, typename V>
-    K findByValue(const map<K, const V> &collection, const V &value)
-    {
-        for (auto &element : collection) {
-            if (element.second == value) {
-                return element.first;
-            }
-        }
-        throw out_of_range("value not found");
-    }
 
 #pragma region ElectionType
 
@@ -1460,6 +1451,36 @@ namespace electionguard
     }
 
     // Public Methods
+
+    BallotStyle *InternalElectionDescription::getBallotStyle(const std::string &ballotStyleId) const
+    {
+        for (auto &style : pimpl->ballotStyles) {
+            if (style->getObjectId() == ballotStyleId) {
+                return style.get();
+            }
+        }
+        return nullptr;
+    }
+
+    vector<reference_wrapper<ContestDescriptionWithPlaceholders>>
+    InternalElectionDescription::getContestsFor(const string &ballotStyleId) const
+    {
+        auto style = getBallotStyle(ballotStyleId);
+        if (style == nullptr || style->getGeopoliticalUnitIds().size() == 0) {
+            throw runtime_error("Could not resolve a valid geopolitical unit");
+        }
+
+        vector<reference_wrapper<ContestDescriptionWithPlaceholders>> contests;
+        for (auto &reference : pimpl->contests) {
+            for (auto gpUnitId : style->getGeopoliticalUnitIds()) {
+                if (reference->getElectoralDistrictId() == gpUnitId) {
+                    contests.push_back(ref(*reference));
+                }
+            }
+        }
+
+        return contests;
+    }
 
     vector<uint8_t> InternalElectionDescription::toBson() const
     {

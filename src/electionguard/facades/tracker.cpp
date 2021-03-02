@@ -15,11 +15,13 @@ using electionguard::ElementModQ;
 using electionguard::Log;
 using electionguard::Tracker;
 
-eg_electionguard_status_t eg_get_hash_for_device(uint64_t in_uuid, const char *in_location,
+eg_electionguard_status_t eg_get_hash_for_device(uint64_t in_device_uuid, uint64_t in_session_uuid,
+                                                 uint64_t in_launch_code, const char *in_location,
                                                  eg_element_mod_q_t **out_device_hash)
 {
     try {
-        auto hash = Tracker::getHashForDevice(in_uuid, string(in_location));
+        auto hash = Tracker::getHashForDevice(in_device_uuid, in_session_uuid, in_launch_code,
+                                              string(in_location));
         *out_device_hash = AS_TYPE(eg_element_mod_q_t, hash.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {

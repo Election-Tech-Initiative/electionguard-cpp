@@ -140,3 +140,5 @@ cmake-build-debug/
 *.sln.DotSettings.user
 
 appsettings.json
+
+cmake/CPM_0.31.0.cmake

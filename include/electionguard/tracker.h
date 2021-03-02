@@ -9,7 +9,10 @@
 extern "C" {
 #endif
 
-EG_API eg_electionguard_status_t eg_get_hash_for_device(uint64_t in_uuid, const char *in_location,
+EG_API eg_electionguard_status_t eg_get_hash_for_device(uint64_t in_device_uuid,
+                                                        uint64_t in_session_uuid,
+                                                        uint64_t in_launch_code,
+                                                        const char *in_location,
                                                         eg_element_mod_q_t **out_device_hash);
 
 EG_API eg_electionguard_status_t eg_get_rotating_tracker_hash(

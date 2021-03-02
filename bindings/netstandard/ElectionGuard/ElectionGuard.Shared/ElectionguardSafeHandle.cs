@@ -36,7 +36,6 @@ namespace ElectionGuard
 
         protected abstract bool Free();
 
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
         protected override bool ReleaseHandle()
         {
             try

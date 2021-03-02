@@ -11,16 +11,20 @@ extern "C" {
 }
 
 using electionguard::CiphertextBallot;
+using electionguard::CiphertextBallotContest;
 using electionguard::CiphertextBallotSelection;
 using electionguard::CiphertextElectionContext;
+using electionguard::ContestDescriptionWithPlaceholders;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
 using electionguard::encryptBallot;
+using electionguard::encryptContest;
 using electionguard::EncryptionDevice;
 using electionguard::EncryptionMediator;
 using electionguard::InternalElectionDescription;
 using electionguard::Log;
 using electionguard::PlaintextBallot;
+using electionguard::PlaintextBallotContest;
 using electionguard::PlaintextBallotSelection;
 using electionguard::SelectionDescription;
 
@@ -29,11 +33,14 @@ using std::unique_ptr;
 
 #pragma region EncryptionDevice
 
-eg_electionguard_status_t eg_encryption_device_new(const uint64_t in_uuid, const char *in_location,
+eg_electionguard_status_t eg_encryption_device_new(uint64_t in_device_uuid,
+                                                   uint64_t in_session_uuid,
+                                                   uint64_t in_launch_code, const char *in_location,
                                                    eg_encryption_device_t **out_handle)
 {
     try {
-        auto device = make_unique<EncryptionDevice>(in_uuid, string(in_location));
+        auto device = make_unique<EncryptionDevice>(in_device_uuid, in_session_uuid, in_launch_code,
+                                                    string(in_location));
         *out_handle = AS_TYPE(eg_encryption_device_t, device.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -167,6 +174,33 @@ eg_electionguard_status_t eg_encrypt_selection(eg_plaintext_ballot_selection_t *
 #pragma endregion
 
 #pragma region EncryptContest
+
+eg_electionguard_status_t eg_encrypt_contest(eg_plaintext_ballot_contest_t *in_plaintext,
+                                             eg_contest_description_t *in_description,
+                                             eg_element_mod_p_t *in_public_key,
+                                             eg_element_mod_q_t *in_crypto_extended_base_hash,
+                                             eg_element_mod_q_t *in_nonce_seed,
+                                             bool in_should_verify_proofs,
+                                             eg_ciphertext_ballot_contest_t **out_handle)
+{
+    try {
+        auto *plaintext = AS_TYPE(PlaintextBallotContest, in_plaintext);
+        auto *description = AS_TYPE(ContestDescriptionWithPlaceholders, in_description);
+        auto *public_key = AS_TYPE(ElementModP, in_public_key);
+        auto *crypto_extended_base_hash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
+        auto *nonce_seed_ = AS_TYPE(ElementModQ, in_nonce_seed);
+
+        auto ciphertext =
+          encryptContest(*plaintext, *description, *public_key, *crypto_extended_base_hash,
+                         *nonce_seed_, in_should_verify_proofs);
+
+        *out_handle = AS_TYPE(eg_ciphertext_ballot_contest_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_encrypt_contest", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
 
 #pragma endregion
 

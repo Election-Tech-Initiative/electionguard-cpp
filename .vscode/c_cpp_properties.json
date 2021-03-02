@@ -14,7 +14,10 @@
         {
             "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/.cache/**",
+                "${workspaceFolder}/include/**",
+                "${workspaceFolder}/src/**",
+                "${workspaceFolder}/test/**"
             ],
             "defines": [],
             "macFrameworkPath": [
@@ -25,7 +28,14 @@
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "${default}"
+            "intelliSenseMode": "${default}",
+            "browse": {
+                "path": [
+                    "${workspaceRoot}"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
         },
         {
             "name": "Win64",

@@ -47,3 +47,37 @@ TEST_CASE("Plaintext Ballot Selection Is InValid")
         CHECK(subject->isValid(objectId) == false);
     }
 }
+
+TEST_CASE("Can serialize PlaintextBallot")
+{
+    // Arrange
+    auto metadata = ElectionGenerator::getFakeMetadata(TWO_MOD_Q());
+    auto plaintext = BallotGenerator::getFakeBallot(*metadata);
+    auto json = plaintext->toJson();
+    auto bson = plaintext->toBson();
+
+    // Act
+    auto fromJson = PlaintextBallot::fromJson(json);
+    auto fromBson = PlaintextBallot::fromBson(bson);
+
+    // Assert
+    CHECK(plaintext->getObjectId() == fromJson->getObjectId());
+    CHECK(plaintext->getObjectId() == fromBson->getObjectId());
+}
+
+TEST_CASE("Can serialize CompactPlaintextBallot")
+{
+    // Arrange
+    auto metadata = ElectionGenerator::getFakeMetadata(TWO_MOD_Q());
+    auto plaintext = BallotGenerator::getFakeBallot(*metadata);
+    auto compact = CompactPlaintextBallot::make(*plaintext);
+    auto msgpack = compact->toMsgPack();
+    auto json = compact->toJson();
+    Log::debug(json);
+
+    // Act
+    auto fromMsgPack = CompactPlaintextBallot::fromMsgPack(msgpack);
+
+    // Assert
+    CHECK(plaintext->getObjectId() == fromMsgPack->getObjectId());
+}

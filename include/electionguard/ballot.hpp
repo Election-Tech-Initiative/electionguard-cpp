@@ -7,12 +7,18 @@
 #include "export.h"
 #include "group.hpp"
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
 namespace electionguard
 {
+    enum class BallotBoxState { cast = 1, spoiled = 2, unknown = 999 };
+
+    EG_API const std::string getBallotBoxStateString(const BallotBoxState &value);
+    EG_API BallotBoxState getBallotBoxState(const std::string &value);
+
     /// <summary>
     /// ExtendedData represents any arbitrary data expressible as a string with a length.
     ///
@@ -24,6 +30,11 @@ namespace electionguard
         uint64_t length;
 
         ExtendedData(std::string value, uint64_t length) : value(value), length(length) {}
+
+        std::unique_ptr<ExtendedData> clone() const
+        {
+            return std::make_unique<ExtendedData>(this->value, this->length);
+        }
     };
 
     /// <summary>
@@ -73,6 +84,8 @@ namespace electionguard
         /// and that the plaintext value can resolve to a valid representation
         /// </summary>
         bool isValid(const std::string &expectedObjectId) const;
+
+        std::unique_ptr<PlaintextBallotSelection> clone() const;
 
       private:
         class Impl;
@@ -227,6 +240,9 @@ namespace electionguard
 
         std::string getObjectId() const;
         std::vector<std::reference_wrapper<PlaintextBallotSelection>> getSelections() const;
+
+        bool isValid(const std::string &expectedObjectId, uint64_t expectedNumberSelections,
+                     uint64_t expectedNumberElected, uint64_t votesAllowd = 0) const;
 
       private:
         class Impl;
@@ -387,8 +403,51 @@ namespace electionguard
 
         std::vector<uint8_t> toBson() const;
         std::string toJson() const;
-        static std::unique_ptr<PlaintextBallot> fromJson(std::string data);
+        std::vector<uint8_t> toMsgPack() const;
         static std::unique_ptr<PlaintextBallot> fromBson(std::vector<uint8_t> data);
+        static std::unique_ptr<PlaintextBallot> fromJson(std::string data);
+        static std::unique_ptr<PlaintextBallot> fromMsgPack(std::vector<uint8_t> data);
+
+      private:
+        class Impl;
+        std::unique_ptr<Impl> pimpl;
+    };
+
+    /// <summary>
+    /// A PlaintextBallot represents a voters selections for a given ballot and ballot style
+    ///
+    /// <param name="object_id"> A unique Ballot ID that is relevant to the external system </param>
+    /// </summary>
+    class EG_API CompactPlaintextBallot
+    {
+      public:
+        CompactPlaintextBallot(const CompactPlaintextBallot &other);
+        CompactPlaintextBallot(const CompactPlaintextBallot &&other);
+        CompactPlaintextBallot(const std::string &objectId, const std::string &ballotStyle,
+                               std::vector<uint64_t> selections,
+                               std::map<std::string, std::unique_ptr<ExtendedData>> extendedData);
+        ~CompactPlaintextBallot();
+
+        CompactPlaintextBallot &operator=(CompactPlaintextBallot other);
+        CompactPlaintextBallot &operator=(CompactPlaintextBallot &&other);
+
+        std::string getObjectId() const;
+        std::string getBallotStyle() const;
+
+        std::vector<uint64_t> getSelections() const;
+        std::map<std::string, std::reference_wrapper<ExtendedData>> getExtendedData() const;
+
+        static std::unique_ptr<CompactPlaintextBallot> make(const PlaintextBallot &plaintext);
+
+        std::unique_ptr<ExtendedData>
+        getExtendedDataFor(const std::string &selectionObjectId) const;
+
+        std::vector<uint8_t> toBson() const;
+        std::string toJson() const;
+        std::vector<uint8_t> toMsgPack() const;
+        static std::unique_ptr<CompactPlaintextBallot> fromJson(std::string data);
+        static std::unique_ptr<CompactPlaintextBallot> fromBson(std::vector<uint8_t> data);
+        static std::unique_ptr<CompactPlaintextBallot> fromMsgPack(std::vector<uint8_t> data);
 
       private:
         class Impl;
@@ -457,14 +516,56 @@ namespace electionguard
 
         std::vector<uint8_t> toBson(bool withNonces = false) const;
         std::string toJson(bool withNonces = false) const;
+        std::vector<uint8_t> toMsgPack(bool withNonces = false) const;
         static std::unique_ptr<CiphertextBallot> fromJson(std::string data);
         static std::unique_ptr<CiphertextBallot> fromBson(std::vector<uint8_t> data);
+        static std::unique_ptr<CiphertextBallot> fromMsgPack(std::vector<uint8_t> data);
 
       protected:
         static std::unique_ptr<ElementModQ>
         makeCryptoHash(std::string objectId,
                        const std::vector<std::reference_wrapper<CiphertextBallotContest>> &contests,
                        const ElementModQ &seedHash);
+
+      private:
+        class Impl;
+        std::unique_ptr<Impl> pimpl;
+    };
+
+    class EG_API CompactCiphertextBallot
+    {
+      public:
+        CompactCiphertextBallot(const CompactCiphertextBallot &other);
+        CompactCiphertextBallot(const CompactCiphertextBallot &&other);
+        CompactCiphertextBallot(std::unique_ptr<CompactPlaintextBallot> plaintext,
+                                BallotBoxState ballotBoxState,
+                                std::unique_ptr<ElementModQ> previousTrackingHash,
+                                std::unique_ptr<ElementModQ> trackingHash, const uint64_t timestamp,
+                                std::unique_ptr<ElementModQ> ballotNonce);
+        ~CompactCiphertextBallot();
+
+        CompactCiphertextBallot &operator=(CompactCiphertextBallot other);
+        CompactCiphertextBallot &operator=(CompactCiphertextBallot &&other);
+
+        std::string getObjectId() const;
+        CompactPlaintextBallot *getPlaintext() const;
+        ElementModQ *getPreviousTrackingHash() const;
+        ElementModQ *getTrackingHash() const;
+        ElementModQ *getNonce() const;
+        uint64_t getTimestamp() const;
+        BallotBoxState getBallotBoxState() const;
+
+        static std::unique_ptr<CompactCiphertextBallot> make(const PlaintextBallot &plaintext,
+                                                             const CiphertextBallot &ciphertext);
+
+        void setBallotBoxState(BallotBoxState state);
+
+        std::vector<uint8_t> toBson() const;
+        std::string toJson() const;
+        std::vector<uint8_t> toMsgPack() const;
+        static std::unique_ptr<CompactCiphertextBallot> fromJson(std::string data);
+        static std::unique_ptr<CompactCiphertextBallot> fromBson(std::vector<uint8_t> data);
+        static std::unique_ptr<CompactCiphertextBallot> fromMsgPack(std::vector<uint8_t> data);
 
       private:
         class Impl;

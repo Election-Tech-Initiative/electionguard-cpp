@@ -573,14 +573,19 @@ namespace electionguard
         InternalElectionDescription &operator=(InternalElectionDescription other);
         InternalElectionDescription &operator=(InternalElectionDescription &&other);
 
-        std::vector<std::reference_wrapper<GeopoliticalUnit>> getGeopoliticalUnits() const;
-        std::vector<std::reference_wrapper<ContestDescriptionWithPlaceholders>> getContests() const;
-        std::vector<std::reference_wrapper<BallotStyle>> getBallotStyles() const;
-
         /// <summary>
         /// The hash of the election metadata
         /// </summary>
         const ElementModQ *getDescriptionHash() const;
+
+        std::vector<std::reference_wrapper<GeopoliticalUnit>> getGeopoliticalUnits() const;
+        std::vector<std::reference_wrapper<ContestDescriptionWithPlaceholders>> getContests() const;
+        std::vector<std::reference_wrapper<BallotStyle>> getBallotStyles() const;
+
+        BallotStyle *getBallotStyle(const std::string &ballotStyleId) const;
+
+        std::vector<std::reference_wrapper<ContestDescriptionWithPlaceholders>>
+        getContestsFor(const std::string &ballotStyleId) const;
 
         std::vector<uint8_t> toBson() const;
         std::string toJson();

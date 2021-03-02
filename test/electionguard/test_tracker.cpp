@@ -12,7 +12,7 @@ using namespace std;
 TEST_CASE("Get rotating tracker hash rotates")
 {
     // Arrange
-    auto deviceHash = Tracker::getHashForDevice(1234UL, "some-location-string");
+    auto deviceHash = Tracker::getHashForDevice(12345UL, 23456UL, 34567UL, "some-location-string");
     uint64_t firstHash[MAX_Q_LEN] = {1, 2, 3, 4};
     auto firstBallotHash = make_unique<ElementModQ>(firstHash);
     uint64_t secondHash[MAX_Q_LEN] = {2, 3, 4, 5};
@@ -44,7 +44,7 @@ TEST_CASE("Get rotating tracker hash rotates")
 TEST_CASE("Hash to words converts to words")
 {
     // Arrange
-    auto deviceHash = Tracker::getHashForDevice(1234UL, "some-location-string");
+    auto deviceHash = Tracker::getHashForDevice(12345UL, 23456UL, 34567UL, "some-location-string");
     const auto &ballotHash = ONE_MOD_Q();
     const auto &anotherBallotHash = TWO_MOD_Q();
     uint64_t timestamp = 1000;
