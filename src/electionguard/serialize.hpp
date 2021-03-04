@@ -33,6 +33,7 @@ namespace electionguard
 
     static unique_ptr<AnnotatedString> annotatedStringFromJson(const json &j)
     {
+        Log::debug(": deserializing");
         auto value = j["value"].get<string>();
         auto annotation = j["annotation"].get<string>();
         return make_unique<AnnotatedString>(annotation, value);
@@ -45,6 +46,7 @@ namespace electionguard
 
     static unique_ptr<Language> languageFromJson(const json &j)
     {
+        Log::debug(": deserializing");
         auto value = j["value"].get<string>();
         auto language = j["language"].get<string>();
         return make_unique<Language>(value, language);
@@ -61,6 +63,7 @@ namespace electionguard
 
     static unique_ptr<InternationalizedText> internationalizedTextFromJson(const json &j)
     {
+        Log::debug(": deserializing");
         vector<unique_ptr<Language>> text;
         for (const auto &i : j["text"]) {
             text.push_back(languageFromJson(i));
@@ -105,6 +108,7 @@ namespace electionguard
     static unique_ptr<ContactInformation> contactInformationFromJson(const json &j)
     {
         Log::debug(": deserializing");
+
         vector<string> addressLine;
         if (j.contains("address_line") && !j["address_line"].is_null()) {
             for (const auto &i : j["address_line"]) {
@@ -210,6 +214,8 @@ namespace electionguard
 
     static unique_ptr<Party> partyFromJson(const json &j)
     {
+        Log::debug(": deserializing");
+
         // TODO: other cases
         if (j.contains("name") && j["name"].is_null()) {
             return make_unique<Party>(j["object_id"].get<string>(),
@@ -265,17 +271,21 @@ namespace electionguard
 
     static unique_ptr<Candidate> candidateFromJson(const json &j)
     {
-        // TODO: other cases
-        if (j.contains("name") && !j["name"].is_null()) {
-            return make_unique<Candidate>(j["object_id"].get<string>(),
-                                          internationalizedTextFromJson(j["name"]),
-                                          j["party_id"].get<string>(), j["image_uri"].get<string>(),
-                                          j["is_write_in"].get<bool>());
-        }
-        auto writeIn = j.contains("is_write_in") && !j["is_write_in"].is_null()
-                         ? j["is_write_in"].get<bool>()
-                         : false;
-        return make_unique<Candidate>(j["object_id"].get<string>(), writeIn);
+        Log::debug(": deserializing");
+        auto objectId = j["object_id"].get<string>();
+        auto name = j.contains("name") && !j["name"].is_null()
+                      ? internationalizedTextFromJson(j["name"])
+                      : nullptr;
+        bool isWriteIn = j.contains("is_write_in") && !j["is_write_in"].is_null()
+                           ? j["is_write_in"].get<bool>()
+                           : false;
+        auto partyId =
+          j.contains("party_id") && !j["party_id"].is_null() ? j["party_id"].get<string>() : "";
+        auto imageUri =
+          j.contains("image_uri") && !j["image_uri"].is_null() ? j["image_uri"].get<string>() : "";
+
+        return make_unique<Candidate>(objectId, name != nullptr ? move(name) : nullptr, partyId,
+                                      imageUri, isWriteIn);
     }
 
     static json candidatesToJson(const vector<reference_wrapper<Candidate>> &serializable)
@@ -326,6 +336,7 @@ namespace electionguard
 
     static unique_ptr<BallotStyle> ballotStyleFromJson(const json &j)
     {
+        Log::debug(": deserializing");
         vector<string> gpUnitIds;
         for (const auto &element : j["geopolitical_unit_ids"]) {
             gpUnitIds.push_back(element);
@@ -373,6 +384,7 @@ namespace electionguard
 
     static unique_ptr<SelectionDescription> selectionDescriptionFromJson(const json &j)
     {
+        Log::debug(": deserializing");
         return make_unique<SelectionDescription>(j["object_id"].get<string>(),
                                                  j["candidate_id"].get<string>(),
                                                  j["sequence_order"].get<uint64_t>());
@@ -429,25 +441,30 @@ namespace electionguard
 
     static unique_ptr<ContestDescription> contestDescriptionFromJson(const json &j)
     {
-        // TODO: just a stub for now.
-        // we need to handle all of the otpional serilization cases.
-        if (j.contains("ballot_title") && !j["ballot_title"].is_null()) {
+        Log::debug(": deserializing");
 
-            return make_unique<ContestDescription>(
-              j["object_id"].get<string>(), j["electoral_district_id"].get<string>(),
-              j["sequence_order"].get<uint64_t>(),
-              getVoteVariationType(j["vote_variation"].get<string>()),
-              j["number_elected"].get<uint64_t>(), j["votes_allowed"].get<uint64_t>(),
-              j["name"].get<string>(), internationalizedTextFromJson(j["ballot_title"]),
-              internationalizedTextFromJson(j["ballot_subtitle"]),
-              selectionDescriptionsFromJson(j["ballot_selections"]));
-        }
+        auto objectId = j["object_id"].get<string>();
+        auto electoralDistrictId = j["electoral_district_id"].get<string>();
+        auto sequenceOrder = j["sequence_order"].get<uint64_t>();
+        auto variation = getVoteVariationType(j["vote_variation"].get<string>());
+        auto elected = j["number_elected"].get<uint64_t>();
+        auto allowed = j.contains("votes_allowed") && !j["votes_allowed"].is_null()
+                         ? j["votes_allowed"].get<uint64_t>()
+                         : 0;
+        auto name = j["name"].get<string>();
+        auto title = j.contains("ballot_title") && !j["ballot_title"].is_null()
+                       ? internationalizedTextFromJson(j["ballot_title"])
+                       : nullptr;
+        auto subtitle = j.contains("ballot_subtitle") && !j["ballot_subtitle"].is_null()
+                          ? internationalizedTextFromJson(j["ballot_subtitle"])
+                          : nullptr;
+
+        auto selections = selectionDescriptionsFromJson(j["ballot_selections"]);
+
         return make_unique<ContestDescription>(
-          j["object_id"].get<string>(), j["electoral_district_id"].get<string>(),
-          j["sequence_order"].get<uint64_t>(),
-          getVoteVariationType(j["vote_variation"].get<string>()),
-          j["number_elected"].get<uint64_t>(), j["name"].get<string>(),
-          selectionDescriptionsFromJson(j["ballot_selections"]));
+          objectId, electoralDistrictId, sequenceOrder, variation, elected, allowed, name,
+          title != nullptr ? move(title) : nullptr, subtitle != nullptr ? move(subtitle) : nullptr,
+          move(selections));
     }
 
     static json
@@ -516,6 +533,8 @@ namespace electionguard
 
             static unique_ptr<electionguard::ElectionDescription> toObject(json j)
             {
+                Log::debug(": deserializing properties");
+
                 auto electionScopeId = j["election_scope_id"].get<string>();
                 auto type = j["type"].get<string>();
                 auto startDate = j["start_date"].get<string>();

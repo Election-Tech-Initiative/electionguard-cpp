@@ -9,6 +9,13 @@ using namespace electionguard;
 using namespace electionguard::test::generators;
 using namespace std;
 
+TEST_CASE("Simple Election Is Valid")
+{
+    auto subject = ElectionGenerator::getSimpleElectionFromFile();
+
+    CHECK(subject->getElectionScopeId() == "jefferson-county-primary");
+}
+
 TEST_CASE("Can serialize ElectionDescription")
 {
     // Arrange

@@ -164,7 +164,7 @@ namespace electionguard
 
         // TODO: ISSUE #133: traverse a discrete_log lookup to find the result
         auto result_as_p = make_unique<ElementModP>(result);
-        uint64_t retval = 0xffffffffffffffff;
+        uint64_t retval = MAX_UINT64;
         if (*result_as_p == ONE_MOD_P()) {
             // if it is 1 it is false
             retval = 0;

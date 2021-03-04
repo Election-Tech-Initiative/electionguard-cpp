@@ -414,9 +414,19 @@ namespace electionguard
     };
 
     /// <summary>
-    /// A PlaintextBallot represents a voters selections for a given ballot and ballot style
+    /// A CompactPlaintextBallot is a representation of a PlaintextBallot
+    /// that includes only the minimal data necessary to interact with electionguard
     ///
-    /// <param name="object_id"> A unique Ballot ID that is relevant to the external system </param>
+    /// This class is space optimized to serve specific use cases on systems where storage
+    /// is a concern.  This object expects an array of slection value votes that are ordered
+    /// correctly according to the sequence order of all of the contests and selections on a ballot
+    /// The CompactPlaintextBallot can be expanded into a PlaintextBallot by traversing the
+    /// selections array and rebuilding the selections from the vote values.
+    ///
+    /// Extended data is included as a map where the key value of the map is the selection id
+    /// corresponding to the selection that includes any extended data.
+    ///
+    /// Don't make this directly. Use `make` instead.
     /// </summary>
     class EG_API CompactPlaintextBallot
     {
@@ -532,6 +542,15 @@ namespace electionguard
         std::unique_ptr<Impl> pimpl;
     };
 
+    /// <summary>
+    /// A CompactCiphertextBallot is a CompactPlaintextBallot that includes the encryption parameters
+    /// to properly re-encrypt the same ballot.
+    ///
+    /// This class is space optimized to serve specific use cases where an encrypted ballot is used
+    /// to verify that plaintext selections have not been tampered with.
+    ///
+    /// Don't make this directly. Use `make` instead.
+    /// </summary>
     class EG_API CompactCiphertextBallot
     {
       public:

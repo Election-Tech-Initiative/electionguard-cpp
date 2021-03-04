@@ -17,8 +17,10 @@ static const uint8_t MAX_Q_LEN_DOUBLE = 8;
 static const uint32_t MAX_P_SIZE = MAX_P_LEN * sizeof(uint64_t);
 static const uint32_t MAX_Q_SIZE = MAX_Q_LEN * sizeof(uint64_t);
 
-static const uint64_t MAX_256[MAX_Q_LEN] = {0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
-                                            0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF};
+static const uint64_t MAX_UINT64 = 0xffffffffffffffff;
+
+static const uint64_t MAX_256[MAX_Q_LEN] = {0xffffffffffffffff, 0xffffffffffffffff,
+                                            0xffffffffffffffff, 0xffffffffffffffff};
 
 static const uint64_t MAX_4096[MAX_P_LEN] = {
   0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff,

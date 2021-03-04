@@ -14,6 +14,7 @@ using electionguard::CiphertextBallot;
 using electionguard::CiphertextBallotContest;
 using electionguard::CiphertextBallotSelection;
 using electionguard::CiphertextElectionContext;
+using electionguard::CompactCiphertextBallot;
 using electionguard::ContestDescriptionWithPlaceholders;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
@@ -243,11 +244,38 @@ eg_electionguard_status_t eg_encrypt_ballot_with_nonce(
         unique_ptr<ElementModQ> nonce_ptr{nonce};
 
         auto ciphertext = encryptBallot(*plaintext, *metadata, *context, *seed_hash,
-                                        move(nonce_ptr), in_should_verify_proofs);
+                                        move(nonce_ptr), 0, in_should_verify_proofs);
         *out_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_encrypt_ballot_with_nonce", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+#pragma endregion
+
+#pragma region EncryptCompactBallot
+
+eg_electionguard_status_t eg_encrypt_compact_ballot(eg_plaintext_ballot_t *in_plaintext,
+                                                    eg_internal_election_description_t *in_metadata,
+                                                    eg_ciphertext_election_context_t *in_context,
+                                                    eg_element_mod_q_t *in_seed_hash,
+                                                    bool in_should_verify_proofs,
+                                                    eg_compact_ciphertext_ballot_t **out_handle)
+{
+    try {
+        auto *plaintext = AS_TYPE(PlaintextBallot, in_plaintext);
+        auto *metadata = AS_TYPE(InternalElectionDescription, in_metadata);
+        auto *context = AS_TYPE(CiphertextElectionContext, in_context);
+        auto *seed_hash = AS_TYPE(ElementModQ, in_seed_hash);
+
+        auto ciphertext = encryptCompactBallot(*plaintext, *metadata, *context, *seed_hash, nullptr,
+                                               0, in_should_verify_proofs);
+        *out_handle = AS_TYPE(eg_compact_ciphertext_ballot_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_encrypt_compact_ballot", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }

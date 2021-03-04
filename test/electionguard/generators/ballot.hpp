@@ -5,6 +5,9 @@
 
 #include <electionguard/ballot.hpp>
 #include <electionguard/election.hpp>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 using namespace electionguard;
 using namespace std;
@@ -14,6 +17,26 @@ namespace electionguard::test::generators
     class BallotGenerator
     {
       public:
+        static unique_ptr<PlaintextBallot> getSimpleBallotFromFile()
+        {
+            return getSimpleBallotFromFile("ballot_in_simple.json");
+        }
+        static unique_ptr<PlaintextBallot> getSimpleBallotFromFile(const string &filename)
+        {
+
+            ifstream file;
+            file.open("data/" + filename);
+            if (!file) {
+                throw invalid_argument("could not find file");
+            }
+
+            stringstream stream;
+            stream << file.rdbuf();
+            file.close();
+
+            return PlaintextBallot::fromJson(stream.str());
+        }
+
         static unique_ptr<PlaintextBallotSelection>
         randomSelectionFrom(const SelectionDescription &description)
         {

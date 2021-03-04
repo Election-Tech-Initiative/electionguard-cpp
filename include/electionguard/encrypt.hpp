@@ -10,6 +10,18 @@
 
 namespace electionguard
 {
+    /// <summary>
+    /// Metadata for encryption device
+    ///
+    /// The encryption device is a stateful container that represents abstract hardware
+    /// authorized to participate in a specific election.
+    ///
+    /// <param name="deviceUuid">a unique identifier tied to the device hardware</param>
+    /// <param name="sessionUuid">a unique identifier tied to the runtime session</param>
+    /// <param name="launchCode">a unique identifer tied to the election</param>
+    /// <param name="location">an arbitrary string meaningful to the external system
+    ///                        such as a friendly name, description, or some other value</param>
+    /// </summary>
     class EG_API EncryptionDevice
     {
       public:
@@ -30,6 +42,15 @@ namespace electionguard
         std::unique_ptr<Impl> pimpl;
     };
 
+    /// <summary>
+    /// An object for caching election and encryption state.
+    ///
+    /// the encryption mediator composes ballots by querying the encryption device
+    /// for a hash of its metadata and incremental timestamps/
+    ///
+    /// this is a convenience wrapper around the encrypt methods
+    /// and may not be suitable for all use cases.
+    /// </summary>
     class EG_API EncryptionMediator
     {
       public:
@@ -70,7 +91,7 @@ namespace electionguard
     /// <returns>A `CiphertextBallotSelection`</returns>
     /// </summary>
     EG_API std::unique_ptr<CiphertextBallotSelection>
-    encryptSelection(const PlaintextBallotSelection &plaintext,
+    encryptSelection(const PlaintextBallotSelection &selection,
                      const SelectionDescription &description, const ElementModP &elgamalPublicKey,
                      const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &nonceSeed,
                      bool isPlaceholder = false, bool shouldVerifyProofs = true);
@@ -94,8 +115,8 @@ namespace electionguard
     /// <returns>A `CiphertextBallotContest`</returns>
     /// </summary>
     EG_API std::unique_ptr<CiphertextBallotContest>
-    encryptContest(const PlaintextBallotContest &plaintext,
-                   const ContestDescriptionWithPlaceholders &contestDescription,
+    encryptContest(const PlaintextBallotContest &contest,
+                   const ContestDescriptionWithPlaceholders &description,
                    const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
                    const ElementModQ &nonceSeed, bool shouldVerifyProofs = true);
 
@@ -109,6 +130,10 @@ namespace electionguard
     ///
     /// This method also allows for ballots to exclude passing contests for which the voter made no selections.
     /// It will fill missing contests with `False` selections and generate `placeholder` selections that are marked `True`.
+    ///
+    /// This version of the encrypt method returns a `compact` version of the ballot that includes a minimal representation
+    /// of the plaintext ballot along with the crypto parameters that are required to expand the ballot
+    ///
     /// <param name="plaintext">the selection in the valid input form</param>
     /// <param name="metadata">the `InternalElectionDescription` which defines this ballot's structure</param>
     /// <param name="context">all the cryptographic context for the election</param>
@@ -119,20 +144,19 @@ namespace electionguard
     /// <returns>A `CiphertextBallot`</returns>
     /// </summary>
     EG_API std::unique_ptr<CiphertextBallot>
-    encryptBallot(const PlaintextBallot &plaintext, const InternalElectionDescription &metadata,
+    encryptBallot(const PlaintextBallot &ballot, const InternalElectionDescription &metadata,
                   const CiphertextElectionContext &context, const ElementModQ &seedHash,
                   std::unique_ptr<ElementModQ> nonce = nullptr, uint64_t timestamp = 0,
                   bool shouldVerifyProofs = true);
 
     EG_API std::unique_ptr<CompactCiphertextBallot>
-    encryptCompactBallot(const PlaintextBallot &plaintext,
-                         const InternalElectionDescription &metadata,
+    encryptCompactBallot(const PlaintextBallot &ballot, const InternalElectionDescription &metadata,
                          const CiphertextElectionContext &context, const ElementModQ &seedHash,
                          std::unique_ptr<ElementModQ> nonce = nullptr, uint64_t timestamp = 0,
                          bool shouldVerifyProofs = true);
 
     std::unique_ptr<PlaintextBallot>
-    expandCompactPlaintextBallot(const CompactPlaintextBallot &compactPlaintext,
+    expandCompactPlaintextBallot(const CompactPlaintextBallot &compactBallot,
                                  const InternalElectionDescription &description);
 
     std::unique_ptr<CiphertextBallot>

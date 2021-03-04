@@ -9,6 +9,13 @@ using namespace electionguard;
 using namespace electionguard::test::generators;
 using namespace std;
 
+TEST_CASE("Plaintext Simple Ballot Is Valid")
+{
+    auto subject = BallotGenerator::getSimpleBallotFromFile();
+
+    CHECK(subject->getObjectId() == "some-external-id-string-123");
+}
+
 TEST_CASE("Plaintext Ballot Selection Is Valid")
 {
     // Arrange

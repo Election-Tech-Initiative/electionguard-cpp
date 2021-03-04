@@ -200,3 +200,22 @@ TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeed
                                                     *context->getCryptoExtendedBaseHash()) == true);
     }
 }
+
+TEST_CASE("Encrypt simple ballot from file succeeds")
+{
+    // Arrange
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto description = ElectionGenerator::getSimpleElectionFromFile();
+    auto [metadata, context] =
+      ElectionGenerator::getFakeCiphertextElection(*description, *keypair->getPublicKey());
+    auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
+
+    auto ballot = BallotGenerator::getSimpleBallotFromFile();
+
+    // Act
+    auto ciphertext = encryptBallot(*ballot, *metadata, *context, *device->getHash());
+
+    // Assert
+    CHECK(ciphertext->isValidEncryption(*context->getDescriptionHash(), *keypair->getPublicKey(),
+                                        *context->getCryptoExtendedBaseHash()) == true);
+}

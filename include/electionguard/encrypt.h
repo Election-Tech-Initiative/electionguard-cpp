@@ -16,8 +16,28 @@ extern "C" {
 // EncryptionDevice
 
 struct eg_encryption_device_s;
+
+/**
+* Metadata for encryption device
+*
+* The encryption device is a stateful container that represents abstract hardware
+* authorized to participate in a specific election.
+*/
 typedef struct eg_encryption_device_s eg_encryption_device_t;
 
+/**
+* Metadata for encryption device
+*
+* The encryption device is a stateful container that represents abstract hardware
+* authorized to participate in a specific election.
+*
+* @param[in] in_device_uuid a unique identifier tied to the device hardware
+* @param[in] in_session_uuid a unique identifier tied to the runtime session
+* @param[in] in_launch_code a unique identifer tied to the election
+* @param[in] in_location an arbitrary string meaningful to the external system
+*                        such as a friendly name, description, or some other value
+* @param[out] out_handle a handle to an `eg_encryption_device_t`.  Caller is responsible for lifecycle.
+*/
 EG_API eg_electionguard_status_t eg_encryption_device_new(uint64_t in_device_uuid,
                                                           uint64_t in_session_uuid,
                                                           uint64_t in_launch_code,
@@ -32,6 +52,16 @@ EG_API eg_electionguard_status_t eg_encryption_device_get_hash(eg_encryption_dev
 // EncryptionMediator
 
 struct eg_encryption_mediator_s;
+
+/**
+* An object for caching election and encryption state.
+*
+* the encryption mediator composes ballots by querying the encryption device
+* for a hash of its metadata and incremental timestamps/
+*
+* this is a convenience wrapper around the encrypt methods
+* and may not be suitable for all use cases.
+*/
 typedef struct eg_encryption_mediator_s eg_encryption_mediator_t;
 
 EG_API eg_electionguard_status_t eg_encryption_mediator_new(
@@ -71,8 +101,6 @@ EG_API eg_electionguard_status_t eg_encrypt_selection(
   eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash,
   eg_element_mod_q_t *in_nonce_seed, bool in_is_placeholder, bool in_should_verify_proofs,
   eg_ciphertext_ballot_selection_t **out_handle);
-
-// TODO: ISSUE #129: eg_encrypt_contest
 
 /**
 * Encrypt a specific `BallotContest` in the context of a specific `Ballot`.
@@ -145,6 +173,31 @@ EG_API eg_electionguard_status_t eg_encrypt_ballot_with_nonce(
   eg_plaintext_ballot_t *in_plaintext, eg_internal_election_description_t *in_metadata,
   eg_ciphertext_election_context_t *in_context, eg_element_mod_q_t *in_seed_hash,
   eg_element_mod_q_t *in_nonce, bool in_should_verify_proofs, eg_ciphertext_ballot_t **out_handle);
+
+/**
+* Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`.
+*
+* This method accepts a ballot representation that only includes `True` selections.
+* It will fill missing selections for a contest with `False` values, and generate `placeholder`
+* selections to represent the number of seats available for a given contest.
+*
+* This method also allows for ballots to exclude passing contests for which the voter made no selections.
+* It will fill missing contests with `False` selections and generate `placeholder` selections that are marked `True`.
+*
+* This version of the encrypt method returns a `compact` version of the ballot that includes a minimal representation
+* of the plaintext ballot along with the crypto parameters that are required to expand the ballot
+*
+* @param[in] in_plaintext: the ballot in the valid input form
+* @param[in] in_metadata: the `InternalElectionDescription` which defines this ballot's structure
+* @param[in] in_context: all the cryptographic context for the election
+* @param[in] in_seed_hash: Hash from previous ballot or starting hash from device
+* @param[in] in_should_verify_proofs: specify if the proofs should be verified prior to returning (default True)
+* @param[out] out_handle a handle to an `eg_compact_ciphertext_ballot_t`. Caller is responsible for lifecycle.
+*/
+EG_API eg_electionguard_status_t eg_encrypt_compact_ballot(
+  eg_plaintext_ballot_t *in_plaintext, eg_internal_election_description_t *in_metadata,
+  eg_ciphertext_election_context_t *in_context, eg_element_mod_q_t *in_seed_hash,
+  bool in_should_verify_proofs, eg_compact_ciphertext_ballot_t **out_handle);
 
 #ifdef __cplusplus
 }

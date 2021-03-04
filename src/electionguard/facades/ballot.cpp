@@ -17,6 +17,7 @@ extern "C" {
 using electionguard::CiphertextBallot;
 using electionguard::CiphertextBallotContest;
 using electionguard::CiphertextBallotSelection;
+using electionguard::CompactCiphertextBallot;
 using electionguard::dynamicCopy;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
@@ -231,10 +232,9 @@ size_t eg_plaintext_ballot_contest_get_selections_size(eg_plaintext_ballot_conte
     return contests.size();
 }
 
-eg_electionguard_status_t
-eg_plaintext_ballot_contest_get_selection_at_index(eg_plaintext_ballot_contest_t *handle,
-                                                   size_t in_index,
-                                                   eg_plaintext_ballot_selection_t **out_selection_ref)
+eg_electionguard_status_t eg_plaintext_ballot_contest_get_selection_at_index(
+  eg_plaintext_ballot_contest_t *handle, size_t in_index,
+  eg_plaintext_ballot_selection_t **out_selection_ref)
 {
     try {
         auto selections = AS_TYPE(PlaintextBallotContest, handle)->getSelections();
@@ -532,8 +532,9 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_ballot_style(eg_ciphertext_ba
     }
 }
 
-eg_electionguard_status_t eg_ciphertext_ballot_get_description_hash(eg_ciphertext_ballot_t *handle,
-                                                                    eg_element_mod_q_t **out_hash_ref)
+eg_electionguard_status_t
+eg_ciphertext_ballot_get_description_hash(eg_ciphertext_ballot_t *handle,
+                                          eg_element_mod_q_t **out_hash_ref)
 {
     auto *descriptionHash = AS_TYPE(CiphertextBallot, handle)->getDescriptionHash();
     *out_hash_ref = AS_TYPE(eg_element_mod_q_t, descriptionHash);
@@ -736,6 +737,55 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_bson_with_nonces(eg_ciphertext
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_ciphertext_ballot_to_bson_with_nonces", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+#pragma endregion
+
+#pragma region CompactCiphertextBallot
+
+EG_API eg_electionguard_status_t
+eg_compact_ciphertext_ballot_free(eg_compact_ciphertext_ballot_t *handle)
+{
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete AS_TYPE(CompactCiphertextBallot, handle);
+    handle = nullptr;
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+EG_API eg_electionguard_status_t eg_compact_ciphertext_ballot_from_msgpack(
+  uint8_t *in_data, uint64_t in_length, eg_compact_ciphertext_ballot_t **out_handle)
+{
+    try {
+        auto data_bytes = vector<uint8_t>(in_data, in_data + in_length);
+        auto deserialized = CompactCiphertextBallot::fromMsgPack(data_bytes);
+
+        *out_handle = AS_TYPE(eg_compact_ciphertext_ballot_t, deserialized.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_compact_ciphertext_ballot_from_msgpack", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_compact_ciphertext_ballot_to_msgpack(
+  eg_compact_ciphertext_ballot_t *handle, uint8_t **out_data, size_t *out_size)
+{
+    try {
+        auto *domain_type = AS_TYPE(CompactCiphertextBallot, handle);
+        auto data_bytes = domain_type->toMsgPack();
+
+        size_t size = 0;
+        *out_data = dynamicCopy(data_bytes, &size);
+        *out_size = size;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_compact_ciphertext_ballot_to_msgpack", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }

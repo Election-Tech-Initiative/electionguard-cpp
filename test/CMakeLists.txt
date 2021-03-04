@@ -27,12 +27,23 @@ CPMAddPackage(
 
 # ---- Sources ----
 
+# Generator Library
+add_library(ElectionGuardUtils SHARED
+${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/ballot.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/ballot.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/ballot.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/election.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/election.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/election.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/constants.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h
+)
+
+target_compile_features(ElectionGuardUtils PRIVATE cxx_std_17)
+
 # C++ Tests
 add_executable(ElectionGuardTests 
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/ballot.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/election.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/constants.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp    
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_election.cpp
@@ -55,7 +66,7 @@ endif()
 # C Tests
 add_executable(ElectionGuardCTests
     ${CMAKE_CURRENT_SOURCE_DIR}/main.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h
+    
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_election.c
@@ -69,15 +80,17 @@ target_compile_features(ElectionGuardCTests PRIVATE c_std_99)
 
 # ---- Link Libraries ----
 
+target_link_libraries(ElectionGuardUtils PUBLIC ${META_PROJECT_TARGET})
+
 if (WIN32)
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
-    target_link_libraries(ElectionGuardTests PRIVATE doctest ${META_PROJECT_TARGET} -static-libstdc++)
+    target_link_libraries(ElectionGuardTests PRIVATE doctest ElectionGuardUtils ${META_PROJECT_TARGET} -static-libstdc++)
 else()
-    target_link_libraries(ElectionGuardTests PRIVATE doctest ${META_PROJECT_TARGET})
+    target_link_libraries(ElectionGuardTests PRIVATE doctest ElectionGuardUtils ${META_PROJECT_TARGET})
 endif()
 
-target_link_libraries(ElectionGuardCTests PRIVATE ${META_PROJECT_TARGET})
+target_link_libraries(ElectionGuardCTests PRIVATE ElectionGuardUtils ${META_PROJECT_TARGET})
 
 if (WIN32)
     # sometimes windows struggles with paths (particularly in CI)

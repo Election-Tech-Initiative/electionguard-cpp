@@ -194,7 +194,7 @@ namespace electionguard
     unique_ptr<PlaintextBallot> emplaceMissingValues(const PlaintextBallot &ballot,
                                                      const InternalElectionDescription &metadata)
     {
-        auto style = metadata.getBallotStyle(ballot.getBallotStyle());
+        auto *style = metadata.getBallotStyle(ballot.getBallotStyle());
 
         vector<unique_ptr<PlaintextBallotContest>> contests;
         // loop through the contests for the ballot style
@@ -390,7 +390,7 @@ namespace electionguard
                   unique_ptr<ElementModQ> nonce /* = nullptr */, uint64_t timestamp /* = 0 */,
                   bool shouldVerifyProofs /* = true */)
     {
-        auto style = metadata.getBallotStyle(ballot.getBallotStyle());
+        auto *style = metadata.getBallotStyle(ballot.getBallotStyle());
 
         // Validate Input
         if (style == nullptr) {
@@ -468,34 +468,32 @@ namespace electionguard
     }
 
     unique_ptr<CompactCiphertextBallot>
-    encryptCompactBallot(const PlaintextBallot &plaintext,
-                         const InternalElectionDescription &metadata,
+    encryptCompactBallot(const PlaintextBallot &ballot, const InternalElectionDescription &metadata,
                          const CiphertextElectionContext &context, const ElementModQ &seedHash,
                          unique_ptr<ElementModQ> nonce /* = nullptr */,
                          uint64_t timestamp /* = 0 */, bool shouldVerifyProofs /* = true*/)
     {
-        auto normalized = emplaceMissingValues(plaintext, metadata);
+        auto normalized = emplaceMissingValues(ballot, metadata);
         auto ciphertext = encryptBallot(*normalized, metadata, context, seedHash, move(nonce),
                                         timestamp, shouldVerifyProofs);
         return CompactCiphertextBallot::make(*normalized, *ciphertext);
     }
 
     unique_ptr<PlaintextBallot>
-    expandCompactPlaintextBallot(const CompactPlaintextBallot &compactPlaintext,
+    expandCompactPlaintextBallot(const CompactPlaintextBallot &compactBallot,
                                  const InternalElectionDescription &metadata)
     {
         vector<unique_ptr<PlaintextBallotContest>> contests;
         uint64_t index = 0;
 
         // Get the ballot style and iterate through the contests for that style
-        for (const auto &contest : metadata.getContestsFor(compactPlaintext.getBallotStyle())) {
+        for (const auto &contest : metadata.getContestsFor(compactBallot.getBallotStyle())) {
             vector<unique_ptr<PlaintextBallotSelection>> selections;
 
             // Iterate through the selections on the contest and expand each selection
             for (const auto &selection : contest.get().getSelections()) {
-                auto vote = compactPlaintext.getSelections().at(index);
-                auto extendedData =
-                  compactPlaintext.getExtendedDataFor(selection.get().getObjectId());
+                auto vote = compactBallot.getSelections().at(index);
+                auto extendedData = compactBallot.getExtendedDataFor(selection.get().getObjectId());
 
                 selections.push_back(make_unique<PlaintextBallotSelection>(
                   selection.get().getObjectId(), vote, false,
@@ -508,8 +506,8 @@ namespace electionguard
               make_unique<PlaintextBallotContest>(contest.get().getObjectId(), move(selections)));
         }
 
-        return make_unique<PlaintextBallot>(compactPlaintext.getObjectId(),
-                                            compactPlaintext.getBallotStyle(), move(contests));
+        return make_unique<PlaintextBallot>(compactBallot.getObjectId(),
+                                            compactBallot.getBallotStyle(), move(contests));
     }
 
     unique_ptr<CiphertextBallot>
