@@ -124,6 +124,38 @@ eg_encryption_mediator_encrypt_ballot(eg_encryption_mediator_t *handle,
     }
 }
 
+eg_electionguard_status_t eg_encryption_mediator_compact_encrypt_ballot(
+  eg_encryption_mediator_t *handle, eg_plaintext_ballot_t *in_plaintext,
+  eg_compact_ciphertext_ballot_t **out_ciphertext_handle)
+{
+    try {
+        auto *plaintext = AS_TYPE(PlaintextBallot, in_plaintext);
+        auto ciphertext = AS_TYPE(EncryptionMediator, handle)->compactEncrypt(*plaintext, false);
+
+        *out_ciphertext_handle = AS_TYPE(eg_compact_ciphertext_ballot_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_encryption_mediator_compact_encrypt_ballot", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_encryption_mediator_compact_encrypt_ballot_verify_proofs(
+  eg_encryption_mediator_t *handle, eg_plaintext_ballot_t *in_plaintext,
+  eg_compact_ciphertext_ballot_t **out_ciphertext_handle)
+{
+    try {
+        auto *plaintext = AS_TYPE(PlaintextBallot, in_plaintext);
+        auto ciphertext = AS_TYPE(EncryptionMediator, handle)->compactEncrypt(*plaintext, true);
+
+        *out_ciphertext_handle = AS_TYPE(eg_compact_ciphertext_ballot_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_encryption_mediator_compact_encrypt_ballot_verify_proofs", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 eg_electionguard_status_t
 eg_encryption_mediator_encrypt_ballot_verify_proofs(eg_encryption_mediator_t *handle,
                                                     eg_plaintext_ballot_t *in_plaintext,

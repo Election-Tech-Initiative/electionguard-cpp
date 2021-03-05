@@ -70,6 +70,14 @@ EG_API eg_electionguard_status_t eg_encryption_mediator_new(
 
 EG_API eg_electionguard_status_t eg_encryption_mediator_free(eg_encryption_mediator_t *handle);
 
+EG_API eg_electionguard_status_t eg_encryption_mediator_compact_encrypt_ballot(
+  eg_encryption_mediator_t *handle, eg_plaintext_ballot_t *in_plaintext,
+  eg_compact_ciphertext_ballot_t **out_ciphertext_handle);
+
+EG_API eg_electionguard_status_t eg_encryption_mediator_compact_encrypt_ballot_verify_proofs(
+  eg_encryption_mediator_t *handle, eg_plaintext_ballot_t *in_plaintext,
+  eg_compact_ciphertext_ballot_t **out_ciphertext_handle);
+
 EG_API eg_electionguard_status_t eg_encryption_mediator_encrypt_ballot(
   eg_encryption_mediator_t *handle, eg_plaintext_ballot_t *in_plaintext,
   eg_ciphertext_ballot_t **out_ciphertext_handle);

@@ -757,6 +757,21 @@ eg_compact_ciphertext_ballot_free(eg_compact_ciphertext_ballot_t *handle)
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
+eg_electionguard_status_t
+eg_compact_ciphertext_ballot_get_object_id(eg_compact_ciphertext_ballot_t *handle,
+                                           char **out_object_id)
+{
+    try {
+        auto objectId = AS_TYPE(CompactCiphertextBallot, handle)->getObjectId();
+        *out_object_id = dynamicCopy(objectId);
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_compact_ciphertext_ballot_get_object_id", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 EG_API eg_electionguard_status_t eg_compact_ciphertext_ballot_from_msgpack(
   uint8_t *in_data, uint64_t in_length, eg_compact_ciphertext_ballot_t **out_handle)
 {
