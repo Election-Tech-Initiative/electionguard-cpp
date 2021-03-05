@@ -131,9 +131,6 @@ namespace electionguard
     /// This method also allows for ballots to exclude passing contests for which the voter made no selections.
     /// It will fill missing contests with `False` selections and generate `placeholder` selections that are marked `True`.
     ///
-    /// This version of the encrypt method returns a `compact` version of the ballot that includes a minimal representation
-    /// of the plaintext ballot along with the crypto parameters that are required to expand the ballot
-    ///
     /// <param name="plaintext">the selection in the valid input form</param>
     /// <param name="metadata">the `InternalElectionDescription` which defines this ballot's structure</param>
     /// <param name="context">all the cryptographic context for the election</param>
@@ -149,6 +146,29 @@ namespace electionguard
                   std::unique_ptr<ElementModQ> nonce = nullptr, uint64_t timestamp = 0,
                   bool shouldVerifyProofs = true);
 
+    /// <summary>
+    /// Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`
+    ///
+    /// This method accepts a ballot representation that only includes `True` selections.
+    /// It will fill missing selections for a contest with `False` values, and generate `placeholder`
+    /// selections to represent the number of seats available for a given contest.  By adding `placeholder`
+    /// votes
+    ///
+    /// This method also allows for ballots to exclude passing contests for which the voter made no selections.
+    /// It will fill missing contests with `False` selections and generate `placeholder` selections that are marked `True`.
+    ///
+    /// This version of the encrypt method returns a `compact` version of the ballot that includes a minimal representation
+    /// of the plaintext ballot along with the crypto parameters that are required to expand the ballot
+    ///
+    /// <param name="plaintext">the selection in the valid input form</param>
+    /// <param name="metadata">the `InternalElectionDescription` which defines this ballot's structure</param>
+    /// <param name="context">all the cryptographic context for the election</param>
+    /// <param name="seedHash">Hash from previous ballot or starting hash from device</param>
+    /// <param name="nonce">an optional `int` used to seed the `Nonce` generated for this contest
+    ///                     if this value is not provided, the secret generating mechanism of the OS provides its own</param>
+    /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
+    /// <returns>A `CiphertextBallot`</returns>
+    /// </summary>
     EG_API std::unique_ptr<CompactCiphertextBallot>
     encryptCompactBallot(const PlaintextBallot &ballot, const InternalElectionDescription &metadata,
                          const CiphertextElectionContext &context, const ElementModQ &seedHash,

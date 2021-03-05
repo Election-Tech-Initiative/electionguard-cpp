@@ -5,14 +5,20 @@ namespace ElectionGuard
     using NativeEncryptionDevice = NativeInterface.EncryptionDevice.EncryptionDeviceHandle;
     using NativeEncryptionMediator = NativeInterface.EncryptionMediator.EncryptionMediatorHandle;
     using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotHandle;
+    using NativeCompactCiphertextBallot = NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle;
 
     public class EncryptionDevice: DisposableBase
     {
         internal unsafe NativeEncryptionDevice Handle;
 
-        public unsafe EncryptionDevice(ulong uuid, string location)
+        public unsafe EncryptionDevice(
+            ulong deviceUuid,
+            ulong sessionUuid,
+            ulong launchCode,
+            string location)
         {
-            var status = NativeInterface.EncryptionDevice.New(uuid, location, out Handle);
+            var status = NativeInterface.EncryptionDevice.New(
+                deviceUuid, sessionUuid, launchCode, location, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"EncryptionDevice New Error Status: {status}");
@@ -72,6 +78,32 @@ namespace ElectionGuard
             
         }
 
+        public unsafe CompactCiphertextBallot CompactEncrypt(
+            PlaintextBallot plaintext, bool verifyProofs = false)
+        {
+            if (verifyProofs)
+            {
+                var status = NativeInterface.EncryptionMediator.CompactEncryptAndVerify(
+                Handle, plaintext.Handle, out NativeCompactCiphertextBallot ciphertext);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"InternalElectionDescription Error Status: {status}");
+                }
+                return new CompactCiphertextBallot(ciphertext);
+            }
+            else
+            {
+                var status = NativeInterface.EncryptionMediator.CompactEncrypt(
+                Handle, plaintext.Handle, out NativeCompactCiphertextBallot ciphertext);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"InternalElectionDescription Error Status: {status}");
+                }
+                return new CompactCiphertextBallot(ciphertext);
+            }
+
+        }
+
         protected override unsafe void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
@@ -116,6 +148,25 @@ namespace ElectionGuard
                 }
                 return new CiphertextBallot(ciphertext);
             }
+        }
+
+        public static unsafe CompactCiphertextBallot CompactBallot(
+            PlaintextBallot ballot,
+            InternalElectionDescription metadata,
+            CiphertextElectionContext context,
+            ElementModQ seedHash,
+            bool verifyProofs = true)
+        {
+
+            var status = NativeInterface.Encrypt.CompactBallot(
+                ballot.Handle, metadata.Handle, context.Handle,
+                seedHash.Handle, verifyProofs,
+                out NativeCompactCiphertextBallot ciphertext);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"Encrypt Error Status: {status}");
+            }
+            return new CompactCiphertextBallot(ciphertext);
         }
     }
 }

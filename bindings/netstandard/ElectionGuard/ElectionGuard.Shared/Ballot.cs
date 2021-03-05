@@ -12,6 +12,7 @@ namespace ElectionGuard
     using NativeCiphertextBallotContest = NativeInterface.CiphertextBallotContest.CiphertextBallotContestHandle;
     using NativePlaintextBallot = NativeInterface.PlaintextBallot.PlaintextBallotHandle;
     using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotHandle;
+    using NativeCompactCiphertextBallot = NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle;
 
     #region PlaintextBallotSelction
 
@@ -340,6 +341,20 @@ namespace ElectionGuard
 
     #region CiphertextBallotContest
 
+    /// <summary>
+    /// A CiphertextBallotContest represents the selections made by a voter for a specific ContestDescription
+    ///
+    /// CiphertextBallotContest can only be a complete representation of a contest dataset.  While
+    /// PlaintextBallotContest supports a partial representation, a CiphertextBallotContest includes all data
+    /// necessary for a verifier to verify the contest.  Specifically, it includes both explicit affirmative
+    /// and negative selections of the contest, as well as the placeholder selections that satisfy
+    /// the ConstantChaumPedersen proof.
+    ///
+    /// Similar to `CiphertextBallotSelection` the consuming application can choose to discard or keep both
+    /// the `nonce` and the `proof` in some circumstances.  For deterministic nonce's derived from the
+    /// master nonce, both values can be regenerated.  If the `nonce` for this contest is completely random,
+    /// then it is required in order to regenerate the proof.
+    /// </summary>
     public class CiphertextBallotContest : DisposableBase
     {
         public unsafe string ObjectId
@@ -454,6 +469,11 @@ namespace ElectionGuard
 
     #region PlaintextBallot
 
+    /// <summary>
+    /// A PlaintextBallot represents a voters selections for a given ballot and ballot style
+    ///
+    /// <param name="object_id"> A unique Ballot ID that is relevant to the external system </param>
+    /// </summary>
     public class PlaintextBallot : DisposableBase
     {
         public unsafe string ObjectId
@@ -545,6 +565,16 @@ namespace ElectionGuard
 
     #region CiphertextBallot
 
+    /// <summary>
+    /// A CiphertextBallot represents a voters encrypted selections for a given ballot and ballot style.
+    ///
+    /// When a ballot is in it's complete, encrypted state, the `nonce` is the master nonce
+    /// from which all other nonces can be derived to encrypt the ballot.  Allong with the `nonce`
+    /// fields on `Ballotcontest` and `BallotSelection`, this value is sensitive.
+    ///
+    /// Don't make this directly. Use `make_ciphertext_ballot` instead.
+    /// <param name="object_id"> A unique Ballot ID that is relevant to the external system </param>
+    /// </summary>
     public class CiphertextBallot : DisposableBase
     {
         internal unsafe NativeCiphertextBallot Handle;
@@ -729,6 +759,88 @@ namespace ElectionGuard
             Handle = null;
         }
     }
+
+    #region CompactCiphertextBallot
+
+    /// <summary>
+    /// A CompactCiphertextBallot is a CompactPlaintextBallot that includes the encryption parameters
+    /// to properly re-encrypt the same ballot.
+    ///
+    /// This class is space optimized to serve specific use cases where an encrypted ballot is used
+    /// to verify that plaintext selections have not been tampered with.
+    ///
+    /// Don't make this directly. Use `make` instead.
+    /// </summary>
+    public class CompactCiphertextBallot : DisposableBase
+    {
+        internal unsafe NativeCompactCiphertextBallot Handle;
+
+        public unsafe string ObjectId
+        {
+            get
+            {
+                var status = NativeInterface.CompactCiphertextBallot.GetObjectId(
+                    Handle, out IntPtr value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"CiphertextBallot Error ObjectId: {status}");
+                    return null;
+                }
+                return Marshal.PtrToStringAnsi(value);
+            }
+        }
+
+        public unsafe CompactCiphertextBallot(byte[] data)
+        {
+            fixed (byte* pointer = data)
+            {
+                var status = NativeInterface.CompactCiphertextBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"CiphertextBallot Error Ctor: {status}");
+                }
+            }
+        }
+
+        unsafe internal CompactCiphertextBallot(NativeCompactCiphertextBallot handle)
+        {
+            Handle = handle;
+        }
+
+        public unsafe byte[] ToMsgPack()
+        {
+ 
+            var status = NativeInterface.CompactCiphertextBallot.ToMsgPack(
+                Handle, out IntPtr data, out UIntPtr size);
+
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"CiphertextBallot Error ToJson: {status}");
+                return null;
+            }
+
+            var byteArray = new byte[(int)size];
+            Marshal.Copy(data, byteArray, 0, (int)size);
+
+            Marshal.FreeHGlobal(data);
+            return byteArray;
+        }
+
+        protected override unsafe void DisposeUnmanaged()
+        {
+            base.DisposeUnmanaged();
+
+            if (Handle == null) return;
+            var status = NativeInterface.CompactCiphertextBallot.Free(Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"CiphertextBallot Error DisposeUnmanaged: {status}");
+            }
+            Handle = null;
+        }
+    }
+
+    #endregion
 
     #endregion
 }
