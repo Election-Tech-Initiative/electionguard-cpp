@@ -177,7 +177,7 @@ namespace electionguard
 
     std::unique_ptr<PlaintextBallot>
     expandCompactPlaintextBallot(const CompactPlaintextBallot &compactBallot,
-                                 const InternalElectionDescription &description);
+                                 const InternalElectionDescription &metadata);
 
     std::unique_ptr<CiphertextBallot>
     expandCompactCiphertextBallot(const CompactCiphertextBallot &compactCiphertext,

@@ -43,7 +43,7 @@ namespace electionguard
       {BallotBoxState::unknown, "unknown"},
     };
 
-    const string getBallotBoxStateString(const BallotBoxState &value)
+    string getBallotBoxStateString(const BallotBoxState &value)
     {
         return _ballot_box_state<BallotBoxState>::_map.find(value)->second;
     }

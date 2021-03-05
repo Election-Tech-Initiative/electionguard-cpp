@@ -31,8 +31,8 @@ eg_electionguard_status_t eg_test_election_generator_get_fake_ciphertext_electio
   eg_internal_election_description_t **out_metadata, eg_ciphertext_election_context_t **out_context)
 {
     try {
-        auto description = AS_TYPE(ElectionDescription, in_description);
-        auto publicKey = AS_TYPE(ElementModP, in_public_key);
+        auto *description = AS_TYPE(ElectionDescription, in_description);
+        auto *publicKey = AS_TYPE(ElementModP, in_public_key);
         auto [metadata, context] =
           electionguard::test::generators::ElectionGenerator::getFakeCiphertextElection(
             *description, *publicKey);

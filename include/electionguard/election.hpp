@@ -29,7 +29,7 @@ namespace electionguard
         other = 7
     };
 
-    EG_API const std::string getElectionTypeString(const ElectionType &value);
+    EG_API std::string getElectionTypeString(const ElectionType &value);
     EG_API ElectionType getElectionType(const std::string &value);
 
     /// <Summary>
@@ -68,7 +68,7 @@ namespace electionguard
         other = 28,
     };
 
-    EG_API const std::string getReportingUnitTypeString(const ReportingUnitType &value);
+    EG_API std::string getReportingUnitTypeString(const ReportingUnitType &value);
     EG_API ReportingUnitType getReportingUnitType(const std::string &value);
 
     /// <Summary>
@@ -91,7 +91,7 @@ namespace electionguard
         other = 12
     };
 
-    EG_API const std::string getVoteVariationTypeString(const VoteVariationType &value);
+    EG_API std::string getVoteVariationTypeString(const VoteVariationType &value);
     EG_API VoteVariationType getVoteVariationType(const std::string &value);
 
     /// <Summary>

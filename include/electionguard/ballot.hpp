@@ -16,7 +16,7 @@ namespace electionguard
 {
     enum class BallotBoxState { cast = 1, spoiled = 2, unknown = 999 };
 
-    EG_API const std::string getBallotBoxStateString(const BallotBoxState &value);
+    EG_API std::string getBallotBoxStateString(const BallotBoxState &value);
     EG_API BallotBoxState getBallotBoxState(const std::string &value);
 
     /// <summary>

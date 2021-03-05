@@ -235,14 +235,19 @@ bool test_encrypt_ballot_simple_succeeds(void)
     assert(strings_are_equal(compact_object_id, compact_deserialized_object_id) == true);
 
     // Clean Up
+    free(compact_deserialized_object_id);
+    free(compact_object_id);
+    free(compact_data);
     eg_compact_ciphertext_ballot_free(compact_deserialized);
     eg_compact_ciphertext_ballot_free(compact);
     eg_ciphertext_ballot_free(ciphertext);
     eg_plaintext_ballot_free(ballot);
+    eg_element_mod_q_free(device_hash);
     eg_encryption_device_free(device);
     eg_ciphertext_election_context_free(context);
     eg_internal_election_description_free(metadata);
     eg_election_description_free(description);
+    eg_elgamal_keypair_free(key_pair);
     eg_element_mod_q_free(two_mod_q);
 
     return true;

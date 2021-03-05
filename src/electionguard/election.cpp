@@ -46,7 +46,7 @@ namespace electionguard
       {ElectionType::other, "other"},
     };
 
-    const string getElectionTypeString(const ElectionType &value)
+    string getElectionTypeString(const ElectionType &value)
     {
         return _election_type<ElectionType>::_map.find(value)->second;
     }
@@ -102,7 +102,7 @@ namespace electionguard
       {ReportingUnitType::other, "other"},
     };
 
-    const string getReportingUnitTypeString(const ReportingUnitType &value)
+    string getReportingUnitTypeString(const ReportingUnitType &value)
     {
         return _reporting_unit_type<ReportingUnitType>::_map.find(value)->second;
     }
@@ -141,7 +141,7 @@ namespace electionguard
       {VoteVariationType::other, "other"},
     };
 
-    const string getVoteVariationTypeString(const VoteVariationType &value)
+    string getVoteVariationTypeString(const VoteVariationType &value)
     {
         return _vote_variation_type<VoteVariationType>::_map.find(value)->second;
     }
@@ -1465,14 +1465,14 @@ namespace electionguard
     vector<reference_wrapper<ContestDescriptionWithPlaceholders>>
     InternalElectionDescription::getContestsFor(const string &ballotStyleId) const
     {
-        auto style = getBallotStyle(ballotStyleId);
-        if (style == nullptr || style->getGeopoliticalUnitIds().size() == 0) {
+        auto *style = getBallotStyle(ballotStyleId);
+        if (style == nullptr || style->getGeopoliticalUnitIds().empty()) {
             throw runtime_error("Could not resolve a valid geopolitical unit");
         }
 
         vector<reference_wrapper<ContestDescriptionWithPlaceholders>> contests;
-        for (auto &reference : pimpl->contests) {
-            for (auto gpUnitId : style->getGeopoliticalUnitIds()) {
+        for (const auto &reference : pimpl->contests) {
+            for (const auto &gpUnitId : style->getGeopoliticalUnitIds()) {
                 if (reference->getElectoralDistrictId() == gpUnitId) {
                     contests.push_back(ref(*reference));
                 }
