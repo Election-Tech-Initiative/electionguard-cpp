@@ -175,11 +175,11 @@ namespace electionguard
                          std::unique_ptr<ElementModQ> nonce = nullptr, uint64_t timestamp = 0,
                          bool shouldVerifyProofs = true);
 
-    std::unique_ptr<PlaintextBallot>
+    EG_API std::unique_ptr<PlaintextBallot>
     expandCompactPlaintextBallot(const CompactPlaintextBallot &compactBallot,
                                  const InternalElectionDescription &metadata);
 
-    std::unique_ptr<CiphertextBallot>
+    EG_API std::unique_ptr<CiphertextBallot>
     expandCompactCiphertextBallot(const CompactCiphertextBallot &compactCiphertext,
                                   const InternalElectionDescription &metadata,
                                   const CiphertextElectionContext &context);
