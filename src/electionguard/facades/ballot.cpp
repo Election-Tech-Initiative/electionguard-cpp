@@ -805,4 +805,14 @@ EG_API eg_electionguard_status_t eg_compact_ciphertext_ballot_to_msgpack(
     }
 }
 
+eg_electionguard_status_t eg_compact_ciphertext_ballot_msgpack_free(uint8_t *in_data)
+{
+    if (in_data == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete[] in_data;
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
 #pragma endregion

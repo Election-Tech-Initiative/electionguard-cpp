@@ -237,7 +237,7 @@ bool test_encrypt_ballot_simple_succeeds(void)
     // Clean Up
     free(compact_deserialized_object_id);
     free(compact_object_id);
-    free(compact_data);
+    eg_compact_ciphertext_ballot_msgpack_free(compact_data);
     eg_compact_ciphertext_ballot_free(compact_deserialized);
     eg_compact_ciphertext_ballot_free(compact);
     eg_ciphertext_ballot_free(ciphertext);
