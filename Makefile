@@ -37,6 +37,8 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 	brew install cmake
 	brew install cppcheck
 	brew install llvm
+	brew install mingw-w64
+	# TODO: symlink for mingw environemnt
 	ln -s "$(brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
@@ -48,6 +50,7 @@ ifeq ($(OPERATING_SYSTEM),Linux)
 	sudo apt install -y cppcheck
 	sudo apt install -y clang-tidy
 	sudo apt install -y valgrind
+	sudo apt install -y mingw-w64
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo 🏁 WINDOWS INSTALL
@@ -55,41 +58,17 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 endif
 	wget -O cmake/CPM.cmake https://github.com/TheLartians/CPM.cmake/releases/latest/download/CPM.cmake
 
-ifeq ($(TARGET),Release)
-build: build-release
-else
-build: build-debug
-endif
-
-build-debug:
-	@echo 🐛 BUILD DEBUG
+build:
+	@echo 🧱 BUILD $(TARGET) For Host Operating System
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug -G "MSYS Makefiles" \
-		-DCMAKE_BUILD_TYPE=Debug \
-		-DBUILD_SHARED_LIBS=ON \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+	make build-windows
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug \
-		-DCMAKE_BUILD_TYPE=Debug \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/host/$(TARGET)/x86_64 \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/host/$(TARGET)/x86_64
 endif
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
-
-build-release: clean
-	@echo 🧱 BUILD RELEASE
-ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Release -G "MSYS Makefiles" \
-		-DCMAKE_BUILD_TYPE=Release \
-		-DBUILD_SHARED_LIBS=ON \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Release \
-		-DCMAKE_BUILD_TYPE=Release \
-		-DBUILD_SHARED_LIBS=ON \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-endif
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Release
 
 build-android:
 	@echo 🤖 BUILD ANDROID
@@ -148,7 +127,49 @@ else
 	echo "iOS builds are only supported on MacOS"
 endif
 
-build-netstandard: build-android build-ios
+build-macos:
+	@echo 📱 BUILD MACOS
+ifeq ($(OPERATING_SYSTEM),Darwin)
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/macos/$(TARGET) \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		"-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
+		-DCMAKE_OSX_DEPLOYMENT_TARGET=10.14 \
+		-DCMAKE_INSTALL_PREFIX=$(ELECTIONGUARD_BUILD_LIBS_DIR)/macos/$(TARGET)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/macos/$(TARGET) --config $(TARGET)
+else
+	echo "iOS builds are only supported on MacOS"
+endif
+
+build-windows:
+	@echo 📎 BUILD WINDOWS
+ifeq ($(OPERATING_SYSTEM),Windows)
+	# build for windows host machine (assumes x86_64)
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/windows/$(TARGET)/x86_64 -G "MSYS Makefiles" \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DBUILD_SHARED_LIBS=ON \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/windows/$(TARGET)/x86_64
+else
+	# Try to cross-compile for x64
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/windows/$(TARGET)/x86_64 \
+		-DCMAKE_TOOLCHAIN_FILE=$(realpath .)/cmake/toolchain.windows.mingw.x64.cmake \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DBUILD_SHARED_LIBS=ON \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/windows/$(TARGET)/x86_64
+
+	# Try to cross-compile for aarch64
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/windows/$(TARGET)/aarch64 \
+		-DCMAKE_TOOLCHAIN_FILE=$(realpath .)/cmake/toolchain.windows.mingw.aarch64.cmake \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DBUILD_SHARED_LIBS=ON \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/windows/$(TARGET)/aarch64
+endif
+	
+
+build-netstandard: build-android build-ios build-macos build-windows
 	@echo 🖥️ BUILD NETSTANDARD
 ifeq ($(OPERATING_SYSTEM),Darwin)
 	msbuild ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /t:Build /p:Configuration=$(TARGET)
@@ -172,20 +193,23 @@ else
 	if [ ! -d "$(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/Debug" ]; then mkdir $(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/Debug; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/Release" ]; then mkdir $(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/Release; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR); fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/android" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/android; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/ios" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/ios; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/linux" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/linux; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/macos" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/macos; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/windows" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/windows; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/host" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/host; fi
 endif
 
 format: build
-	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 && $(MAKE) format
+	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/host/$(TARGET)/x86_64 && $(MAKE) format
 
 memcheck:
 	@echo 🧼 RUN STATIC ANALYSIS
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo "Static analysis is only supported on Linux"
 else
-	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 && $(MAKE) memcheck-ElectionGuardTests
+	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/host/$(TARGET)/x86_64 && $(MAKE) memcheck-ElectionGuardTests
 endif
 
 rebuild: clean build
@@ -197,7 +221,7 @@ sanitize-asan:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo "Address sanitizer is only supported on Linux & Mac"
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64 \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DBUILD_SHARED_LIBS=ON \
 		-DOPTION_ENABLE_TESTS=ON \
@@ -206,9 +230,9 @@ else
 		-DUSE_DYNAMIC_ANALYSIS=ON \
 		-DUSE_SANITIZER="address" \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64/test/ElectionGuardCTests
 endif
 
 sanitize-tsan:
@@ -216,7 +240,7 @@ sanitize-tsan:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	echo "Thread sanitizer is only supported on Linux & Mac"
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64 \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DBUILD_SHARED_LIBS=ON \
 		-DOPTION_ENABLE_TESTS=ON \
@@ -225,41 +249,41 @@ else
 		-DUSE_DYNAMIC_ANALYSIS=ON \
 		-DUSE_SANITIZER="thread" \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64/test/ElectionGuardCTests
 endif
 
 test:
 	@echo 🧪 TEST
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug -G "MSYS Makefiles" \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64 -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DBUILD_SHARED_LIBS=ON \
 		-DOPTION_ENABLE_TESTS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64 \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DBUILD_SHARED_LIBS=ON \
 		-DOPTION_ENABLE_TESTS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 endif
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64/test/ElectionGuardCTests
 
 coverage:
 	@echo ✅ CHECK COVERAGE
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug -G "MSYS Makefiles" \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64 -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DBUILD_SHARED_LIBS=ON \
 		-DOPTION_ENABLE_TESTS=ON \
 		-DCODE_COVERAGE=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64 \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DBUILD_SHARED_LIBS=ON \
 		-DOPTION_ENABLE_TESTS=ON \
@@ -267,6 +291,6 @@ else
 		-DUSE_STATIC_ANALYSIS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 endif
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/host/Debug/x86_64/test/ElectionGuardCTests
