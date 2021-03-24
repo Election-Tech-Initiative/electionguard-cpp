@@ -898,7 +898,7 @@ namespace electionguard
                 json extendedData;
                 for (auto &[key, value] : serializable.getExtendedData()) {
                     json data = {{"value", value.get().value}, {"length", value.get().length}};
-                    extendedData.emplace(key, data);
+                    extendedData.emplace(to_string(key), data);
                 }
 
                 json result = {{"object_id", serializable.getObjectId()},
@@ -922,12 +922,13 @@ namespace electionguard
                     votes.push_back(vote);
                 }
 
-                map<string, unique_ptr<electionguard::ExtendedData>> extendedDataMap;
+                map<uint64_t, unique_ptr<electionguard::ExtendedData>> extendedDataMap;
                 if (j.contains("extended_data") && !j["extended_data"].is_null()) {
                     for (auto &[key, body] : j["extended_data"].items()) {
                         auto value = body["value"].get<string>();
                         auto length = body["length"].get<uint64_t>();
-                        extendedDataMap.emplace(key, make_unique<ExtendedData>(value, length));
+                        extendedDataMap.emplace(stoul(key),
+                                                make_unique<ExtendedData>(value, length));
                     }
                 }
 

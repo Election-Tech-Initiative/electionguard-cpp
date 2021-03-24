@@ -493,7 +493,7 @@ namespace electionguard
             // Iterate through the selections on the contest and expand each selection
             for (const auto &selection : contest.get().getSelections()) {
                 auto vote = compactBallot.getSelections().at(index);
-                auto extendedData = compactBallot.getExtendedDataFor(selection.get().getObjectId());
+                auto extendedData = compactBallot.getExtendedDataFor(index);
 
                 selections.push_back(make_unique<PlaintextBallotSelection>(
                   selection.get().getObjectId(), vote, false,

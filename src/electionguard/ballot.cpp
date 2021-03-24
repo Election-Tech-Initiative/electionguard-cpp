@@ -667,10 +667,10 @@ namespace electionguard
     struct CompactPlaintextBallot::Impl : public ElectionObjectBase {
         string ballotStyle;
         vector<uint64_t> selections;
-        map<string, unique_ptr<ExtendedData>> extendedData;
+        map<uint64_t, unique_ptr<ExtendedData>> extendedData;
 
         Impl(const string &objectId, const string &ballotStyle, vector<uint64_t> selections,
-             map<string, unique_ptr<ExtendedData>> extendedData)
+             map<uint64_t, unique_ptr<ExtendedData>> extendedData)
             : selections(move(selections)), extendedData(move(extendedData))
         {
             this->object_id = objectId;
@@ -682,7 +682,7 @@ namespace electionguard
 
     CompactPlaintextBallot::CompactPlaintextBallot(
       const string &objectId, const string &ballotStyle, vector<uint64_t> selections,
-      map<string, unique_ptr<ExtendedData>> extendedData)
+      map<uint64_t, unique_ptr<ExtendedData>> extendedData)
         : pimpl(new Impl(objectId, ballotStyle, move(selections), move(extendedData)))
     {
     }
@@ -700,9 +700,9 @@ namespace electionguard
     string CompactPlaintextBallot::getBallotStyle() const { return pimpl->ballotStyle; }
 
     vector<uint64_t> CompactPlaintextBallot::getSelections() const { return pimpl->selections; }
-    map<string, reference_wrapper<ExtendedData>> CompactPlaintextBallot::getExtendedData() const
+    map<uint64_t, reference_wrapper<ExtendedData>> CompactPlaintextBallot::getExtendedData() const
     {
-        map<string, reference_wrapper<ExtendedData>> extendedData;
+        map<uint64_t, reference_wrapper<ExtendedData>> extendedData;
         for (const auto &data : pimpl->extendedData) {
             extendedData.emplace(data.first, ref(*data.second));
         }
@@ -715,14 +715,15 @@ namespace electionguard
     CompactPlaintextBallot::make(const PlaintextBallot &plaintext)
     {
         vector<uint64_t> selections;
-        map<string, unique_ptr<ExtendedData>> extendedData;
+        map<uint64_t, unique_ptr<ExtendedData>> extendedData;
+        uint32_t index;
         for (const auto &contest : plaintext.getContests()) {
             for (const auto &selection : contest.get().getSelections()) {
                 selections.push_back(selection.get().getVote());
                 if (selection.get().getExtendedData() != nullptr) {
-                    extendedData.emplace(selection.get().getObjectId(),
-                                         selection.get().getExtendedData()->clone());
+                    extendedData.emplace(index, selection.get().getExtendedData()->clone());
                 }
+                index++;
             }
         }
 
@@ -733,10 +734,9 @@ namespace electionguard
 
     // Public Methods
 
-    unique_ptr<ExtendedData>
-    CompactPlaintextBallot::getExtendedDataFor(const string &selectionObjectId) const
+    unique_ptr<ExtendedData> CompactPlaintextBallot::getExtendedDataFor(const uint64_t index) const
     {
-        auto extendedData = pimpl->extendedData.find(selectionObjectId);
+        auto extendedData = pimpl->extendedData.find(index);
         if (extendedData != pimpl->extendedData.end()) {
             return extendedData->second->clone();
         }

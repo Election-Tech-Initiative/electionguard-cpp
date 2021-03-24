@@ -435,7 +435,7 @@ namespace electionguard
         CompactPlaintextBallot(const CompactPlaintextBallot &&other);
         CompactPlaintextBallot(const std::string &objectId, const std::string &ballotStyle,
                                std::vector<uint64_t> selections,
-                               std::map<std::string, std::unique_ptr<ExtendedData>> extendedData);
+                               std::map<uint64_t, std::unique_ptr<ExtendedData>> extendedData);
         ~CompactPlaintextBallot();
 
         CompactPlaintextBallot &operator=(CompactPlaintextBallot other);
@@ -445,12 +445,11 @@ namespace electionguard
         std::string getBallotStyle() const;
 
         std::vector<uint64_t> getSelections() const;
-        std::map<std::string, std::reference_wrapper<ExtendedData>> getExtendedData() const;
+        std::map<uint64_t, std::reference_wrapper<ExtendedData>> getExtendedData() const;
 
         static std::unique_ptr<CompactPlaintextBallot> make(const PlaintextBallot &plaintext);
 
-        std::unique_ptr<ExtendedData>
-        getExtendedDataFor(const std::string &selectionObjectId) const;
+        std::unique_ptr<ExtendedData> getExtendedDataFor(const uint64_t index) const;
 
         std::vector<uint8_t> toBson() const;
         std::string toJson() const;
