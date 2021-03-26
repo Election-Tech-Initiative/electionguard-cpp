@@ -42,7 +42,7 @@ eg_electionguard_status_t eg_elgamal_keypair_free(eg_elgamal_keypair_t *handle)
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(ElGamalKeyPair, handle);
+    delete AS_TYPE(ElGamalKeyPair, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -79,7 +79,7 @@ eg_electionguard_status_t eg_elgamal_ciphertext_free(eg_elgamal_ciphertext_t *ha
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(ElGamalCiphertext, handle);
+    delete AS_TYPE(ElGamalCiphertext, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }

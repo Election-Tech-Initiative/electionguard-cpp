@@ -268,7 +268,7 @@ namespace electionguard
                                          cryptoExtendedBaseHash)) {
             return encrypted;
         }
-        throw "encryptSelection failed validity check";
+        throw runtime_error("encryptSelection failed validity check");
     }
 
     unique_ptr<CiphertextBallotContest>

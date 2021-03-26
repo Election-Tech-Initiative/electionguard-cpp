@@ -56,7 +56,7 @@ eg_electionguard_status_t eg_encryption_device_free(eg_encryption_device_t *hand
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(EncryptionDevice, handle);
+    delete AS_TYPE(EncryptionDevice, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -102,7 +102,7 @@ eg_electionguard_status_t eg_encryption_mediator_free(eg_encryption_mediator_t *
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(EncryptionMediator, handle);
+    delete AS_TYPE(EncryptionMediator, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -252,7 +252,7 @@ eg_electionguard_status_t eg_encrypt_ballot(eg_plaintext_ballot_t *in_plaintext,
         auto *context = AS_TYPE(CiphertextElectionContext, in_context);
         auto *seed_hash = AS_TYPE(ElementModQ, in_seed_hash);
 
-        auto ciphertext = encryptBallot(*plaintext, *metadata, *context, *seed_hash, nullptr,
+        auto ciphertext = encryptBallot(*plaintext, *metadata, *context, *seed_hash, nullptr, 0ULL,
                                         in_should_verify_proofs);
         *out_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;

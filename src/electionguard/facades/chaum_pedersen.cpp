@@ -42,7 +42,7 @@ eg_constant_chaum_pedersen_proof_free(eg_constant_chaum_pedersen_proof_t *handle
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(ConstantChaumPedersenProof, handle);
+    delete AS_TYPE(ConstantChaumPedersenProof, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }

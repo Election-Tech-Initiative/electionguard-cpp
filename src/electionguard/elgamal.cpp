@@ -56,7 +56,7 @@ namespace electionguard
     unique_ptr<ElGamalKeyPair> ElGamalKeyPair::fromSecret(const ElementModQ &secretKey)
     {
         if (const_cast<ElementModQ &>(secretKey) < TWO_MOD_Q()) {
-            throw "ElGamalKeyPair fromSecret secret key needs to be in [2,Q).";
+            throw invalid_argument("ElGamalKeyPair fromSecret secret key needs to be in [2,Q).");
         }
         auto privateKey = make_unique<ElementModQ>(secretKey);
         auto publicKey = g_pow_p(secretKey);
@@ -188,7 +188,7 @@ namespace electionguard
                                                  const ElementModP &publicKey)
     {
         if ((const_cast<ElementModQ &>(nonce) == ZERO_MOD_Q())) {
-            throw "elgamalEncrypt encryption requires a non-zero nonce";
+            throw invalid_argument("elgamalEncrypt encryption requires a non-zero nonce");
         }
 
         const auto nonce4096 = nonce.toElementModP();

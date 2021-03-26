@@ -27,7 +27,7 @@ eg_electionguard_status_t eg_compact_plaintext_ballot_free(eg_compact_plaintext_
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(CompactPlaintextBallot, handle);
+    delete AS_TYPE(CompactPlaintextBallot, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -73,7 +73,7 @@ eg_electionguard_status_t eg_compact_plaintext_ballot_msgpack_free(uint8_t *in_d
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete[] in_data;
+    delete[] in_data; // NOLINT(cppcoreguidelines-owning-memory)
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -87,7 +87,7 @@ eg_electionguard_status_t eg_compact_ciphertext_ballot_free(eg_compact_ciphertex
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(CompactCiphertextBallot, handle);
+    delete AS_TYPE(CompactCiphertextBallot, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -148,7 +148,7 @@ eg_electionguard_status_t eg_compact_ciphertext_ballot_msgpack_free(uint8_t *in_
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete[] in_data;
+    delete[] in_data; // NOLINT(cppcoreguidelines-owning-memory)
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 

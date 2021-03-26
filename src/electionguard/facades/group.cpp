@@ -70,7 +70,7 @@ eg_electionguard_status_t eg_element_mod_p_free(eg_element_mod_p_t *handle)
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(ElementModP, handle);
+    delete AS_TYPE(ElementModP, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -146,7 +146,7 @@ eg_electionguard_status_t eg_element_mod_q_free(eg_element_mod_q_t *handle)
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(ElementModQ, handle);
+    delete AS_TYPE(ElementModQ, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
