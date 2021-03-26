@@ -34,7 +34,6 @@ namespace electionguard
 
     static unique_ptr<AnnotatedString> annotatedStringFromJson(const json &j)
     {
-        Log::debug(": deserializing");
         auto value = j["value"].get<string>();
         auto annotation = j["annotation"].get<string>();
         return make_unique<AnnotatedString>(annotation, value);
@@ -47,7 +46,6 @@ namespace electionguard
 
     static unique_ptr<Language> languageFromJson(const json &j)
     {
-        Log::debug(": deserializing");
         auto value = j["value"].get<string>();
         auto language = j["language"].get<string>();
         return make_unique<Language>(value, language);
@@ -64,7 +62,6 @@ namespace electionguard
 
     static unique_ptr<InternationalizedText> internationalizedTextFromJson(const json &j)
     {
-        Log::debug(": deserializing");
         vector<unique_ptr<Language>> text;
         for (const auto &i : j["text"]) {
             text.push_back(languageFromJson(i));
@@ -108,8 +105,6 @@ namespace electionguard
 
     static unique_ptr<ContactInformation> contactInformationFromJson(const json &j)
     {
-        Log::debug(": deserializing");
-
         vector<string> addressLine;
         if (j.contains("address_line") && !j["address_line"].is_null()) {
             for (const auto &i : j["address_line"]) {
@@ -155,7 +150,6 @@ namespace electionguard
 
     static unique_ptr<GeopoliticalUnit> geopoliticalUnitFromJson(const json &j)
     {
-        Log::debug(": deserializing");
         if (j.contains("contact_information") && !j["contact_information"].is_null()) {
             return make_unique<GeopoliticalUnit>(
               j["object_id"].get<string>(), j["name"].get<string>(),
@@ -215,8 +209,6 @@ namespace electionguard
 
     static unique_ptr<Party> partyFromJson(const json &j)
     {
-        Log::debug(": deserializing");
-
         // TODO: other cases
         if (j.contains("name") && j["name"].is_null()) {
             return make_unique<Party>(j["object_id"].get<string>(),
@@ -272,7 +264,6 @@ namespace electionguard
 
     static unique_ptr<Candidate> candidateFromJson(const json &j)
     {
-        Log::debug(": deserializing");
         auto objectId = j["object_id"].get<string>();
         auto name = j.contains("name") && !j["name"].is_null()
                       ? internationalizedTextFromJson(j["name"])
@@ -337,7 +328,6 @@ namespace electionguard
 
     static unique_ptr<BallotStyle> ballotStyleFromJson(const json &j)
     {
-        Log::debug(": deserializing");
         vector<string> gpUnitIds;
         for (const auto &element : j["geopolitical_unit_ids"]) {
             gpUnitIds.push_back(element);
@@ -385,7 +375,6 @@ namespace electionguard
 
     static unique_ptr<SelectionDescription> selectionDescriptionFromJson(const json &j)
     {
-        Log::debug(": deserializing");
         return make_unique<SelectionDescription>(j["object_id"].get<string>(),
                                                  j["candidate_id"].get<string>(),
                                                  j["sequence_order"].get<uint64_t>());
@@ -442,8 +431,6 @@ namespace electionguard
 
     static unique_ptr<ContestDescription> contestDescriptionFromJson(const json &j)
     {
-        Log::debug(": deserializing");
-
         auto objectId = j["object_id"].get<string>();
         auto electoralDistrictId = j["electoral_district_id"].get<string>();
         auto sequenceOrder = j["sequence_order"].get<uint64_t>();
@@ -534,8 +521,6 @@ namespace electionguard
 
             static unique_ptr<electionguard::ElectionDescription> toObject(json j)
             {
-                Log::debug(": deserializing properties");
-
                 auto electionScopeId = j["election_scope_id"].get<string>();
                 auto type = j["type"].get<string>();
                 auto startDate = j["start_date"].get<string>();
@@ -592,12 +577,8 @@ namespace electionguard
           private:
             static json fromObject(const electionguard::InternalElectionDescription &serializable)
             {
-                Log::debug(": serializing from object");
-
                 auto geopoliticalUnits =
                   geopoliticalUnitsToJson(serializable.getGeopoliticalUnits());
-
-                Log::debug(" serialized GeopoliticalUnits");
 
                 // Contests
                 json contests;
@@ -632,8 +613,6 @@ namespace electionguard
                     contests.push_back(contest_json);
                 }
 
-                Log::debug(" serialized Contests");
-
                 auto ballotStyles = ballotStylesToJson(serializable.getBallotStyles());
 
                 Log::debug(" serialized Ballot Styles");
@@ -647,11 +626,7 @@ namespace electionguard
             }
             static unique_ptr<electionguard::InternalElectionDescription> toObject(json j)
             {
-                Log::debug(": deserializing");
-
                 auto geopoliticalUnits = geopoliticalUnitsFromJson(j["geopolitical_units"]);
-
-                Log::debug(": deserialized geopoliticalUnits");
 
                 auto contests = j["contests"];
 
@@ -693,16 +668,10 @@ namespace electionguard
                     }
                 }
 
-                Log::debug(" deserialized contests");
-
                 auto ballotStyles = ballotStylesFromJson(j["ballot_styles"]);
-
-                Log::debug(" deserialized ballotStyles");
 
                 auto description_hash = j["description_hash"].get<string>();
                 auto descriptionHash = ElementModQ::fromHex(description_hash);
-
-                Log::debug(" deserialized descriptionHash");
 
                 return make_unique<electionguard::InternalElectionDescription>(
                   move(geopoliticalUnits), move(contestDescriptions), move(ballotStyles),
@@ -910,7 +879,6 @@ namespace electionguard
             }
             static unique_ptr<electionguard::CompactPlaintextBallot> toObject(json j)
             {
-
                 auto object_id = j["object_id"].get<string>();
                 auto ballot_style = j["ballot_style"].get<string>();
 

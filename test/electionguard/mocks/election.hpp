@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD_CPP_TEST_GENERATORS_ELECTION_HPP_INCLUDED__
-#define __ELECTIONGUARD_CPP_TEST_GENERATORS_ELECTION_HPP_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_TEST_MOCKS_ELECTION_HPP_INCLUDED__
+#define __ELECTIONGUARD_CPP_TEST_MOCKS_ELECTION_HPP_INCLUDED__
 
 #include <electionguard/election.hpp>
 #include <fstream>
@@ -9,7 +9,7 @@
 using namespace electionguard;
 using namespace std;
 
-namespace electionguard::test::generators
+namespace electionguard::test::mocks
 {
     class ElectionGenerator
     {
@@ -209,6 +209,6 @@ namespace electionguard::test::generators
             return context;
         }
     };
-} // namespace electionguard::test::generators
+} // namespace electionguard::test::mocks
 
-#endif /* __ELECTIONGUARD_CPP_TEST_GENERATORS_ELECTION_HPP_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_TEST_MOCKS_ELECTION_HPP_INCLUDED__ */

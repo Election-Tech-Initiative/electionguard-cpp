@@ -5,8 +5,8 @@
 #include "electionguard/tracker.hpp"
 #include "log.hpp"
 #include "nonces.hpp"
+#include "utils.hpp"
 
-#include <chrono>
 #include <iostream>
 
 extern "C" {
@@ -19,7 +19,8 @@ using std::runtime_error;
 using std::to_string;
 using std::unique_ptr;
 using std::vector;
-using std::chrono::system_clock;
+
+using electionguard::getSystemTimestamp;
 
 namespace electionguard
 {
@@ -62,12 +63,7 @@ namespace electionguard
                                          pimpl->location);
     }
 
-    uint64_t EncryptionDevice::getTimestamp() const
-    {
-        auto now = system_clock::now();
-        auto ticks = now.time_since_epoch();
-        return ticks.count() * system_clock::period::num / system_clock::period::den;
-    }
+    uint64_t EncryptionDevice::getTimestamp() const { return getSystemTimestamp(); }
 
 #pragma endregion
 
@@ -438,9 +434,7 @@ namespace electionguard
 
         // Get the system time
         if (timestamp == 0) {
-            auto now = system_clock::now();
-            auto ticks = now.time_since_epoch();
-            timestamp = ticks.count() * system_clock::period::num / system_clock::period::den;
+            timestamp = getSystemTimestamp();
         }
 
         // make the Ciphertext Ballot object

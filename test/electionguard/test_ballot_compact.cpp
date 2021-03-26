@@ -1,13 +1,13 @@
 #include "../../src/electionguard/log.hpp"
-#include "generators/ballot.hpp"
-#include "generators/election.hpp"
+#include "mocks/ballot.hpp"
+#include "mocks/election.hpp"
 
 #include <doctest/doctest.h>
 #include <electionguard/ballot.hpp>
 #include <electionguard/ballot_compact.hpp>
 
 using namespace electionguard;
-using namespace electionguard::test::generators;
+using namespace electionguard::test::mocks;
 using namespace std;
 
 TEST_CASE("Can serialize CompactPlaintextBallot")

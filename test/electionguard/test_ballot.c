@@ -1,4 +1,4 @@
-#include "generators/ballot.h"
+#include "mocks/ballot.h"
 #include "utils/utils.h"
 
 #include <assert.h>
@@ -28,7 +28,7 @@ bool test_plaintext_simple_ballot_is_valid(void)
 
     // Act
     eg_plaintext_ballot_t *result = NULL;
-    if (eg_test_ballot_generator_get_simple_ballot_from_file(&result)) {
+    if (eg_test_ballot_mocks_get_simple_ballot_from_file(&result)) {
         assert(false);
     }
 

@@ -1,5 +1,5 @@
-#include "generators/ballot.h"
-#include "generators/election.h"
+#include "mocks/ballot.h"
+#include "mocks/election.h"
 #include "utils/utils.h"
 
 #include <assert.h>
@@ -38,14 +38,14 @@ bool test_encrypt_ballot_compact_simple_succeeds(void)
     }
 
     eg_election_description_t *description = NULL;
-    if (eg_test_election_generator_get_simple_election_from_file(&description)) {
+    if (eg_test_election_mocks_get_simple_election_from_file(&description)) {
         assert(false);
     }
 
     eg_internal_election_description_t *metadata = NULL;
     eg_ciphertext_election_context_t *context = NULL;
-    if (eg_test_election_generator_get_fake_ciphertext_election(description, public_key, &metadata,
-                                                                &context)) {
+    if (eg_test_election_mocks_get_fake_ciphertext_election(description, public_key, &metadata,
+                                                            &context)) {
         assert(false);
     }
 
@@ -55,7 +55,7 @@ bool test_encrypt_ballot_compact_simple_succeeds(void)
     }
 
     eg_plaintext_ballot_t *ballot = NULL;
-    if (eg_test_ballot_generator_get_simple_ballot_from_file(&ballot)) {
+    if (eg_test_ballot_mocks_get_simple_ballot_from_file(&ballot)) {
         assert(false);
     }
 

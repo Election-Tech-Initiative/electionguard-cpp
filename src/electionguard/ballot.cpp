@@ -5,7 +5,7 @@
 #include "electionguard/tracker.hpp"
 #include "log.hpp"
 #include "serialize.hpp"
-#include "utils.cpp"
+#include "utils.hpp"
 
 #include <cstdlib>
 #include <ctime>

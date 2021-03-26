@@ -3,7 +3,7 @@
 #include "electionguard/hash.hpp"
 #include "log.hpp"
 #include "serialize.hpp"
-#include "utils.cpp"
+#include "utils.hpp"
 
 #include <cstring>
 #include <iostream>

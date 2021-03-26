@@ -1,12 +1,12 @@
 #include "../../src/electionguard/log.hpp"
-#include "generators/ballot.hpp"
-#include "generators/election.hpp"
+#include "mocks/ballot.hpp"
+#include "mocks/election.hpp"
 
 #include <doctest/doctest.h>
 #include <electionguard/ballot.hpp>
 
 using namespace electionguard;
-using namespace electionguard::test::generators;
+using namespace electionguard::test::mocks;
 using namespace std;
 
 TEST_CASE("Plaintext Simple Ballot Is Valid")
@@ -62,12 +62,15 @@ TEST_CASE("Can serialize PlaintextBallot")
     auto plaintext = BallotGenerator::getFakeBallot(*metadata);
     auto json = plaintext->toJson();
     auto bson = plaintext->toBson();
+    auto msgPack = plaintext->toMsgPack();
 
     // Act
     auto fromJson = PlaintextBallot::fromJson(json);
     auto fromBson = PlaintextBallot::fromBson(bson);
+    auto fromMsgPack = PlaintextBallot::fromMsgPack(msgPack);
 
     // Assert
     CHECK(plaintext->getObjectId() == fromJson->getObjectId());
     CHECK(plaintext->getObjectId() == fromBson->getObjectId());
+    CHECK(plaintext->getObjectId() == fromMsgPack->getObjectId());
 }

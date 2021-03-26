@@ -45,6 +45,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/convert.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/random.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/tracker.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/utils.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/variant_cast.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/words.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/words.hpp

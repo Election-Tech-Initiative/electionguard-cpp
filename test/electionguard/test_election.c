@@ -1,4 +1,4 @@
-#include "generators/election.h"
+#include "mocks/election.h"
 #include "utils/utils.h"
 
 #include <assert.h>
@@ -49,7 +49,7 @@ bool test_simple_election_is_valid(void)
     printf("\n -------- test_simple_election_is_valid -------- \n");
     // Act
     eg_election_description_t *result = NULL;
-    if (eg_test_election_generator_get_simple_election_from_file(&result)) {
+    if (eg_test_election_mocks_get_simple_election_from_file(&result)) {
         assert(false);
     }
 

@@ -27,14 +27,14 @@ CPMAddPackage(
 
 # ---- Sources ----
 
-# Generator Library
+# Utils Library
 add_library(ElectionGuardUtils SHARED
-${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/ballot.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/ballot.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/ballot.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/election.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/election.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/election.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/constants.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h
 )
