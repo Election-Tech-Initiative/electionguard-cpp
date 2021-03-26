@@ -11,6 +11,7 @@ namespace ElectionGuard
     using NativePlaintextBallotContest = NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle;
     using NativeCiphertextBallotContest = NativeInterface.CiphertextBallotContest.CiphertextBallotContestHandle;
     using NativePlaintextBallot = NativeInterface.PlaintextBallot.PlaintextBallotHandle;
+    using NativeCompactPlaintextBallot = NativeInterface.CompactPlaintextBallot.CompactPlaintextBallotHandle;
     using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotHandle;
     using NativeCompactCiphertextBallot = NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle;
 
@@ -563,6 +564,72 @@ namespace ElectionGuard
 
     #endregion
 
+    #region CompactPlaintextBallot
+
+    /// <summary>
+    /// A CompactCiphertextBallot is a CompactPlaintextBallot that includes the encryption parameters
+    /// to properly re-encrypt the same ballot.
+    ///
+    /// This class is space optimized to serve specific use cases where an encrypted ballot is used
+    /// to verify that plaintext selections have not been tampered with.
+    ///
+    /// Don't make this directly. Use `make` instead.
+    /// </summary>
+    public class CompactPlaintextBallot : DisposableBase
+    {
+        internal unsafe NativeCompactPlaintextBallot Handle;
+
+        public unsafe CompactPlaintextBallot(byte[] data)
+        {
+            fixed (byte* pointer = data)
+            {
+                var status = NativeInterface.CompactPlaintextBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"CompactPlaintextBallot Error Ctor: {status}");
+                }
+            }
+        }
+
+        unsafe internal CompactPlaintextBallot(NativeCompactPlaintextBallot handle)
+        {
+            Handle = handle;
+        }
+
+        public unsafe byte[] ToMsgPack()
+        {
+
+            var status = NativeInterface.CompactPlaintextBallot.ToMsgPack(
+                Handle, out IntPtr data, out UIntPtr size);
+
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"CompactPlaintextBallot Error ToJson: {status}");
+                return null;
+            }
+
+            var byteArray = new byte[(int)size];
+            Marshal.Copy(data, byteArray, 0, (int)size);
+            NativeInterface.CompactPlaintextBallot.MsgPackFree(data);
+            return byteArray;
+        }
+
+        protected override unsafe void DisposeUnmanaged()
+        {
+            base.DisposeUnmanaged();
+
+            if (Handle == null) return;
+            var status = NativeInterface.CompactPlaintextBallot.Free(Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"CompactPlaintextBallot Error DisposeUnmanaged: {status}");
+            }
+            Handle = null;
+        }
+    }
+
+    #endregion
+
     #region CiphertextBallot
 
     /// <summary>
@@ -760,6 +827,8 @@ namespace ElectionGuard
         }
     }
 
+    #endregion
+
     #region CompactCiphertextBallot
 
     /// <summary>
@@ -783,7 +852,7 @@ namespace ElectionGuard
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error ObjectId: {status}");
+                    Console.WriteLine($"CompactCiphertextBallot Error ObjectId: {status}");
                     return null;
                 }
                 return Marshal.PtrToStringAnsi(value);
@@ -797,7 +866,7 @@ namespace ElectionGuard
                 var status = NativeInterface.CompactCiphertextBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error Ctor: {status}");
+                    Console.WriteLine($"CompactCiphertextBallot Error Ctor: {status}");
                 }
             }
         }
@@ -815,14 +884,13 @@ namespace ElectionGuard
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallot Error ToJson: {status}");
+                Console.WriteLine($"CompactCiphertextBallot Error ToJson: {status}");
                 return null;
             }
 
             var byteArray = new byte[(int)size];
             Marshal.Copy(data, byteArray, 0, (int)size);
-
-            Marshal.FreeHGlobal(data);
+            NativeInterface.CompactCiphertextBallot.MsgPackFree(data);
             return byteArray;
         }
 
@@ -834,13 +902,11 @@ namespace ElectionGuard
             var status = NativeInterface.CompactCiphertextBallot.Free(Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallot Error DisposeUnmanaged: {status}");
+                Console.WriteLine($"CompactCiphertextBallot Error DisposeUnmanaged: {status}");
             }
             Handle = null;
         }
     }
-
-    #endregion
 
     #endregion
 }

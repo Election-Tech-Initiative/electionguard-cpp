@@ -739,6 +739,43 @@ namespace ElectionGuard
                 PlaintextBallotHandle handle, out uint* data, out UIntPtr size);
         }
 
+        internal static unsafe class CompactPlaintextBallot
+        {
+            internal unsafe struct CompactPlaintextBallotType { };
+
+            internal class CompactPlaintextBallotHandle
+                : ElectionguardSafeHandle<CompactPlaintextBallotType>
+            {
+                [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = CompactPlaintextBallot.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"CompactPlaintextBallot Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_compact_plaintext_ballot_free")]
+            internal static extern Status Free(CompactPlaintextBallotHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_compact_plaintext_ballot_from_msgpack")]
+            internal static extern Status FromMsgPack(
+                byte* data, ulong size, out CompactPlaintextBallotHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_compact_plaintext_ballot_to_msgpack")]
+            internal static extern Status ToMsgPack(
+                CompactPlaintextBallotHandle handle, out IntPtr data, out UIntPtr size);
+            
+            [DllImport(DllName, EntryPoint = "eg_compact_plaintext_ballot_msgpack_free")]
+            internal static extern Status MsgPackFree(IntPtr data);
+        }
+
         internal static unsafe class CiphertextBallot
         {
             internal unsafe struct CiphertextBallotType { };
@@ -876,6 +913,9 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_compact_ciphertext_ballot_to_msgpack")]
             internal static extern Status ToMsgPack(
                 CompactCiphertextBallotHandle handle, out IntPtr data, out UIntPtr size);
+            
+            [DllImport(DllName, EntryPoint = "eg_compact_ciphertext_ballot_msgpack_free")]
+            internal static extern Status MsgPackFree(IntPtr data);
 
         }
 
