@@ -1041,6 +1041,13 @@ namespace electionguard
         for (const auto &selection : pimpl->selections) {
             selections.push_back(ref(*selection));
         }
+
+        sort(selections.begin(), selections.end(),
+             [](const reference_wrapper<SelectionDescription> left,
+                const reference_wrapper<SelectionDescription> right) {
+                 return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+             });
+
         return selections;
     }
 
@@ -1118,6 +1125,13 @@ namespace electionguard
         for (const auto &selection : pimpl->placeholderSelections) {
             placeholders.push_back(ref(*selection));
         }
+
+        sort(placeholders.begin(), placeholders.end(),
+             [](const reference_wrapper<SelectionDescription> left,
+                const reference_wrapper<SelectionDescription> right) {
+                 return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+             });
+
         return placeholders;
     }
 
@@ -1319,6 +1333,13 @@ namespace electionguard
         for (auto &reference : pimpl->contests) {
             references.push_back(ref(*reference));
         }
+
+        sort(references.begin(), references.end(),
+             [](const reference_wrapper<ContestDescription> left,
+                const reference_wrapper<ContestDescription> right) {
+                 return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+             });
+
         return references;
     }
 
@@ -1437,6 +1458,11 @@ namespace electionguard
         for (auto &reference : pimpl->contests) {
             references.push_back(ref(*reference));
         }
+        sort(references.begin(), references.end(),
+             [](const reference_wrapper<ContestDescriptionWithPlaceholders> left,
+                const reference_wrapper<ContestDescriptionWithPlaceholders> right) {
+                 return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+             });
         return references;
     }
 
@@ -1478,6 +1504,12 @@ namespace electionguard
                 }
             }
         }
+
+        sort(contests.begin(), contests.end(),
+             [](const reference_wrapper<ContestDescriptionWithPlaceholders> left,
+                const reference_wrapper<ContestDescriptionWithPlaceholders> right) {
+                 return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+             });
 
         return contests;
     }
