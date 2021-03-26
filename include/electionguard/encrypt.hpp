@@ -2,6 +2,7 @@
 #define __ELECTIONGUARD_CPP_ENCRYPT_HPP_INCLUDED__
 
 #include "electionguard/ballot.hpp"
+#include "electionguard/ballot_compact.hpp"
 #include "electionguard/election.hpp"
 #include "electionguard/group.hpp"
 #include "export.h"
@@ -175,14 +176,6 @@ namespace electionguard
                          std::unique_ptr<ElementModQ> nonce = nullptr, uint64_t timestamp = 0,
                          bool shouldVerifyProofs = true);
 
-    EG_API std::unique_ptr<PlaintextBallot>
-    expandCompactPlaintextBallot(const CompactPlaintextBallot &compactBallot,
-                                 const InternalElectionDescription &metadata);
-
-    EG_API std::unique_ptr<CiphertextBallot>
-    expandCompactCiphertextBallot(const CompactCiphertextBallot &compactCiphertext,
-                                  const InternalElectionDescription &metadata,
-                                  const CiphertextElectionContext &context);
 
 } // namespace electionguard
 

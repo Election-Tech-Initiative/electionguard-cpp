@@ -3,6 +3,7 @@
 
 #include "convert.hpp"
 #include "electionguard/ballot.hpp"
+#include "electionguard/ballot_compact.hpp"
 #include "electionguard/election.hpp"
 #include "electionguard/export.h"
 #include "electionguard/group.hpp"

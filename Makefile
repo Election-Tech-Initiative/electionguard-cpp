@@ -36,6 +36,7 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 	brew install wget
 	brew install cmake
 	brew install cppcheck
+	brew install include-what-you-use
 	brew install llvm
 	ln -s "$(brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
 endif

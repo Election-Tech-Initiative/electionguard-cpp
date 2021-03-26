@@ -71,20 +71,3 @@ TEST_CASE("Can serialize PlaintextBallot")
     CHECK(plaintext->getObjectId() == fromJson->getObjectId());
     CHECK(plaintext->getObjectId() == fromBson->getObjectId());
 }
-
-TEST_CASE("Can serialize CompactPlaintextBallot")
-{
-    // Arrange
-    auto metadata = ElectionGenerator::getFakeMetadata(TWO_MOD_Q());
-    auto plaintext = BallotGenerator::getFakeBallot(*metadata);
-    auto compact = CompactPlaintextBallot::make(*plaintext);
-    auto msgpack = compact->toMsgPack();
-    auto json = compact->toJson();
-    Log::debug(json);
-
-    // Act
-    auto fromMsgPack = CompactPlaintextBallot::fromMsgPack(msgpack);
-
-    // Assert
-    CHECK(plaintext->getObjectId() == fromMsgPack->getObjectId());
-}

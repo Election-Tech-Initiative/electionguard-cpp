@@ -217,6 +217,8 @@ namespace electionguard
                                             move(contests));
     }
 
+#pragma region Encryption Functions
+
     unique_ptr<CiphertextBallotSelection>
     encryptSelection(const PlaintextBallotSelection &selection,
                      const SelectionDescription &description, const ElementModP &elgamalPublicKey,
@@ -479,67 +481,6 @@ namespace electionguard
         return CompactCiphertextBallot::make(*normalized, *ciphertext);
     }
 
-    unique_ptr<PlaintextBallot>
-    expandCompactPlaintextBallot(const CompactPlaintextBallot &compactBallot,
-                                 const InternalElectionDescription &metadata)
-    {
-        vector<unique_ptr<PlaintextBallotContest>> contests;
-        uint64_t index = 0;
-
-        // Get the ballot style and iterate through the contests for that style
-        for (const auto &contest : metadata.getContestsFor(compactBallot.getBallotStyle())) {
-            vector<unique_ptr<PlaintextBallotSelection>> selections;
-
-            // Iterate through the selections on the contest and expand each selection
-            for (const auto &selection : contest.get().getSelections()) {
-                auto vote = compactBallot.getSelections().at(index);
-                auto extendedData = compactBallot.getExtendedDataFor(index);
-
-                selections.push_back(make_unique<PlaintextBallotSelection>(
-                  selection.get().getObjectId(), vote, false,
-                  extendedData == nullptr ? nullptr : move(extendedData)));
-
-                index++;
-            }
-
-            contests.push_back(
-              make_unique<PlaintextBallotContest>(contest.get().getObjectId(), move(selections)));
-        }
-
-        return make_unique<PlaintextBallot>(compactBallot.getObjectId(),
-                                            compactBallot.getBallotStyle(), move(contests));
-    }
-
-    unique_ptr<CiphertextBallot>
-    expandCompactCiphertextBallot(const CompactCiphertextBallot &compactCiphertext,
-                                  const InternalElectionDescription &metadata,
-                                  const CiphertextElectionContext &context)
-    {
-        if (compactCiphertext.getPlaintext() == nullptr) {
-            throw runtime_error("the plaintext seelctions were not found");
-        }
-        if (compactCiphertext.getPreviousTrackingHash() == nullptr) {
-            throw runtime_error("the previous tracking hash was not found");
-        }
-
-        if (compactCiphertext.getTrackingHash() == nullptr) {
-            throw runtime_error("the tracking hash was not found");
-        }
-
-        if (compactCiphertext.getNonce() == nullptr) {
-            throw runtime_error("the nonce was not found");
-        }
-
-        auto plaintext = expandCompactPlaintextBallot(*compactCiphertext.getPlaintext(), metadata);
-        auto ciphertext =
-          encryptBallot(*plaintext, metadata, context, *compactCiphertext.getPreviousTrackingHash(),
-                        compactCiphertext.getNonce()->clone(), compactCiphertext.getTimestamp());
-
-        if (*ciphertext->getTrackingHash() != *compactCiphertext.getTrackingHash()) {
-            throw runtime_error("The regenerated tracking hash does not match");
-        }
-
-        return ciphertext;
-    }
+#pragma endregion
 
 } // namespace electionguard

@@ -3,6 +3,7 @@
 #define __ELECTIONGUARD_CPP_ENCRYPT_H_INCLUDED__
 
 #include "ballot.h"
+#include "ballot_compact.h"
 #include "election.h"
 #include "export.h"
 #include "status.h"
@@ -13,7 +14,7 @@
 extern "C" {
 #endif
 
-// EncryptionDevice
+#ifndef EncryptionDevice
 
 struct eg_encryption_device_s;
 
@@ -49,7 +50,9 @@ EG_API eg_electionguard_status_t eg_encryption_device_free(eg_encryption_device_
 EG_API eg_electionguard_status_t eg_encryption_device_get_hash(eg_encryption_device_t *handle,
                                                                eg_element_mod_q_t **out_hash);
 
-// EncryptionMediator
+#endif
+
+#ifndef EncryptionMediator
 
 struct eg_encryption_mediator_s;
 
@@ -85,6 +88,10 @@ EG_API eg_electionguard_status_t eg_encryption_mediator_encrypt_ballot(
 EG_API eg_electionguard_status_t eg_encryption_mediator_encrypt_ballot_verify_proofs(
   eg_encryption_mediator_t *handle, eg_plaintext_ballot_t *in_plaintext,
   eg_ciphertext_ballot_t **out_ciphertext_handle);
+
+#endif
+
+#ifndef Encryption Functions
 
 /**
 * Encrypt a specific `BallotSelection` in the context of a specific `BallotContest`
@@ -206,6 +213,8 @@ EG_API eg_electionguard_status_t eg_encrypt_compact_ballot(
   eg_plaintext_ballot_t *in_plaintext, eg_internal_election_description_t *in_metadata,
   eg_ciphertext_election_context_t *in_context, eg_element_mod_q_t *in_seed_hash,
   bool in_should_verify_proofs, eg_compact_ciphertext_ballot_t **out_handle);
+
+#endif
 
 #ifdef __cplusplus
 }

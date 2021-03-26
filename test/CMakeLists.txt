@@ -45,10 +45,12 @@ target_compile_features(ElectionGuardUtils PRIVATE cxx_std_17)
 add_executable(ElectionGuardTests 
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp    
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot_compact.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_election.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt_compact.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_group.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hacl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.cpp
@@ -71,6 +73,7 @@ add_executable(ElectionGuardCTests
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_election.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt_compact.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_tracker.c

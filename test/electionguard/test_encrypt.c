@@ -185,27 +185,6 @@ bool test_encrypt_ballot_simple_succeeds(void)
         assert(false);
     }
 
-    eg_compact_ciphertext_ballot_t *compact = NULL;
-    if (eg_encrypt_compact_ballot(ballot, metadata, context, device_hash, true, &compact)) {
-        assert(false);
-    }
-
-    uint8_t *compact_data = NULL;
-    size_t compact_data_size;
-    if (eg_compact_ciphertext_ballot_to_msgpack(compact, &compact_data, &compact_data_size)) {
-        assert(false);
-    }
-
-    assert(compact_data != NULL);
-    assert(compact_data[0] != 0);
-    assert(compact_data_size > 0);
-
-    eg_compact_ciphertext_ballot_t *compact_deserialized = NULL;
-    if (eg_compact_ciphertext_ballot_from_msgpack(compact_data, compact_data_size,
-                                                  &compact_deserialized)) {
-        assert(false);
-    }
-
     // Assert
     eg_element_mod_q_t *description_hash = NULL;
     if (eg_ciphertext_election_context_get_description_hash(context, &description_hash)) {
@@ -221,25 +200,7 @@ bool test_encrypt_ballot_simple_succeeds(void)
     assert(eg_ciphertext_ballot_is_valid_encryption(ciphertext, description_hash, public_key,
                                                     extended_base_hash) == true);
 
-    // check the serialized compact ballot
-    char *compact_object_id;
-    if (eg_compact_ciphertext_ballot_get_object_id(compact, &compact_object_id)) {
-        assert(false);
-    }
-
-    char *compact_deserialized_object_id;
-    if (eg_compact_ciphertext_ballot_get_object_id(compact_deserialized,
-                                                   &compact_deserialized_object_id)) {
-        assert(false);
-    }
-    assert(strings_are_equal(compact_object_id, compact_deserialized_object_id) == true);
-
     // Clean Up
-    free(compact_deserialized_object_id);
-    free(compact_object_id);
-    eg_compact_ciphertext_ballot_msgpack_free(compact_data);
-    eg_compact_ciphertext_ballot_free(compact_deserialized);
-    eg_compact_ciphertext_ballot_free(compact);
     eg_ciphertext_ballot_free(ciphertext);
     eg_plaintext_ballot_free(ballot);
     eg_element_mod_q_free(device_hash);

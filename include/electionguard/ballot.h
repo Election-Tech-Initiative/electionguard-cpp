@@ -461,39 +461,6 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_to_bson_with_nonces(
 
 #endif
 
-#ifndef CompactCiphertextBallot
-
-struct eg_compact_ciphertext_ballot_s;
-
-/*
-* A CompactCiphertextBallot is a CompactPlaintextBallot that includes the encryption parameters
-* to properly re-encrypt the same ballot.
-*
-* This class is space optimized to serve specific use cases where an encrypted ballot is used
-* to verify that plaintext selections have not been tampered with.
-*
-* Don't make this directly. Use `make` instead.
-*/
-typedef struct eg_ciphertext_ballot_s eg_compact_ciphertext_ballot_t;
-
-// no constructors defined.  use `eg_encrypt_compact_ballot` in encrypt.h
-
-EG_API eg_electionguard_status_t
-eg_compact_ciphertext_ballot_free(eg_compact_ciphertext_ballot_t *handle);
-
-EG_API eg_electionguard_status_t eg_compact_ciphertext_ballot_get_object_id(
-  eg_compact_ciphertext_ballot_t *handle, char **out_object_id);
-
-EG_API eg_electionguard_status_t eg_compact_ciphertext_ballot_from_msgpack(
-  uint8_t *in_data, uint64_t in_length, eg_compact_ciphertext_ballot_t **out_handle);
-
-EG_API eg_electionguard_status_t eg_compact_ciphertext_ballot_to_msgpack(
-  eg_compact_ciphertext_ballot_t *handle, uint8_t **out_data, size_t *out_size);
-
-EG_API eg_electionguard_status_t eg_compact_ciphertext_ballot_msgpack_free(uint8_t *in_data);
-
-#endif
-
 #ifdef __cplusplus
 }
 #endif

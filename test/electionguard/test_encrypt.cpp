@@ -161,44 +161,6 @@ TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeed
 
     // Assert
     CHECK(compactCiphertext->getObjectId() == plaintext->getObjectId());
-
-    SUBCASE("Can Serialize CompactCiphertextBallot")
-    {
-        auto json = compactCiphertext->toJson();
-        Log::debug(json);
-        // Assert
-        auto msgpack = compactCiphertext->toMsgPack();
-        auto fromMsgpack = CompactCiphertextBallot::fromMsgPack(msgpack);
-        CHECK(fromMsgpack->getNonce()->toHex() == compactCiphertext->getNonce()->toHex());
-    }
-
-    SUBCASE("Can Expand Plaintext")
-    {
-        auto expandedPlaintext =
-          expandCompactPlaintextBallot(*compactCiphertext->getPlaintext(), *metadata);
-
-        // Assert
-        CHECK(expandedPlaintext->getObjectId() == compactCiphertext->getObjectId());
-
-        auto msgpack = expandedPlaintext->toMsgPack();
-        auto fromMsgPack = PlaintextBallot::fromMsgPack(msgpack);
-        CHECK(fromMsgPack->getObjectId() == expandedPlaintext->getObjectId());
-    }
-
-    SUBCASE("Can Expand Ciphertext")
-    {
-        auto json = compactCiphertext->toJson();
-        Log::debug(json);
-
-        auto expandedCiphertext =
-          expandCompactCiphertextBallot(*compactCiphertext, *metadata, *context);
-
-        // Assert
-        CHECK(expandedCiphertext->getNonce()->toHex() == compactCiphertext->getNonce()->toHex());
-        CHECK(expandedCiphertext->isValidEncryption(*context->getDescriptionHash(),
-                                                    *keypair->getPublicKey(),
-                                                    *context->getCryptoExtendedBaseHash()) == true);
-    }
 }
 
 TEST_CASE("Encrypt simple ballot from file succeeds")
