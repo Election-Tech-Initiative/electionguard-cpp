@@ -409,9 +409,6 @@ eg_ciphertext_ballot_get_contest_at_index(eg_ciphertext_ballot_t *handle, size_t
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_tracking_hash(
   eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_tracking_hash_ref);
 
-EG_API eg_electionguard_status_t
-eg_ciphertext_ballot_get_tracking_code(eg_ciphertext_ballot_t *handle, char **out_tracking_code);
-
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_timestamp(eg_ciphertext_ballot_t *handle,
                                                                     uint64_t *out_timestamp);
 

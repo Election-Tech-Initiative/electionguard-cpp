@@ -1,17 +1,21 @@
 #include "words.hpp"
 
-#include "log.hpp"
+#include "../../../src/electionguard/convert.hpp"
+#include "../../../src/electionguard/log.hpp"
+#include "../../../src/electionguard/variant_cast.hpp"
 
 #include <algorithm>
+#include <cstring>
 #include <string>
 #include <vector>
 
 using std::distance;
 using std::find;
 using std::string;
+using std::uppercase;
 using std::vector;
 
-namespace electionguard
+namespace electionguard::test::mocks
 {
     static vector<string> WORDS = {
       "aardvark",
@@ -5405,8 +5409,6 @@ namespace electionguard
 
     string getWord(uint16_t index) { return WORDS[index & 0xfff]; }
 
-    int16_t getIndex(const char *word) { return getIndex(string(word)); }
-
     int16_t getIndex(const string &word)
     {
         auto element = find(WORDS.begin(), WORDS.end(), word);
@@ -5419,4 +5421,61 @@ namespace electionguard
         return -1;
     }
 
-} // namespace electionguard
+    int16_t getIndex(const char *word) { return getIndex(string(word)); }
+
+    string hashToWords(const ElementModQ &trackerHash, const char *separator)
+    {
+        auto bytes = trackerHash.toBytes();
+        stringstream stream;
+
+        for (size_t i = 0; (i + 3) < bytes.size(); i += 4) {
+            // Select 4 bytes for the segment
+            auto first = bytes.at(i);
+            auto second = bytes.at(i + 1);
+            auto third = bytes.at(i + 2);
+            auto fourth = bytes.at(i + 3);
+
+            // word is byte(1) + 1/2 of byte(2)
+            auto wordPart = getWord(static_cast<uint16_t>((first * 16 + (second >> 4))));
+            // hex is other 1/2 of byte(2) + byte(3) + byte(4)
+            auto hexPart = {(second & 0x0f) >> 0, (third & 0xf0) >> 4, (third & 0x0f) >> 0,
+                            (fourth & 0xf0) >> 4, (fourth & 0x0f) >> 0};
+
+            stream << wordPart << separator;
+
+            for (auto i : hexPart) {
+                stream << hex << uppercase << setw(1) << static_cast<uint32_t>(i);
+            }
+
+            if (fourth == bytes.back()) {
+                separator = "";
+            }
+
+            stream << separator;
+        }
+
+        return stream.str();
+    }
+
+} // namespace electionguard::test::mocks
+
+eg_electionguard_status_t
+eg_hash_to_words_with_default_separator(eg_element_mod_q_t *in_tracker_hash, char **out_hash_words)
+{
+    return eg_hash_to_words(in_tracker_hash, " ", out_hash_words);
+}
+
+eg_electionguard_status_t eg_hash_to_words(eg_element_mod_q_t *in_tracker_hash,
+                                           const char *in_separator, char **out_hash_words)
+{
+    try {
+        auto *trackerHash = AS_TYPE(electionguard::ElementModQ, in_tracker_hash);
+        auto words = electionguard::test::mocks::hashToWords(*trackerHash, in_separator);
+        *out_hash_words = electionguard::dynamicCopy(words);
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        electionguard::Log::error(":eg_element_mod_q_to_hex", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}

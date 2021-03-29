@@ -1007,7 +1007,6 @@ namespace electionguard
                   {"previous_tracking_hash", serializable.getPreviousTrackingHash()->toHex()},
                   {"contests", contests},
                   {"tracking_hash", serializable.getTrackingHash()->toHex()},
-                  {"tracking_code", serializable.getTrackingCode()},
                   {"timestamp", serializable.getTimestamp()},
                   {"crypto_hash", serializable.getCryptoHash()->toHex()},
                 };

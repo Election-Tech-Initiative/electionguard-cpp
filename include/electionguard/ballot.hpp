@@ -448,7 +448,6 @@ namespace electionguard
         std::vector<std::reference_wrapper<CiphertextBallotContest>> getContests() const;
 
         ElementModQ *getTrackingHash() const;
-        std::string getTrackingCode() const;
         uint64_t getTimestamp() const;
         ElementModQ *getNonce() const;
         ElementModQ *getCryptoHash() const;

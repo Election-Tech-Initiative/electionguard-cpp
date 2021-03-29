@@ -51,24 +51,3 @@ eg_electionguard_status_t eg_get_rotating_tracker_hash(eg_element_mod_q_t *in_pr
         return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     }
 }
-
-eg_electionguard_status_t
-eg_hash_to_words_with_default_separator(eg_element_mod_q_t *in_tracker_hash, char **out_hash_words)
-{
-    return eg_hash_to_words(in_tracker_hash, " ", out_hash_words);
-}
-
-eg_electionguard_status_t eg_hash_to_words(eg_element_mod_q_t *in_tracker_hash,
-                                           const char *in_separator, char **out_hash_words)
-{
-    try {
-        auto *trackerHash = AS_TYPE(ElementModQ, in_tracker_hash);
-        auto words = Tracker::hashToWords(*trackerHash, in_separator);
-        *out_hash_words = dynamicCopy(words);
-
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(":eg_element_mod_q_to_hex", e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
-    }
-}

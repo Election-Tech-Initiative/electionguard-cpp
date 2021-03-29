@@ -47,8 +47,6 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/tracker.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/utils.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/variant_cast.hpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/words.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/words.hpp
     ${PROJECT_SOURCE_DIR}/src/kremlin/evercrypt_targetconfig.h
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum.c
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum.h

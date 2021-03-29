@@ -35,6 +35,8 @@ ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.h
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/words.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/words.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/constants.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h
 )

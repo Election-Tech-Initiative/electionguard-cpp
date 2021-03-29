@@ -21,8 +21,6 @@ namespace electionguard
         static std::unique_ptr<ElementModQ> getRotatingTrackerHash(const ElementModQ &previous,
                                                                    uint64_t timestamp,
                                                                    const ElementModQ &ballotHash);
-
-        static std::string hashToWords(const ElementModQ &trackerHash, const char *separator = " ");
     };
 
 } // namespace electionguard

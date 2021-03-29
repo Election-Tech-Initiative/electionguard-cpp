@@ -587,20 +587,6 @@ eg_ciphertext_ballot_get_tracking_hash(eg_ciphertext_ballot_t *handle,
     }
 }
 
-eg_electionguard_status_t eg_ciphertext_ballot_get_tracking_code(eg_ciphertext_ballot_t *handle,
-                                                                 char **out_tracking_code)
-{
-    try {
-        auto code = AS_TYPE(CiphertextBallot, handle)->getTrackingCode();
-        *out_tracking_code = dynamicCopy(code);
-
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(":eg_ciphertext_ballot_get_tracking_code", e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
-    }
-}
-
 uint64_t eg_ciphertext_ballot_get_timestamp(eg_ciphertext_ballot_t *ciphertext)
 {
     auto timestamp = AS_TYPE(CiphertextBallot, ciphertext)->getTimestamp();
