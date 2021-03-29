@@ -730,21 +730,6 @@ namespace ElectionGuard
             }
         }
 
-        public unsafe string TrackingCode
-        {
-            get
-            {
-                var status = NativeInterface.CiphertextBallot.GetTrackingCode(
-                    Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallot Error TrackingCode: {status}");
-                    return null;
-                }
-                return Marshal.PtrToStringAnsi(value);
-            }
-        }
-
         public unsafe ElementModQ Nonce
         {
             get

@@ -833,10 +833,6 @@ namespace ElectionGuard
                 CiphertextBallotHandle handle,
                 out ElementModQ.ElementModQHandle tracking_hash);
 
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_tracking_code")]
-            internal static extern Status GetTrackingCode(
-                CiphertextBallotHandle handle, out IntPtr tracking_code);
-
             // TODO: ISSUE #129: get timestamp
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_nonce")]
