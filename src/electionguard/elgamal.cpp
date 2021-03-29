@@ -56,7 +56,7 @@ namespace electionguard
     unique_ptr<ElGamalKeyPair> ElGamalKeyPair::fromSecret(const ElementModQ &secretKey)
     {
         if (const_cast<ElementModQ &>(secretKey) < TWO_MOD_Q()) {
-            throw "ElGamalKeyPair fromSecret secret key needs to be in [2,Q).";
+            throw invalid_argument("ElGamalKeyPair fromSecret secret key needs to be in [2,Q).");
         }
         auto privateKey = make_unique<ElementModQ>(secretKey);
         auto publicKey = g_pow_p(secretKey);
@@ -164,7 +164,7 @@ namespace electionguard
 
         // TODO: ISSUE #133: traverse a discrete_log lookup to find the result
         auto result_as_p = make_unique<ElementModP>(result);
-        uint64_t retval = 0xffffffffffffffff;
+        uint64_t retval = MAX_UINT64;
         if (*result_as_p == ONE_MOD_P()) {
             // if it is 1 it is false
             retval = 0;
@@ -188,7 +188,7 @@ namespace electionguard
                                                  const ElementModP &publicKey)
     {
         if ((const_cast<ElementModQ &>(nonce) == ZERO_MOD_Q())) {
-            throw "elgamalEncrypt encryption requires a non-zero nonce";
+            throw invalid_argument("elgamalEncrypt encryption requires a non-zero nonce");
         }
 
         const auto nonce4096 = nonce.toElementModP();

@@ -19,6 +19,7 @@ CPMAddPackage(
 
 set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/ballot.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/ballot_compact.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/chaum_pedersen.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/election.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/elgamal.cpp
@@ -31,6 +32,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum4096.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/tracker.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_compact.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/chaum_pedersen.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/election.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/elgamal.cpp
@@ -43,6 +45,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/convert.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/random.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/tracker.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/utils.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/variant_cast.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/words.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/words.hpp
@@ -72,7 +75,9 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/kremlin/Lib_RandomBuffer_System.h
     ${PROJECT_SOURCE_DIR}/src/kremlin/libintvector.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_compact.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_compact.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/constants.h

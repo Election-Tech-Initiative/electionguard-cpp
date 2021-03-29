@@ -13,7 +13,7 @@ bool test_generate_tracking_code_rotates(void)
 {
     // Arrange
     eg_element_mod_q_t *device_hash = NULL;
-    if (eg_get_hash_for_device(1234, "some-location-string", &device_hash)) {
+    if (eg_get_hash_for_device(12345UL, 23456UL, 34567UL, "some-location-string", &device_hash)) {
         assert(false);
     }
 

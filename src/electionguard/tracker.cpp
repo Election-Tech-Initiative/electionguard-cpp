@@ -15,9 +15,10 @@ using std::uppercase;
 
 namespace electionguard
 {
-    unique_ptr<ElementModQ> Tracker::getHashForDevice(uint64_t uuid, const string &location)
+    unique_ptr<ElementModQ> Tracker::getHashForDevice(uint64_t deviceUuid, uint64_t sessionUuid,
+                                                      uint64_t launchCode, const string &location)
     {
-        return hash_elems({uuid, location});
+        return hash_elems({deviceUuid, sessionUuid, launchCode, location});
     }
 
     unique_ptr<ElementModQ> Tracker::getRotatingTrackerHash(const ElementModQ &previous,

@@ -5,6 +5,7 @@
 #include "electionguard/tracker.hpp"
 #include "log.hpp"
 #include "serialize.hpp"
+#include "utils.hpp"
 
 #include <cstdlib>
 #include <ctime>
@@ -13,6 +14,7 @@
 
 using std::invalid_argument;
 using std::make_unique;
+using std::map;
 using std::ref;
 using std::reference_wrapper;
 using std::string;
@@ -26,6 +28,37 @@ using CiphertextBallotSerializer = electionguard::Serialize::CiphertextBallot;
 
 namespace electionguard
 {
+
+#pragma region BallotBoxState
+
+    template <typename> struct _ballot_box_state {
+        static const map<BallotBoxState, const string> _map;
+    };
+    template <typename T>
+    const map<BallotBoxState, const string> _ballot_box_state<T>::_map = {
+      {BallotBoxState::cast, "cast"},
+      {BallotBoxState::spoiled, "spoiled"},
+      {BallotBoxState::unknown, "unknown"},
+    };
+
+    string getBallotBoxStateString(const BallotBoxState &value)
+    {
+        return _ballot_box_state<BallotBoxState>::_map.find(value)->second;
+    }
+
+    BallotBoxState getBallotBoxState(const string &value)
+    {
+        try {
+            auto item = findByValue(_ballot_box_state<BallotBoxState>::_map, value);
+            return item;
+        } catch (const std::exception &e) {
+            Log::error(": error", e);
+            return BallotBoxState::unknown;
+        }
+    }
+
+#pragma endregion
+
 #pragma region PlaintextBallotSelection
 
     struct PlaintextBallotSelection::Impl : public ElectionObjectBase {
@@ -67,6 +100,10 @@ namespace electionguard
     {
         return pimpl->isPlaceholderSelection;
     }
+    ExtendedData *PlaintextBallotSelection::getExtendedData() const
+    {
+        return pimpl->extendedData.get();
+    }
 
     bool PlaintextBallotSelection::isValid(const std::string &expectedObjectId) const
     {
@@ -80,6 +117,13 @@ namespace electionguard
             return false;
         }
         return true;
+    }
+
+    std::unique_ptr<PlaintextBallotSelection> PlaintextBallotSelection::clone() const
+    {
+        return make_unique<PlaintextBallotSelection>(
+          pimpl->object_id, pimpl->vote, pimpl->isPlaceholderSelection,
+          pimpl->extendedData == nullptr ? nullptr : pimpl->extendedData->clone());
     }
 
 #pragma endregion
@@ -280,6 +324,50 @@ namespace electionguard
             selections.push_back(ref(*selection));
         }
         return selections;
+    }
+
+    // Public Functions
+
+    bool PlaintextBallotContest::isValid(const string &expectedObjectId,
+                                         uint64_t expectedNumberSelections,
+                                         uint64_t expectedNumberElected,
+                                         uint64_t votesAllowd /* = 0 */) const
+    {
+        if (pimpl->object_id != expectedObjectId) {
+            Log::debug(": invalid objectId");
+            return false;
+        }
+
+        if (pimpl->selections.size() > expectedNumberSelections) {
+            Log::debug(": too many selections");
+            return false;
+        }
+
+        uint64_t numberElected = 0;
+        uint64_t votes = 0;
+
+        for (const auto &selection : pimpl->selections) {
+            votes += selection->getVote();
+            if (selection->getVote() >= 1) {
+                numberElected += 1;
+            }
+        }
+
+        if (numberElected > expectedNumberElected) {
+            Log::debug(": too many elections");
+            return false;
+        }
+
+        if (votesAllowd == 0) {
+            votesAllowd = expectedNumberElected;
+        }
+
+        if (votes > votesAllowd) {
+            Log::debug(": too many votes");
+            return false;
+        }
+
+        return true;
     }
 
 #pragma endregion
@@ -550,6 +638,11 @@ namespace electionguard
 
     string PlaintextBallot::toJson() const { return PlaintextBallotSerializer::toJson(*this); }
 
+    vector<uint8_t> PlaintextBallot::toMsgPack() const
+    {
+        return PlaintextBallotSerializer::toMsgPack(*this);
+    }
+
     unique_ptr<PlaintextBallot> PlaintextBallot::fromJson(string data)
     {
         return PlaintextBallotSerializer::fromJson(move(data));
@@ -558,6 +651,11 @@ namespace electionguard
     unique_ptr<PlaintextBallot> PlaintextBallot::fromBson(vector<uint8_t> data)
     {
         return PlaintextBallotSerializer::fromBson(move(data));
+    }
+
+    unique_ptr<PlaintextBallot> PlaintextBallot::fromMsgPack(vector<uint8_t> data)
+    {
+        return PlaintextBallotSerializer::fromMsgPack(move(data));
     }
 
 #pragma endregion
@@ -760,6 +858,11 @@ namespace electionguard
         return CiphertextBallotSerializer::toJson(*this, withNonces);
     }
 
+    vector<uint8_t> CiphertextBallot::toMsgPack(bool withNonces /* = false */) const
+    {
+        return CiphertextBallotSerializer::toMsgPack(*this, withNonces);
+    }
+
     unique_ptr<CiphertextBallot> CiphertextBallot::fromJson(string data)
     {
         return CiphertextBallotSerializer::fromJson(move(data));
@@ -768,6 +871,11 @@ namespace electionguard
     unique_ptr<CiphertextBallot> CiphertextBallot::fromBson(vector<uint8_t> data)
     {
         return CiphertextBallotSerializer::fromBson(move(data));
+    }
+
+    unique_ptr<CiphertextBallot> CiphertextBallot::fromMsgPack(vector<uint8_t> data)
+    {
+        return CiphertextBallotSerializer::fromMsgPack(move(data));
     }
 
     // Protected Methods

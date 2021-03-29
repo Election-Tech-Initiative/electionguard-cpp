@@ -3,6 +3,7 @@
 #include "electionguard/hash.hpp"
 #include "log.hpp"
 #include "serialize.hpp"
+#include "utils.hpp"
 
 #include <cstring>
 #include <iostream>
@@ -14,6 +15,7 @@ using std::move;
 using std::out_of_range;
 using std::ref;
 using std::reference_wrapper;
+using std::runtime_error;
 using std::string;
 using std::to_string;
 using std::unique_ptr;
@@ -26,17 +28,6 @@ using ContextSerializer = electionguard::Serialize::CiphertextelectionContext;
 
 namespace electionguard
 {
-
-    template <typename K, typename V>
-    K findByValue(const map<K, const V> &collection, const V &value)
-    {
-        for (auto &element : collection) {
-            if (element.second == value) {
-                return element.first;
-            }
-        }
-        throw out_of_range("value not found");
-    }
 
 #pragma region ElectionType
 
@@ -55,7 +46,7 @@ namespace electionguard
       {ElectionType::other, "other"},
     };
 
-    const string getElectionTypeString(const ElectionType &value)
+    string getElectionTypeString(const ElectionType &value)
     {
         return _election_type<ElectionType>::_map.find(value)->second;
     }
@@ -111,7 +102,7 @@ namespace electionguard
       {ReportingUnitType::other, "other"},
     };
 
-    const string getReportingUnitTypeString(const ReportingUnitType &value)
+    string getReportingUnitTypeString(const ReportingUnitType &value)
     {
         return _reporting_unit_type<ReportingUnitType>::_map.find(value)->second;
     }
@@ -150,7 +141,7 @@ namespace electionguard
       {VoteVariationType::other, "other"},
     };
 
-    const string getVoteVariationTypeString(const VoteVariationType &value)
+    string getVoteVariationTypeString(const VoteVariationType &value)
     {
         return _vote_variation_type<VoteVariationType>::_map.find(value)->second;
     }
@@ -1050,6 +1041,13 @@ namespace electionguard
         for (const auto &selection : pimpl->selections) {
             selections.push_back(ref(*selection));
         }
+
+        sort(selections.begin(), selections.end(),
+             [](const reference_wrapper<SelectionDescription> left,
+                const reference_wrapper<SelectionDescription> right) {
+                 return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+             });
+
         return selections;
     }
 
@@ -1127,6 +1125,13 @@ namespace electionguard
         for (const auto &selection : pimpl->placeholderSelections) {
             placeholders.push_back(ref(*selection));
         }
+
+        sort(placeholders.begin(), placeholders.end(),
+             [](const reference_wrapper<SelectionDescription> left,
+                const reference_wrapper<SelectionDescription> right) {
+                 return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+             });
+
         return placeholders;
     }
 
@@ -1328,6 +1333,13 @@ namespace electionguard
         for (auto &reference : pimpl->contests) {
             references.push_back(ref(*reference));
         }
+
+        sort(references.begin(), references.end(),
+             [](const reference_wrapper<ContestDescription> left,
+                const reference_wrapper<ContestDescription> right) {
+                 return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+             });
+
         return references;
     }
 
@@ -1446,6 +1458,11 @@ namespace electionguard
         for (auto &reference : pimpl->contests) {
             references.push_back(ref(*reference));
         }
+        sort(references.begin(), references.end(),
+             [](const reference_wrapper<ContestDescriptionWithPlaceholders> left,
+                const reference_wrapper<ContestDescriptionWithPlaceholders> right) {
+                 return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+             });
         return references;
     }
 
@@ -1460,6 +1477,42 @@ namespace electionguard
     }
 
     // Public Methods
+
+    BallotStyle *InternalElectionDescription::getBallotStyle(const std::string &ballotStyleId) const
+    {
+        for (auto &style : pimpl->ballotStyles) {
+            if (style->getObjectId() == ballotStyleId) {
+                return style.get();
+            }
+        }
+        return nullptr;
+    }
+
+    vector<reference_wrapper<ContestDescriptionWithPlaceholders>>
+    InternalElectionDescription::getContestsFor(const string &ballotStyleId) const
+    {
+        auto *style = getBallotStyle(ballotStyleId);
+        if (style == nullptr || style->getGeopoliticalUnitIds().empty()) {
+            throw runtime_error("Could not resolve a valid geopolitical unit");
+        }
+
+        vector<reference_wrapper<ContestDescriptionWithPlaceholders>> contests;
+        for (const auto &reference : pimpl->contests) {
+            for (const auto &gpUnitId : style->getGeopoliticalUnitIds()) {
+                if (reference->getElectoralDistrictId() == gpUnitId) {
+                    contests.push_back(ref(*reference));
+                }
+            }
+        }
+
+        sort(contests.begin(), contests.end(),
+             [](const reference_wrapper<ContestDescriptionWithPlaceholders> left,
+                const reference_wrapper<ContestDescriptionWithPlaceholders> right) {
+                 return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+             });
+
+        return contests;
+    }
 
     vector<uint8_t> InternalElectionDescription::toBson() const
     {

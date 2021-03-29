@@ -29,7 +29,7 @@ namespace electionguard
         other = 7
     };
 
-    EG_API const std::string getElectionTypeString(const ElectionType &value);
+    EG_API std::string getElectionTypeString(const ElectionType &value);
     EG_API ElectionType getElectionType(const std::string &value);
 
     /// <Summary>
@@ -68,7 +68,7 @@ namespace electionguard
         other = 28,
     };
 
-    EG_API const std::string getReportingUnitTypeString(const ReportingUnitType &value);
+    EG_API std::string getReportingUnitTypeString(const ReportingUnitType &value);
     EG_API ReportingUnitType getReportingUnitType(const std::string &value);
 
     /// <Summary>
@@ -91,7 +91,7 @@ namespace electionguard
         other = 12
     };
 
-    EG_API const std::string getVoteVariationTypeString(const VoteVariationType &value);
+    EG_API std::string getVoteVariationTypeString(const VoteVariationType &value);
     EG_API VoteVariationType getVoteVariationType(const std::string &value);
 
     /// <Summary>
@@ -573,14 +573,19 @@ namespace electionguard
         InternalElectionDescription &operator=(InternalElectionDescription other);
         InternalElectionDescription &operator=(InternalElectionDescription &&other);
 
-        std::vector<std::reference_wrapper<GeopoliticalUnit>> getGeopoliticalUnits() const;
-        std::vector<std::reference_wrapper<ContestDescriptionWithPlaceholders>> getContests() const;
-        std::vector<std::reference_wrapper<BallotStyle>> getBallotStyles() const;
-
         /// <summary>
         /// The hash of the election metadata
         /// </summary>
         const ElementModQ *getDescriptionHash() const;
+
+        std::vector<std::reference_wrapper<GeopoliticalUnit>> getGeopoliticalUnits() const;
+        std::vector<std::reference_wrapper<ContestDescriptionWithPlaceholders>> getContests() const;
+        std::vector<std::reference_wrapper<BallotStyle>> getBallotStyles() const;
+
+        BallotStyle *getBallotStyle(const std::string &ballotStyleId) const;
+
+        std::vector<std::reference_wrapper<ContestDescriptionWithPlaceholders>>
+        getContestsFor(const std::string &ballotStyleId) const;
 
         std::vector<uint8_t> toBson() const;
         std::string toJson();

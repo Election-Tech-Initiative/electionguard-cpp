@@ -419,13 +419,16 @@ namespace ElectionGuard
                 ulong number_of_guardians,
                 ulong quorum,
                 ElementModP.ElementModPHandle elgamal_public_key,
+                ElementModQ.ElementModQHandle commitment_hash,
                 ElementModQ.ElementModQHandle description_hash,
                 out CiphertextElectionContextHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_from_hex")]
             internal static extern Status Make(
                 ulong number_of_guardians,
-                ulong quorum, [MarshalAs(UnmanagedType.LPStr)] string hex_elgamal_public_key,
+                ulong quorum,
+                [MarshalAs(UnmanagedType.LPStr)] string hex_elgamal_public_key,
+                [MarshalAs(UnmanagedType.LPStr)] string hex_commitment_hash,
                 [MarshalAs(UnmanagedType.LPStr)] string hex_description_hash,
                 out CiphertextElectionContextHandle handle);
 
@@ -736,6 +739,43 @@ namespace ElectionGuard
                 PlaintextBallotHandle handle, out uint* data, out UIntPtr size);
         }
 
+        internal static unsafe class CompactPlaintextBallot
+        {
+            internal unsafe struct CompactPlaintextBallotType { };
+
+            internal class CompactPlaintextBallotHandle
+                : ElectionguardSafeHandle<CompactPlaintextBallotType>
+            {
+                [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = CompactPlaintextBallot.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"CompactPlaintextBallot Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_compact_plaintext_ballot_free")]
+            internal static extern Status Free(CompactPlaintextBallotHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_compact_plaintext_ballot_from_msgpack")]
+            internal static extern Status FromMsgPack(
+                byte* data, ulong size, out CompactPlaintextBallotHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_compact_plaintext_ballot_to_msgpack")]
+            internal static extern Status ToMsgPack(
+                CompactPlaintextBallotHandle handle, out IntPtr data, out UIntPtr size);
+            
+            [DllImport(DllName, EntryPoint = "eg_compact_plaintext_ballot_msgpack_free")]
+            internal static extern Status MsgPackFree(IntPtr data);
+        }
+
         internal static unsafe class CiphertextBallot
         {
             internal unsafe struct CiphertextBallotType { };
@@ -837,6 +877,48 @@ namespace ElectionGuard
                 CiphertextBallotHandle handle, out uint* data, out UIntPtr size);
         }
 
+        internal static unsafe class CompactCiphertextBallot
+        {
+            internal unsafe struct CompactCiphertextBallotType { };
+
+            internal class CompactCiphertextBallotHandle
+                : ElectionguardSafeHandle<CompactCiphertextBallotType>
+            {
+                [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = CompactCiphertextBallot.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"CompactCiphertextBallot Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_compact_ciphertext_ballot_free")]
+            internal static extern Status Free(CompactCiphertextBallotHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_compact_ciphertext_ballot_get_object_id")]
+            internal static extern Status GetObjectId(
+                CompactCiphertextBallotHandle handle, out IntPtr object_id);
+
+            [DllImport(DllName, EntryPoint = "eg_compact_ciphertext_ballot_from_msgpack")]
+            internal static extern Status FromMsgPack(
+                byte* data, ulong size, out CompactCiphertextBallotHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_compact_ciphertext_ballot_to_msgpack")]
+            internal static extern Status ToMsgPack(
+                CompactCiphertextBallotHandle handle, out IntPtr data, out UIntPtr size);
+            
+            [DllImport(DllName, EntryPoint = "eg_compact_ciphertext_ballot_msgpack_free")]
+            internal static extern Status MsgPackFree(IntPtr data);
+
+        }
+
         #endregion
 
         #region Encrypt
@@ -865,7 +947,9 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_encryption_device_new")]
             internal static extern Status New(
-                ulong uuid,
+                ulong deviceUuid,
+                ulong sessionUuid,
+                ulong launchCode,
                 [MarshalAs(UnmanagedType.LPStr)] string location,
                 out EncryptionDeviceHandle handle);
 
@@ -910,6 +994,18 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_encryption_mediator_free")]
             internal static extern Status Free(EncryptionMediatorHandle handle);
 
+            [DllImport(DllName, EntryPoint = "eg_encryption_mediator_compact_encrypt_ballot")]
+            internal static extern Status CompactEncrypt(
+                EncryptionMediatorHandle handle,
+                PlaintextBallot.PlaintextBallotHandle plainutext,
+                out CompactCiphertextBallot.CompactCiphertextBallotHandle ciphertext);
+
+            [DllImport(DllName, EntryPoint = "eg_encryption_mediator_compact_encrypt_ballot_verify_proofs")]
+            internal static extern Status CompactEncryptAndVerify(
+                EncryptionMediatorHandle handle,
+                PlaintextBallot.PlaintextBallotHandle plainutext,
+                out CompactCiphertextBallot.CompactCiphertextBallotHandle ciphertext);
+
             [DllImport(DllName, EntryPoint = "eg_encryption_mediator_encrypt_ballot")]
             internal static extern Status Encrypt(
                 EncryptionMediatorHandle handle,
@@ -926,24 +1022,53 @@ namespace ElectionGuard
 
         internal static unsafe class Encrypt
         {
+            [DllImport(DllName, EntryPoint = "eg_encrypt_ballot_with_nonce")]
+            internal static extern Status Selection(
+                PlaintextBallotSelection.PlaintextBallotSelectionHandle plaintext,
+                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                CiphertextElectionContext.CiphertextElectionContextHandle context,
+                ElementModQ.ElementModQHandle seedHash,
+                ElementModQ.ElementModQHandle nonce,
+                bool shouldVerifyProofs,
+                out CiphertextBallot.CiphertextBallotHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_encrypt_ballot_with_nonce")]
+            internal static extern Status Contest(
+                PlaintextBallotContest.PlaintextBallotContestHandle plaintext,
+                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                CiphertextElectionContext.CiphertextElectionContextHandle context,
+                ElementModQ.ElementModQHandle seedHash,
+                ElementModQ.ElementModQHandle nonce,
+                bool shouldVerifyProofs,
+                out CiphertextBallot.CiphertextBallotHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot")]
             internal static extern Status Ballot(
                 PlaintextBallot.PlaintextBallotHandle plaintext,
-                 InternalElectionDescription.InternalElectionDescriptionHandle metadata,
-                 CiphertextElectionContext.CiphertextElectionContextHandle context,
-                 ElementModQ.ElementModQHandle seedHash,
-                 bool shouldVerifyProofs,
-                 out CiphertextBallot.CiphertextBallotHandle handle);
+                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                CiphertextElectionContext.CiphertextElectionContextHandle context,
+                ElementModQ.ElementModQHandle seedHash,
+                bool shouldVerifyProofs,
+                out CiphertextBallot.CiphertextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot_with_nonce")]
             internal static extern Status Ballot(
                 PlaintextBallot.PlaintextBallotHandle plaintext,
-                 InternalElectionDescription.InternalElectionDescriptionHandle metadata,
-                 CiphertextElectionContext.CiphertextElectionContextHandle context,
-                 ElementModQ.ElementModQHandle seedHash,
-                 ElementModQ.ElementModQHandle nonce,
-                 bool shouldVerifyProofs,
-                 out CiphertextBallot.CiphertextBallotHandle handle);
+                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                CiphertextElectionContext.CiphertextElectionContextHandle context,
+                ElementModQ.ElementModQHandle seedHash,
+                ElementModQ.ElementModQHandle nonce,
+                bool shouldVerifyProofs,
+                out CiphertextBallot.CiphertextBallotHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_encrypt_compact_ballot")]
+            internal static extern Status CompactBallot(
+                PlaintextBallot.PlaintextBallotHandle plaintext,
+                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                CiphertextElectionContext.CiphertextElectionContextHandle context,
+                ElementModQ.ElementModQHandle seedHash,
+                bool shouldVerifyProofs,
+                out CompactCiphertextBallot.CompactCiphertextBallotHandle handle);
         }
     }
 

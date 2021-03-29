@@ -26,6 +26,7 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
     message(FATAL_ERROR "In-source builds not allowed. Please make a new /build/ directory and run CMake from there.")
 endif()
 
+
 # ---- Options ----
 
 option(CMAKE_BUILD_TYPE         "Build with or without debug symbols"                       Release)
@@ -41,11 +42,23 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # ---- Dependencies ----
 
+set(CPM_DOWNLOAD_VERSION 0.31.0) 
+set(CPM_DOWNLOAD_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM_${CPM_DOWNLOAD_VERSION}.cmake")
+
+if(NOT (EXISTS ${CPM_DOWNLOAD_LOCATION}))
+    message(STATUS "Downloading CPM.cmake")
+    file(DOWNLOAD https://github.com/cpm-cmake/CPM.cmake/releases/download/v${CPM_DOWNLOAD_VERSION}/CPM.cmake ${CPM_DOWNLOAD_LOCATION})
+endif()
+
+include(${CPM_DOWNLOAD_LOCATION})
+
+
 # ---- Tools ----
 
 include(cmake/tools.cmake)
 
 # --- Properties ---
+
 
 set(CMAKE_CXX_STANDARD_REQUIRED     ON)
 set(CMAKE_CXX_EXTENSIONS            OFF)

@@ -1,3 +1,4 @@
+#include "mocks/ballot.h"
 #include "utils/utils.h"
 
 #include <assert.h>
@@ -6,6 +7,7 @@
 
 bool strings_are_equal(char *expected, char *actual);
 
+static bool test_plaintext_simple_ballot_is_valid(void);
 static bool test_ballot_property_getters(void);
 static bool test_ballot_serialization(void);
 static bool test_plaintext_ballot_selection_is_valid(void);
@@ -14,13 +16,42 @@ static bool test_plaintext_ballot_selection_is_invalid(void);
 bool test_ballot(void)
 {
     printf("\n -------- test_ballot.c --------- \n");
-    return test_ballot_property_getters() && test_ballot_serialization() &&
+    return test_plaintext_simple_ballot_is_valid() && test_ballot_property_getters() &&
+           test_ballot_serialization() &&
            test_plaintext_ballot_selection_is_valid() &
              test_plaintext_ballot_selection_is_invalid();
 }
 
+bool test_plaintext_simple_ballot_is_valid(void)
+{
+    printf("\n -------- test_plaintext_simple_ballot_is_valid --------- \n");
+
+    // Act
+    eg_plaintext_ballot_t *result = NULL;
+    if (eg_test_ballot_mocks_get_simple_ballot_from_file(&result)) {
+        assert(false);
+    }
+
+    // Assert
+    char *object_id = NULL;
+    if (eg_plaintext_ballot_get_object_id(result, &object_id)) {
+        assert(false);
+    }
+
+    assert(strings_are_equal("some-external-id-string-123", object_id) == true);
+
+    // Clean Up
+    eg_plaintext_ballot_free(result);
+
+    free(object_id);
+
+    return true;
+}
+
 bool test_ballot_property_getters()
 {
+    printf("\n -------- test_ballot_property_getters --------- \n");
+
     // Arrange
     char *data =
       "{\"ballot_style\":\"ballot-style-1\",\"contests\":[{\"ballot_selections\":[{\"object_id\":"
@@ -98,6 +129,8 @@ bool test_ballot_property_getters()
 
 bool test_ballot_serialization(void)
 {
+    printf("\n -------- test_ballot_serialization --------- \n");
+
     // Arrange
     char *json =
       "{\"ballot_style\":\"ballot-style-1\",\"contests\":[{\"ballot_selections\":[{\"is_"
@@ -137,6 +170,8 @@ bool test_ballot_serialization(void)
 
 bool test_plaintext_ballot_selection_is_valid(void)
 {
+    printf("\n -------- test_plaintext_ballot_selection_is_valid --------- \n");
+
     // Arrange
     char *object_id = "some-object-id";
 
@@ -156,6 +191,8 @@ bool test_plaintext_ballot_selection_is_valid(void)
 
 bool test_plaintext_ballot_selection_is_invalid(void)
 {
+    printf("\n -------- test_plaintext_ballot_selection_is_invalid --------- \n");
+
     bool different_object_ids_fail(void);
     bool vote_out_of_range_fails(void);
 
@@ -164,6 +201,8 @@ bool test_plaintext_ballot_selection_is_invalid(void)
 
 bool different_object_ids_fail()
 {
+    printf("\n -------- different_object_ids_fail --------- \n");
+
     // Arrange
     char *object_id = "some-object-id";
 
@@ -183,6 +222,8 @@ bool different_object_ids_fail()
 
 bool vote_out_of_range_fails()
 {
+    printf("\n -------- vote_out_of_range_fails --------- \n");
+
     // Arrange
     char *object_id = "some-object-id";
 

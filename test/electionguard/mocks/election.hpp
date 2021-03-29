@@ -1,16 +1,38 @@
-#ifndef __ELECTIONGUARD_CPP_TEST_GENERATORS_ELECTION_HPP_INCLUDED__
-#define __ELECTIONGUARD_CPP_TEST_GENERATORS_ELECTION_HPP_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_TEST_MOCKS_ELECTION_HPP_INCLUDED__
+#define __ELECTIONGUARD_CPP_TEST_MOCKS_ELECTION_HPP_INCLUDED__
 
 #include <electionguard/election.hpp>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 using namespace electionguard;
 using namespace std;
 
-namespace electionguard::test::generators
+namespace electionguard::test::mocks
 {
     class ElectionGenerator
     {
       public:
+        static unique_ptr<ElectionDescription> getSimpleElectionFromFile()
+        {
+            return getSimpleElectionFromFile("election_manifest_simple.json");
+        }
+        static unique_ptr<ElectionDescription> getSimpleElectionFromFile(const string &filename)
+        {
+
+            ifstream file;
+            file.open("data/" + filename);
+            if (!file) {
+                throw invalid_argument("could not find file");
+            }
+
+            stringstream stream;
+            stream << file.rdbuf();
+            file.close();
+
+            return ElectionDescription::fromJson(stream.str());
+        }
         static unique_ptr<BallotStyle> getFakeBallotStyle(string objectId, string gpUnitId)
         {
             vector<string> gpunitIds{gpUnitId};
@@ -168,17 +190,25 @@ namespace electionguard::test::generators
             return metadata;
         }
 
+        static tuple<unique_ptr<InternalElectionDescription>, unique_ptr<CiphertextElectionContext>>
+        getFakeCiphertextElection(const ElectionDescription &description,
+                                  const ElementModP &publicKey)
+        {
+            auto metadata = make_unique<InternalElectionDescription>(description);
+            auto context = getFakeContext(*metadata, publicKey);
+
+            return make_tuple(move(metadata), move(context));
+        }
+
         static unique_ptr<CiphertextElectionContext>
         getFakeContext(const InternalElectionDescription &metadata, const ElementModP &publicKey)
         {
-
             auto context = CiphertextElectionContext::make(
-              1UL, 1UL, make_unique<ElementModP>(publicKey),
-              make_unique<ElementModQ>(TWO_MOD_Q()),
+              1UL, 1UL, make_unique<ElementModP>(publicKey), make_unique<ElementModQ>(TWO_MOD_Q()),
               make_unique<ElementModQ>(*metadata.getDescriptionHash()));
             return context;
         }
     };
-} // namespace electionguard::test::generators
+} // namespace electionguard::test::mocks
 
-#endif /* __ELECTIONGUARD_CPP_SERIALIZE_HPP_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_TEST_MOCKS_ELECTION_HPP_INCLUDED__ */

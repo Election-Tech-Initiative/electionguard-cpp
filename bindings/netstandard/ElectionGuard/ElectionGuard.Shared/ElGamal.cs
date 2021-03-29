@@ -7,6 +7,9 @@ namespace ElectionGuard
     using NativeElGamalKeyPair = NativeInterface.ElGamalKeyPair.ElGamalKeyPairHandle;
     using NativeElGamalCiphertext = NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
 
+    /// <summary>
+    /// An exponential ElGamal keypair
+    /// </summary>
     public class ElGamalKeyPair : DisposableBase
     {
         public unsafe ElementModP PublicKey
@@ -71,6 +74,11 @@ namespace ElectionGuard
         }
     }
 
+    /// <summary>
+    /// An "exponential ElGamal ciphertext" (i.e., with the plaintext in the exponent to allow for
+    /// homomorphic addition). Create one with `elgamal_encrypt`. Add them with `elgamal_add`.
+    /// Decrypt using one of the supplied instance methods.
+    /// </summary>
     public class ElGamalCiphertext : DisposableBase
     {
         public unsafe ElementModP Pad

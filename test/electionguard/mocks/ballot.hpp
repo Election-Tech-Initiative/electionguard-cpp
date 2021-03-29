@@ -1,19 +1,42 @@
-#ifndef __ELECTIONGUARD_CPP_TEST_GENERATORS_BALLOT_HPP_INCLUDED__
-#define __ELECTIONGUARD_CPP_TEST_GENERATORS_BALLOT_HPP_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_TEST_MOCKS_BALLOT_HPP_INCLUDED__
+#define __ELECTIONGUARD_CPP_TEST_MOCKS_BALLOT_HPP_INCLUDED__
 
 #include "../../../src/electionguard/random.hpp"
 
 #include <electionguard/ballot.hpp>
 #include <electionguard/election.hpp>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 using namespace electionguard;
 using namespace std;
 
-namespace electionguard::test::generators
+namespace electionguard::test::mocks
 {
     class BallotGenerator
     {
       public:
+        static unique_ptr<PlaintextBallot> getSimpleBallotFromFile()
+        {
+            return getSimpleBallotFromFile("ballot_in_simple.json");
+        }
+        static unique_ptr<PlaintextBallot> getSimpleBallotFromFile(const string &filename)
+        {
+
+            ifstream file;
+            file.open("data/" + filename);
+            if (!file) {
+                throw invalid_argument("could not find file");
+            }
+
+            stringstream stream;
+            stream << file.rdbuf();
+            file.close();
+
+            return PlaintextBallot::fromJson(stream.str());
+        }
+
         static unique_ptr<PlaintextBallotSelection>
         randomSelectionFrom(const SelectionDescription &description)
         {
@@ -72,6 +95,6 @@ namespace electionguard::test::generators
               ballotId, metadata.getBallotStyles().at(0).get().getObjectId(), move(contests));
         }
     };
-} // namespace electionguard::test::generators
+} // namespace electionguard::test::mocks
 
-#endif /* __ELECTIONGUARD_CPP_TEST_GENERATORS_BALLOT_HPP_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_TEST_MOCKS_BALLOT_HPP_INCLUDED__ */

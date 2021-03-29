@@ -1,13 +1,20 @@
 #include "../../src/electionguard/log.hpp"
-#include "generators/election.hpp"
+#include "mocks/election.hpp"
 
 #include <doctest/doctest.h>
 #include <electionguard/election.hpp>
 #include <electionguard/elgamal.hpp>
 
 using namespace electionguard;
-using namespace electionguard::test::generators;
+using namespace electionguard::test::mocks;
 using namespace std;
+
+TEST_CASE("Simple Election Is Valid")
+{
+    auto subject = ElectionGenerator::getSimpleElectionFromFile();
+
+    CHECK(subject->getElectionScopeId() == "jefferson-county-primary");
+}
 
 TEST_CASE("Can serialize ElectionDescription")
 {

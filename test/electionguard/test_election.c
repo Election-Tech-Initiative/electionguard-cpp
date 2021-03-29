@@ -1,3 +1,4 @@
+#include "mocks/election.h"
 #include "utils/utils.h"
 
 #include <assert.h>
@@ -6,6 +7,7 @@
 
 bool strings_are_equal(char *expected, char *actual);
 
+bool test_simple_election_is_valid(void);
 static bool test_can_deserialize_election_description(void);
 static bool test_can_construct_internal_election_description_from_election_description(void);
 static bool test_can_deserlialze_internal_election_description(void);
@@ -14,7 +16,7 @@ static bool test_can_deserialize_ciphertext_election_context(void);
 bool test_election(void)
 {
     printf("\n -------- test_election.c --------- \n");
-    return test_can_deserialize_election_description() &&
+    return test_simple_election_is_valid() && test_can_deserialize_election_description() &&
            test_can_construct_internal_election_description_from_election_description() &&
            test_can_deserlialze_internal_election_description() &&
            test_can_deserialize_ciphertext_election_context();
@@ -42,9 +44,34 @@ char *election_json =
   "unit-id\",\"type\":\"unknown\"}],\"parties\":[{\"object_id\":\"some-party-id-1\"},{\"object_"
   "id\":\"some-party-id-2\"}],\"start_date\":\"2021-02-04T13:30:10Z\",\"type\":\"unknown\"}";
 
+bool test_simple_election_is_valid(void)
+{
+    printf("\n -------- test_simple_election_is_valid -------- \n");
+    // Act
+    eg_election_description_t *result = NULL;
+    if (eg_test_election_mocks_get_simple_election_from_file(&result)) {
+        assert(false);
+    }
+
+    // Assert
+    char *election_scope_id;
+    if (eg_election_description_get_election_scope_id(result, &election_scope_id)) {
+        assert(false);
+    }
+
+    assert(strings_are_equal("jefferson-county-primary", election_scope_id) == true);
+
+    // Clean Up
+    eg_election_description_free(result);
+
+    free(election_scope_id);
+
+    return true;
+}
+
 bool test_can_deserialize_election_description(void)
 {
-    printf("\n -------- test_can_deserialize_election_description \n");
+    printf("\n -------- test_can_deserialize_election_description -------- \n");
     // Act
     eg_election_description_t *result = NULL;
     if (eg_election_description_from_json(election_json, &result)) {
@@ -68,8 +95,8 @@ bool test_can_deserialize_election_description(void)
 
 bool test_can_construct_internal_election_description_from_election_description(void)
 {
-    printf(
-      "\n -------- test_can_construct_internal_election_description_from_election_description \n");
+    printf("\n -------- test_can_construct_internal_election_description_from_election_description "
+           "-------- \n");
     // Arrange
     eg_election_description_t *data = NULL;
     if (eg_election_description_from_json(election_json, &data)) {
@@ -119,7 +146,7 @@ bool test_can_construct_internal_election_description_from_election_description(
 
 bool test_can_deserlialze_internal_election_description(void)
 {
-    printf("\n -------- test_can_deserlialze_internal_election_description \n");
+    printf("\n -------- test_can_deserlialze_internal_election_description -------- \n");
     // Arrange
     // A dump of an InternalElectionDescription from test_election.cpp
     char *internal_json =
@@ -179,7 +206,7 @@ bool test_can_deserlialze_internal_election_description(void)
 
 bool test_can_deserialize_ciphertext_election_context(void)
 {
-    printf("\n -------- test_can_deserialize_ciphertext_election_context \n");
+    printf("\n -------- test_can_deserialize_ciphertext_election_context -------- \n");
     char *context_json =
       "{\"crypto_base_hash\":\"B8CF9A8915BDB19C681AFBCDD1797F2CF360F723843D977D0E1B280CA2B24245\","
       "\"crypto_extended_base_hash\":"

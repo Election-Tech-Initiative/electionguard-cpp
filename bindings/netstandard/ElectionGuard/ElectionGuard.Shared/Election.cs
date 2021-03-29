@@ -267,6 +267,20 @@ namespace ElectionGuard
             }
         }
 
+        public unsafe CiphertextElectionContext(ulong numberOfGuardians,
+                ulong quorum,
+                ElementModP publicKey,
+                ElementModQ commitmentHash,
+                ElementModQ manifestHash)
+        {
+            var status = NativeInterface.CiphertextElectionContext.Make(
+                numberOfGuardians, quorum, publicKey.Handle, commitmentHash.Handle, manifestHash.Handle, out Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"CiphertextElectionContext Error Status: {status}");
+            }
+        }
+
         protected override unsafe void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();

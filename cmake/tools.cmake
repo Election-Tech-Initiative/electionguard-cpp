@@ -44,12 +44,52 @@ if (CODE_COVERAGE)
 endif()
 
 if (USE_STATIC_ANALYSIS)
-    message("++ Running with static analysis")
-    set(CLANG_TIDY ON)
-    set(CPPCHECK ON)
     include(${StableCoder-cmake-scripts_SOURCE_DIR}/tools.cmake)
-    clang_tidy()
+endif()
+
+if (USE_STATIC_ANALYSIS)
+    message("++ Running with static analysis - clang_tidy")
+    set(CLANG_TIDY ON)
+    set(CLANG_TIDY_CHECKS *
+            # add checks to ignore here:
+            -cppcoreguidelines-avoid-magic-numbers
+            -cppcoreguidelines-avoid-non-const-global-variables
+            -cppcoreguidelines-init-variables
+            -cppcoreguidelines-pro-type-const-cast
+            -cppcoreguidelines-pro-type-reinterpret-cast
+            -fuchsia-default-arguments-calls
+            -fuchsia-default-arguments-declarations
+            -fuchsia-overloaded-operator
+            -google-readability-todo
+            -llvmlibc-restrict-system-libc-headers
+            -llvmlibc-implementation-in-namespace
+            -llvmlibc-callee-namespace
+            -misc-non-private-member-variables-in-classes
+            -modernize-use-trailing-return-type
+            -readability-avoid-const-params-in-decls
+            -readability-isolate-declaration
+            -readability-magic-numbers
+            -readability-non-const-parameter
+        )
+    string(REPLACE ";" "," CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS}")
+    clang_tidy(-checks=${CLANG_TIDY_CHECKS})
+endif()
+
+if (USE_STATIC_ANALYSIS)
+    message("++ Running with static analysis - cpp check")
+    set(CPPCHECK ON)
     cppcheck()
+endif()
+
+if (USE_STATIC_ANALYSIS)
+    find_program(iwyu_path NAMES include-what-you-use iwyu)
+
+    if(iwyu_path)
+        message("++ Running with static analysis - IWYU")
+        set(IWYU ON)
+        include_what_you_use()
+    endif()
+    
 endif()
 
 if (USE_DYNAMIC_ANALYSIS)

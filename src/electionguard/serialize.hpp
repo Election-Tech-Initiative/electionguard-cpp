@@ -3,6 +3,7 @@
 
 #include "convert.hpp"
 #include "electionguard/ballot.hpp"
+#include "electionguard/ballot_compact.hpp"
 #include "electionguard/election.hpp"
 #include "electionguard/export.h"
 #include "electionguard/group.hpp"
@@ -104,7 +105,6 @@ namespace electionguard
 
     static unique_ptr<ContactInformation> contactInformationFromJson(const json &j)
     {
-        Log::debug(": deserializing");
         vector<string> addressLine;
         if (j.contains("address_line") && !j["address_line"].is_null()) {
             for (const auto &i : j["address_line"]) {
@@ -150,7 +150,6 @@ namespace electionguard
 
     static unique_ptr<GeopoliticalUnit> geopoliticalUnitFromJson(const json &j)
     {
-        Log::debug(": deserializing");
         if (j.contains("contact_information") && !j["contact_information"].is_null()) {
             return make_unique<GeopoliticalUnit>(
               j["object_id"].get<string>(), j["name"].get<string>(),
@@ -265,17 +264,20 @@ namespace electionguard
 
     static unique_ptr<Candidate> candidateFromJson(const json &j)
     {
-        // TODO: other cases
-        if (j.contains("name") && !j["name"].is_null()) {
-            return make_unique<Candidate>(j["object_id"].get<string>(),
-                                          internationalizedTextFromJson(j["name"]),
-                                          j["party_id"].get<string>(), j["image_uri"].get<string>(),
-                                          j["is_write_in"].get<bool>());
-        }
-        auto writeIn = j.contains("is_write_in") && !j["is_write_in"].is_null()
-                         ? j["is_write_in"].get<bool>()
-                         : false;
-        return make_unique<Candidate>(j["object_id"].get<string>(), writeIn);
+        auto objectId = j["object_id"].get<string>();
+        auto name = j.contains("name") && !j["name"].is_null()
+                      ? internationalizedTextFromJson(j["name"])
+                      : nullptr;
+        bool isWriteIn = j.contains("is_write_in") && !j["is_write_in"].is_null()
+                           ? j["is_write_in"].get<bool>()
+                           : false;
+        auto partyId =
+          j.contains("party_id") && !j["party_id"].is_null() ? j["party_id"].get<string>() : "";
+        auto imageUri =
+          j.contains("image_uri") && !j["image_uri"].is_null() ? j["image_uri"].get<string>() : "";
+
+        return make_unique<Candidate>(objectId, name != nullptr ? move(name) : nullptr, partyId,
+                                      imageUri, isWriteIn);
     }
 
     static json candidatesToJson(const vector<reference_wrapper<Candidate>> &serializable)
@@ -429,25 +431,28 @@ namespace electionguard
 
     static unique_ptr<ContestDescription> contestDescriptionFromJson(const json &j)
     {
-        // TODO: just a stub for now.
-        // we need to handle all of the otpional serilization cases.
-        if (j.contains("ballot_title") && !j["ballot_title"].is_null()) {
+        auto objectId = j["object_id"].get<string>();
+        auto electoralDistrictId = j["electoral_district_id"].get<string>();
+        auto sequenceOrder = j["sequence_order"].get<uint64_t>();
+        auto variation = getVoteVariationType(j["vote_variation"].get<string>());
+        auto elected = j["number_elected"].get<uint64_t>();
+        auto allowed = j.contains("votes_allowed") && !j["votes_allowed"].is_null()
+                         ? j["votes_allowed"].get<uint64_t>()
+                         : 0;
+        auto name = j["name"].get<string>();
+        auto title = j.contains("ballot_title") && !j["ballot_title"].is_null()
+                       ? internationalizedTextFromJson(j["ballot_title"])
+                       : nullptr;
+        auto subtitle = j.contains("ballot_subtitle") && !j["ballot_subtitle"].is_null()
+                          ? internationalizedTextFromJson(j["ballot_subtitle"])
+                          : nullptr;
 
-            return make_unique<ContestDescription>(
-              j["object_id"].get<string>(), j["electoral_district_id"].get<string>(),
-              j["sequence_order"].get<uint64_t>(),
-              getVoteVariationType(j["vote_variation"].get<string>()),
-              j["number_elected"].get<uint64_t>(), j["votes_allowed"].get<uint64_t>(),
-              j["name"].get<string>(), internationalizedTextFromJson(j["ballot_title"]),
-              internationalizedTextFromJson(j["ballot_subtitle"]),
-              selectionDescriptionsFromJson(j["ballot_selections"]));
-        }
+        auto selections = selectionDescriptionsFromJson(j["ballot_selections"]);
+
         return make_unique<ContestDescription>(
-          j["object_id"].get<string>(), j["electoral_district_id"].get<string>(),
-          j["sequence_order"].get<uint64_t>(),
-          getVoteVariationType(j["vote_variation"].get<string>()),
-          j["number_elected"].get<uint64_t>(), j["name"].get<string>(),
-          selectionDescriptionsFromJson(j["ballot_selections"]));
+          objectId, electoralDistrictId, sequenceOrder, variation, elected, allowed, name,
+          title != nullptr ? move(title) : nullptr, subtitle != nullptr ? move(subtitle) : nullptr,
+          move(selections));
     }
 
     static json
@@ -572,12 +577,8 @@ namespace electionguard
           private:
             static json fromObject(const electionguard::InternalElectionDescription &serializable)
             {
-                Log::debug(": serializing from object");
-
                 auto geopoliticalUnits =
                   geopoliticalUnitsToJson(serializable.getGeopoliticalUnits());
-
-                Log::debug(" serialized GeopoliticalUnits");
 
                 // Contests
                 json contests;
@@ -612,8 +613,6 @@ namespace electionguard
                     contests.push_back(contest_json);
                 }
 
-                Log::debug(" serialized Contests");
-
                 auto ballotStyles = ballotStylesToJson(serializable.getBallotStyles());
 
                 Log::debug(" serialized Ballot Styles");
@@ -627,11 +626,7 @@ namespace electionguard
             }
             static unique_ptr<electionguard::InternalElectionDescription> toObject(json j)
             {
-                Log::debug(": deserializing");
-
                 auto geopoliticalUnits = geopoliticalUnitsFromJson(j["geopolitical_units"]);
-
-                Log::debug(": deserialized geopoliticalUnits");
 
                 auto contests = j["contests"];
 
@@ -673,16 +668,10 @@ namespace electionguard
                     }
                 }
 
-                Log::debug(" deserialized contests");
-
                 auto ballotStyles = ballotStylesFromJson(j["ballot_styles"]);
-
-                Log::debug(" deserialized ballotStyles");
 
                 auto description_hash = j["description_hash"].get<string>();
                 auto descriptionHash = ElementModQ::fromHex(description_hash);
-
-                Log::debug(" deserialized descriptionHash");
 
                 return make_unique<electionguard::InternalElectionDescription>(
                   move(geopoliticalUnits), move(contestDescriptions), move(ballotStyles),
@@ -848,6 +837,10 @@ namespace electionguard
             {
                 return fromObject(serializable).dump();
             }
+            static vector<uint8_t> toMsgPack(const electionguard::PlaintextBallot &serializable)
+            {
+                return json::to_msgpack(fromObject(serializable));
+            }
             static unique_ptr<electionguard::PlaintextBallot> fromBson(vector<uint8_t> data)
             {
                 return toObject(json::from_bson(data));
@@ -855,6 +848,89 @@ namespace electionguard
             static unique_ptr<electionguard::PlaintextBallot> fromJson(string data)
             {
                 return toObject(json::parse(data));
+            }
+            static unique_ptr<electionguard::PlaintextBallot> fromMsgPack(vector<uint8_t> data)
+            {
+                return toObject(json::from_msgpack(data));
+            }
+        };
+
+        class CompactPlaintextBallot
+        {
+          protected:
+            static json fromObject(const electionguard::CompactPlaintextBallot &serializable)
+            {
+                json selections;
+                for (auto selection : serializable.getSelections()) {
+                    selections.push_back(selection);
+                }
+
+                json extendedData;
+                for (auto &[key, value] : serializable.getExtendedData()) {
+                    json data = {{"value", value.get().value}, {"length", value.get().length}};
+                    extendedData.emplace(to_string(key), data);
+                }
+
+                json result = {{"object_id", serializable.getObjectId()},
+                               {"ballot_style", serializable.getBallotStyle()},
+                               {"selections", selections},
+                               {"extended_data", extendedData}};
+                return result;
+            }
+            static unique_ptr<electionguard::CompactPlaintextBallot> toObject(json j)
+            {
+                auto object_id = j["object_id"].get<string>();
+                auto ballot_style = j["ballot_style"].get<string>();
+
+                auto selections = j["selections"];
+
+                vector<uint64_t> votes;
+                votes.reserve(selections.size());
+                for (auto &selection : selections) {
+                    auto vote = selection.get<uint64_t>();
+                    votes.push_back(vote);
+                }
+
+                map<uint64_t, unique_ptr<electionguard::ExtendedData>> extendedDataMap;
+                if (j.contains("extended_data") && !j["extended_data"].is_null()) {
+                    for (auto &[key, body] : j["extended_data"].items()) {
+                        auto value = body["value"].get<string>();
+                        auto length = body["length"].get<uint64_t>();
+                        extendedDataMap.emplace(stoul(key),
+                                                make_unique<ExtendedData>(value, length));
+                    }
+                }
+
+                return make_unique<electionguard::CompactPlaintextBallot>(
+                  object_id, ballot_style, move(selections), move(extendedDataMap));
+            }
+
+          public:
+            static vector<uint8_t> toBson(const electionguard::CompactPlaintextBallot &serializable)
+            {
+                return json::to_bson(fromObject(serializable));
+            }
+            static string toJson(const electionguard::CompactPlaintextBallot &serializable)
+            {
+                return fromObject(serializable).dump();
+            }
+            static vector<uint8_t>
+            toMsgPack(const electionguard::CompactPlaintextBallot &serializable)
+            {
+                return json::to_msgpack(fromObject(serializable));
+            }
+            static unique_ptr<electionguard::CompactPlaintextBallot> fromBson(vector<uint8_t> data)
+            {
+                return toObject(json::from_bson(data));
+            }
+            static unique_ptr<electionguard::CompactPlaintextBallot> fromJson(string data)
+            {
+                return toObject(json::parse(data));
+            }
+            static unique_ptr<electionguard::CompactPlaintextBallot>
+            fromMsgPack(vector<uint8_t> data)
+            {
+                return toObject(json::from_msgpack(data));
             }
         };
 
@@ -1080,6 +1156,11 @@ namespace electionguard
             {
                 return fromObject(serializable, withNonces).dump();
             }
+            static vector<uint8_t> toMsgPack(const electionguard::CiphertextBallot &serializable,
+                                             bool withNonce)
+            {
+                return json::to_msgpack(fromObject(serializable, withNonce));
+            }
             static unique_ptr<electionguard::CiphertextBallot> fromBson(vector<uint8_t> data)
             {
                 return toObject(json::from_bson(data));
@@ -1087,6 +1168,88 @@ namespace electionguard
             static unique_ptr<electionguard::CiphertextBallot> fromJson(string data)
             {
                 return toObject(json::parse(data));
+            }
+            static unique_ptr<electionguard::CiphertextBallot> fromMsgPack(vector<uint8_t> data)
+            {
+                return toObject(json::from_msgpack(data));
+            }
+        };
+
+        class CompactCiphertextBallot
+        {
+            class CompactPlaintextBallotWrapper : CompactPlaintextBallot
+            {
+              public:
+                static json
+                fromObjectWrapper(const electionguard::CompactPlaintextBallot &serializable)
+                {
+                    return CompactPlaintextBallot::fromObject(serializable);
+                }
+                static unique_ptr<electionguard::CompactPlaintextBallot> toObjectWrapper(json j)
+                {
+                    return CompactPlaintextBallot::toObject(j);
+                }
+            };
+
+          private:
+            static json fromObject(const electionguard::CompactCiphertextBallot &serializable)
+            {
+                json plaintext =
+                  CompactPlaintextBallotWrapper::fromObjectWrapper(*serializable.getPlaintext());
+
+                json result = {
+                  {"plaintext", plaintext},
+                  {"previous_tracking_hash", serializable.getPreviousTrackingHash()->toHex()},
+                  {"tracking_hash", serializable.getTrackingHash()->toHex()},
+                  {"nonce", serializable.getNonce()->toHex()},
+                  {"timestamp", serializable.getTimestamp()},
+                  {"ballot_box_state", getBallotBoxStateString(serializable.getBallotBoxState())}};
+                return result;
+            }
+            static unique_ptr<electionguard::CompactCiphertextBallot> toObject(json j)
+            {
+
+                auto previousTrackingHash = j["previous_tracking_hash"].get<string>();
+                auto trackingHash = j["tracking_hash"].get<string>();
+                auto nonce = j["nonce"].get<string>();
+                auto timestamp = j["timestamp"].get<uint64_t>();
+                auto ballotBoxState = j["ballot_box_state"].get<string>();
+
+                auto plaintext = CompactPlaintextBallotWrapper::toObjectWrapper(j["plaintext"]);
+
+                return make_unique<electionguard::CompactCiphertextBallot>(
+                  move(plaintext), getBallotBoxState(ballotBoxState),
+                  ElementModQ::fromHex(previousTrackingHash), ElementModQ::fromHex(trackingHash),
+                  timestamp, ElementModQ::fromHex(nonce));
+            }
+
+          public:
+            static vector<uint8_t>
+            toBson(const electionguard::CompactCiphertextBallot &serializable)
+            {
+                return json::to_bson(fromObject(serializable));
+            }
+            static string toJson(const electionguard::CompactCiphertextBallot &serializable)
+            {
+                return fromObject(serializable).dump();
+            }
+            static vector<uint8_t>
+            toMsgPack(const electionguard::CompactCiphertextBallot &serializable)
+            {
+                return json::to_msgpack(fromObject(serializable));
+            }
+            static unique_ptr<electionguard::CompactCiphertextBallot> fromBson(vector<uint8_t> data)
+            {
+                return toObject(json::from_bson(data));
+            }
+            static unique_ptr<electionguard::CompactCiphertextBallot> fromJson(string data)
+            {
+                return toObject(json::parse(data));
+            }
+            static unique_ptr<electionguard::CompactCiphertextBallot>
+            fromMsgPack(vector<uint8_t> data)
+            {
+                return toObject(json::from_msgpack(data));
             }
         };
     };

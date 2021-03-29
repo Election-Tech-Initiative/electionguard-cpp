@@ -55,7 +55,7 @@ eg_electionguard_status_t eg_selection_description_free(eg_selection_description
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(SelectionDescription, handle);
+    delete AS_TYPE(SelectionDescription, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -115,7 +115,7 @@ eg_electionguard_status_t eg_election_description_free(eg_election_description_t
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(ElectionDescription, handle);
+    delete AS_TYPE(ElectionDescription, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -241,7 +241,7 @@ eg_internal_election_description_free(eg_internal_election_description_t *handle
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(InternalElectionDescription, handle);
+    delete AS_TYPE(InternalElectionDescription, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -336,7 +336,7 @@ eg_ciphertext_election_context_free(eg_ciphertext_election_context_t *handle)
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(CiphertextElectionContext, handle);
+    delete AS_TYPE(CiphertextElectionContext, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -392,7 +392,7 @@ eg_electionguard_status_t eg_ciphertext_election_context_make(
 {
     try {
         auto *publicKeyPtr = AS_TYPE(ElementModP, in_elgamal_public_key);
-        auto *commitmentHashPtr = AS_TYPE(ElementModQ, in_description_hash);
+        auto *commitmentHashPtr = AS_TYPE(ElementModQ, in_commitment_hash);
         auto *descriptionHashPtr = AS_TYPE(ElementModQ, in_description_hash);
 
         unique_ptr<ElementModP> elGamalPublicKey{publicKeyPtr};

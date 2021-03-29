@@ -7,12 +7,18 @@
 #include "export.h"
 #include "group.hpp"
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
 namespace electionguard
 {
+    enum class BallotBoxState { cast = 1, spoiled = 2, unknown = 999 };
+
+    EG_API std::string getBallotBoxStateString(const BallotBoxState &value);
+    EG_API BallotBoxState getBallotBoxState(const std::string &value);
+
     /// <summary>
     /// ExtendedData represents any arbitrary data expressible as a string with a length.
     ///
@@ -24,6 +30,11 @@ namespace electionguard
         uint64_t length;
 
         ExtendedData(std::string value, uint64_t length) : value(value), length(length) {}
+
+        std::unique_ptr<ExtendedData> clone() const
+        {
+            return std::make_unique<ExtendedData>(this->value, this->length);
+        }
     };
 
     /// <summary>
@@ -73,6 +84,8 @@ namespace electionguard
         /// and that the plaintext value can resolve to a valid representation
         /// </summary>
         bool isValid(const std::string &expectedObjectId) const;
+
+        std::unique_ptr<PlaintextBallotSelection> clone() const;
 
       private:
         class Impl;
@@ -227,6 +240,9 @@ namespace electionguard
 
         std::string getObjectId() const;
         std::vector<std::reference_wrapper<PlaintextBallotSelection>> getSelections() const;
+
+        bool isValid(const std::string &expectedObjectId, uint64_t expectedNumberSelections,
+                     uint64_t expectedNumberElected, uint64_t votesAllowd = 0) const;
 
       private:
         class Impl;
@@ -387,8 +403,10 @@ namespace electionguard
 
         std::vector<uint8_t> toBson() const;
         std::string toJson() const;
-        static std::unique_ptr<PlaintextBallot> fromJson(std::string data);
+        std::vector<uint8_t> toMsgPack() const;
         static std::unique_ptr<PlaintextBallot> fromBson(std::vector<uint8_t> data);
+        static std::unique_ptr<PlaintextBallot> fromJson(std::string data);
+        static std::unique_ptr<PlaintextBallot> fromMsgPack(std::vector<uint8_t> data);
 
       private:
         class Impl;
@@ -457,8 +475,10 @@ namespace electionguard
 
         std::vector<uint8_t> toBson(bool withNonces = false) const;
         std::string toJson(bool withNonces = false) const;
+        std::vector<uint8_t> toMsgPack(bool withNonces = false) const;
         static std::unique_ptr<CiphertextBallot> fromJson(std::string data);
         static std::unique_ptr<CiphertextBallot> fromBson(std::vector<uint8_t> data);
+        static std::unique_ptr<CiphertextBallot> fromMsgPack(std::vector<uint8_t> data);
 
       protected:
         static std::unique_ptr<ElementModQ>

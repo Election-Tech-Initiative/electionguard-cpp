@@ -124,7 +124,7 @@ namespace electionguard
 
             stringstream stream;
 #ifdef _WIN32
-            // TODO: handle error
+            // TODO: ISSUE #136: handle error
             gmtime_s(&now, &now_seconds);
             stream << put_time(&now, "%c");
 #else

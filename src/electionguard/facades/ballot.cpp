@@ -72,7 +72,7 @@ eg_plaintext_ballot_selection_free(eg_plaintext_ballot_selection_t *handle)
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(PlaintextBallotSelection, handle);
+    delete AS_TYPE(PlaintextBallotSelection, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -114,7 +114,7 @@ eg_ciphertext_ballot_selection_free(eg_ciphertext_ballot_selection_t *handle)
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(CiphertextBallotSelection, handle);
+    delete AS_TYPE(CiphertextBallotSelection, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -205,7 +205,7 @@ eg_electionguard_status_t eg_plaintext_ballot_contest_free(eg_plaintext_ballot_c
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(PlaintextBallotContest, handle);
+    delete AS_TYPE(PlaintextBallotContest, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -231,10 +231,9 @@ size_t eg_plaintext_ballot_contest_get_selections_size(eg_plaintext_ballot_conte
     return contests.size();
 }
 
-eg_electionguard_status_t
-eg_plaintext_ballot_contest_get_selection_at_index(eg_plaintext_ballot_contest_t *handle,
-                                                   size_t in_index,
-                                                   eg_plaintext_ballot_selection_t **out_selection_ref)
+eg_electionguard_status_t eg_plaintext_ballot_contest_get_selection_at_index(
+  eg_plaintext_ballot_contest_t *handle, size_t in_index,
+  eg_plaintext_ballot_selection_t **out_selection_ref)
 {
     try {
         auto selections = AS_TYPE(PlaintextBallotContest, handle)->getSelections();
@@ -259,7 +258,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_contest_free(eg_ciphertext_ballot
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(CiphertextBallotContest, handle);
+    delete AS_TYPE(CiphertextBallotContest, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -368,7 +367,7 @@ eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(PlaintextBallot, handle);
+    delete AS_TYPE(PlaintextBallot, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -499,7 +498,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_free(eg_ciphertext_ballot_t *hand
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(CiphertextBallot, handle);
+    delete AS_TYPE(CiphertextBallot, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -532,8 +531,9 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_ballot_style(eg_ciphertext_ba
     }
 }
 
-eg_electionguard_status_t eg_ciphertext_ballot_get_description_hash(eg_ciphertext_ballot_t *handle,
-                                                                    eg_element_mod_q_t **out_hash_ref)
+eg_electionguard_status_t
+eg_ciphertext_ballot_get_description_hash(eg_ciphertext_ballot_t *handle,
+                                          eg_element_mod_q_t **out_hash_ref)
 {
     auto *descriptionHash = AS_TYPE(CiphertextBallot, handle)->getDescriptionHash();
     *out_hash_ref = AS_TYPE(eg_element_mod_q_t, descriptionHash);
@@ -671,7 +671,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_json(eg_ciphertext_ballot_t *h
 {
     try {
         auto *domain_type = AS_TYPE(CiphertextBallot, handle);
-        auto data_string = domain_type->toJson();
+        auto data_string = domain_type->toJson(false);
 
         size_t size = 0;
         *out_data = dynamicCopy(data_string, &size);
@@ -708,7 +708,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_bson(eg_ciphertext_ballot_t *h
 {
     try {
         auto *domain_type = AS_TYPE(CiphertextBallot, handle);
-        auto data_bytes = domain_type->toBson();
+        auto data_bytes = domain_type->toBson(false);
 
         size_t size = 0;
         *out_data = dynamicCopy(data_bytes, &size);
