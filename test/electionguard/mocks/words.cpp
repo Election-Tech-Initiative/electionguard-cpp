@@ -5407,9 +5407,9 @@ namespace electionguard::test::mocks
       "zucchini",
     };
 
-    string getWord(uint16_t index) { return WORDS[index & 0xfff]; }
+    EG_API string getWord(uint16_t index) { return WORDS[index & 0xfff]; }
 
-    int16_t getIndex(const string &word)
+    EG_API int16_t getIndex(const string &word)
     {
         auto element = find(WORDS.begin(), WORDS.end(), word);
 
@@ -5421,9 +5421,9 @@ namespace electionguard::test::mocks
         return -1;
     }
 
-    int16_t getIndex(const char *word) { return getIndex(string(word)); }
+    EG_API int16_t getIndex(const char *word) { return getIndex(string(word)); }
 
-    string hashToWords(const ElementModQ &trackerHash, const char *separator)
+    EG_API string hashToWords(const ElementModQ &trackerHash, const char *separator)
     {
         auto bytes = trackerHash.toBytes();
         stringstream stream;
@@ -5459,14 +5459,14 @@ namespace electionguard::test::mocks
 
 } // namespace electionguard::test::mocks
 
-eg_electionguard_status_t
+EG_API eg_electionguard_status_t
 eg_hash_to_words_with_default_separator(eg_element_mod_q_t *in_tracker_hash, char **out_hash_words)
 {
     return eg_hash_to_words(in_tracker_hash, " ", out_hash_words);
 }
 
-eg_electionguard_status_t eg_hash_to_words(eg_element_mod_q_t *in_tracker_hash,
-                                           const char *in_separator, char **out_hash_words)
+EG_API eg_electionguard_status_t eg_hash_to_words(eg_element_mod_q_t *in_tracker_hash,
+                                                  const char *in_separator, char **out_hash_words)
 {
     try {
         auto *trackerHash = AS_TYPE(electionguard::ElementModQ, in_tracker_hash);
