@@ -1003,10 +1003,10 @@ namespace electionguard
                 json result = {
                   {"object_id", serializable.getObjectId()},
                   {"ballot_style", serializable.getBallotStyle()},
-                  {"description_hash", serializable.getDescriptionHash()->toHex()},
-                  {"previous_tracking_hash", serializable.getPreviousTrackingHash()->toHex()},
+                  {"manifest_hash", serializable.getManifestHash()->toHex()},
+                  {"ballot_code_seed", serializable.getBallotCodeSeed()->toHex()},
                   {"contests", contests},
-                  {"tracking_hash", serializable.getTrackingHash()->toHex()},
+                  {"ballot_code", serializable.getBallotCode()->toHex()},
                   {"timestamp", serializable.getTimestamp()},
                   {"crypto_hash", serializable.getCryptoHash()->toHex()},
                 };
@@ -1019,9 +1019,9 @@ namespace electionguard
             {
                 auto object_id = j["object_id"].get<string>();
                 auto ballot_style = j["ballot_style"].get<string>();
-                auto description_hash = j["description_hash"].get<string>();
-                auto previous_tracking_hash = j["previous_tracking_hash"].get<string>();
-                auto tracking_hash = j["tracking_hash"].get<string>();
+                auto manifest_hash = j["manifest_hash"].get<string>();
+                auto ballot_code_seed = j["ballot_code_seed"].get<string>();
+                auto ballot_code = j["ballot_code"].get<string>();
                 auto timestamp = j["timestamp"].get<uint64_t>();
                 auto ballot_nonce = j["nonce"].is_null() ? "" : j["nonce"].get<string>();
                 auto crypto_hash = j["crypto_hash"].get<string>();
@@ -1138,9 +1138,9 @@ namespace electionguard
                                                   : ElementModQ::fromHex(ballot_nonce);
 
                 return make_unique<electionguard::CiphertextBallot>(
-                  object_id, ballot_style, *ElementModQ::fromHex(description_hash),
-                  ElementModQ::fromHex(previous_tracking_hash), move(ciphertextContests),
-                  ElementModQ::fromHex(tracking_hash), timestamp, move(nonce),
+                  object_id, ballot_style, *ElementModQ::fromHex(manifest_hash),
+                  ElementModQ::fromHex(ballot_code_seed), move(ciphertextContests),
+                  ElementModQ::fromHex(ballot_code), timestamp, move(nonce),
                   ElementModQ::fromHex(crypto_hash));
             }
 
@@ -1198,8 +1198,8 @@ namespace electionguard
 
                 json result = {
                   {"plaintext", plaintext},
-                  {"previous_tracking_hash", serializable.getPreviousTrackingHash()->toHex()},
-                  {"tracking_hash", serializable.getTrackingHash()->toHex()},
+                  {"ballot_code_seed", serializable.getBallotCodeSeed()->toHex()},
+                  {"ballot_code", serializable.getBallotCode()->toHex()},
                   {"nonce", serializable.getNonce()->toHex()},
                   {"timestamp", serializable.getTimestamp()},
                   {"ballot_box_state", getBallotBoxStateString(serializable.getBallotBoxState())}};
@@ -1208,8 +1208,8 @@ namespace electionguard
             static unique_ptr<electionguard::CompactCiphertextBallot> toObject(json j)
             {
 
-                auto previousTrackingHash = j["previous_tracking_hash"].get<string>();
-                auto trackingHash = j["tracking_hash"].get<string>();
+                auto ballotCodeSeed = j["ballot_code_seed"].get<string>();
+                auto ballotCode = j["ballot_code"].get<string>();
                 auto nonce = j["nonce"].get<string>();
                 auto timestamp = j["timestamp"].get<uint64_t>();
                 auto ballotBoxState = j["ballot_box_state"].get<string>();
@@ -1218,8 +1218,8 @@ namespace electionguard
 
                 return make_unique<electionguard::CompactCiphertextBallot>(
                   move(plaintext), getBallotBoxState(ballotBoxState),
-                  ElementModQ::fromHex(previousTrackingHash), ElementModQ::fromHex(trackingHash),
-                  timestamp, ElementModQ::fromHex(nonce));
+                  ElementModQ::fromHex(ballotCodeSeed), ElementModQ::fromHex(ballotCode), timestamp,
+                  ElementModQ::fromHex(nonce));
             }
 
           public:

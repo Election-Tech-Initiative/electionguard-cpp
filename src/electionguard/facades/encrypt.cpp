@@ -208,13 +208,11 @@ eg_electionguard_status_t eg_encrypt_selection(eg_plaintext_ballot_selection_t *
 
 #pragma region EncryptContest
 
-eg_electionguard_status_t eg_encrypt_contest(eg_plaintext_ballot_contest_t *in_plaintext,
-                                             eg_contest_description_t *in_description,
-                                             eg_element_mod_p_t *in_public_key,
-                                             eg_element_mod_q_t *in_crypto_extended_base_hash,
-                                             eg_element_mod_q_t *in_nonce_seed,
-                                             bool in_should_verify_proofs,
-                                             eg_ciphertext_ballot_contest_t **out_handle)
+eg_electionguard_status_t eg_encrypt_contest(
+  eg_plaintext_ballot_contest_t *in_plaintext,
+  eg_contest_description_with_placeholders_t *in_description, eg_element_mod_p_t *in_public_key,
+  eg_element_mod_q_t *in_crypto_extended_base_hash, eg_element_mod_q_t *in_nonce_seed,
+  bool in_should_verify_proofs, eg_ciphertext_ballot_contest_t **out_handle)
 {
     try {
         auto *plaintext = AS_TYPE(PlaintextBallotContest, in_plaintext);
@@ -242,7 +240,7 @@ eg_electionguard_status_t eg_encrypt_contest(eg_plaintext_ballot_contest_t *in_p
 eg_electionguard_status_t eg_encrypt_ballot(eg_plaintext_ballot_t *in_plaintext,
                                             eg_internal_election_description_t *in_metadata,
                                             eg_ciphertext_election_context_t *in_context,
-                                            eg_element_mod_q_t *in_seed_hash,
+                                            eg_element_mod_q_t *in_ballot_code_seed,
                                             bool in_should_verify_proofs,
                                             eg_ciphertext_ballot_t **out_handle)
 {
@@ -250,9 +248,9 @@ eg_electionguard_status_t eg_encrypt_ballot(eg_plaintext_ballot_t *in_plaintext,
         auto *plaintext = AS_TYPE(PlaintextBallot, in_plaintext);
         auto *metadata = AS_TYPE(InternalElectionDescription, in_metadata);
         auto *context = AS_TYPE(CiphertextElectionContext, in_context);
-        auto *seed_hash = AS_TYPE(ElementModQ, in_seed_hash);
+        auto *code_seed = AS_TYPE(ElementModQ, in_ballot_code_seed);
 
-        auto ciphertext = encryptBallot(*plaintext, *metadata, *context, *seed_hash, nullptr, 0ULL,
+        auto ciphertext = encryptBallot(*plaintext, *metadata, *context, *code_seed, nullptr, 0ULL,
                                         in_should_verify_proofs);
         *out_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -264,18 +262,18 @@ eg_electionguard_status_t eg_encrypt_ballot(eg_plaintext_ballot_t *in_plaintext,
 
 eg_electionguard_status_t eg_encrypt_ballot_with_nonce(
   eg_plaintext_ballot_t *in_plaintext, eg_internal_election_description_t *in_metadata,
-  eg_ciphertext_election_context_t *in_context, eg_element_mod_q_t *in_seed_hash,
+  eg_ciphertext_election_context_t *in_context, eg_element_mod_q_t *in_ballot_code_seed,
   eg_element_mod_q_t *in_nonce, bool in_should_verify_proofs, eg_ciphertext_ballot_t **out_handle)
 {
     try {
         auto *plaintext = AS_TYPE(PlaintextBallot, in_plaintext);
         auto *metadata = AS_TYPE(InternalElectionDescription, in_metadata);
         auto *context = AS_TYPE(CiphertextElectionContext, in_context);
-        auto *seed_hash = AS_TYPE(ElementModQ, in_seed_hash);
+        auto *code_seed = AS_TYPE(ElementModQ, in_ballot_code_seed);
         auto *nonce = AS_TYPE(ElementModQ, in_nonce);
         unique_ptr<ElementModQ> nonce_ptr{nonce};
 
-        auto ciphertext = encryptBallot(*plaintext, *metadata, *context, *seed_hash,
+        auto ciphertext = encryptBallot(*plaintext, *metadata, *context, *code_seed,
                                         move(nonce_ptr), 0, in_should_verify_proofs);
         *out_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -292,7 +290,7 @@ eg_electionguard_status_t eg_encrypt_ballot_with_nonce(
 eg_electionguard_status_t eg_encrypt_compact_ballot(eg_plaintext_ballot_t *in_plaintext,
                                                     eg_internal_election_description_t *in_metadata,
                                                     eg_ciphertext_election_context_t *in_context,
-                                                    eg_element_mod_q_t *in_seed_hash,
+                                                    eg_element_mod_q_t *in_ballot_code_seed,
                                                     bool in_should_verify_proofs,
                                                     eg_compact_ciphertext_ballot_t **out_handle)
 {
@@ -300,9 +298,9 @@ eg_electionguard_status_t eg_encrypt_compact_ballot(eg_plaintext_ballot_t *in_pl
         auto *plaintext = AS_TYPE(PlaintextBallot, in_plaintext);
         auto *metadata = AS_TYPE(InternalElectionDescription, in_metadata);
         auto *context = AS_TYPE(CiphertextElectionContext, in_context);
-        auto *seed_hash = AS_TYPE(ElementModQ, in_seed_hash);
+        auto *code_seed = AS_TYPE(ElementModQ, in_ballot_code_seed);
 
-        auto ciphertext = encryptCompactBallot(*plaintext, *metadata, *context, *seed_hash, nullptr,
+        auto ciphertext = encryptCompactBallot(*plaintext, *metadata, *context, *code_seed, nullptr,
                                                0, in_should_verify_proofs);
         *out_handle = AS_TYPE(eg_compact_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;

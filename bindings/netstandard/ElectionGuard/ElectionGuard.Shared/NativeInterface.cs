@@ -805,19 +805,19 @@ namespace ElectionGuard
             internal static extern Status GetObjectId(
                 CiphertextBallotHandle handle, out IntPtr object_id);
 
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_ballot_style")]
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_ballot_style")]
             internal static extern Status GetBallotStyle(
                 CiphertextBallotHandle handle, out IntPtr ballot_style);
 
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_description_hash")]
-            internal static extern Status GetDescriptionHash(
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_manifest_hash")]
+            internal static extern Status GetManifestHash(
                 CiphertextBallotHandle handle,
-                out ElementModQ.ElementModQHandle description_hash);
+                out ElementModQ.ElementModQHandle manifest_hash_ref);
 
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_previous_tracking_hash")]
-            internal static extern Status GetPreviousTrackingHash(
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_ballot_code_seed")]
+            internal static extern Status GetBallotCodeSeed(
                 CiphertextBallotHandle handle,
-                out ElementModQ.ElementModQHandle tracking_hash);
+                out ElementModQ.ElementModQHandle ballot_code_seed_ref);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_contests_size")]
             internal static extern ulong GetContestsSize(CiphertextBallotHandle handle);
@@ -826,24 +826,29 @@ namespace ElectionGuard
             internal static extern Status GetContestAtIndex(
                 CiphertextBallotHandle handle,
                 ulong index,
-                out CiphertextBallotContest.CiphertextBallotContestHandle contest);
+                out CiphertextBallotContest.CiphertextBallotContestHandle contest_ref);
 
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_tracking_hash")]
-            internal static extern Status GetTrackingHash(
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_ballot_code")]
+            internal static extern Status GetBallotCode(
                 CiphertextBallotHandle handle,
-                out ElementModQ.ElementModQHandle tracking_hash);
+                out ElementModQ.ElementModQHandle ballot_code_ref);
 
             // TODO: ISSUE #129: get timestamp
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_nonce")]
             internal static extern Status GetNonce(
                 CiphertextBallotHandle handle,
-                out ElementModQ.ElementModQHandle nonce);
+                out ElementModQ.ElementModQHandle nonce_ref);
+
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_crypto_hash")]
+            internal static extern Status GetCryptoHash(
+                CiphertextBallotHandle handle,
+                out ElementModQ.ElementModQHandle hash_ref);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_is_valid_encryption")]
             internal static extern bool IsValidEncryption(
                 CiphertextBallotHandle handle,
-                ElementModQ.ElementModQHandle seed_hash,
+                ElementModQ.ElementModQHandle manifest_hash,
                 ElementModP.ElementModPHandle public_key,
                 ElementModQ.ElementModQHandle crypto_extended_base_hash);
 
@@ -1018,41 +1023,42 @@ namespace ElectionGuard
 
         internal static unsafe class Encrypt
         {
-            [DllImport(DllName, EntryPoint = "eg_encrypt_ballot_with_nonce")]
-            internal static extern Status Selection(
-                PlaintextBallotSelection.PlaintextBallotSelectionHandle plaintext,
-                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
-                CiphertextElectionContext.CiphertextElectionContextHandle context,
-                ElementModQ.ElementModQHandle seedHash,
-                ElementModQ.ElementModQHandle nonce,
-                bool shouldVerifyProofs,
-                out CiphertextBallot.CiphertextBallotHandle handle);
+            // TODO: when the manifest is completely exposed
+            // [DllImport(DllName, EntryPoint = "eg_encrypt_selection")]
+            // internal static extern Status Selection(
+            //     PlaintextBallotSelection.PlaintextBallotSelectionHandle plaintext,
+            //     SelectionDescription.SelectionDescriptionHandle metadata,
+            //     CiphertextElectionContext.CiphertextElectionContextHandle context,
+            //     ElementModQ.ElementModQHandle ballot_code_seed,
+            //     ElementModQ.ElementModQHandle nonce,
+            //     bool shouldVerifyProofs,
+            //     out CiphertextBallot.CiphertextBallotHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_encrypt_ballot_with_nonce")]
-            internal static extern Status Contest(
-                PlaintextBallotContest.PlaintextBallotContestHandle plaintext,
-                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
-                CiphertextElectionContext.CiphertextElectionContextHandle context,
-                ElementModQ.ElementModQHandle seedHash,
-                ElementModQ.ElementModQHandle nonce,
-                bool shouldVerifyProofs,
-                out CiphertextBallot.CiphertextBallotHandle handle);
+            // [DllImport(DllName, EntryPoint = "eg_encrypt_contest")]
+            // internal static extern Status Contest(
+            //     PlaintextBallotContest.PlaintextBallotContestHandle plaintext,
+            //     ContestDescription.InternalElectionDescriptionHandle metadata,
+            //     CiphertextElectionContext.CiphertextElectionContextHandle context,
+            //     ElementModQ.ElementModQHandle ballot_code_seed,
+            //     ElementModQ.ElementModQHandle nonce,
+            //     bool shouldVerifyProofs,
+            //     out CiphertextBallot.CiphertextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot")]
             internal static extern Status Ballot(
                 PlaintextBallot.PlaintextBallotHandle plaintext,
-                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                InternalElectionDescription.InternalElectionDescriptionHandle internal_manifest,
                 CiphertextElectionContext.CiphertextElectionContextHandle context,
-                ElementModQ.ElementModQHandle seedHash,
+                ElementModQ.ElementModQHandle ballot_code_seed,
                 bool shouldVerifyProofs,
                 out CiphertextBallot.CiphertextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot_with_nonce")]
             internal static extern Status Ballot(
                 PlaintextBallot.PlaintextBallotHandle plaintext,
-                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                InternalElectionDescription.InternalElectionDescriptionHandle internal_manifest,
                 CiphertextElectionContext.CiphertextElectionContextHandle context,
-                ElementModQ.ElementModQHandle seedHash,
+                ElementModQ.ElementModQHandle ballot_code_seed,
                 ElementModQ.ElementModQHandle nonce,
                 bool shouldVerifyProofs,
                 out CiphertextBallot.CiphertextBallotHandle handle);
@@ -1060,9 +1066,9 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_encrypt_compact_ballot")]
             internal static extern Status CompactBallot(
                 PlaintextBallot.PlaintextBallotHandle plaintext,
-                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                InternalElectionDescription.InternalElectionDescriptionHandle internal_manifest,
                 CiphertextElectionContext.CiphertextElectionContextHandle context,
-                ElementModQ.ElementModQHandle seedHash,
+                ElementModQ.ElementModQHandle ballot_code_seed,
                 bool shouldVerifyProofs,
                 out CompactCiphertextBallot.CompactCiphertextBallotHandle handle);
         }

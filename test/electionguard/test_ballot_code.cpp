@@ -1,6 +1,6 @@
 #include <doctest/doctest.h>
+#include <electionguard/ballot_code.hpp>
 #include <electionguard/log.hpp>
-#include <electionguard/tracker.hpp>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -9,18 +9,20 @@
 using namespace electionguard;
 using namespace std;
 
-TEST_CASE("Get rotating tracker hash rotates")
+TEST_CASE("Get rotating ballot code rotates")
 {
     // Arrange
-    auto deviceHash = Tracker::getHashForDevice(12345UL, 23456UL, 34567UL, "some-location-string");
+    auto deviceHash =
+      BallotCode::getHashForDevice(12345UL, 23456UL, 34567UL, "some-location-string");
     uint64_t firstHash[MAX_Q_LEN] = {1, 2, 3, 4};
     auto firstBallotHash = make_unique<ElementModQ>(firstHash);
     uint64_t secondHash[MAX_Q_LEN] = {2, 3, 4, 5};
     auto secondBallotHash = make_unique<ElementModQ>(secondHash);
 
     // Act
-    auto rotatingHash1 = Tracker::getRotatingTrackerHash(*deviceHash, 1000UL, *firstBallotHash);
-    auto rotatingHash2 = Tracker::getRotatingTrackerHash(*rotatingHash1, 1001UL, *secondBallotHash);
+    auto rotatingHash1 = BallotCode::getRotatingBallotCode(*deviceHash, 1000UL, *firstBallotHash);
+    auto rotatingHash2 =
+      BallotCode::getRotatingBallotCode(*rotatingHash1, 1001UL, *secondBallotHash);
 
     //Assert
     CHECK(deviceHash != nullptr);

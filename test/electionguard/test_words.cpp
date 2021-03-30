@@ -1,8 +1,8 @@
 #include "mocks/words.hpp"
 
 #include <doctest/doctest.h>
+#include <electionguard/ballot_code.hpp>
 #include <electionguard/log.hpp>
-#include <electionguard/tracker.hpp>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -12,7 +12,7 @@ using namespace electionguard;
 using namespace electionguard::test::mocks;
 using namespace std;
 
-TEST_SUITE("Demonstrate a method for makign friendly names from hash codes")
+TEST_SUITE("Demonstrate a method for making friendly names from hash codes")
 {
 
     TEST_CASE("Retrieving words from the words list succeeds")
@@ -49,14 +49,14 @@ TEST_SUITE("Demonstrate a method for makign friendly names from hash codes")
     {
         // Arrange
         auto deviceHash =
-          Tracker::getHashForDevice(12345UL, 23456UL, 34567UL, "some-location-string");
+          BallotCode::getHashForDevice(12345UL, 23456UL, 34567UL, "some-location-string");
         const auto &ballotHash = ONE_MOD_Q();
         const auto &anotherBallotHash = TWO_MOD_Q();
         uint64_t timestamp = 1000;
         auto firstRotatingHash =
-          Tracker::getRotatingTrackerHash(*deviceHash, timestamp, ballotHash);
+          BallotCode::getRotatingBallotCode(*deviceHash, timestamp, ballotHash);
         auto secondRotatingHash =
-          Tracker::getRotatingTrackerHash(*deviceHash, timestamp, anotherBallotHash);
+          BallotCode::getRotatingBallotCode(*deviceHash, timestamp, anotherBallotHash);
 
         // Act
         auto deviceWords = hashToWords(*deviceHash);
@@ -81,14 +81,14 @@ TEST_SUITE("Demonstrate a method for makign friendly names from hash codes")
         const auto &deviceHash = ONE_MOD_Q();
         const auto &ballotHash = TWO_MOD_Q();
         uint64_t timestamp = 1000;
-        auto trackerHash = Tracker::getRotatingTrackerHash(deviceHash, timestamp, ballotHash);
+        auto ballotCode = BallotCode::getRotatingBallotCode(deviceHash, timestamp, ballotHash);
 
         // Act
-        auto trackerWords = hashToWords(*trackerHash, "-");
+        auto trackerWords = hashToWords(*ballotCode, "-");
 
         // Assert
         CHECK(trackerWords.empty() == false);
-        CHECK(trackerHash->toHex() == expectedHash);
+        CHECK(ballotCode->toHex() == expectedHash);
         CHECK(trackerWords == expectedWords);
     }
 }

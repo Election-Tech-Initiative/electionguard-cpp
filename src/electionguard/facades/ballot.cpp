@@ -532,20 +532,20 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_ballot_style(eg_ciphertext_ba
 }
 
 eg_electionguard_status_t
-eg_ciphertext_ballot_get_description_hash(eg_ciphertext_ballot_t *handle,
-                                          eg_element_mod_q_t **out_hash_ref)
+eg_ciphertext_ballot_get_manifest_hash(eg_ciphertext_ballot_t *handle,
+                                       eg_element_mod_q_t **out_manifest_hash_ref)
 {
-    auto *descriptionHash = AS_TYPE(CiphertextBallot, handle)->getDescriptionHash();
-    *out_hash_ref = AS_TYPE(eg_element_mod_q_t, descriptionHash);
+    auto *manifestHash = AS_TYPE(CiphertextBallot, handle)->getManifestHash();
+    *out_manifest_hash_ref = AS_TYPE(eg_element_mod_q_t, manifestHash);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 eg_electionguard_status_t
-eg_ciphertext_ballot_get_previous_tracking_hash(eg_ciphertext_ballot_t *handle,
-                                                eg_element_mod_q_t **out_hash_ref)
+eg_ciphertext_ballot_get_ballot_code_seed(eg_ciphertext_ballot_t *handle,
+                                          eg_element_mod_q_t **out_ballot_code_seed_ref)
 {
-    auto *previousTrackingHash = AS_TYPE(CiphertextBallot, handle)->getPreviousTrackingHash();
-    *out_hash_ref = AS_TYPE(eg_element_mod_q_t, previousTrackingHash);
+    auto *codeSeed = AS_TYPE(CiphertextBallot, handle)->getBallotCodeSeed();
+    *out_ballot_code_seed_ref = AS_TYPE(eg_element_mod_q_t, codeSeed);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -573,12 +573,12 @@ eg_ciphertext_ballot_get_contest_at_index(eg_ciphertext_ballot_t *handle, size_t
 }
 
 eg_electionguard_status_t
-eg_ciphertext_ballot_get_tracking_hash(eg_ciphertext_ballot_t *handle,
-                                       eg_element_mod_q_t **out_tracking_hash_ref)
+eg_ciphertext_ballot_get_ballot_code(eg_ciphertext_ballot_t *handle,
+                                     eg_element_mod_q_t **out_ballot_code_ref)
 {
     try {
-        auto *hash = AS_TYPE(CiphertextBallot, handle)->getTrackingHash();
-        *out_tracking_hash_ref = AS_TYPE(eg_element_mod_q_t, hash);
+        auto *code = AS_TYPE(CiphertextBallot, handle)->getBallotCode();
+        *out_ballot_code_ref = AS_TYPE(eg_element_mod_q_t, code);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {

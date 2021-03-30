@@ -95,7 +95,7 @@ struct eg_ciphertext_ballot_selection_s;
 * or keep both values.
 *
 * By discarding the `nonce`, the encrypted representation and `proof`
-* can only be regenerated if the nonce was derived from the ballot's master nonce.  If the nonce
+* can only be regenerated if the nonce was derived from the ballot's seed nonce.  If the nonce
 * used for this selection is truly random, and it is discarded, then the proofs cannot be regenerated.
 *
 * By keeping the `nonce`, or deriving the selection nonce from the ballot nonce, an external system can
@@ -370,22 +370,22 @@ EG_API eg_electionguard_status_t
 eg_ciphertext_ballot_get_ballot_style(eg_ciphertext_ballot_t *handle, char **out_ballot_style);
 
 /**
- * Hash of the election metadata
+ * Hash of the election manifest
  * 
- * @param[out] out_hash_ref An opaque pointer to the description hash.  
+ * @param[out] out_manifest_hash_ref An opaque pointer to the description hash.  
  *                          The value is a reference and is not owned by the caller
  */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_description_hash(
-  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_hash_ref);
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_manifest_hash(
+  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_manifest_hash_ref);
 
 /**
  * Previous tracking hash or seed hash
  * 
- * @param[out] out_hash_ref An opaque pointer to the previous tracking or seed hash.  
+ * @param[out] out_ballot_code_seed_ref An opaque pointer to the previous tracking or seed hash.  
  *                          The value is a reference and is not owned by the caller
  */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_previous_tracking_hash(
-  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_hash_ref);
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_ballot_code_seed(
+  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_ballot_code_seed_ref);
 
 EG_API size_t eg_ciphertext_ballot_get_contests_size(eg_ciphertext_ballot_t *handle);
 
@@ -401,13 +401,13 @@ eg_ciphertext_ballot_get_contest_at_index(eg_ciphertext_ballot_t *handle, size_t
                                           eg_ciphertext_ballot_contest_t **out_contest_ref);
 
 /**
- * Unique ballot tracking hash for this ballot
+ * Unique ballot tracking code for this ballot
  * 
- * @param[out] out_tracking_hash_ref An opaque pointer to the tracking hash.  
+ * @param[out] out_ballot_code_ref An opaque pointer to the ballot code.  
  *                                   The value is a reference and is not owned by the caller
  */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_tracking_hash(
-  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_tracking_hash_ref);
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_ballot_code(
+  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_ballot_code_ref);
 
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_timestamp(eg_ciphertext_ballot_t *handle,
                                                                     uint64_t *out_timestamp);
@@ -415,7 +415,7 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_timestamp(eg_ciphertex
 /**
  * The nonce used to encrypt this ballot. Sensitive & should be treated as a secret
  * 
- * @param[out] out_nonce_ref An opaque pointer to the master ballot nonce.  
+ * @param[out] out_nonce_ref An opaque pointer to the seed ballot nonce.  
  *                           The value is a reference and is not owned by the caller
  */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_nonce(eg_ciphertext_ballot_t *handle,
@@ -434,7 +434,7 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_crypto_hash(
 // static CiphertextBallot::make not provided, use eg_encrypt_ballot
 
 EG_API bool eg_ciphertext_ballot_is_valid_encryption(
-  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t *in_seed_hash,
+  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t *in_manifest_hash,
   eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash);
 
 EG_API eg_electionguard_status_t

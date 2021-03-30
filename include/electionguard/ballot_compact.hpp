@@ -83,8 +83,8 @@ namespace electionguard
         CompactCiphertextBallot(const CompactCiphertextBallot &&other);
         CompactCiphertextBallot(std::unique_ptr<CompactPlaintextBallot> plaintext,
                                 BallotBoxState ballotBoxState,
-                                std::unique_ptr<ElementModQ> previousTrackingHash,
-                                std::unique_ptr<ElementModQ> trackingHash, const uint64_t timestamp,
+                                std::unique_ptr<ElementModQ> ballotCodeSeed,
+                                std::unique_ptr<ElementModQ> ballotCode, const uint64_t timestamp,
                                 std::unique_ptr<ElementModQ> ballotNonce);
         ~CompactCiphertextBallot();
 
@@ -93,8 +93,8 @@ namespace electionguard
 
         std::string getObjectId() const;
         CompactPlaintextBallot *getPlaintext() const;
-        ElementModQ *getPreviousTrackingHash() const;
-        ElementModQ *getTrackingHash() const;
+        ElementModQ *getBallotCodeSeed() const;
+        ElementModQ *getBallotCode() const;
         ElementModQ *getNonce() const;
         uint64_t getTimestamp() const;
         BallotBoxState getBallotBoxState() const;

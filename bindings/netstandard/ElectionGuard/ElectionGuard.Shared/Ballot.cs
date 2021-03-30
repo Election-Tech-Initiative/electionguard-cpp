@@ -130,7 +130,7 @@ namespace ElectionGuard
     /// or keep both values.
     ///
     /// By discarding the `nonce`, the encrypted representation and `proof`
-    /// can only be regenerated if the nonce was derived from the ballot's master nonce.  If the nonce
+    /// can only be regenerated if the nonce was derived from the ballot's seed nonce.  If the nonce
     /// used for this selection is truly random, and it is discarded, then the proofs cannot be regenerated.
     ///
     /// By keeping the `nonce`, or deriving the selection nonce from the ballot nonce, an external system can
@@ -353,7 +353,7 @@ namespace ElectionGuard
     ///
     /// Similar to `CiphertextBallotSelection` the consuming application can choose to discard or keep both
     /// the `nonce` and the `proof` in some circumstances.  For deterministic nonce's derived from the
-    /// master nonce, both values can be regenerated.  If the `nonce` for this contest is completely random,
+    /// seed nonce, both values can be regenerated.  If the `nonce` for this contest is completely random,
     /// then it is required in order to regenerate the proof.
     /// </summary>
     public class CiphertextBallotContest : DisposableBase
@@ -635,7 +635,7 @@ namespace ElectionGuard
     /// <summary>
     /// A CiphertextBallot represents a voters encrypted selections for a given ballot and ballot style.
     ///
-    /// When a ballot is in it's complete, encrypted state, the `nonce` is the master nonce
+    /// When a ballot is in it's complete, encrypted state, the `nonce` is the seed nonce
     /// from which all other nonces can be derived to encrypt the ballot.  Allong with the `nonce`
     /// fields on `Ballotcontest` and `BallotSelection`, this value is sensitive.
     ///
@@ -676,30 +676,30 @@ namespace ElectionGuard
             }
         }
 
-        public unsafe ElementModQ DescriptionHash
+        public unsafe ElementModQ ManifestHash
         {
             get
             {
-                var status = NativeInterface.CiphertextBallot.GetDescriptionHash(
+                var status = NativeInterface.CiphertextBallot.GetManifestHash(
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error DescriptionHash: {status}");
+                    Console.WriteLine($"CiphertextBallot Error ManifestHash: {status}");
                     return null;
                 }
                 return new ElementModQ(value);
             }
         }
 
-        public unsafe ElementModQ PreviousTrackingHash
+        public unsafe ElementModQ BallotCodeSeed
         {
             get
             {
-                var status = NativeInterface.CiphertextBallot.GetPreviousTrackingHash(
+                var status = NativeInterface.CiphertextBallot.GetBallotCodeSeed(
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error PreviousTrackingHash: {status}");
+                    Console.WriteLine($"CiphertextBallot Error BallotCodeSeed: {status}");
                     return null;
                 }
                 return new ElementModQ(value);
@@ -715,15 +715,15 @@ namespace ElectionGuard
             }
         }
 
-        public unsafe ElementModQ TrackingHash
+        public unsafe ElementModQ BallotCode
         {
             get
             {
-                var status = NativeInterface.CiphertextBallot.GetTrackingHash(
+                var status = NativeInterface.CiphertextBallot.GetBallotCode(
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error TrackingHash: {status}");
+                    Console.WriteLine($"CiphertextBallot Error BallotCode: {status}");
                     return null;
                 }
                 return new ElementModQ(value);
@@ -772,10 +772,10 @@ namespace ElectionGuard
         }
 
         public unsafe bool IsValidEncryption(
-            ElementModQ seedHash, ElementModP elGamalPublicKey, ElementModQ cryptoExtendedBaseHash)
+            ElementModQ manifestHash, ElementModP elGamalPublicKey, ElementModQ cryptoExtendedBaseHash)
         {
             return NativeInterface.CiphertextBallot.IsValidEncryption(
-                Handle, seedHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
+                Handle, manifestHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
         }
 
         // TODO: ISSUE #129: To bson

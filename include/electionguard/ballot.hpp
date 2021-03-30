@@ -107,7 +107,7 @@ namespace electionguard
     /// or keep both values.
     ///
     /// By discarding the `nonce`, the encrypted representation and `proof`
-    /// can only be regenerated if the nonce was derived from the ballot's master nonce.  If the nonce
+    /// can only be regenerated if the nonce was derived from the ballot's seed nonce.  If the nonce
     /// used for this selection is truly random, and it is discarded, then the proofs cannot be regenerated.
     ///
     /// By keeping the `nonce`, or deriving the selection nonce from the ballot nonce, an external system can
@@ -260,7 +260,7 @@ namespace electionguard
     ///
     /// Similar to `CiphertextBallotSelection` the consuming application can choose to discard or keep both
     /// the `nonce` and the `proof` in some circumstances.  For deterministic nonce's derived from the
-    /// master nonce, both values can be regenerated.  If the `nonce` for this contest is completely random,
+    /// seed nonce, both values can be regenerated.  If the `nonce` for this contest is completely random,
     /// then it is required in order to regenerate the proof.
     /// </summary>
     class EG_API CiphertextBallotContest : public CryptoHashCheckable
@@ -416,7 +416,7 @@ namespace electionguard
     /// <summary>
     /// A CiphertextBallot represents a voters encrypted selections for a given ballot and ballot style.
     ///
-    /// When a ballot is in it's complete, encrypted state, the `nonce` is the master nonce
+    /// When a ballot is in it's complete, encrypted state, the `nonce` is the seed nonce
     /// from which all other nonces can be derived to encrypt the ballot.  Allong with the `nonce`
     /// fields on `Ballotcontest` and `BallotSelection`, this value is sensitive.
     ///
@@ -429,10 +429,10 @@ namespace electionguard
         CiphertextBallot(const CiphertextBallot &other);
         CiphertextBallot(const CiphertextBallot &&other);
         CiphertextBallot(const std::string &objectId, const std::string &ballotStyle,
-                         const ElementModQ &descriptionHash,
-                         std::unique_ptr<ElementModQ> previousTrackingHash,
+                         const ElementModQ &manifestHash,
+                         std::unique_ptr<ElementModQ> ballotCodeSeed,
                          std::vector<std::unique_ptr<CiphertextBallotContest>> contests,
-                         std::unique_ptr<ElementModQ> trackingHash, const uint64_t timestamp,
+                         std::unique_ptr<ElementModQ> ballotCode, const uint64_t timestamp,
                          std::unique_ptr<ElementModQ> nonce,
                          std::unique_ptr<ElementModQ> cryptoHash);
         ~CiphertextBallot();
@@ -440,36 +440,105 @@ namespace electionguard
         CiphertextBallot &operator=(CiphertextBallot other);
         CiphertextBallot &operator=(CiphertextBallot &&other);
 
+        /// <summary>
+        /// The unique ballot id that is meaningful to the consuming application.
+        /// The Must be less than 256 bytes
+        /// </summary>
         std::string getObjectId() const;
-        std::string getBallotStyle() const;
-        ElementModQ *getDescriptionHash() const;
-        ElementModQ *getPreviousTrackingHash() const;
 
+        /// <summary>
+        /// The `object_id` of the `BallotStyle` in the `Election` Manifest
+        /// </summary>
+        std::string getBallotStyle() const;
+
+        /// <summary>
+        /// Hash of the election manifest to which this ballot belongs
+        /// </summary>
+        ElementModQ *getManifestHash() const;
+
+        /// <summary>
+        /// The seed hash for the ballot.  It may be the encryption device hash, the hash of a previous ballot
+        /// or the hash of some other value that is meaningful to the consuming application.
+        /// </summary>
+        ElementModQ *getBallotCodeSeed() const;
+
+        /// <summary>
+        /// The list of contests for this ballot
+        /// </summary>
         std::vector<std::reference_wrapper<CiphertextBallotContest>> getContests() const;
 
-        ElementModQ *getTrackingHash() const;
+        /// <summary>
+        /// The unique ballot code for this ballot that is derived from
+        /// the ballot seed, the timestamp, and the hash of the encrypted values
+        /// </summary>
+        ElementModQ *getBallotCode() const;
         uint64_t getTimestamp() const;
+
+        /// <summary>
+        /// The nonce value used to encrypt all values in the ballot
+        /// </summary>
         ElementModQ *getNonce() const;
+
+        /// <summary>
+        /// The hash of the encrypted values on this ballot in sequence order
+        /// </summary>
         ElementModQ *getCryptoHash() const;
 
+        /// <summary>
+        /// Given an encrypted Ballot, generates a hash, suitable for rolling up
+        /// into a hash for an entire ballot / ballot code. Of note, this particular hash examines
+        /// the `manifest_hash` and `ballot_selections`, but not the proof.
+        /// This is deliberate, allowing for the possibility of ElectionGuard variants running on
+        /// much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed
+        /// later on.
+        /// </summary>
         virtual std::unique_ptr<ElementModQ>
-        crypto_hash_with(const ElementModQ &seedHash) const override;
+        crypto_hash_with(const ElementModQ &manifestHash) const override;
 
+        /// <summary>
+        /// Makes a `CiphertextBallot`, initially in the state where it's neither been cast nor spoiled.
+        ///
+        /// <param name="objectId"> the object_id of this specific ballot</param>
+        /// <param name="ballotStyle"> The `object_id` of the `BallotStyle` in the `Election` Manifest</param>
+        /// <param name="manifestHash"> Hash of the election manifest</param>
+        /// <param name="nonce"> optional nonce used as part of the encryption process</param>
+        /// <param name="contests"> List of contests for this ballot</param>
+        /// <param name="timestamp"> Timestamp at which the ballot encryption is generated in tick.
+        ///                          Will use the system time if none provided</param>
+        /// <param name="ballotCode"> Previous ballot code or seed.
+        ///                           Will use the manifestHash if none provided</param>
+        /// </summary>
         static std::unique_ptr<CiphertextBallot>
         make(const std::string &objectId, const std::string &ballotStyle,
-             const ElementModQ &descriptionHash,
+             const ElementModQ &manifestHash,
              std::vector<std::unique_ptr<CiphertextBallotContest>> contests,
              std::unique_ptr<ElementModQ> nonce = nullptr, const uint64_t timestamp = 0,
-             std::unique_ptr<ElementModQ> previousTrackingHash = nullptr,
-             std::unique_ptr<ElementModQ> trackingHash = nullptr);
+             std::unique_ptr<ElementModQ> ballotCodeSeed = nullptr,
+             std::unique_ptr<ElementModQ> ballotCode = nullptr);
 
-        static std::unique_ptr<ElementModQ> nonceSeed(const ElementModQ &descriptionHash,
+        /// <summary>
+        /// A static helper method to derive the nonceSeed used to encrypt the ballot
+        /// </summary>
+        static std::unique_ptr<ElementModQ> nonceSeed(const ElementModQ &manifestHash,
                                                       const std::string &objectId,
                                                       const ElementModQ &nonce);
 
-        bool isValidEncryption(const ElementModQ &seedHash, const ElementModP &elgamalPublicKey,
+        /// <summary>
+        /// Given an encrypted Ballot, validates the encryption state against a specific ballot seed and public key
+        /// by verifying the states of this ballot's members (BallotContest's and BallotSelection's).
+        /// Calling this function expects that the object is in a well-formed encrypted state
+        /// with the `contests` populated with valid encrypted ballot selections,
+        /// and the ElementModQ `manifest_hash` also populated.
+        /// Specifically, the seed in this context is the hash of the Election Manifest,
+        /// or whatever `ElementModQ` was used to populate the `manifest_hash` field.
+        /// </summary>
+        bool isValidEncryption(const ElementModQ &manifestHash, const ElementModP &elgamalPublicKey,
                                const ElementModQ &cryptoExtendedBaseHash);
 
+        /// <summary>
+        /// A sufficiently random value used to seed the nonces on the ballot.
+        /// Can be generated by calling the static member nonceSeed(ElementModQ, std::string, ElementModQ)
+        /// </summary>
         std::unique_ptr<ElementModQ> nonceSeed();
 
         std::vector<uint8_t> toBson(bool withNonces = false) const;
@@ -483,7 +552,7 @@ namespace electionguard
         static std::unique_ptr<ElementModQ>
         makeCryptoHash(std::string objectId,
                        const std::vector<std::reference_wrapper<CiphertextBallotContest>> &contests,
-                       const ElementModQ &seedHash);
+                       const ElementModQ &manifestHash);
 
       private:
         class Impl;

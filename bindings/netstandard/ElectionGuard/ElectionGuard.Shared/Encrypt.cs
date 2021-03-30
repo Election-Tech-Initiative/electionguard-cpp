@@ -118,33 +118,33 @@ namespace ElectionGuard
     {
         public static unsafe CiphertextBallot Ballot(
             PlaintextBallot ballot,
-            InternalElectionDescription metadata,
+            InternalElectionDescription internalManifest,
             CiphertextElectionContext context,
-            ElementModQ seedHash,
+            ElementModQ ballotCodeSeed,
             ElementModQ nonce = null,
             bool verifyProofs = true)
         {
             if (nonce == null)
             {
                 var status = NativeInterface.Encrypt.Ballot(
-                    ballot.Handle, metadata.Handle, context.Handle,
-                    seedHash.Handle, verifyProofs,
+                    ballot.Handle, internalManifest.Handle, context.Handle,
+                    ballotCodeSeed.Handle, verifyProofs,
                     out NativeCiphertextBallot ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"Encrypt Error Status: {status}");
+                    Console.WriteLine($"Encrypt Ballot Error Status: {status}");
                 }
                 return new CiphertextBallot(ciphertext);
             }
             else
             {
                 var status = NativeInterface.Encrypt.Ballot(
-                    ballot.Handle, metadata.Handle, context.Handle,
-                    seedHash.Handle, nonce.Handle, verifyProofs,
+                    ballot.Handle, internalManifest.Handle, context.Handle,
+                    ballotCodeSeed.Handle, nonce.Handle, verifyProofs,
                     out NativeCiphertextBallot ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"EncryptWithNonce Error Status: {status}");
+                    Console.WriteLine($"EncryptWithNonce Ballot Error Status: {status}");
                 }
                 return new CiphertextBallot(ciphertext);
             }
@@ -152,19 +152,19 @@ namespace ElectionGuard
 
         public static unsafe CompactCiphertextBallot CompactBallot(
             PlaintextBallot ballot,
-            InternalElectionDescription metadata,
+            InternalElectionDescription internalManifest,
             CiphertextElectionContext context,
-            ElementModQ seedHash,
+            ElementModQ ballotCodeSeed,
             bool verifyProofs = true)
         {
 
             var status = NativeInterface.Encrypt.CompactBallot(
-                ballot.Handle, metadata.Handle, context.Handle,
-                seedHash.Handle, verifyProofs,
+                ballot.Handle, internalManifest.Handle, context.Handle,
+                ballotCodeSeed.Handle, verifyProofs,
                 out NativeCompactCiphertextBallot ciphertext);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"Encrypt Error Status: {status}");
+                Console.WriteLine($"Encrypt CompactBallot Error Status: {status}");
             }
             return new CompactCiphertextBallot(ciphertext);
         }

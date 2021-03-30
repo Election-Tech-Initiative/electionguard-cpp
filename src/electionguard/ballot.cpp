@@ -1,8 +1,8 @@
 #include "electionguard/ballot.hpp"
 
+#include "electionguard/ballot_code.hpp"
 #include "electionguard/election_object_base.hpp"
 #include "electionguard/hash.hpp"
-#include "electionguard/tracker.hpp"
 #include "log.hpp"
 #include "serialize.hpp"
 #include "utils.hpp"
@@ -18,7 +18,6 @@ using std::map;
 using std::ref;
 using std::reference_wrapper;
 using std::string;
-using std::time;
 using std::unique_ptr;
 using std::unordered_map;
 using std::vector;
@@ -318,12 +317,20 @@ namespace electionguard
     vector<reference_wrapper<PlaintextBallotSelection>>
     PlaintextBallotContest::getSelections() const
     {
-        vector<reference_wrapper<PlaintextBallotSelection>> selections;
-        selections.reserve(pimpl->selections.size());
+        // TODO: template
+        vector<reference_wrapper<PlaintextBallotSelection>> references;
+        references.reserve(pimpl->selections.size());
         for (auto &selection : pimpl->selections) {
-            selections.push_back(ref(*selection));
+            references.push_back(ref(*selection));
         }
-        return selections;
+
+        // TODO: when sequence order added
+        // sort(references.begin(), references.end(),
+        //      [](const reference_wrapper<PlaintextBallotSelection> left,
+        //         const reference_wrapper<PlaintextBallotSelection> right) {
+        //          return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+        //      });
+        return references;
     }
 
     // Public Functions
@@ -425,12 +432,19 @@ namespace electionguard
     vector<reference_wrapper<CiphertextBallotSelection>>
     CiphertextBallotContest::getSelections() const
     {
-        vector<reference_wrapper<CiphertextBallotSelection>> selections;
-        selections.reserve(pimpl->selections.size());
+        vector<reference_wrapper<CiphertextBallotSelection>> references;
+        references.reserve(pimpl->selections.size());
         for (const auto &selection : pimpl->selections) {
-            selections.push_back(ref(*selection));
+            references.push_back(ref(*selection));
         }
-        return selections;
+
+        // TODO: add sequence order to object
+        // sort(references.begin(), references.end(),
+        //      [](const reference_wrapper<CiphertextBallotSelection> left,
+        //         const reference_wrapper<CiphertextBallotSelection> right) {
+        //          return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+        //      });
+        return references;
     }
 
     ElementModQ *CiphertextBallotContest::getNonce() const { return pimpl->nonce.get(); }
@@ -621,12 +635,19 @@ namespace electionguard
 
     vector<reference_wrapper<PlaintextBallotContest>> PlaintextBallot::getContests() const
     {
-        vector<reference_wrapper<PlaintextBallotContest>> contests;
-        contests.reserve(pimpl->contests.size());
+        vector<reference_wrapper<PlaintextBallotContest>> references;
+        references.reserve(pimpl->contests.size());
         for (const auto &contest : pimpl->contests) {
-            contests.push_back(ref(*contest));
+            references.push_back(ref(*contest));
         }
-        return contests;
+
+        // TODO: add sequence order to object
+        // sort(references.begin(), references.end(),
+        //      [](const reference_wrapper<PlaintextBallotContest> left,
+        //         const reference_wrapper<PlaintextBallotContest> right) {
+        //          return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+        //      });
+        return references;
     }
 
     // Public Methods
@@ -664,22 +685,22 @@ namespace electionguard
 
     struct CiphertextBallot::Impl : public ElectionObjectBase {
         string ballotStyle;
-        unique_ptr<ElementModQ> descriptionHash;
-        unique_ptr<ElementModQ> previousTrackingHash;
+        unique_ptr<ElementModQ> manifestHash;
+        unique_ptr<ElementModQ> ballotCodeSeed;
         vector<unique_ptr<CiphertextBallotContest>> contests;
-        unique_ptr<ElementModQ> trackingHash;
+        unique_ptr<ElementModQ> ballotCode;
         uint64_t timestamp;
         unique_ptr<ElementModQ> nonce;
         unique_ptr<ElementModQ> cryptoHash;
 
         Impl(const string &objectId, const string &ballotStyle,
-             unique_ptr<ElementModQ> descriptionHash, unique_ptr<ElementModQ> previousTrackingHash,
+             unique_ptr<ElementModQ> manifestHash, unique_ptr<ElementModQ> ballotCodeSeed,
              vector<unique_ptr<CiphertextBallotContest>> contests,
-             unique_ptr<ElementModQ> trackingHash, const uint64_t timestamp,
+             unique_ptr<ElementModQ> ballotCode, const uint64_t timestamp,
              unique_ptr<ElementModQ> nonce, unique_ptr<ElementModQ> cryptoHash)
-            : descriptionHash(move(descriptionHash)),
-              previousTrackingHash(move(previousTrackingHash)), contests(move(contests)),
-              trackingHash(move(trackingHash)), nonce(move(nonce)), cryptoHash(move(cryptoHash))
+            : manifestHash(move(manifestHash)), ballotCodeSeed(move(ballotCodeSeed)),
+              contests(move(contests)), ballotCode(move(ballotCode)), nonce(move(nonce)),
+              cryptoHash(move(cryptoHash))
         {
             this->object_id = objectId;
             this->ballotStyle = ballotStyle;
@@ -690,14 +711,14 @@ namespace electionguard
     // Lifecycle Methods
 
     CiphertextBallot::CiphertextBallot(const string &objectId, const string &ballotStyle,
-                                       const ElementModQ &descriptionHash,
-                                       unique_ptr<ElementModQ> previousTrackingHash,
+                                       const ElementModQ &manifestHash,
+                                       unique_ptr<ElementModQ> ballotCodeSeed,
                                        vector<unique_ptr<CiphertextBallotContest>> contests,
-                                       unique_ptr<ElementModQ> trackingHash,
-                                       const uint64_t timestamp, unique_ptr<ElementModQ> nonce,
+                                       unique_ptr<ElementModQ> ballotCode, const uint64_t timestamp,
+                                       unique_ptr<ElementModQ> nonce,
                                        unique_ptr<ElementModQ> cryptoHash)
-        : pimpl(new Impl(objectId, ballotStyle, make_unique<ElementModQ>(descriptionHash),
-                         move(previousTrackingHash), move(contests), move(trackingHash), timestamp,
+        : pimpl(new Impl(objectId, ballotStyle, make_unique<ElementModQ>(manifestHash),
+                         move(ballotCodeSeed), move(contests), move(ballotCode), timestamp,
                          move(nonce), move(cryptoHash)))
     {
     }
@@ -713,27 +734,28 @@ namespace electionguard
 
     string CiphertextBallot::getObjectId() const { return pimpl->object_id; }
     string CiphertextBallot::getBallotStyle() const { return pimpl->ballotStyle; }
-    ElementModQ *CiphertextBallot::getDescriptionHash() const
-    {
-        return pimpl->descriptionHash.get();
-    }
-    ElementModQ *CiphertextBallot::getPreviousTrackingHash() const
-    {
-        return pimpl->previousTrackingHash.get();
-    }
+    ElementModQ *CiphertextBallot::getManifestHash() const { return pimpl->manifestHash.get(); }
+    ElementModQ *CiphertextBallot::getBallotCodeSeed() const { return pimpl->ballotCodeSeed.get(); }
 
     vector<reference_wrapper<CiphertextBallotContest>> CiphertextBallot::getContests() const
     {
         // TODO: templatize this pattern
-        vector<reference_wrapper<CiphertextBallotContest>> contests;
-        contests.reserve(pimpl->contests.size());
+        vector<reference_wrapper<CiphertextBallotContest>> references;
+        references.reserve(pimpl->contests.size());
         for (const auto &contest : pimpl->contests) {
-            contests.push_back(ref(*contest));
+            references.push_back(ref(*contest));
         }
-        return contests;
+
+        // TODO: add sequence order to object
+        // sort(references.begin(), references.end(),
+        //      [](const reference_wrapper<CiphertextBallotContest> left,
+        //         const reference_wrapper<CiphertextBallotContest> right) {
+        //          return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+        //      });
+        return references;
     }
 
-    ElementModQ *CiphertextBallot::getTrackingHash() const { return pimpl->trackingHash.get(); }
+    ElementModQ *CiphertextBallot::getBallotCode() const { return pimpl->ballotCode.get(); }
 
     uint64_t CiphertextBallot::getTimestamp() const { return pimpl->timestamp; }
 
@@ -743,19 +765,20 @@ namespace electionguard
 
     // Interface Overrides
 
-    unique_ptr<ElementModQ> CiphertextBallot::crypto_hash_with(const ElementModQ &seedHash) const
+    unique_ptr<ElementModQ>
+    CiphertextBallot::crypto_hash_with(const ElementModQ &manifestHash) const
     {
-        return makeCryptoHash(pimpl->object_id, this->getContests(), seedHash);
+        return makeCryptoHash(pimpl->object_id, this->getContests(), manifestHash);
     }
 
     // Public Static Methods
 
     unique_ptr<CiphertextBallot> CiphertextBallot::make(
-      const string &objectId, const string &ballotStyle, const ElementModQ &descriptionHash,
+      const string &objectId, const string &ballotStyle, const ElementModQ &manifestHash,
       vector<unique_ptr<CiphertextBallotContest>> contests,
       unique_ptr<ElementModQ> nonce /* = nullptr */, const uint64_t timestamp /* = 0 */,
-      unique_ptr<ElementModQ> previousTrackingHash /* = nullptr */,
-      unique_ptr<ElementModQ> trackingHash /* = nullptr */)
+      unique_ptr<ElementModQ> ballotCodeSeed /* = nullptr */,
+      unique_ptr<ElementModQ> ballotCode /* = nullptr */)
     {
         if (contests.empty()) {
             Log::debug(":ballot must have at least some contests");
@@ -768,45 +791,46 @@ namespace electionguard
             contestsRefs.push_back(ref(*contest));
         }
 
-        auto cryptoHash = makeCryptoHash(objectId, contestsRefs, descriptionHash);
-        auto ballotTimestamp = timestamp == 0 ? time(nullptr) : timestamp;
-        if (!previousTrackingHash) {
-            auto previous = make_unique<ElementModQ>(descriptionHash);
-            previousTrackingHash = move(previous);
+        auto cryptoHash = makeCryptoHash(objectId, contestsRefs, manifestHash);
+        auto ballotTimestamp = timestamp == 0 ? getSystemTimestamp() : timestamp;
+        if (!ballotCodeSeed) {
+            // if there is no ballotCodeSeed, default to using the manifest
+            auto previous = make_unique<ElementModQ>(manifestHash);
+            ballotCodeSeed = move(previous);
         }
 
-        if (!trackingHash) {
+        if (!ballotCode) {
             auto tracking =
-              Tracker::getRotatingTrackerHash(*previousTrackingHash, ballotTimestamp, *cryptoHash);
-            trackingHash.swap(tracking);
+              BallotCode::getRotatingBallotCode(*ballotCodeSeed, ballotTimestamp, *cryptoHash);
+            ballotCode.swap(tracking);
         }
 
-        return make_unique<CiphertextBallot>(
-          objectId, ballotStyle, descriptionHash, move(previousTrackingHash), move(contests),
-          move(trackingHash), ballotTimestamp, move(nonce), move(cryptoHash));
+        return make_unique<CiphertextBallot>(objectId, ballotStyle, manifestHash,
+                                             move(ballotCodeSeed), move(contests), move(ballotCode),
+                                             ballotTimestamp, move(nonce), move(cryptoHash));
     }
 
-    unique_ptr<ElementModQ> CiphertextBallot::nonceSeed(const ElementModQ &descriptionHash,
+    unique_ptr<ElementModQ> CiphertextBallot::nonceSeed(const ElementModQ &manifestHash,
                                                         const string &objectId,
                                                         const ElementModQ &nonce)
     {
-        return hash_elems({ref(descriptionHash), objectId, ref(nonce)});
+        return hash_elems({ref(manifestHash), objectId, ref(nonce)});
     }
 
     // Public Methods
 
-    bool CiphertextBallot::isValidEncryption(const ElementModQ &seedHash,
+    bool CiphertextBallot::isValidEncryption(const ElementModQ &manifestHash,
                                              const ElementModP &elgamalPublicKey,
                                              const ElementModQ &cryptoExtendedBaseHash)
     {
-        if ((const_cast<ElementModQ &>(seedHash) != *pimpl->descriptionHash)) {
-            Log::debug(": CiphertextBallot mismatching ballot hash: ");
-            Log::debugHex(": expected: ", seedHash.toHex());
-            Log::debugHex(": actual: ", pimpl->descriptionHash->toHex());
+        if ((const_cast<ElementModQ &>(manifestHash) != *pimpl->manifestHash)) {
+            Log::debug(": CiphertextBallot mismatching manifestHash: ");
+            Log::debugHex(": expected: ", manifestHash.toHex());
+            Log::debugHex(": actual: ", pimpl->manifestHash->toHex());
             return false;
         }
 
-        auto recalculatedCryptoHash = crypto_hash_with(seedHash);
+        auto recalculatedCryptoHash = crypto_hash_with(manifestHash);
         if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
             Log::debug(": CiphertextBallot mismatching crypto hash: ");
             Log::debugHex(": expected: ", recalculatedCryptoHash->toHex());
@@ -840,7 +864,7 @@ namespace electionguard
 
     unique_ptr<ElementModQ> CiphertextBallot::nonceSeed()
     {
-        return nonceSeed(*pimpl->descriptionHash, pimpl->object_id, *pimpl->nonce);
+        return nonceSeed(*pimpl->manifestHash, pimpl->object_id, *pimpl->nonce);
     }
 
     vector<uint8_t> CiphertextBallot::toBson(bool withNonces /* = false */) const
@@ -877,14 +901,14 @@ namespace electionguard
 
     unique_ptr<ElementModQ> CiphertextBallot::makeCryptoHash(
       string objectId, const vector<reference_wrapper<CiphertextBallotContest>> &contests,
-      const ElementModQ &seedHash)
+      const ElementModQ &manifestHash)
     {
         if (contests.empty()) {
             throw invalid_argument("mismatching contests state for " + objectId +
                                    "expected(some) actual(none)");
         }
 
-        vector<CryptoHashableType> elems = {objectId, &const_cast<ElementModQ &>(seedHash)};
+        vector<CryptoHashableType> elems = {objectId, &const_cast<ElementModQ &>(manifestHash)};
         for (const auto &contest : contests) {
             elems.emplace_back(ref(*contest.get().getCryptoHash()));
         }

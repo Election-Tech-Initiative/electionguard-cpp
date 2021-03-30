@@ -46,6 +46,16 @@ typedef struct eg_contest_description_s eg_contest_description_t;
 
 #endif
 
+#ifndef ConstestDescriptionWithPlaceholders
+
+struct eg_contest_description_with_placeholders_s;
+typedef struct eg_contest_description_with_placeholders_s
+  eg_contest_description_with_placeholders_t;
+
+// TODO: ISSUE #129: implement
+
+#endif
+
 #ifndef ElectionDescription
 
 struct eg_election_description_s;
