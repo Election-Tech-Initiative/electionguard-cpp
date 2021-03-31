@@ -605,22 +605,22 @@ namespace electionguard
 #pragma region PlaintextBallot
 
     struct PlaintextBallot::Impl : public ElectionObjectBase {
-        string ballotStyle;
+        string styleId;
         vector<unique_ptr<PlaintextBallotContest>> contests;
-        Impl(const string &objectId, const string &ballotStyle,
+        Impl(const string &objectId, const string &styleId,
              vector<unique_ptr<PlaintextBallotContest>> contests)
             : contests(move(contests))
         {
             this->object_id = objectId;
-            this->ballotStyle = ballotStyle;
+            this->styleId = styleId;
         }
     };
 
     // Lifecycle Methods
 
-    PlaintextBallot::PlaintextBallot(const string &objectId, const string &ballotStyle,
+    PlaintextBallot::PlaintextBallot(const string &objectId, const string &styleId,
                                      vector<unique_ptr<PlaintextBallotContest>> contests)
-        : pimpl(new Impl(objectId, ballotStyle, move(contests)))
+        : pimpl(new Impl(objectId, styleId, move(contests)))
     {
     }
     PlaintextBallot::~PlaintextBallot() = default;
@@ -634,7 +634,7 @@ namespace electionguard
     // Property Getters
 
     string PlaintextBallot::getObjectId() const { return pimpl->object_id; }
-    string PlaintextBallot::getBallotStyle() const { return pimpl->ballotStyle; }
+    string PlaintextBallot::getStyleId() const { return pimpl->styleId; }
 
     vector<reference_wrapper<PlaintextBallotContest>> PlaintextBallot::getContests() const
     {
@@ -687,7 +687,7 @@ namespace electionguard
 #pragma region CiphertextBallot
 
     struct CiphertextBallot::Impl : public ElectionObjectBase {
-        string ballotStyle;
+        string styleId;
         unique_ptr<ElementModQ> manifestHash;
         unique_ptr<ElementModQ> ballotCodeSeed;
         vector<unique_ptr<CiphertextBallotContest>> contests;
@@ -696,8 +696,8 @@ namespace electionguard
         unique_ptr<ElementModQ> nonce;
         unique_ptr<ElementModQ> cryptoHash;
 
-        Impl(const string &objectId, const string &ballotStyle,
-             unique_ptr<ElementModQ> manifestHash, unique_ptr<ElementModQ> ballotCodeSeed,
+        Impl(const string &objectId, const string &styleId, unique_ptr<ElementModQ> manifestHash,
+             unique_ptr<ElementModQ> ballotCodeSeed,
              vector<unique_ptr<CiphertextBallotContest>> contests,
              unique_ptr<ElementModQ> ballotCode, const uint64_t timestamp,
              unique_ptr<ElementModQ> nonce, unique_ptr<ElementModQ> cryptoHash)
@@ -706,21 +706,21 @@ namespace electionguard
               cryptoHash(move(cryptoHash))
         {
             this->object_id = objectId;
-            this->ballotStyle = ballotStyle;
+            this->styleId = styleId;
             this->timestamp = timestamp;
         }
     };
 
     // Lifecycle Methods
 
-    CiphertextBallot::CiphertextBallot(const string &objectId, const string &ballotStyle,
+    CiphertextBallot::CiphertextBallot(const string &objectId, const string &styleId,
                                        const ElementModQ &manifestHash,
                                        unique_ptr<ElementModQ> ballotCodeSeed,
                                        vector<unique_ptr<CiphertextBallotContest>> contests,
                                        unique_ptr<ElementModQ> ballotCode, const uint64_t timestamp,
                                        unique_ptr<ElementModQ> nonce,
                                        unique_ptr<ElementModQ> cryptoHash)
-        : pimpl(new Impl(objectId, ballotStyle, make_unique<ElementModQ>(manifestHash),
+        : pimpl(new Impl(objectId, styleId, make_unique<ElementModQ>(manifestHash),
                          move(ballotCodeSeed), move(contests), move(ballotCode), timestamp,
                          move(nonce), move(cryptoHash)))
     {
@@ -736,7 +736,7 @@ namespace electionguard
     // Property Getters
 
     string CiphertextBallot::getObjectId() const { return pimpl->object_id; }
-    string CiphertextBallot::getBallotStyle() const { return pimpl->ballotStyle; }
+    string CiphertextBallot::getStyleId() const { return pimpl->styleId; }
     ElementModQ *CiphertextBallot::getManifestHash() const { return pimpl->manifestHash.get(); }
     ElementModQ *CiphertextBallot::getBallotCodeSeed() const { return pimpl->ballotCodeSeed.get(); }
 
@@ -777,7 +777,7 @@ namespace electionguard
     // Public Static Methods
 
     unique_ptr<CiphertextBallot> CiphertextBallot::make(
-      const string &objectId, const string &ballotStyle, const ElementModQ &manifestHash,
+      const string &objectId, const string &styleId, const ElementModQ &manifestHash,
       vector<unique_ptr<CiphertextBallotContest>> contests,
       unique_ptr<ElementModQ> nonce /* = nullptr */, const uint64_t timestamp /* = 0 */,
       unique_ptr<ElementModQ> ballotCodeSeed /* = nullptr */,
@@ -808,9 +808,9 @@ namespace electionguard
             ballotCode.swap(_ballotCode);
         }
 
-        return make_unique<CiphertextBallot>(objectId, ballotStyle, manifestHash,
-                                             move(ballotCodeSeed), move(contests), move(ballotCode),
-                                             ballotTimestamp, move(nonce), move(cryptoHash));
+        return make_unique<CiphertextBallot>(objectId, styleId, manifestHash, move(ballotCodeSeed),
+                                             move(contests), move(ballotCode), ballotTimestamp,
+                                             move(nonce), move(cryptoHash));
     }
 
     unique_ptr<ElementModQ> CiphertextBallot::nonceSeed(const ElementModQ &manifestHash,

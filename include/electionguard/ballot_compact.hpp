@@ -37,7 +37,7 @@ namespace electionguard
       public:
         CompactPlaintextBallot(const CompactPlaintextBallot &other);
         CompactPlaintextBallot(const CompactPlaintextBallot &&other);
-        CompactPlaintextBallot(const std::string &objectId, const std::string &ballotStyle,
+        CompactPlaintextBallot(const std::string &objectId, const std::string &styleId,
                                std::vector<uint64_t> selections,
                                std::map<uint64_t, std::unique_ptr<ExtendedData>> extendedData);
         ~CompactPlaintextBallot();
@@ -46,7 +46,7 @@ namespace electionguard
         CompactPlaintextBallot &operator=(CompactPlaintextBallot &&other);
 
         std::string getObjectId() const;
-        std::string getBallotStyle() const;
+        std::string getStyleId() const;
 
         std::vector<uint64_t> getSelections() const;
         std::map<uint64_t, std::reference_wrapper<ExtendedData>> getExtendedData() const;

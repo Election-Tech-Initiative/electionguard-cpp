@@ -492,15 +492,15 @@ namespace ElectionGuard
             }
         }
 
-        public unsafe string BallotStyle
+        public unsafe string StyleId
         {
             get
             {
-                var status = NativeInterface.PlaintextBallot.GetBallotStyle(
+                var status = NativeInterface.PlaintextBallot.GetStyleId(
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"PlaintextBallot Error BallotStyle: {status}");
+                    Console.WriteLine($"PlaintextBallot Error StyleId: {status}");
                     return null;
                 }
                 return Marshal.PtrToStringAnsi(value);
@@ -533,7 +533,7 @@ namespace ElectionGuard
                 Handle, index, out NativePlaintextBallotContest value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"PlaintextBallot Error BallotStyle: {status}");
+                Console.WriteLine($"PlaintextBallot Error GetContestAt: {status}");
                 return null;
             }
             return new PlaintextBallotContest(value);
@@ -661,15 +661,15 @@ namespace ElectionGuard
             }
         }
 
-        public unsafe string BallotStyle
+        public unsafe string StyleId
         {
             get
             {
-                var status = NativeInterface.CiphertextBallot.GetBallotStyle(
+                var status = NativeInterface.CiphertextBallot.GetStyleId(
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error BallotStyle: {status}");
+                    Console.WriteLine($"CiphertextBallot Error StyleId: {status}");
                     return null;
                 }
                 return Marshal.PtrToStringAnsi(value);

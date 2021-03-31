@@ -30,25 +30,25 @@ namespace electionguard
 #pragma region CompactPlaintextBallot
 
     struct CompactPlaintextBallot::Impl : public ElectionObjectBase {
-        string ballotStyle;
+        string styleId;
         vector<uint64_t> selections;
         map<uint64_t, unique_ptr<ExtendedData>> extendedData;
 
-        Impl(const string &objectId, const string &ballotStyle, vector<uint64_t> selections,
+        Impl(const string &objectId, const string &styleId, vector<uint64_t> selections,
              map<uint64_t, unique_ptr<ExtendedData>> extendedData)
             : selections(move(selections)), extendedData(move(extendedData))
         {
             this->object_id = objectId;
-            this->ballotStyle = ballotStyle;
+            this->styleId = styleId;
         }
     };
 
     // Lifecycle Methods
 
     CompactPlaintextBallot::CompactPlaintextBallot(
-      const string &objectId, const string &ballotStyle, vector<uint64_t> selections,
+      const string &objectId, const string &styleId, vector<uint64_t> selections,
       map<uint64_t, unique_ptr<ExtendedData>> extendedData)
-        : pimpl(new Impl(objectId, ballotStyle, move(selections), move(extendedData)))
+        : pimpl(new Impl(objectId, styleId, move(selections), move(extendedData)))
     {
     }
     CompactPlaintextBallot::~CompactPlaintextBallot() = default;
@@ -62,7 +62,7 @@ namespace electionguard
     // Property Getters
 
     string CompactPlaintextBallot::getObjectId() const { return pimpl->object_id; }
-    string CompactPlaintextBallot::getBallotStyle() const { return pimpl->ballotStyle; }
+    string CompactPlaintextBallot::getStyleId() const { return pimpl->styleId; }
 
     vector<uint64_t> CompactPlaintextBallot::getSelections() const { return pimpl->selections; }
     map<uint64_t, reference_wrapper<ExtendedData>> CompactPlaintextBallot::getExtendedData() const
@@ -259,9 +259,8 @@ namespace electionguard
             }
         }
 
-        return make_unique<CompactPlaintextBallot>(plaintext.getObjectId(),
-                                                   plaintext.getBallotStyle(), move(selections),
-                                                   move(extendedData));
+        return make_unique<CompactPlaintextBallot>(plaintext.getObjectId(), plaintext.getStyleId(),
+                                                   move(selections), move(extendedData));
     }
 
     unique_ptr<CompactCiphertextBallot> compressCiphertextBallot(const PlaintextBallot &plaintext,
@@ -299,7 +298,7 @@ namespace electionguard
         uint64_t index = 0;
 
         // Get the ballot style and iterate through the contests for that style
-        for (const auto &contest : metadata.getContestsFor(compactBallot.getBallotStyle())) {
+        for (const auto &contest : metadata.getContestsFor(compactBallot.getStyleId())) {
             vector<unique_ptr<PlaintextBallotSelection>> selections;
 
             // Iterate through the selections on the contest and expand each selection
@@ -318,8 +317,8 @@ namespace electionguard
               make_unique<PlaintextBallotContest>(contest.get().getObjectId(), move(selections)));
         }
 
-        return make_unique<PlaintextBallot>(compactBallot.getObjectId(),
-                                            compactBallot.getBallotStyle(), move(contests));
+        return make_unique<PlaintextBallot>(compactBallot.getObjectId(), compactBallot.getStyleId(),
+                                            move(contests));
     }
 
     unique_ptr<CiphertextBallot>

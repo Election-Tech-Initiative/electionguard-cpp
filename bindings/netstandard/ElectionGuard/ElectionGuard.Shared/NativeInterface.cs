@@ -708,9 +708,9 @@ namespace ElectionGuard
             internal static extern Status GetObjectId(
                 PlaintextBallotHandle handle, out IntPtr object_id);
 
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_ballot_style")]
-            internal static extern Status GetBallotStyle(
-                PlaintextBallotHandle handle, out IntPtr ballot_style);
+            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_style_id")]
+            internal static extern Status GetStyleId(
+                PlaintextBallotHandle handle, out IntPtr style_id);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_contests_size")]
             internal static extern ulong GetContestsSize(PlaintextBallotHandle handle);
@@ -805,9 +805,9 @@ namespace ElectionGuard
             internal static extern Status GetObjectId(
                 CiphertextBallotHandle handle, out IntPtr object_id);
 
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_ballot_style")]
-            internal static extern Status GetBallotStyle(
-                CiphertextBallotHandle handle, out IntPtr ballot_style);
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_style_id")]
+            internal static extern Status GetStyleId(
+                CiphertextBallotHandle handle, out IntPtr style_id);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_manifest_hash")]
             internal static extern Status GetManifestHash(

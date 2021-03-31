@@ -783,7 +783,7 @@ namespace electionguard
                 }
 
                 json result = {{"object_id", serializable.getObjectId()},
-                               {"ballot_style", serializable.getBallotStyle()},
+                               {"style_id", serializable.getStyleId()},
                                {"contests", contests}};
                 return result;
             }
@@ -791,7 +791,7 @@ namespace electionguard
             {
 
                 auto object_id = j["object_id"].get<string>();
-                auto ballot_style = j["ballot_style"].get<string>();
+                auto style_id = j["style_id"].get<string>();
 
                 auto contests = j["contests"];
 
@@ -824,7 +824,7 @@ namespace electionguard
                       contest_object_id, move(plaintextSelections)));
                 }
 
-                return make_unique<electionguard::PlaintextBallot>(object_id, ballot_style,
+                return make_unique<electionguard::PlaintextBallot>(object_id, style_id,
                                                                    move(plaintextContests));
             }
 
@@ -872,7 +872,7 @@ namespace electionguard
                 }
 
                 json result = {{"object_id", serializable.getObjectId()},
-                               {"ballot_style", serializable.getBallotStyle()},
+                               {"style_id", serializable.getStyleId()},
                                {"selections", selections},
                                {"extended_data", extendedData}};
                 return result;
@@ -880,7 +880,7 @@ namespace electionguard
             static unique_ptr<electionguard::CompactPlaintextBallot> toObject(json j)
             {
                 auto object_id = j["object_id"].get<string>();
-                auto ballot_style = j["ballot_style"].get<string>();
+                auto style_id = j["style_id"].get<string>();
 
                 auto selections = j["selections"];
 
@@ -902,7 +902,7 @@ namespace electionguard
                 }
 
                 return make_unique<electionguard::CompactPlaintextBallot>(
-                  object_id, ballot_style, move(selections), move(extendedDataMap));
+                  object_id, style_id, move(selections), move(extendedDataMap));
             }
 
           public:
@@ -1002,7 +1002,7 @@ namespace electionguard
                 }
                 json result = {
                   {"object_id", serializable.getObjectId()},
-                  {"ballot_style", serializable.getBallotStyle()},
+                  {"style_id", serializable.getStyleId()},
                   {"manifest_hash", serializable.getManifestHash()->toHex()},
                   {"ballot_code_seed", serializable.getBallotCodeSeed()->toHex()},
                   {"contests", contests},
@@ -1018,7 +1018,7 @@ namespace electionguard
             static unique_ptr<electionguard::CiphertextBallot> toObject(json j)
             {
                 auto object_id = j["object_id"].get<string>();
-                auto ballot_style = j["ballot_style"].get<string>();
+                auto style_id = j["style_id"].get<string>();
                 auto manifest_hash = j["manifest_hash"].get<string>();
                 auto ballot_code_seed = j["ballot_code_seed"].get<string>();
                 auto ballot_code = j["ballot_code"].get<string>();
@@ -1138,7 +1138,7 @@ namespace electionguard
                                                   : ElementModQ::fromHex(ballot_nonce);
 
                 return make_unique<electionguard::CiphertextBallot>(
-                  object_id, ballot_style, *ElementModQ::fromHex(manifest_hash),
+                  object_id, style_id, *ElementModQ::fromHex(manifest_hash),
                   ElementModQ::fromHex(ballot_code_seed), move(ciphertextContests),
                   ElementModQ::fromHex(ballot_code), timestamp, move(nonce),
                   ElementModQ::fromHex(crypto_hash));

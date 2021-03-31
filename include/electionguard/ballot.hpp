@@ -393,7 +393,7 @@ namespace electionguard
       public:
         PlaintextBallot(const PlaintextBallot &other);
         PlaintextBallot(const PlaintextBallot &&other);
-        PlaintextBallot(const std::string &objectId, const std::string &ballotStyle,
+        PlaintextBallot(const std::string &objectId, const std::string &styleId,
                         std::vector<std::unique_ptr<PlaintextBallotContest>> contests);
         ~PlaintextBallot();
 
@@ -401,7 +401,7 @@ namespace electionguard
         PlaintextBallot &operator=(PlaintextBallot &&other);
 
         std::string getObjectId() const;
-        std::string getBallotStyle() const;
+        std::string getStyleId() const;
 
         std::vector<std::reference_wrapper<PlaintextBallotContest>> getContests() const;
 
@@ -432,7 +432,7 @@ namespace electionguard
       public:
         CiphertextBallot(const CiphertextBallot &other);
         CiphertextBallot(const CiphertextBallot &&other);
-        CiphertextBallot(const std::string &objectId, const std::string &ballotStyle,
+        CiphertextBallot(const std::string &objectId, const std::string &styleId,
                          const ElementModQ &manifestHash,
                          std::unique_ptr<ElementModQ> ballotCodeSeed,
                          std::vector<std::unique_ptr<CiphertextBallotContest>> contests,
@@ -451,9 +451,9 @@ namespace electionguard
         std::string getObjectId() const;
 
         /// <summary>
-        /// The `object_id` of the `BallotStyle` in the `Election` Manifest
+        /// The `object_id` of the `StyleId` in the `Election` Manifest
         /// </summary>
-        std::string getBallotStyle() const;
+        std::string getStyleId() const;
 
         /// <summary>
         /// Hash of the election manifest to which this ballot belongs
@@ -503,7 +503,7 @@ namespace electionguard
         /// Makes a `CiphertextBallot`, initially in the state where it's neither been cast nor spoiled.
         ///
         /// <param name="objectId"> the object_id of this specific ballot</param>
-        /// <param name="ballotStyle"> The `object_id` of the `BallotStyle` in the `Election` Manifest</param>
+        /// <param name="styleId"> The `object_id` of the `StyleId` in the `Election` Manifest</param>
         /// <param name="manifestHash"> Hash of the election manifest</param>
         /// <param name="nonce"> optional nonce used as part of the encryption process</param>
         /// <param name="contests"> List of contests for this ballot</param>
@@ -513,7 +513,7 @@ namespace electionguard
         ///                           Will use the manifestHash if none provided</param>
         /// </summary>
         static std::unique_ptr<CiphertextBallot>
-        make(const std::string &objectId, const std::string &ballotStyle,
+        make(const std::string &objectId, const std::string &styleId,
              const ElementModQ &manifestHash,
              std::vector<std::unique_ptr<CiphertextBallotContest>> contests,
              std::unique_ptr<ElementModQ> nonce = nullptr, const uint64_t timestamp = 0,

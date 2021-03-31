@@ -326,8 +326,8 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t 
 EG_API eg_electionguard_status_t eg_plaintext_ballot_get_object_id(eg_plaintext_ballot_t *handle,
                                                                    char **out_object_id);
 
-EG_API eg_electionguard_status_t eg_plaintext_ballot_get_ballot_style(eg_plaintext_ballot_t *handle,
-                                                                      char **out_ballot_style);
+EG_API eg_electionguard_status_t eg_plaintext_ballot_get_style_id(eg_plaintext_ballot_t *handle,
+                                                                  char **out_style_id);
 
 EG_API size_t eg_plaintext_ballot_get_contests_size(eg_plaintext_ballot_t *handle);
 
@@ -366,8 +366,8 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_free(eg_ciphertext_ballot_
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_object_id(eg_ciphertext_ballot_t *handle,
                                                                     char **out_object_id);
 
-EG_API eg_electionguard_status_t
-eg_ciphertext_ballot_get_ballot_style(eg_ciphertext_ballot_t *handle, char **out_ballot_style);
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_style_id(eg_ciphertext_ballot_t *handle,
+                                                                   char **out_style_id);
 
 /**
  * Hash of the election manifest

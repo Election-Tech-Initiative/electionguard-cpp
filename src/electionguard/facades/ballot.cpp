@@ -386,16 +386,16 @@ eg_electionguard_status_t eg_plaintext_ballot_get_object_id(eg_plaintext_ballot_
     }
 }
 
-eg_electionguard_status_t eg_plaintext_ballot_get_ballot_style(eg_plaintext_ballot_t *handle,
-                                                               char **out_ballot_style)
+eg_electionguard_status_t eg_plaintext_ballot_get_style_id(eg_plaintext_ballot_t *handle,
+                                                           char **out_style_id)
 {
     try {
-        auto ballotStyle = AS_TYPE(PlaintextBallot, handle)->getBallotStyle();
-        *out_ballot_style = dynamicCopy(ballotStyle);
+        auto ballotStyle = AS_TYPE(PlaintextBallot, handle)->getStyleId();
+        *out_style_id = dynamicCopy(ballotStyle);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_plaintext_ballot_get_ballot_style", e);
+        Log::error(": eg_plaintext_ballot_get_style_id", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -517,16 +517,16 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_object_id(eg_ciphertext_ballo
     }
 }
 
-eg_electionguard_status_t eg_ciphertext_ballot_get_ballot_style(eg_ciphertext_ballot_t *handle,
-                                                                char **out_ballot_style)
+eg_electionguard_status_t eg_ciphertext_ballot_get_style_id(eg_ciphertext_ballot_t *handle,
+                                                            char **out_style_id)
 {
     try {
-        auto ballotStyle = AS_TYPE(CiphertextBallot, handle)->getBallotStyle();
-        *out_ballot_style = dynamicCopy(ballotStyle);
+        auto ballotStyle = AS_TYPE(CiphertextBallot, handle)->getStyleId();
+        *out_style_id = dynamicCopy(ballotStyle);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_ciphertext_ballot_get_ballot_style", e);
+        Log::error(": eg_ciphertext_ballot_get_style_id", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }

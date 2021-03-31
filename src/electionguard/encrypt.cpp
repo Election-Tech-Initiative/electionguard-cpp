@@ -199,7 +199,7 @@ namespace electionguard
     unique_ptr<PlaintextBallot> emplaceMissingValues(const PlaintextBallot &ballot,
                                                      const InternalElectionDescription &metadata)
     {
-        auto *style = metadata.getBallotStyle(ballot.getBallotStyle());
+        auto *style = metadata.getBallotStyle(ballot.getStyleId());
 
         vector<unique_ptr<PlaintextBallotContest>> contests;
         // loop through the contests for the ballot style
@@ -218,7 +218,7 @@ namespace electionguard
                 contests.push_back(contestFrom(description));
             }
         }
-        return make_unique<PlaintextBallot>(ballot.getObjectId(), ballot.getBallotStyle(),
+        return make_unique<PlaintextBallot>(ballot.getObjectId(), ballot.getStyleId(),
                                             move(contests));
     }
 
@@ -397,7 +397,7 @@ namespace electionguard
                     const CiphertextElectionContext &context, const ElementModQ &nonceSeed,
                     bool shouldVerifyProofs /* = true */)
     {
-        auto *style = internalManifest.getBallotStyle(ballot.getBallotStyle());
+        auto *style = internalManifest.getBallotStyle(ballot.getStyleId());
         vector<unique_ptr<CiphertextBallotContest>> encryptedContests;
         auto normalizedBallot = emplaceMissingValues(ballot, internalManifest);
 
@@ -432,11 +432,11 @@ namespace electionguard
                                                uint64_t timestamp /* = 0 */,
                                                bool shouldVerifyProofs /* = true */)
     {
-        auto *style = internalManifest.getBallotStyle(ballot.getBallotStyle());
+        auto *style = internalManifest.getBallotStyle(ballot.getStyleId());
 
         // Validate Input
         if (style == nullptr) {
-            throw runtime_error("could not find a ballot style: " + ballot.getBallotStyle());
+            throw runtime_error("could not find a ballot style: " + ballot.getStyleId());
         }
 
         // Generate a random seed nonce to use for the contest and selection nonce's on the ballot
@@ -464,7 +464,7 @@ namespace electionguard
 
         // make the Ciphertext Ballot object
         auto encryptedBallot = CiphertextBallot::make(
-          ballot.getObjectId(), ballot.getBallotStyle(), *internalManifest.getDescriptionHash(),
+          ballot.getObjectId(), ballot.getStyleId(), *internalManifest.getDescriptionHash(),
           move(encryptedContests), move(nonce), timestamp, make_unique<ElementModQ>(ballotCodeSeed),
           nullptr);
 
