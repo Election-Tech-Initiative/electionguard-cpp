@@ -7,7 +7,19 @@ namespace ElectionGuard
     using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotHandle;
     using NativeCompactCiphertextBallot = NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle;
 
-    public class EncryptionDevice: DisposableBase
+    /// <summary>
+    /// Metadata for encryption device
+    ///
+    /// The encryption device is a stateful container that represents abstract hardware
+    /// authorized to participate in a specific election.
+    ///
+    /// <param name="deviceUuid">a unique identifier tied to the device hardware</param>
+    /// <param name="sessionUuid">a unique identifier tied to the runtime session</param>
+    /// <param name="launchCode">a unique identifer tied to the election</param>
+    /// <param name="location">an arbitrary string meaningful to the external system
+    ///                        such as a friendly name, description, or some other value</param>
+    /// </summary>
+    public class EncryptionDevice : DisposableBase
     {
         internal unsafe NativeEncryptionDevice Handle;
 
@@ -35,7 +47,16 @@ namespace ElectionGuard
         }
     }
 
-    public class EncryptionMediator: DisposableBase
+    /// <summary>
+    /// An object for caching election and encryption state.
+    ///
+    /// the encryption mediator composes ballots by querying the encryption device
+    /// for a hash of its metadata and incremental timestamps/
+    ///
+    /// this is a convenience wrapper around the encrypt methods
+    /// and may not be suitable for all use cases.
+    /// </summary>
+    public class EncryptionMediator : DisposableBase
     {
         internal unsafe NativeEncryptionMediator Handle;
 
@@ -52,6 +73,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Encrypt the specified ballot using the cached election context.
+        /// </summary>
         public unsafe CiphertextBallot Encrypt(
             PlaintextBallot plaintext, bool verifyProofs = false)
         {
@@ -75,9 +99,12 @@ namespace ElectionGuard
                 }
                 return new CiphertextBallot(ciphertext);
             }
-            
+
         }
 
+        /// <summary>
+        /// Encrypt the specified ballot into its compact form using the cached election context.
+        /// </summary>
         public unsafe CompactCiphertextBallot CompactEncrypt(
             PlaintextBallot plaintext, bool verifyProofs = false)
         {
@@ -116,19 +143,39 @@ namespace ElectionGuard
 
     public class Encrypt
     {
+        /// <summary>
+        /// Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`
+        ///
+        /// This method accepts a ballot representation that only includes `True` selections.
+        /// It will fill missing selections for a contest with `False` values, and generate `placeholder`
+        /// selections to represent the number of seats available for a given contest.  By adding `placeholder`
+        /// votes
+        ///
+        /// This method also allows for ballots to exclude passing contests for which the voter made no selections.
+        /// It will fill missing contests with `False` selections and generate `placeholder` selections that are marked `True`.
+        ///
+        /// <param name="ballot">the selection in the valid input form</param>
+        /// <param name="internalManifest">the `InternalElectionDescription` which defines this ballot's structure</param>
+        /// <param name="context">all the cryptographic context for the election</param>
+        /// <param name="ballotCodeSeed">Hash from previous ballot or hash from device</param>
+        /// <param name="nonce">an optional value used to seed the `Nonce` generated for this ballot
+        ///                     if this value is not provided, the secret generating mechanism of the OS provides its own</param>
+        /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
+        /// <returns>A `CiphertextBallot`</returns>
+        /// </summary>
         public static unsafe CiphertextBallot Ballot(
             PlaintextBallot ballot,
             InternalElectionDescription internalManifest,
             CiphertextElectionContext context,
             ElementModQ ballotCodeSeed,
             ElementModQ nonce = null,
-            bool verifyProofs = true)
+            bool shouldVerifyProofs = true)
         {
             if (nonce == null)
             {
                 var status = NativeInterface.Encrypt.Ballot(
                     ballot.Handle, internalManifest.Handle, context.Handle,
-                    ballotCodeSeed.Handle, verifyProofs,
+                    ballotCodeSeed.Handle, shouldVerifyProofs,
                     out NativeCiphertextBallot ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
@@ -140,7 +187,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.Encrypt.Ballot(
                     ballot.Handle, internalManifest.Handle, context.Handle,
-                    ballotCodeSeed.Handle, nonce.Handle, verifyProofs,
+                    ballotCodeSeed.Handle, nonce.Handle, shouldVerifyProofs,
                     out NativeCiphertextBallot ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
@@ -150,6 +197,29 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`
+        ///
+        /// This method accepts a ballot representation that only includes `True` selections.
+        /// It will fill missing selections for a contest with `False` values, and generate `placeholder`
+        /// selections to represent the number of seats available for a given contest.  By adding `placeholder`
+        /// votes
+        ///
+        /// This method also allows for ballots to exclude passing contests for which the voter made no selections.
+        /// It will fill missing contests with `False` selections and generate `placeholder` selections that are marked `True`.
+        ///
+        /// This version of the encrypt method returns a `compact` version of the ballot that includes a minimal representation
+        /// of the plaintext ballot along with the crypto parameters that are required to expand the ballot
+        ///
+        /// <param name="ballot">the selection in the valid input form</param>
+        /// <param name="internalManifest">the `InternalElectionDescription` which defines this ballot's structure</param>
+        /// <param name="context">all the cryptographic context for the election</param>
+        /// <param name="ballotCodeSeed">Hash from previous ballot or hash from device</param>
+        /// <param name="nonceSeed">an optional value used to seed the `Nonce` generated for this ballot
+        ///                     if this value is not provided, the secret generating mechanism of the OS provides its own</param>
+        /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
+        /// <returns>A `CiphertextBallot`</returns>
+        /// </summary>
         public static unsafe CompactCiphertextBallot CompactBallot(
             PlaintextBallot ballot,
             InternalElectionDescription internalManifest,

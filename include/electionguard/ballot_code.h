@@ -37,14 +37,14 @@ EG_API eg_electionguard_status_t eg_ballot_code_get_hash_for_device(
 * previous encrypted ballot creating a linked hash chain between the ballots that can be traversed.
 * Other liniking paradigms exists (such as tree strctures) and are beyond the scope of this implementation.
 *
-* @param[in] in_previous Previous code or starting hash from device
+* @param[in] in_seed Previous code or starting hash from device
 * @param[in] in_timestamp Timestamp or other incrementing integer value
-* @param[in] in_ballot_code Hash of the ballot
+* @param[in] in_ballot_hash Hash of the ballot
 * @param[out] out_ballot_code a handle to an `eg_element_mod_q_t`. Caller is responsible for lifecycle.
 * @return eg_electionguard_status_t indicating success or failure
 */
-EG_API eg_electionguard_status_t eg_ballot_code_get_rotating_ballot_code(
-  eg_element_mod_q_t *in_previous, uint64_t in_timestamp, eg_element_mod_q_t *in_ballot_code,
+EG_API eg_electionguard_status_t eg_ballot_code_get_ballot_code(
+  eg_element_mod_q_t *in_seed, uint64_t in_timestamp, eg_element_mod_q_t *in_ballot_hash,
   eg_element_mod_q_t **out_ballot_code);
 
 #ifdef __cplusplus

@@ -20,12 +20,11 @@ namespace electionguard
         return hash_elems({deviceUuid, sessionUuid, launchCode, location});
     }
 
-    unique_ptr<ElementModQ> BallotCode::getRotatingBallotCode(const ElementModQ &ballotCode,
-                                                              uint64_t timestamp,
-                                                              const ElementModQ &ballotHash)
+    unique_ptr<ElementModQ> BallotCode::getBallotCode(const ElementModQ &seed, uint64_t timestamp,
+                                                      const ElementModQ &ballotCode)
     {
-        return hash_elems({&const_cast<ElementModQ &>(ballotCode), timestamp,
-                           &const_cast<ElementModQ &>(ballotHash)});
+        return hash_elems(
+          {&const_cast<ElementModQ &>(seed), timestamp, &const_cast<ElementModQ &>(ballotCode)});
     }
 
 } // namespace electionguard

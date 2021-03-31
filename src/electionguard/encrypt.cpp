@@ -73,7 +73,7 @@ namespace electionguard
         const InternalElectionDescription &internalManifest;
         const CiphertextElectionContext &context;
         const EncryptionDevice &encryptionDevice;
-        unique_ptr<ElementModQ> trackerHashSeed;
+        unique_ptr<ElementModQ> ballotCodeSeed;
 
         Impl(const InternalElectionDescription &internalManifest,
              const CiphertextElectionContext &context, const EncryptionDevice &encryptionDevice)
@@ -105,19 +105,23 @@ namespace electionguard
     {
         Log::debug(" encrypt: objectId: " + ballot.getObjectId());
 
-        if (!pimpl->trackerHashSeed) {
-            auto trackerHashSeed = pimpl->encryptionDevice.getHash();
-            pimpl->trackerHashSeed.swap(trackerHashSeed);
-            Log::debugHex(": encrypt: instantiated tacking hash: ",
-                          pimpl->trackerHashSeed->toHex());
+        // this implementation chains each ballot encrypted by the mediator
+        // to every subsequent ballot creating a linked list data structure
+        // that can be used to prove there are no gaps in the election record
+        // but this is not required as part of the specification
+        if (!pimpl->ballotCodeSeed) {
+            auto deviceHash = pimpl->encryptionDevice.getHash();
+            pimpl->ballotCodeSeed.swap(deviceHash);
+            Log::debugHex(": encrypt: instantiated ballotCodeSeed: ",
+                          pimpl->ballotCodeSeed->toHex());
         }
 
         auto encryptedBallot =
-          encryptBallot(ballot, pimpl->internalManifest, pimpl->context, *pimpl->trackerHashSeed,
+          encryptBallot(ballot, pimpl->internalManifest, pimpl->context, *pimpl->ballotCodeSeed,
                         nullptr, pimpl->encryptionDevice.getTimestamp(), shouldVerifyProofs);
 
         Log::debug(": encrypt: ballot encrypted");
-        pimpl->trackerHashSeed = make_unique<ElementModQ>(*encryptedBallot->getBallotCode());
+        pimpl->ballotCodeSeed = make_unique<ElementModQ>(*encryptedBallot->getBallotCode());
         return encryptedBallot;
     }
 
@@ -127,19 +131,23 @@ namespace electionguard
     {
         Log::debug(" encrypt: objectId: " + ballot.getObjectId());
 
-        if (!pimpl->trackerHashSeed) {
-            auto trackerHashSeed = pimpl->encryptionDevice.getHash();
-            pimpl->trackerHashSeed.swap(trackerHashSeed);
-            Log::debugHex(": encrypt: instantiated tacking hash: ",
-                          pimpl->trackerHashSeed->toHex());
+        // this implementation chains each ballot encrypted by the mediator
+        // to every subsequent ballot creating a linked list data structure
+        // that can be used to prove there are no gaps in the election record
+        // but this is not required as part of the specification
+        if (!pimpl->ballotCodeSeed) {
+            auto deviceHash = pimpl->encryptionDevice.getHash();
+            pimpl->ballotCodeSeed.swap(deviceHash);
+            Log::debugHex(": encrypt: instantiated ballotCodeSeed: ",
+                          pimpl->ballotCodeSeed->toHex());
         }
 
         auto encryptedBallot = encryptCompactBallot(
-          ballot, pimpl->internalManifest, pimpl->context, *pimpl->trackerHashSeed, nullptr,
+          ballot, pimpl->internalManifest, pimpl->context, *pimpl->ballotCodeSeed, nullptr,
           pimpl->encryptionDevice.getTimestamp(), shouldVerifyProofs);
 
         Log::debug(": encrypt: ballot encrypted");
-        pimpl->trackerHashSeed = make_unique<ElementModQ>(*encryptedBallot->getBallotCode());
+        pimpl->ballotCodeSeed = make_unique<ElementModQ>(*encryptedBallot->getBallotCode());
         return encryptedBallot;
     }
 

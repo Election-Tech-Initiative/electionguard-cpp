@@ -800,9 +800,9 @@ namespace electionguard
         }
 
         if (!ballotCode) {
-            auto tracking =
-              BallotCode::getRotatingBallotCode(*ballotCodeSeed, ballotTimestamp, *cryptoHash);
-            ballotCode.swap(tracking);
+            auto _ballotCode =
+              BallotCode::getBallotCode(*ballotCodeSeed, ballotTimestamp, *cryptoHash);
+            ballotCode.swap(_ballotCode);
         }
 
         return make_unique<CiphertextBallot>(objectId, ballotStyle, manifestHash,

@@ -11,7 +11,6 @@ extern "C" {
 #include <cstring>
 
 using electionguard::BallotCode;
-using electionguard::dynamicCopy;
 using electionguard::ElementModQ;
 using electionguard::Log;
 
@@ -32,24 +31,24 @@ eg_electionguard_status_t eg_ballot_code_get_hash_for_device(uint64_t in_device_
     }
 }
 
-eg_electionguard_status_t
-eg_ballot_code_get_rotating_ballot_code(eg_element_mod_q_t *in_previous, uint64_t in_timestamp,
-                                        eg_element_mod_q_t *in_ballot_hash,
-                                        eg_element_mod_q_t **out_ballot_code)
+eg_electionguard_status_t eg_ballot_code_get_ballot_code(eg_element_mod_q_t *in_seed,
+                                                         uint64_t in_timestamp,
+                                                         eg_element_mod_q_t *in_ballot_hash,
+                                                         eg_element_mod_q_t **out_ballot_code)
 {
-    if (in_previous == nullptr || in_ballot_hash == nullptr) {
+    if (in_seed == nullptr || in_ballot_hash == nullptr) {
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
     try {
-        auto *previousHash = AS_TYPE(ElementModQ, in_previous);
+        auto *seed = AS_TYPE(ElementModQ, in_seed);
         auto *ballotHash = AS_TYPE(ElementModQ, in_ballot_hash);
 
-        auto hash = BallotCode::getRotatingBallotCode(*previousHash, in_timestamp, *ballotHash);
+        auto hash = BallotCode::getBallotCode(*seed, in_timestamp, *ballotHash);
         *out_ballot_code = AS_TYPE(eg_element_mod_q_t, hash.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_ballot_code_get_rotating_ballot_code", e);
+        Log::error(":eg_ballot_code_get_ballot_code", e);
         return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     }
 }

@@ -32,7 +32,7 @@ namespace electionguard
                                                              const std::string &location);
 
         /// <summary>
-        /// Get a rotating ballot code based on the previous ballot code.  Useful for chaining ballots.
+        /// Get a ballot code based on a seed.  Useful for chaining ballots or defining higher order link strcutures.
         ///
         /// Though not required by the spec, it can be useful for some use cases to chain ballots together
         /// And prove an unbroken dataset for a specific encryption device. Typically the rotating ballot code
@@ -40,14 +40,13 @@ namespace electionguard
         /// previous encrypted ballot creating a linked hash chain between the ballots that can be traversed.
         /// Other liniking paradigms exists (such as tree strctures) and are beyond the scope of this implementation.
         ///
-        /// <param name="previous">Previous code or starting hash from device</param>
+        /// <param name="seed">a seed such as the previous ballot code or starting hash from device</param>
         /// <param name="timestamp">Timestamp or other incrementing integer value</param>
         /// <param name="ballotCode">Hash of the ballot</param>
         /// <returns>Code</returns>
         /// </summary>
-        static std::unique_ptr<ElementModQ> getRotatingBallotCode(const ElementModQ &previous,
-                                                                  uint64_t timestamp,
-                                                                  const ElementModQ &ballotCode);
+        static std::unique_ptr<ElementModQ>
+        getBallotCode(const ElementModQ &seed, uint64_t timestamp, const ElementModQ &ballotCode);
     };
 
 } // namespace electionguard

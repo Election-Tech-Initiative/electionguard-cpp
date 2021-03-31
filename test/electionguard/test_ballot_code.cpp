@@ -20,9 +20,8 @@ TEST_CASE("Get rotating ballot code rotates")
     auto secondBallotHash = make_unique<ElementModQ>(secondHash);
 
     // Act
-    auto rotatingHash1 = BallotCode::getRotatingBallotCode(*deviceHash, 1000UL, *firstBallotHash);
-    auto rotatingHash2 =
-      BallotCode::getRotatingBallotCode(*rotatingHash1, 1001UL, *secondBallotHash);
+    auto rotatingHash1 = BallotCode::getBallotCode(*deviceHash, 1000UL, *firstBallotHash);
+    auto rotatingHash2 = BallotCode::getBallotCode(*rotatingHash1, 1001UL, *secondBallotHash);
 
     //Assert
     CHECK(deviceHash != nullptr);

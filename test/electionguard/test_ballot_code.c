@@ -33,13 +33,12 @@ bool test_ballot_code_rotates(void)
 
     // Act
     eg_element_mod_q_t *rotating_hash_1 = NULL;
-    if (eg_ballot_code_get_rotating_ballot_code(device_hash, 1000, first_ballot_hash,
-                                                &rotating_hash_1)) {
+    if (eg_ballot_code_get_ballot_code(device_hash, 1000, first_ballot_hash, &rotating_hash_1)) {
         assert(false);
     }
     eg_element_mod_q_t *rotating_hash_2 = NULL;
-    if (eg_ballot_code_get_rotating_ballot_code(rotating_hash_1, 1001, second_ballot_hash,
-                                                &rotating_hash_2)) {
+    if (eg_ballot_code_get_ballot_code(rotating_hash_1, 1001, second_ballot_hash,
+                                       &rotating_hash_2)) {
         assert(false);
     }
 
