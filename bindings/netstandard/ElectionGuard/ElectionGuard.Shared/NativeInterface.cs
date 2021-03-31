@@ -564,7 +564,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_is_valid_encryption")]
             internal static extern bool IsValidEncryption(
                 CiphertextBallotSelectionHandle handle,
-                ElementModQ.ElementModQHandle seed_hash,
+                ElementModQ.ElementModQHandle encryption_seed,
                 ElementModP.ElementModPHandle public_key,
                 ElementModQ.ElementModQHandle crypto_extended_base_hash);
 
@@ -674,7 +674,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_is_valid_encryption")]
             internal static extern bool IsValidEncryption(
                 CiphertextBallotContestHandle handle,
-                ElementModQ.ElementModQHandle seed_hash,
+                ElementModQ.ElementModQHandle encryption_seed,
                 ElementModP.ElementModPHandle public_key,
                 ElementModQ.ElementModQHandle crypto_extended_base_hash);
         }

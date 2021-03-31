@@ -172,13 +172,13 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_proof(
 * the DisjunctiveChaumPedersenProof`proof` populated.
 * the ElementModQ `description_hash` and the ElementModQ `crypto_hash` are also checked.
 *
-* @param[in] seed_hash The hash of the SelectionDescription, or
+* @param[in] encryption_seed The hash of the SelectionDescription, or
 *                      whatever `ElementModQ` was used to populate the `description_hash` field.
 * @param[in] in_public_key The election public key
 * @param[in] in_crypto_extended_base_hash The extended base hash of the election
 */
 EG_API bool eg_ciphertext_ballot_selection_is_valid_encryption(
-  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t *in_seed_hash,
+  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t *in_encryption_seed,
   eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash);
 
 // CiphertextBallotSelection::crypto_hash_with not provided
@@ -309,7 +309,7 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_proof(
 * or whatever `ElementModQ` was used to populate the `description_hash` field.
  */
 EG_API bool eg_ciphertext_ballot_contest_is_valid_encryption(
-  eg_ciphertext_ballot_contest_t *handle, eg_element_mod_q_t *in_seed_hash,
+  eg_ciphertext_ballot_contest_t *handle, eg_element_mod_q_t *in_encryption_seed,
   eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash);
 
 #endif

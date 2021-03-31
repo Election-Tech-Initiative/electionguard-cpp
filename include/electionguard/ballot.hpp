@@ -166,16 +166,17 @@ namespace electionguard
         /// <summary>
         /// Given an encrypted BallotSelection, generates a hash, suitable for rolling up
         /// into a hash / tracking code for an entire ballot. Of note, this particular hash examines
-        /// the `seed_hash` and `message`, but not the proof.
+        /// the `encryptionSeed` and `message`, but not the proof.
         /// This is deliberate, allowing for the possibility of ElectionGuard variants running on
         /// much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed
         /// later on.
         ///
-        /// In most cases the seed_hash should match the `description_hash`
+        /// In most cases the encryption_seed should match the `description_hash`
         /// </summary>
-        virtual std::unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) override;
         virtual std::unique_ptr<ElementModQ>
-        crypto_hash_with(const ElementModQ &seedHash) const override;
+        crypto_hash_with(const ElementModQ &encryptionSeed) override;
+        virtual std::unique_ptr<ElementModQ>
+        crypto_hash_with(const ElementModQ &encryptionSeed) const override;
 
         /// <summary>
         /// Constructs a `CipherTextBallotSelection` object. Most of the parameters here match up to fields
@@ -200,17 +201,18 @@ namespace electionguard
         /// the DisjunctiveChaumPedersenProof`proof` populated.
         /// the ElementModQ `description_hash` and the ElementModQ `crypto_hash` are also checked.
         ///
-        /// <param name="seed_hash">The hash of the SelectionDescription, or
+        /// <param name="encryptionSeed">The hash of the SelectionDescription, or
         ///                         whatever `ElementModQ` was used to populate the `description_hash` field. </param>
         /// <param name="elgamalPublicKey">The election public key</param>
         /// <param name="cryptoExtendedBaseHash">The extended base hash of the election</param>
         /// </summary>
-        bool isValidEncryption(const ElementModQ &seedHash, const ElementModP &elgamalPublicKey,
+        bool isValidEncryption(const ElementModQ &encryptionSeed,
+                               const ElementModP &elgamalPublicKey,
                                const ElementModQ &cryptoExtendedBaseHash);
 
       protected:
         static std::unique_ptr<ElementModQ> makeCryptoHash(const std::string &objectId,
-                                                           const ElementModQ &seedHash,
+                                                           const ElementModQ &encryptionSeed,
                                                            const ElGamalCiphertext &ciphertext);
 
       private:
@@ -315,15 +317,15 @@ namespace electionguard
         /// <summary>
         /// Given an encrypted BallotContest, generates a hash, suitable for rolling up
         /// into a hash / tracking code for an entire ballot. Of note, this particular hash examines
-        /// the `seed_hash` and `ballot_selections`, but not the proof.
+        /// the `encryptionSeed` and `ballot_selections`, but not the proof.
         /// This is deliberate, allowing for the possibility of ElectionGuard variants running on
         /// much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed
         /// later on.
         ///
-        /// In most cases, the seed_hash is the description_hash
+        /// In most cases, the encryption_seed is the description_hash
         /// </summary>
         virtual std::unique_ptr<ElementModQ>
-        crypto_hash_with(const ElementModQ &seedHash) const override;
+        crypto_hash_with(const ElementModQ &encryptionSeed) const override;
 
         /// <summary>
         /// Constructs a `CipherTextBallotContest` object. Most of the parameters here match up to fields
@@ -352,7 +354,8 @@ namespace electionguard
         std::unique_ptr<ElGamalCiphertext> elgamalAccumulate() const;
 
         /// <summary>
-        /// Given an encrypted BallotContest, validates the encryption state against a specific seed hash and public key
+        /// Given an encrypted BallotContest, validates the encryption state against
+        /// a specific encryption seed and public key
         /// by verifying the accumulated sum of selections match the proof.
         /// Calling this function expects that the object is in a well-formed encrypted state
         /// with the `ballot_selections` populated with valid encrypted ballot selections,
@@ -361,14 +364,15 @@ namespace electionguard
         /// Specifically, the seed hash in this context is the hash of the ContestDescription,
         /// or whatever `ElementModQ` was used to populate the `description_hash` field.
         /// </summary>
-        bool isValidEncryption(const ElementModQ &seedHash, const ElementModP &elgamalPublicKey,
+        bool isValidEncryption(const ElementModQ &encryptionSeed,
+                               const ElementModP &elgamalPublicKey,
                                const ElementModQ &cryptoExtendedBaseHash);
 
       protected:
         static std::unique_ptr<ElementModQ> makeCryptoHash(
           std::string objectId,
           const std::vector<std::reference_wrapper<CiphertextBallotSelection>> &selections,
-          const ElementModQ &seedHash);
+          const ElementModQ &encryptionSeed);
         static std::unique_ptr<ElementModQ> aggregateNonce(
           const std::vector<std::reference_wrapper<CiphertextBallotSelection>> &selections);
         static std::unique_ptr<ElGamalCiphertext> elgamalAccumulate(

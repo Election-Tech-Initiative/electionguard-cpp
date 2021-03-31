@@ -252,18 +252,18 @@ namespace ElectionGuard
         /// the DisjunctiveChaumPedersenProof`proof` populated.
         /// the ElementModQ `description_hash` and the ElementModQ `crypto_hash` are also checked.
         ///
-        /// <param name="seed_hash">The hash of the SelectionDescription, or
+        /// <param name="encryptionSeed">The hash of the SelectionDescription, or
         ///                         whatever `ElementModQ` was used to populate the `description_hash` field. </param>
         /// <param name="elgamalPublicKey">The election public key</param>
         /// <param name="cryptoExtendedBaseHash">The extended base hash of the election</param>
         /// </summary>
         public unsafe bool IsValidEncryption(
-            ElementModQ seedHash,
+            ElementModQ encryptionSeed,
             ElementModP elGamalPublicKey,
             ElementModQ cryptoExtendedBaseHash)
         {
             return NativeInterface.CiphertextBallotSelection.IsValidEncryption(
-                Handle, seedHash.Handle,
+                Handle, encryptionSeed.Handle,
                 elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
         }
 
@@ -447,12 +447,12 @@ namespace ElectionGuard
         }
 
         public unsafe bool IsValidEncryption(
-            ElementModQ seedHash,
+            ElementModQ encryptionSeed,
             ElementModP elGamalPublicKey,
             ElementModQ cryptoExtendedBaseHash)
         {
             return NativeInterface.CiphertextBallotContest.IsValidEncryption(
-                Handle, seedHash.Handle, elGamalPublicKey.Handle,
+                Handle, encryptionSeed.Handle, elGamalPublicKey.Handle,
                 cryptoExtendedBaseHash.Handle);
         }
 
@@ -863,7 +863,7 @@ namespace ElectionGuard
 
         public unsafe byte[] ToMsgPack()
         {
- 
+
             var status = NativeInterface.CompactCiphertextBallot.ToMsgPack(
                 Handle, out IntPtr data, out UIntPtr size);
 

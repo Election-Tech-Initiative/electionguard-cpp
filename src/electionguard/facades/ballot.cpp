@@ -185,14 +185,14 @@ eg_ciphertext_ballot_selection_get_proof(eg_ciphertext_ballot_selection_t *handl
 }
 
 bool eg_ciphertext_ballot_selection_is_valid_encryption(
-  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t *in_seed_hash,
+  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t *in_encryption_seed,
   eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash)
 {
-    auto *seedHash = AS_TYPE(ElementModQ, in_seed_hash);
+    auto *encryptionSeed = AS_TYPE(ElementModQ, in_encryption_seed);
     auto *publicKey = AS_TYPE(ElementModP, in_public_key);
     auto *cryptoExtendedBaseHash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
     return AS_TYPE(CiphertextBallotSelection, handle)
-      ->isValidEncryption(*seedHash, *publicKey, *cryptoExtendedBaseHash);
+      ->isValidEncryption(*encryptionSeed, *publicKey, *cryptoExtendedBaseHash);
 }
 
 #pragma endregion
@@ -347,14 +347,14 @@ eg_ciphertext_ballot_contest_get_proof(eg_ciphertext_ballot_selection_t *handle,
 }
 
 bool eg_ciphertext_ballot_contest_is_valid_encryption(
-  eg_ciphertext_ballot_contest_t *handle, eg_element_mod_q_t *in_seed_hash,
+  eg_ciphertext_ballot_contest_t *handle, eg_element_mod_q_t *in_encryption_seed,
   eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash)
 {
-    auto *seedHash = AS_TYPE(ElementModQ, in_seed_hash);
+    auto *encryptionSeed = AS_TYPE(ElementModQ, in_encryption_seed);
     auto *publicKey = AS_TYPE(ElementModP, in_public_key);
     auto *cryptoExtendedBaseHash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
     return AS_TYPE(CiphertextBallotContest, handle)
-      ->isValidEncryption(*seedHash, *publicKey, *cryptoExtendedBaseHash);
+      ->isValidEncryption(*encryptionSeed, *publicKey, *cryptoExtendedBaseHash);
 }
 
 #pragma endregion
@@ -610,16 +610,16 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_crypto_hash(eg_ciphertext_bal
 }
 
 bool eg_ciphertext_ballot_is_valid_encryption(eg_ciphertext_ballot_t *handle,
-                                              eg_element_mod_q_t *in_seed_hash,
+                                              eg_element_mod_q_t *in_encryption_seed,
                                               eg_element_mod_p_t *in_public_key,
                                               eg_element_mod_q_t *in_crypto_extended_base_hash)
 {
     auto *ciphertext = AS_TYPE(CiphertextBallot, handle);
-    auto *seed_hash = AS_TYPE(ElementModQ, in_seed_hash);
+    auto *encryptionSeed = AS_TYPE(ElementModQ, in_encryption_seed);
     auto *public_key = AS_TYPE(ElementModP, in_public_key);
     auto *extended_hash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
 
-    return ciphertext->isValidEncryption(*seed_hash, *public_key, *extended_hash);
+    return ciphertext->isValidEncryption(*encryptionSeed, *public_key, *extended_hash);
 }
 
 eg_electionguard_status_t eg_ciphertext_ballot_from_json(char *in_data,

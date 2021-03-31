@@ -151,9 +151,10 @@ namespace electionguard
             this->isPlaceholder = isPlaceholder;
         }
 
-        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) const
+        [[nodiscard]] unique_ptr<ElementModQ>
+        crypto_hash_with(const ElementModQ &encryptionSeed) const
         {
-            return makeCryptoHash(objectId, seedHash, *ciphertext);
+            return makeCryptoHash(objectId, encryptionSeed, *ciphertext);
         }
     };
 
@@ -210,9 +211,9 @@ namespace electionguard
     // Interface Overrides
 
     unique_ptr<ElementModQ>
-    CiphertextBallotSelection::crypto_hash_with(const ElementModQ &seedHash) const
+    CiphertextBallotSelection::crypto_hash_with(const ElementModQ &encryptionSeed) const
     {
-        return pimpl->crypto_hash_with(seedHash);
+        return pimpl->crypto_hash_with(encryptionSeed);
     }
 
     // public Static Members
@@ -239,25 +240,26 @@ namespace electionguard
                                                       move(proof), move(extendedData));
     }
 
-    unique_ptr<ElementModQ> CiphertextBallotSelection::crypto_hash_with(const ElementModQ &seedHash)
+    unique_ptr<ElementModQ>
+    CiphertextBallotSelection::crypto_hash_with(const ElementModQ &encryptionSeed)
     {
-        return pimpl->crypto_hash_with(seedHash);
+        return pimpl->crypto_hash_with(encryptionSeed);
     }
 
     // Public Methods
 
-    bool CiphertextBallotSelection::isValidEncryption(const ElementModQ &seedHash,
+    bool CiphertextBallotSelection::isValidEncryption(const ElementModQ &encryptionSeed,
                                                       const ElementModP &elgamalPublicKey,
                                                       const ElementModQ &cryptoExtendedBaseHash)
     {
-        if ((const_cast<ElementModQ &>(seedHash) != *pimpl->descriptionHash)) {
+        if ((const_cast<ElementModQ &>(encryptionSeed) != *pimpl->descriptionHash)) {
             Log::debug(": CiphertextBallotSelection mismatching selection hash: ");
-            Log::debugHex(": expected: ", seedHash.toHex());
+            Log::debugHex(": expected: ", encryptionSeed.toHex());
             Log::debugHex(": actual: ", pimpl->descriptionHash->toHex());
             return false;
         }
 
-        auto recalculatedCryptoHash = crypto_hash_with(seedHash);
+        auto recalculatedCryptoHash = crypto_hash_with(encryptionSeed);
         if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
             Log::debug(": CiphertextBallotSelection mismatching crypto hash: ");
             Log::debugHex(": expected: ", recalculatedCryptoHash->toHex());
@@ -275,11 +277,12 @@ namespace electionguard
     // Protected Members
 
     unique_ptr<ElementModQ>
-    CiphertextBallotSelection::makeCryptoHash(const string &objectId, const ElementModQ &seedHash,
+    CiphertextBallotSelection::makeCryptoHash(const string &objectId,
+                                              const ElementModQ &encryptionSeed,
                                               const ElGamalCiphertext &ciphertext)
     {
         return hash_elems(
-          {objectId, &const_cast<ElementModQ &>(seedHash), ciphertext.crypto_hash().get()});
+          {objectId, &const_cast<ElementModQ &>(encryptionSeed), ciphertext.crypto_hash().get()});
     }
 
 #pragma endregion
@@ -464,9 +467,9 @@ namespace electionguard
     // Interface Overrides
 
     unique_ptr<ElementModQ>
-    CiphertextBallotContest::crypto_hash_with(const ElementModQ &seedHash) const
+    CiphertextBallotContest::crypto_hash_with(const ElementModQ &encryptionSeed) const
     {
-        return makeCryptoHash(pimpl->object_id, this->getSelections(), seedHash);
+        return makeCryptoHash(pimpl->object_id, this->getSelections(), encryptionSeed);
     }
 
     // Public Static Methods
@@ -515,18 +518,18 @@ namespace electionguard
         return elgamalAccumulate(this->getSelections());
     }
 
-    bool CiphertextBallotContest::isValidEncryption(const ElementModQ &seedHash,
+    bool CiphertextBallotContest::isValidEncryption(const ElementModQ &encryptionSeed,
                                                     const ElementModP &elgamalPublicKey,
                                                     const ElementModQ &cryptoExtendedBaseHash)
     {
-        if ((const_cast<ElementModQ &>(seedHash) != *pimpl->descriptionHash)) {
+        if ((const_cast<ElementModQ &>(encryptionSeed) != *pimpl->descriptionHash)) {
             Log::debug(": CiphertextBallotContest mismatching constest hash: ");
-            Log::debugHex(": expected: ", seedHash.toHex());
+            Log::debugHex(": expected: ", encryptionSeed.toHex());
             Log::debugHex(": actual: ", pimpl->descriptionHash->toHex());
             return false;
         }
 
-        auto recalculatedCryptoHash = crypto_hash_with(seedHash);
+        auto recalculatedCryptoHash = crypto_hash_with(encryptionSeed);
         if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
             Log::debug(": CiphertextBallotContest mismatching crypto hash: ");
             Log::debugHex(": expected: ", recalculatedCryptoHash->toHex());
@@ -584,13 +587,13 @@ namespace electionguard
 
     unique_ptr<ElementModQ> CiphertextBallotContest::makeCryptoHash(
       string objectId, const vector<reference_wrapper<CiphertextBallotSelection>> &selections,
-      const ElementModQ &seedHash)
+      const ElementModQ &encryptionSeed)
     {
         if (selections.empty()) {
             throw invalid_argument("mismatching selection state for " + objectId +
                                    "expected(some) actual(none)");
         }
-        vector<CryptoHashableType> elems = {objectId, &const_cast<ElementModQ &>(seedHash)};
+        vector<CryptoHashableType> elems = {objectId, &const_cast<ElementModQ &>(encryptionSeed)};
         for (const auto &selection : selections) {
             elems.emplace_back(ref(*selection.get().getCryptoHash()));
         }
