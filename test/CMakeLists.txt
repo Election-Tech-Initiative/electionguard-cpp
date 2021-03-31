@@ -35,8 +35,6 @@ ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.h
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/words.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/words.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/constants.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h
 )
@@ -58,7 +56,6 @@ add_executable(ElectionGuardTests
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hacl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_nonces.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_words.cpp
 )
 
 target_compile_features(ElectionGuardTests PRIVATE cxx_std_17)
