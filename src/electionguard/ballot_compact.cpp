@@ -292,13 +292,13 @@ namespace electionguard
 
     unique_ptr<PlaintextBallot>
     expandCompactPlaintextBallot(const CompactPlaintextBallot &compactBallot,
-                                 const InternalElectionDescription &metadata)
+                                 const InternalManifest &manifest)
     {
         vector<unique_ptr<PlaintextBallotContest>> contests;
         uint64_t index = 0;
 
         // Get the ballot style and iterate through the contests for that style
-        for (const auto &contest : metadata.getContestsFor(compactBallot.getStyleId())) {
+        for (const auto &contest : manifest.getContestsFor(compactBallot.getStyleId())) {
             vector<unique_ptr<PlaintextBallotSelection>> selections;
 
             // Iterate through the selections on the contest and expand each selection
@@ -323,7 +323,7 @@ namespace electionguard
 
     unique_ptr<CiphertextBallot>
     expandCompactCiphertextBallot(const CompactCiphertextBallot &compactCiphertext,
-                                  const InternalElectionDescription &metadata,
+                                  const InternalManifest &manifest,
                                   const CiphertextElectionContext &context)
     {
         if (compactCiphertext.getPlaintext() == nullptr) {
@@ -341,9 +341,9 @@ namespace electionguard
             throw runtime_error("the nonce was not found");
         }
 
-        auto plaintext = expandCompactPlaintextBallot(*compactCiphertext.getPlaintext(), metadata);
+        auto plaintext = expandCompactPlaintextBallot(*compactCiphertext.getPlaintext(), manifest);
         auto ciphertext =
-          encryptBallot(*plaintext, metadata, context, *compactCiphertext.getBallotCodeSeed(),
+          encryptBallot(*plaintext, manifest, context, *compactCiphertext.getBallotCodeSeed(),
                         compactCiphertext.getNonce()->clone(), compactCiphertext.getTimestamp());
 
         if (*ciphertext->getBallotCode() != *compactCiphertext.getBallotCode()) {

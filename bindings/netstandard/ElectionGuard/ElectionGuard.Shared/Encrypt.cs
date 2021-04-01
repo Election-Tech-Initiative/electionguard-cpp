@@ -61,12 +61,12 @@ namespace ElectionGuard
         internal unsafe NativeEncryptionMediator Handle;
 
         public unsafe EncryptionMediator(
-            InternalElectionDescription metadata,
+            InternalManifest manifest,
             CiphertextElectionContext context,
             EncryptionDevice device)
         {
             var status = NativeInterface.EncryptionMediator.New(
-                metadata.Handle, context.Handle, device.Handle, out Handle);
+                manifest.Handle, context.Handle, device.Handle, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"EncryptionMediator New Error Status: {status}");
@@ -85,7 +85,7 @@ namespace ElectionGuard
                 Handle, plaintext.Handle, out NativeCiphertextBallot ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"InternalElectionDescription Error Status: {status}");
+                    Console.WriteLine($"Encrypt Error Status: {status}");
                 }
                 return new CiphertextBallot(ciphertext);
             }
@@ -95,7 +95,7 @@ namespace ElectionGuard
                 Handle, plaintext.Handle, out NativeCiphertextBallot ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"InternalElectionDescription Error Status: {status}");
+                    Console.WriteLine($"Encrypt Error Status: {status}");
                 }
                 return new CiphertextBallot(ciphertext);
             }
@@ -114,7 +114,7 @@ namespace ElectionGuard
                 Handle, plaintext.Handle, out NativeCompactCiphertextBallot ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"InternalElectionDescription Error Status: {status}");
+                    Console.WriteLine($"InternalManifest Error Status: {status}");
                 }
                 return new CompactCiphertextBallot(ciphertext);
             }
@@ -124,7 +124,7 @@ namespace ElectionGuard
                 Handle, plaintext.Handle, out NativeCompactCiphertextBallot ciphertext);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"InternalElectionDescription Error Status: {status}");
+                    Console.WriteLine($"InternalManifest Error Status: {status}");
                 }
                 return new CompactCiphertextBallot(ciphertext);
             }
@@ -155,7 +155,7 @@ namespace ElectionGuard
         /// It will fill missing contests with `False` selections and generate `placeholder` selections that are marked `True`.
         ///
         /// <param name="ballot">the selection in the valid input form</param>
-        /// <param name="internalManifest">the `InternalElectionDescription` which defines this ballot's structure</param>
+        /// <param name="internalManifest">the `InternalManifest` which defines this ballot's structure</param>
         /// <param name="context">all the cryptographic context for the election</param>
         /// <param name="ballotCodeSeed">Hash from previous ballot or hash from device</param>
         /// <param name="nonce">an optional value used to seed the `Nonce` generated for this ballot
@@ -165,7 +165,7 @@ namespace ElectionGuard
         /// </summary>
         public static unsafe CiphertextBallot Ballot(
             PlaintextBallot ballot,
-            InternalElectionDescription internalManifest,
+            InternalManifest internalManifest,
             CiphertextElectionContext context,
             ElementModQ ballotCodeSeed,
             ElementModQ nonce = null,
@@ -212,7 +212,7 @@ namespace ElectionGuard
         /// of the plaintext ballot along with the crypto parameters that are required to expand the ballot
         ///
         /// <param name="ballot">the selection in the valid input form</param>
-        /// <param name="internalManifest">the `InternalElectionDescription` which defines this ballot's structure</param>
+        /// <param name="internalManifest">the `InternalManifest` which defines this ballot's structure</param>
         /// <param name="context">all the cryptographic context for the election</param>
         /// <param name="ballotCodeSeed">Hash from previous ballot or hash from device</param>
         /// <param name="nonceSeed">an optional value used to seed the `Nonce` generated for this ballot
@@ -222,7 +222,7 @@ namespace ElectionGuard
         /// </summary>
         public static unsafe CompactCiphertextBallot CompactBallot(
             PlaintextBallot ballot,
-            InternalElectionDescription internalManifest,
+            InternalManifest internalManifest,
             CiphertextElectionContext context,
             ElementModQ ballotCodeSeed,
             bool verifyProofs = true)

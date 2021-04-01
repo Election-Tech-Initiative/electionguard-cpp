@@ -492,35 +492,33 @@ namespace electionguard
     ///
     /// See: https://developers.google.com/elections-data/reference/election
     /// </summary>
-    class EG_API ElectionDescription : public CryptoHashable
+    class EG_API Manifest : public CryptoHashable
     {
       public:
-        ElectionDescription(const ElectionDescription &other);
-        ElectionDescription(const ElectionDescription &&other);
-        explicit ElectionDescription(
-          const std::string &electionScopeId, ElectionType type,
-          std::chrono::system_clock::time_point startDate,
-          std::chrono::system_clock::time_point endDate,
-          std::vector<std::unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
-          std::vector<std::unique_ptr<Party>> parties,
-          std::vector<std::unique_ptr<Candidate>> candidates,
-          std::vector<std::unique_ptr<ContestDescription>> contests,
-          std::vector<std::unique_ptr<BallotStyle>> ballotStyles);
-        explicit ElectionDescription(
-          const std::string &electionScopeId, ElectionType type,
-          std::chrono::system_clock::time_point startDate,
-          std::chrono::system_clock::time_point endDate,
-          std::vector<std::unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
-          std::vector<std::unique_ptr<Party>> parties,
-          std::vector<std::unique_ptr<Candidate>> candidates,
-          std::vector<std::unique_ptr<ContestDescription>> contests,
-          std::vector<std::unique_ptr<BallotStyle>> ballotStyles,
-          std::unique_ptr<InternationalizedText> name,
-          std::unique_ptr<ContactInformation> contactInformation);
-        ~ElectionDescription();
+        Manifest(const Manifest &other);
+        Manifest(const Manifest &&other);
+        explicit Manifest(const std::string &electionScopeId, ElectionType type,
+                          std::chrono::system_clock::time_point startDate,
+                          std::chrono::system_clock::time_point endDate,
+                          std::vector<std::unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
+                          std::vector<std::unique_ptr<Party>> parties,
+                          std::vector<std::unique_ptr<Candidate>> candidates,
+                          std::vector<std::unique_ptr<ContestDescription>> contests,
+                          std::vector<std::unique_ptr<BallotStyle>> ballotStyles);
+        explicit Manifest(const std::string &electionScopeId, ElectionType type,
+                          std::chrono::system_clock::time_point startDate,
+                          std::chrono::system_clock::time_point endDate,
+                          std::vector<std::unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
+                          std::vector<std::unique_ptr<Party>> parties,
+                          std::vector<std::unique_ptr<Candidate>> candidates,
+                          std::vector<std::unique_ptr<ContestDescription>> contests,
+                          std::vector<std::unique_ptr<BallotStyle>> ballotStyles,
+                          std::unique_ptr<InternationalizedText> name,
+                          std::unique_ptr<ContactInformation> contactInformation);
+        ~Manifest();
 
-        ElectionDescription &operator=(ElectionDescription other);
-        ElectionDescription &operator=(ElectionDescription &&other);
+        Manifest &operator=(Manifest other);
+        Manifest &operator=(Manifest &&other);
 
         std::string getElectionScopeId() const;
         ElectionType getElectionType() const;
@@ -541,8 +539,8 @@ namespace electionguard
         std::string toJson();
         std::string toJson() const;
 
-        static std::unique_ptr<ElectionDescription> fromJson(std::string data);
-        static std::unique_ptr<ElectionDescription> fromBson(std::vector<uint8_t> data);
+        static std::unique_ptr<Manifest> fromJson(std::string data);
+        static std::unique_ptr<Manifest> fromBson(std::vector<uint8_t> data);
 
         virtual std::unique_ptr<ElementModQ> crypto_hash() override;
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
@@ -553,30 +551,29 @@ namespace electionguard
     };
 
     /// <summary>
-    /// `InternalElectionDescription` is a subset of the `ElectionDescription` structure that specifies
+    /// `InternalManifest` is a subset of the `Manifest` structure that specifies
     /// the components that ElectionGuard uses for conducting an election.  The key component is the
-    /// `contests` collection, which applies placeholder selections to the `ElectionDescription` contests
+    /// `contests` collection, which applies placeholder selections to the `Manifest` contests
     /// </summary>
-    class EG_API InternalElectionDescription
+    class EG_API InternalManifest
     {
       public:
-        InternalElectionDescription(const InternalElectionDescription &other);
-        InternalElectionDescription(const InternalElectionDescription &&other);
-        explicit InternalElectionDescription(
+        InternalManifest(const InternalManifest &other);
+        InternalManifest(const InternalManifest &&other);
+        explicit InternalManifest(
           std::vector<std::unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
           std::vector<std::unique_ptr<ContestDescriptionWithPlaceholders>> contests,
-          std::vector<std::unique_ptr<BallotStyle>> ballotStyles,
-          const ElementModQ &descriptionHash);
-        InternalElectionDescription(const ElectionDescription &description);
-        ~InternalElectionDescription();
+          std::vector<std::unique_ptr<BallotStyle>> ballotStyles, const ElementModQ &manifestHash);
+        InternalManifest(const Manifest &description);
+        ~InternalManifest();
 
-        InternalElectionDescription &operator=(InternalElectionDescription other);
-        InternalElectionDescription &operator=(InternalElectionDescription &&other);
+        InternalManifest &operator=(InternalManifest other);
+        InternalManifest &operator=(InternalManifest &&other);
 
         /// <summary>
         /// The hash of the election metadata
         /// </summary>
-        const ElementModQ *getDescriptionHash() const;
+        const ElementModQ *getManifestHash() const;
 
         std::vector<std::reference_wrapper<GeopoliticalUnit>> getGeopoliticalUnits() const;
         std::vector<std::reference_wrapper<ContestDescriptionWithPlaceholders>> getContests() const;
@@ -591,18 +588,18 @@ namespace electionguard
         std::string toJson();
         std::string toJson() const;
 
-        static std::unique_ptr<InternalElectionDescription> fromJson(std::string data);
-        static std::unique_ptr<InternalElectionDescription> fromBson(std::vector<uint8_t> data);
+        static std::unique_ptr<InternalManifest> fromJson(std::string data);
+        static std::unique_ptr<InternalManifest> fromBson(std::vector<uint8_t> data);
 
       protected:
         static std::vector<std::unique_ptr<ContestDescriptionWithPlaceholders>>
-        generateContestsWithPlaceholders(const ElectionDescription &description);
+        generateContestsWithPlaceholders(const Manifest &description);
 
         static std::vector<std::unique_ptr<GeopoliticalUnit>>
-        copyGeopoliticalUnits(const ElectionDescription &description);
+        copyGeopoliticalUnits(const Manifest &description);
 
         static std::vector<std::unique_ptr<BallotStyle>>
-        copyBallotStyles(const ElectionDescription &description);
+        copyBallotStyles(const Manifest &description);
 
       private:
         class Impl;
@@ -628,7 +625,7 @@ namespace electionguard
         explicit CiphertextElectionContext(const uint64_t numberOfGuardians, const uint64_t quorum,
                                            std::unique_ptr<ElementModP> elGamalPublicKey,
                                            std::unique_ptr<ElementModQ> commitmentHash,
-                                           std::unique_ptr<ElementModQ> descriptionHash,
+                                           std::unique_ptr<ElementModQ> manifestHash,
                                            std::unique_ptr<ElementModQ> cryptoBaseHash,
                                            std::unique_ptr<ElementModQ> cryptoExtendedBaseHash);
         ~CiphertextElectionContext();
@@ -660,7 +657,7 @@ namespace electionguard
         /// <summary>
         /// The hash of the election metadata
         /// </summary>
-        const ElementModQ *getDescriptionHash() const;
+        const ElementModQ *getManifestHash() const;
 
         /// <summary>
         /// the `base hash code (𝑄)` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
@@ -679,13 +676,13 @@ namespace electionguard
         /// <param name="quorum"> The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians` </param>
         /// <param name="elGamalPublicKey"> the public key of the election </param>
         /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
-        /// <param name="descriptionHash"> the hash of the election metadata </param>
+        /// <param name="manifestHash"> the hash of the election metadata </param>
         /// </summary>
         static std::unique_ptr<CiphertextElectionContext>
         make(const uint64_t numberOfGuardians, const uint64_t quorum,
              std::unique_ptr<ElementModP> elGamalPublicKey,
              std::unique_ptr<ElementModQ> commitmentHash,
-             std::unique_ptr<ElementModQ> descriptionHash);
+             std::unique_ptr<ElementModQ> manifestHash);
 
         /// <summary>
         ///  Makes a CiphertextElectionContext object from hex string representations.
@@ -694,12 +691,12 @@ namespace electionguard
         /// <param name="quorum"> The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians` </param>
         /// <param name="elGamalPublicKeyInHex"> the public key of the election </param>
         /// <param name="commitmentHashInHex"> the hash of the commitments the guardians make to each other </param>
-        /// <param name="descriptionHashInHex"> the hash of the election metadata </param>
+        /// <param name="manifestHashInHex"> the hash of the election metadata </param>
         /// </summary>
         static std::unique_ptr<CiphertextElectionContext>
         make(const uint64_t numberOfGuardians, const uint64_t quorum,
              const std::string &elGamalPublicKeyInHex, const std::string &commitmentHashInHex,
-             const std::string &descriptionHashInHex);
+             const std::string &manifestHashInHex);
 
         std::vector<uint8_t> toBson() const;
         std::string toJson() const;

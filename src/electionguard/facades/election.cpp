@@ -16,11 +16,11 @@ extern "C" {
 
 using electionguard::CiphertextElectionContext;
 using electionguard::dynamicCopy;
-using electionguard::ElectionDescription;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
-using electionguard::InternalElectionDescription;
+using electionguard::InternalManifest;
 using electionguard::Log;
+using electionguard::Manifest;
 using electionguard::SelectionDescription;
 
 using std::make_unique;
@@ -107,82 +107,81 @@ eg_electionguard_status_t eg_selection_description_crypto_hash(eg_selection_desc
 
 #pragma endregion
 
-#pragma region ElectionDescription
+#pragma region Manifest
 
-eg_electionguard_status_t eg_election_description_free(eg_election_description_t *handle)
+eg_electionguard_status_t eg_election_manifest_free(eg_election_manifest_t *handle)
 {
     if (handle == nullptr) {
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(ElectionDescription, handle); // NOLINT(cppcoreguidelines-owning-memory)
+    delete AS_TYPE(Manifest, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_electionguard_status_t
-eg_election_description_get_election_scope_id(eg_election_description_t *handle,
-                                              char **out_election_scope_id)
+eg_electionguard_status_t eg_election_manifest_get_election_scope_id(eg_election_manifest_t *handle,
+                                                                     char **out_election_scope_id)
 {
     try {
-        auto scopeId = AS_TYPE(ElectionDescription, handle)->getElectionScopeId();
+        auto scopeId = AS_TYPE(Manifest, handle)->getElectionScopeId();
         *out_election_scope_id = dynamicCopy(scopeId);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_election_description_get_election_scope_id", e);
+        Log::error(":eg_election_manifest_get_election_scope_id", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
 
-eg_electionguard_status_t eg_election_description_crypto_hash(eg_election_description_t *handle,
-                                                              eg_element_mod_q_t **out_owned_hash)
+eg_electionguard_status_t eg_election_manifest_crypto_hash(eg_election_manifest_t *handle,
+                                                           eg_element_mod_q_t **out_owned_hash)
 {
     try {
-        auto cryptoHash = AS_TYPE(ElectionDescription, handle)->crypto_hash();
+        auto cryptoHash = AS_TYPE(Manifest, handle)->crypto_hash();
         *out_owned_hash = AS_TYPE(eg_element_mod_q_t, cryptoHash.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_election_description_crypto_hash", e);
+        Log::error(":eg_election_manifest_crypto_hash", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
 
-eg_electionguard_status_t eg_election_description_from_json(char *in_data,
-                                                            eg_election_description_t **out_handle)
+eg_electionguard_status_t eg_election_manifest_from_json(char *in_data,
+                                                         eg_election_manifest_t **out_handle)
 {
     try {
         auto data = string(in_data);
-        auto deserialized = ElectionDescription::fromJson(data);
+        auto deserialized = Manifest::fromJson(data);
 
-        *out_handle = AS_TYPE(eg_election_description_t, deserialized.release());
+        *out_handle = AS_TYPE(eg_election_manifest_t, deserialized.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_election_description_from_json", e);
+        Log::error(":eg_election_manifest_from_json", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
 
-eg_electionguard_status_t eg_election_description_from_bson(uint8_t *in_data, uint64_t in_length,
-                                                            eg_election_description_t **out_handle)
+eg_electionguard_status_t eg_election_manifest_from_bson(uint8_t *in_data, uint64_t in_length,
+                                                         eg_election_manifest_t **out_handle)
 {
     try {
         auto data_bytes = vector<uint8_t>(in_data, in_data + in_length);
-        auto deserialized = ElectionDescription::fromBson(data_bytes);
+        auto deserialized = Manifest::fromBson(data_bytes);
 
-        *out_handle = AS_TYPE(eg_election_description_t, deserialized.release());
+        *out_handle = AS_TYPE(eg_election_manifest_t, deserialized.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_election_description_from_bson", e);
+        Log::error(":eg_election_manifest_from_bson", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
 
-eg_electionguard_status_t eg_election_description_to_json(eg_election_description_t *handle,
-                                                          char **out_data, size_t *out_size)
+eg_electionguard_status_t eg_election_manifest_to_json(eg_election_manifest_t *handle,
+                                                       char **out_data, size_t *out_size)
 {
     try {
-        auto *domain_type = AS_TYPE(ElectionDescription, handle);
+        auto *domain_type = AS_TYPE(Manifest, handle);
         auto data_string = domain_type->toJson();
 
         size_t size = 0;
@@ -191,16 +190,16 @@ eg_electionguard_status_t eg_election_description_to_json(eg_election_descriptio
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_election_description_to_json", e);
+        Log::error(":eg_election_manifest_to_json", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
 
-eg_electionguard_status_t eg_election_description_to_bson(eg_election_description_t *handle,
-                                                          uint8_t **out_data, size_t *out_size)
+eg_electionguard_status_t eg_election_manifest_to_bson(eg_election_manifest_t *handle,
+                                                       uint8_t **out_data, size_t *out_size)
 {
     try {
-        auto *domain_type = AS_TYPE(ElectionDescription, handle);
+        auto *domain_type = AS_TYPE(Manifest, handle);
         auto data_bytes = domain_type->toBson();
 
         size_t size = 0;
@@ -209,90 +208,85 @@ eg_electionguard_status_t eg_election_description_to_bson(eg_election_descriptio
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_internal_election_description_to_bson", e);
+        Log::error(":eg_internal_manifest_to_bson", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
 
 #pragma endregion
 
-#pragma region InternalElectionDescription
+#pragma region InternalManifest
 
-eg_electionguard_status_t
-eg_internal_election_description_new(eg_election_description_t *in_election_description,
-                                     eg_internal_election_description_t **out_handle)
+eg_electionguard_status_t eg_internal_manifest_new(eg_election_manifest_t *in_manifest,
+                                                   eg_internal_manifest_t **out_handle)
 {
     try {
-        auto *domain_type = AS_TYPE(ElectionDescription, in_election_description);
-        auto pointer = make_unique<InternalElectionDescription>(*domain_type);
+        auto *domain_type = AS_TYPE(Manifest, in_manifest);
+        auto pointer = make_unique<InternalManifest>(*domain_type);
 
-        *out_handle = AS_TYPE(eg_internal_election_description_t, pointer.release());
+        *out_handle = AS_TYPE(eg_internal_manifest_t, pointer.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_internal_election_description_new", e);
+        Log::error(":eg_internal_manifest_new", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
 
-eg_electionguard_status_t
-eg_internal_election_description_free(eg_internal_election_description_t *handle)
+eg_electionguard_status_t eg_internal_manifest_free(eg_internal_manifest_t *handle)
 {
     if (handle == nullptr) {
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
     }
 
-    delete AS_TYPE(InternalElectionDescription, handle); // NOLINT(cppcoreguidelines-owning-memory)
+    delete AS_TYPE(InternalManifest, handle); // NOLINT(cppcoreguidelines-owning-memory)
     handle = nullptr;
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 eg_electionguard_status_t
-eg_internal_election_description_get_description_hash(eg_internal_election_description_t *handle,
-                                                      eg_element_mod_q_t **out_description_hash_ref)
+eg_internal_manifest_get_manifest_hash(eg_internal_manifest_t *handle,
+                                       eg_element_mod_q_t **out_manifest_hash_ref)
 {
-    const auto *description = AS_TYPE(InternalElectionDescription, handle)->getDescriptionHash();
-    *out_description_hash_ref = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(description));
+    const auto *manifestHash = AS_TYPE(InternalManifest, handle)->getManifestHash();
+    *out_manifest_hash_ref = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(manifestHash));
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_electionguard_status_t
-eg_internal_election_description_from_json(char *in_data,
-                                           eg_internal_election_description_t **out_handle)
+eg_electionguard_status_t eg_internal_manifest_from_json(char *in_data,
+                                                         eg_internal_manifest_t **out_handle)
 {
     try {
         auto data = string(in_data);
-        auto deserialized = InternalElectionDescription::fromJson(data);
+        auto deserialized = InternalManifest::fromJson(data);
 
-        *out_handle = AS_TYPE(eg_internal_election_description_t, deserialized.release());
+        *out_handle = AS_TYPE(eg_internal_manifest_t, deserialized.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_internal_election_description_from_json", e);
+        Log::error(":eg_internal_manifest_from_json", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
 
-eg_electionguard_status_t
-eg_internal_election_description_from_bson(uint8_t *in_data, uint64_t in_length,
-                                           eg_internal_election_description_t **out_handle)
+eg_electionguard_status_t eg_internal_manifest_from_bson(uint8_t *in_data, uint64_t in_length,
+                                                         eg_internal_manifest_t **out_handle)
 {
     try {
         auto data_bytes = vector<uint8_t>(in_data, in_data + in_length);
-        auto deserialized = InternalElectionDescription::fromBson(data_bytes);
+        auto deserialized = InternalManifest::fromBson(data_bytes);
 
-        *out_handle = AS_TYPE(eg_internal_election_description_t, deserialized.release());
+        *out_handle = AS_TYPE(eg_internal_manifest_t, deserialized.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_internal_election_description_from_bson", e);
+        Log::error(":eg_internal_manifest_from_bson", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
 
-eg_electionguard_status_t
-eg_internal_election_description_to_json(eg_internal_election_description_t *handle,
-                                         char **out_data, size_t *out_size)
+eg_electionguard_status_t eg_internal_manifest_to_json(eg_internal_manifest_t *handle,
+                                                       char **out_data, size_t *out_size)
 {
     try {
-        auto *domain_type = AS_TYPE(InternalElectionDescription, handle);
+        auto *domain_type = AS_TYPE(InternalManifest, handle);
         auto data_string = domain_type->toJson();
 
         size_t size = 0;
@@ -301,17 +295,16 @@ eg_internal_election_description_to_json(eg_internal_election_description_t *han
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_internal_election_description_to_json", e);
+        Log::error(":eg_internal_manifest_to_json", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
 
-eg_electionguard_status_t
-eg_internal_election_description_to_bson(eg_internal_election_description_t *handle,
-                                         uint8_t **out_data, size_t *out_size)
+eg_electionguard_status_t eg_internal_manifest_to_bson(eg_internal_manifest_t *handle,
+                                                       uint8_t **out_data, size_t *out_size)
 {
     try {
-        auto *domain_type = AS_TYPE(InternalElectionDescription, handle);
+        auto *domain_type = AS_TYPE(InternalManifest, handle);
         auto data_bytes = domain_type->toBson();
 
         size_t size = 0;
@@ -320,7 +313,7 @@ eg_internal_election_description_to_bson(eg_internal_election_description_t *han
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_internal_election_description_to_bson", e);
+        Log::error(":eg_internal_manifest_to_bson", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -359,11 +352,11 @@ eg_ciphertext_election_context_get_commitment_hash(eg_ciphertext_election_contex
 }
 
 eg_electionguard_status_t
-eg_ciphertext_election_context_get_description_hash(eg_ciphertext_election_context_t *handle,
-                                                    eg_element_mod_q_t **out_description_hash_ref)
+eg_ciphertext_election_context_get_manifest_hash(eg_ciphertext_election_context_t *handle,
+                                                 eg_element_mod_q_t **out_manifest_hash_ref)
 {
-    const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getDescriptionHash();
-    *out_description_hash_ref = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(pointer));
+    const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getManifestHash();
+    *out_manifest_hash_ref = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(pointer));
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -387,21 +380,21 @@ eg_electionguard_status_t eg_ciphertext_election_context_get_crypto_extended_bas
 
 eg_electionguard_status_t eg_ciphertext_election_context_make(
   uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
-  eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_description_hash,
+  eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
   eg_ciphertext_election_context_t **out_handle)
 {
     try {
         auto *publicKeyPtr = AS_TYPE(ElementModP, in_elgamal_public_key);
         auto *commitmentHashPtr = AS_TYPE(ElementModQ, in_commitment_hash);
-        auto *descriptionHashPtr = AS_TYPE(ElementModQ, in_description_hash);
+        auto *manifestHashPtr = AS_TYPE(ElementModQ, in_manifest_hash);
 
         unique_ptr<ElementModP> elGamalPublicKey{publicKeyPtr};
         unique_ptr<ElementModQ> commitmentHash{commitmentHashPtr};
-        unique_ptr<ElementModQ> descriptionHash{descriptionHashPtr};
+        unique_ptr<ElementModQ> manifestHash{manifestHashPtr};
 
         auto context =
           CiphertextElectionContext::make(in_number_of_guardians, in_quorum, move(elGamalPublicKey),
-                                          move(commitmentHash), move(descriptionHash));
+                                          move(commitmentHash), move(manifestHash));
 
         *out_handle = AS_TYPE(eg_ciphertext_election_context_t, context.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -413,16 +406,16 @@ eg_electionguard_status_t eg_ciphertext_election_context_make(
 
 eg_electionguard_status_t eg_ciphertext_election_context_make_from_hex(
   uint64_t in_number_of_guardians, uint64_t in_quorum, const char *in_elgamal_public_key,
-  const char *in_commitment_hash, const char *in_description_hash,
+  const char *in_commitment_hash, const char *in_manifest_hash,
   eg_ciphertext_election_context_t **out_handle)
 {
     try {
         auto elGamalPublicKey = string(in_elgamal_public_key);
         auto commitmentHash = string(in_commitment_hash);
-        auto descriptionHash = string(in_description_hash);
+        auto manifestHash = string(in_manifest_hash);
 
         auto context = CiphertextElectionContext::make(
-          in_number_of_guardians, in_quorum, elGamalPublicKey, commitmentHash, descriptionHash);
+          in_number_of_guardians, in_quorum, elGamalPublicKey, commitmentHash, manifestHash);
         *out_handle = AS_TYPE(eg_ciphertext_election_context_t, context.release());
 
         return ELECTIONGUARD_STATUS_SUCCESS;

@@ -22,8 +22,8 @@ using std::unique_ptr;
 using std::vector;
 using std::chrono::system_clock;
 
-using DescriptionSerializer = electionguard::Serialize::ElectionDescription;
-using InternalDescriptionSerializer = electionguard::Serialize::InternalElectionDescription;
+using ManifestSerializer = electionguard::Serialize::Manifest;
+using InternalManifestSerializer = electionguard::Serialize::InternalManifest;
 using ContextSerializer = electionguard::Serialize::CiphertextelectionContext;
 
 namespace electionguard
@@ -1167,9 +1167,9 @@ namespace electionguard
 
 #pragma endregion
 
-#pragma region ElectionDescription
+#pragma region Manifest
 
-    struct ElectionDescription::Impl {
+    struct Manifest::Impl {
         string electionScopeId;
         ElectionType type;
         system_clock::time_point startDate;
@@ -1259,31 +1259,34 @@ namespace electionguard
 
     // Lifecycle Methods
 
-    ElectionDescription::ElectionDescription(
-      const string &electionScopeId, ElectionType type, system_clock::time_point startDate,
-      system_clock::time_point endDate, vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
-      vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
-      vector<unique_ptr<ContestDescription>> contests, vector<unique_ptr<BallotStyle>> ballotStyles)
+    Manifest::Manifest(const string &electionScopeId, ElectionType type,
+                       system_clock::time_point startDate, system_clock::time_point endDate,
+                       vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
+                       vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
+                       vector<unique_ptr<ContestDescription>> contests,
+                       vector<unique_ptr<BallotStyle>> ballotStyles)
         : pimpl(new Impl(electionScopeId, type, startDate, endDate, move(geopoliticalUnits),
                          move(parties), move(candidates), move(contests), move(ballotStyles)))
     {
     }
 
-    ElectionDescription::ElectionDescription(
-      const string &electionScopeId, ElectionType type, system_clock::time_point startDate,
-      system_clock::time_point endDate, vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
-      vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
-      vector<unique_ptr<ContestDescription>> contests, vector<unique_ptr<BallotStyle>> ballotStyles,
-      unique_ptr<InternationalizedText> name, unique_ptr<ContactInformation> contactInformation)
+    Manifest::Manifest(const string &electionScopeId, ElectionType type,
+                       system_clock::time_point startDate, system_clock::time_point endDate,
+                       vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
+                       vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
+                       vector<unique_ptr<ContestDescription>> contests,
+                       vector<unique_ptr<BallotStyle>> ballotStyles,
+                       unique_ptr<InternationalizedText> name,
+                       unique_ptr<ContactInformation> contactInformation)
         : pimpl(new Impl(electionScopeId, type, startDate, endDate, move(geopoliticalUnits),
                          move(parties), move(candidates), move(contests), move(ballotStyles),
                          move(name), move(contactInformation)))
     {
     }
 
-    ElectionDescription::~ElectionDescription() = default;
+    Manifest::~Manifest() = default;
 
-    ElectionDescription &ElectionDescription::operator=(ElectionDescription other)
+    Manifest &Manifest::operator=(Manifest other)
     {
         swap(pimpl, other.pimpl);
         return *this;
@@ -1291,12 +1294,12 @@ namespace electionguard
 
     // Property Getters
 
-    string ElectionDescription::getElectionScopeId() const { return pimpl->electionScopeId; }
-    ElectionType ElectionDescription::getElectionType() const { return pimpl->type; }
-    system_clock::time_point ElectionDescription::getStartDate() const { return pimpl->startDate; }
-    system_clock::time_point ElectionDescription::getEndDate() const { return pimpl->endDate; }
+    string Manifest::getElectionScopeId() const { return pimpl->electionScopeId; }
+    ElectionType Manifest::getElectionType() const { return pimpl->type; }
+    system_clock::time_point Manifest::getStartDate() const { return pimpl->startDate; }
+    system_clock::time_point Manifest::getEndDate() const { return pimpl->endDate; }
 
-    vector<reference_wrapper<GeopoliticalUnit>> ElectionDescription::getGeopoliticalUnits() const
+    vector<reference_wrapper<GeopoliticalUnit>> Manifest::getGeopoliticalUnits() const
     {
         vector<reference_wrapper<GeopoliticalUnit>> references;
         references.reserve(pimpl->geopoliticalUnits.size());
@@ -1306,7 +1309,7 @@ namespace electionguard
         return references;
     }
 
-    vector<reference_wrapper<Party>> ElectionDescription::getParties() const
+    vector<reference_wrapper<Party>> Manifest::getParties() const
     {
         vector<reference_wrapper<Party>> references;
         references.reserve(pimpl->parties.size());
@@ -1316,7 +1319,7 @@ namespace electionguard
         return references;
     }
 
-    vector<reference_wrapper<Candidate>> ElectionDescription::getCandidates() const
+    vector<reference_wrapper<Candidate>> Manifest::getCandidates() const
     {
         vector<reference_wrapper<Candidate>> references;
         references.reserve(pimpl->candidates.size());
@@ -1326,7 +1329,7 @@ namespace electionguard
         return references;
     }
 
-    vector<reference_wrapper<ContestDescription>> ElectionDescription::getContests() const
+    vector<reference_wrapper<ContestDescription>> Manifest::getContests() const
     {
         vector<reference_wrapper<ContestDescription>> references;
         references.reserve(pimpl->contests.size());
@@ -1343,7 +1346,7 @@ namespace electionguard
         return references;
     }
 
-    vector<reference_wrapper<BallotStyle>> ElectionDescription::getBallotStyles() const
+    vector<reference_wrapper<BallotStyle>> Manifest::getBallotStyles() const
     {
         vector<reference_wrapper<BallotStyle>> references;
         references.reserve(pimpl->ballotStyles.size());
@@ -1353,80 +1356,73 @@ namespace electionguard
         return references;
     }
 
-    InternationalizedText *ElectionDescription::getName() const { return pimpl->name.get(); }
-    ContactInformation *ElectionDescription::getContactInformation() const
+    InternationalizedText *Manifest::getName() const { return pimpl->name.get(); }
+    ContactInformation *Manifest::getContactInformation() const
     {
         return pimpl->contactInformation.get();
     }
 
     // Public Methods
 
-    vector<uint8_t> ElectionDescription::toBson() const
+    vector<uint8_t> Manifest::toBson() const { return ManifestSerializer::toBson(*this); }
+
+    string Manifest::toJson() { return ManifestSerializer::toJson(*this); }
+
+    string Manifest::toJson() const { return ManifestSerializer::toJson(*this); }
+
+    unique_ptr<Manifest> Manifest::fromJson(string data)
     {
-        return DescriptionSerializer::toBson(*this);
+        return ManifestSerializer::fromJson(move(data));
     }
 
-    string ElectionDescription::toJson() { return DescriptionSerializer::toJson(*this); }
-
-    string ElectionDescription::toJson() const { return DescriptionSerializer::toJson(*this); }
-
-    unique_ptr<ElectionDescription> ElectionDescription::fromJson(string data)
+    unique_ptr<Manifest> Manifest::fromBson(vector<uint8_t> data)
     {
-        return DescriptionSerializer::fromJson(move(data));
+        return ManifestSerializer::fromBson(move(data));
     }
 
-    unique_ptr<ElectionDescription> ElectionDescription::fromBson(vector<uint8_t> data)
-    {
-        return DescriptionSerializer::fromBson(move(data));
-    }
-
-    unique_ptr<ElementModQ> ElectionDescription::crypto_hash() { return pimpl->crypto_hash(); }
-    unique_ptr<ElementModQ> ElectionDescription::crypto_hash() const
-    {
-        return pimpl->crypto_hash();
-    }
+    unique_ptr<ElementModQ> Manifest::crypto_hash() { return pimpl->crypto_hash(); }
+    unique_ptr<ElementModQ> Manifest::crypto_hash() const { return pimpl->crypto_hash(); }
 
 #pragma endregion
 
-#pragma region InternalElectionDescription
+#pragma region InternalManifest
 
-    struct InternalElectionDescription::Impl {
+    struct InternalManifest::Impl {
         vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits;
         vector<unique_ptr<ContestDescriptionWithPlaceholders>> contests;
         vector<unique_ptr<BallotStyle>> ballotStyles;
-        unique_ptr<ElementModQ> descriptionHash;
+        unique_ptr<ElementModQ> manifestHash;
 
         Impl(vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
              vector<unique_ptr<ContestDescriptionWithPlaceholders>> contests,
-             vector<unique_ptr<BallotStyle>> ballotStyles, unique_ptr<ElementModQ> descriptionHash)
+             vector<unique_ptr<BallotStyle>> ballotStyles, unique_ptr<ElementModQ> manifestHash)
             : geopoliticalUnits(move(geopoliticalUnits)), contests(move(contests)),
-              ballotStyles(move(ballotStyles)), descriptionHash(move(descriptionHash))
+              ballotStyles(move(ballotStyles)), manifestHash(move(manifestHash))
         {
         }
     };
 
     // Lifecycle Methods
 
-    InternalElectionDescription::InternalElectionDescription(
+    InternalManifest::InternalManifest(
       vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
       vector<unique_ptr<ContestDescriptionWithPlaceholders>> contests,
-      vector<unique_ptr<BallotStyle>> ballotStyles, const ElementModQ &descriptionHash)
+      vector<unique_ptr<BallotStyle>> ballotStyles, const ElementModQ &manifestHash)
         : pimpl(new Impl(move(geopoliticalUnits), move(contests), move(ballotStyles),
-                         make_unique<ElementModQ>(descriptionHash)))
+                         make_unique<ElementModQ>(manifestHash)))
     {
     }
 
-    InternalElectionDescription::InternalElectionDescription(const ElectionDescription &description)
+    InternalManifest::InternalManifest(const Manifest &description)
         : pimpl(new Impl(copyGeopoliticalUnits(description),
                          generateContestsWithPlaceholders(description),
                          copyBallotStyles(description), description.crypto_hash()))
     {
     }
 
-    InternalElectionDescription::~InternalElectionDescription() = default;
+    InternalManifest::~InternalManifest() = default;
 
-    InternalElectionDescription &
-    InternalElectionDescription::operator=(InternalElectionDescription other)
+    InternalManifest &InternalManifest::operator=(InternalManifest other)
     {
         swap(pimpl, other.pimpl);
         return *this;
@@ -1434,13 +1430,12 @@ namespace electionguard
 
     // Property Getters
 
-    const ElementModQ *InternalElectionDescription::getDescriptionHash() const
+    const ElementModQ *InternalManifest::getManifestHash() const
     {
-        return pimpl->descriptionHash.get();
+        return pimpl->manifestHash.get();
     }
 
-    vector<reference_wrapper<GeopoliticalUnit>>
-    InternalElectionDescription::getGeopoliticalUnits() const
+    vector<reference_wrapper<GeopoliticalUnit>> InternalManifest::getGeopoliticalUnits() const
     {
         vector<reference_wrapper<GeopoliticalUnit>> references;
         references.reserve(pimpl->geopoliticalUnits.size());
@@ -1451,7 +1446,7 @@ namespace electionguard
     }
 
     vector<reference_wrapper<ContestDescriptionWithPlaceholders>>
-    InternalElectionDescription::getContests() const
+    InternalManifest::getContests() const
     {
         vector<reference_wrapper<ContestDescriptionWithPlaceholders>> references;
         references.reserve(pimpl->contests.size());
@@ -1466,7 +1461,7 @@ namespace electionguard
         return references;
     }
 
-    vector<reference_wrapper<BallotStyle>> InternalElectionDescription::getBallotStyles() const
+    vector<reference_wrapper<BallotStyle>> InternalManifest::getBallotStyles() const
     {
         vector<reference_wrapper<BallotStyle>> references;
         references.reserve(pimpl->ballotStyles.size());
@@ -1478,7 +1473,7 @@ namespace electionguard
 
     // Public Methods
 
-    BallotStyle *InternalElectionDescription::getBallotStyle(const std::string &ballotStyleId) const
+    BallotStyle *InternalManifest::getBallotStyle(const std::string &ballotStyleId) const
     {
         for (auto &style : pimpl->ballotStyles) {
             if (style->getObjectId() == ballotStyleId) {
@@ -1489,7 +1484,7 @@ namespace electionguard
     }
 
     vector<reference_wrapper<ContestDescriptionWithPlaceholders>>
-    InternalElectionDescription::getContestsFor(const string &ballotStyleId) const
+    InternalManifest::getContestsFor(const string &ballotStyleId) const
     {
         auto *style = getBallotStyle(ballotStyleId);
         if (style == nullptr || style->getGeopoliticalUnitIds().empty()) {
@@ -1514,37 +1509,29 @@ namespace electionguard
         return contests;
     }
 
-    vector<uint8_t> InternalElectionDescription::toBson() const
+    vector<uint8_t> InternalManifest::toBson() const
     {
-        return InternalDescriptionSerializer::toBson(*this);
+        return InternalManifestSerializer::toBson(*this);
     }
 
-    string InternalElectionDescription::toJson()
+    string InternalManifest::toJson() { return InternalManifestSerializer::toJson(*this); }
+
+    string InternalManifest::toJson() const { return InternalManifestSerializer::toJson(*this); }
+
+    unique_ptr<InternalManifest> InternalManifest::fromJson(string data)
     {
-        return InternalDescriptionSerializer::toJson(*this);
+        return InternalManifestSerializer::fromJson(move(data));
     }
 
-    string InternalElectionDescription::toJson() const
+    unique_ptr<InternalManifest> InternalManifest::fromBson(vector<uint8_t> data)
     {
-        return InternalDescriptionSerializer::toJson(*this);
-    }
-
-    unique_ptr<InternalElectionDescription> InternalElectionDescription::fromJson(string data)
-    {
-        return InternalDescriptionSerializer::fromJson(move(data));
-    }
-
-    unique_ptr<InternalElectionDescription>
-    InternalElectionDescription::fromBson(vector<uint8_t> data)
-    {
-        return InternalDescriptionSerializer::fromBson(move(data));
+        return InternalManifestSerializer::fromBson(move(data));
     }
 
     // Protected Methods
 
     vector<unique_ptr<ContestDescriptionWithPlaceholders>>
-    InternalElectionDescription::generateContestsWithPlaceholders(
-      const ElectionDescription &description)
+    InternalManifest::generateContestsWithPlaceholders(const Manifest &description)
     {
         vector<unique_ptr<ContestDescriptionWithPlaceholders>> contests;
         for (const auto &contest : description.getContests()) {
@@ -1573,7 +1560,7 @@ namespace electionguard
     }
 
     vector<unique_ptr<GeopoliticalUnit>>
-    InternalElectionDescription::copyGeopoliticalUnits(const ElectionDescription &description)
+    InternalManifest::copyGeopoliticalUnits(const Manifest &description)
     {
         vector<unique_ptr<GeopoliticalUnit>> collection;
         auto source = description.getGeopoliticalUnits();
@@ -1584,8 +1571,7 @@ namespace electionguard
         return collection;
     }
 
-    vector<unique_ptr<BallotStyle>>
-    InternalElectionDescription::copyBallotStyles(const ElectionDescription &description)
+    vector<unique_ptr<BallotStyle>> InternalManifest::copyBallotStyles(const Manifest &description)
     {
         vector<unique_ptr<BallotStyle>> collection;
         auto source = description.getBallotStyles();
@@ -1605,15 +1591,15 @@ namespace electionguard
         uint64_t quorum;
         unique_ptr<ElementModP> elGamalPublicKey;
         unique_ptr<ElementModQ> commitmentHash;
-        unique_ptr<ElementModQ> descriptionHash;
+        unique_ptr<ElementModQ> manifestHash;
         unique_ptr<ElementModQ> cryptoBaseHash;
         unique_ptr<ElementModQ> cryptoExtendedBaseHash;
 
         Impl(uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
-             unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> descriptionHash,
+             unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
              unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash)
             : elGamalPublicKey(move(elGamalPublicKey)), commitmentHash(move(commitmentHash)),
-              descriptionHash(move(descriptionHash)), cryptoBaseHash(move(cryptoBaseHash)),
+              manifestHash(move(manifestHash)), cryptoBaseHash(move(cryptoBaseHash)),
               cryptoExtendedBaseHash(move(cryptoExtendedBaseHash))
         {
             this->numberOfGuardians = numberOfGuardians;
@@ -1625,10 +1611,10 @@ namespace electionguard
 
     CiphertextElectionContext::CiphertextElectionContext(
       uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
-      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> descriptionHash,
+      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
       unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash)
         : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-                         move(descriptionHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash)))
+                         move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash)))
     {
     }
     CiphertextElectionContext::~CiphertextElectionContext() = default;
@@ -1654,9 +1640,9 @@ namespace electionguard
     {
         return pimpl->commitmentHash.get();
     }
-    const ElementModQ *CiphertextElectionContext::getDescriptionHash() const
+    const ElementModQ *CiphertextElectionContext::getManifestHash() const
     {
-        return pimpl->descriptionHash.get();
+        return pimpl->manifestHash.get();
     }
     const ElementModQ *CiphertextElectionContext::getCryptoBaseHash() const
     {
@@ -1690,29 +1676,29 @@ namespace electionguard
 
     unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
       uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
-      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> descriptionHash)
+      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash)
     {
         auto cryptoBaseHash = hash_elems(
           {&const_cast<ElementModP &>(P()), &const_cast<ElementModQ &>(Q()),
-           &const_cast<ElementModP &>(G()), numberOfGuardians, quorum, descriptionHash.get()});
+           &const_cast<ElementModP &>(G()), numberOfGuardians, quorum, manifestHash.get()});
 
         auto cryptoExtendedBaseHash = hash_elems({cryptoBaseHash.get(), commitmentHash.get()});
 
         return make_unique<CiphertextElectionContext>(
           numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-          move(descriptionHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash));
+          move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash));
     }
 
     unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
       uint64_t numberOfGuardians, uint64_t quorum, const string &elGamalPublicKeyInHex,
-      const string &commitmentHashInHex, const string &descriptionHashInHex)
+      const string &commitmentHashInHex, const string &manifestHashInHex)
     {
         auto elGamalPublicKey = ElementModP::fromHex(elGamalPublicKeyInHex);
         auto commitmentHash = ElementModQ::fromHex(commitmentHashInHex);
-        auto descriptionHash = ElementModQ::fromHex(descriptionHashInHex);
+        auto manifestHash = ElementModQ::fromHex(manifestHashInHex);
 
         return make(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-                    move(descriptionHash));
+                    move(manifestHash));
     }
 
 #pragma endregion

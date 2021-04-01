@@ -58,8 +58,8 @@ TEST_CASE("Plaintext Ballot Selection Is InValid")
 TEST_CASE("Can serialize PlaintextBallot")
 {
     // Arrange
-    auto metadata = ElectionGenerator::getFakeMetadata(TWO_MOD_Q());
-    auto plaintext = BallotGenerator::getFakeBallot(*metadata);
+    auto manifest = ElectionGenerator::getFakeManifest(TWO_MOD_Q());
+    auto plaintext = BallotGenerator::getFakeBallot(*manifest);
     auto json = plaintext->toJson();
     auto bson = plaintext->toBson();
     auto msgPack = plaintext->toMsgPack();

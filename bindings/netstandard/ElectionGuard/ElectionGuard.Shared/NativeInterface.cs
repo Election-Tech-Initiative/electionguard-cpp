@@ -251,114 +251,114 @@ namespace ElectionGuard
 
         #endregion
 
-        #region ElectionDescription
+        #region Manifest
 
-        internal static unsafe class ElectionDescription
+        internal static unsafe class Manifest
         {
-            internal unsafe struct ElectionDescriptionType { };
+            internal unsafe struct ManifestType { };
 
-            internal class ElectionDescriptionHandle
-                : ElectionguardSafeHandle<ElectionDescriptionType>
+            internal class ManifestHandle
+                : ElectionguardSafeHandle<ManifestType>
             {
                 protected override bool Free()
                 {
                     if (IsClosed) return true;
 
-                    var status = ElectionDescription.Free(this);
+                    var status = Manifest.Free(this);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"ElectionDescription Error Free: {status}");
+                        Console.WriteLine($"Manifest Error Free: {status}");
                         return false;
                     }
                     return true;
                 }
             }
 
-            [DllImport(DllName, EntryPoint = "eg_election_description_free")]
-            internal static extern Status Free(ElectionDescriptionHandle handle);
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_free")]
+            internal static extern Status Free(ManifestHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_election_description_get_election_scope_id")]
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_election_scope_id")]
             internal static extern Status GetElectionScopeId(
-                ElectionDescriptionHandle handle, out IntPtr election_scope_id);
+                ManifestHandle handle, out IntPtr election_scope_id);
 
-            [DllImport(DllName, EntryPoint = "eg_election_description_crypto_hash")]
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_crypto_hash")]
             internal static extern Status CryptoHash(
-                ElectionDescriptionHandle handle,
+                ManifestHandle handle,
                 out ElementModQ.ElementModQHandle crypto_hash);
 
-            [DllImport(DllName, EntryPoint = "eg_election_description_from_json")]
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_from_json")]
             internal static extern Status FromJson(
                 [MarshalAs(UnmanagedType.LPStr)] string data,
-                out ElectionDescriptionHandle handle);
+                out ManifestHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_election_description_from_bson")]
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_from_bson")]
             internal static extern Status FromBson(
-                uint* data, ulong length, ElectionDescriptionHandle handle);
+                uint* data, ulong length, ManifestHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_election_description_to_json")]
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_to_json")]
             internal static extern Status ToJson(
-                ElectionDescriptionHandle handle, out IntPtr data, out UIntPtr size);
+                ManifestHandle handle, out IntPtr data, out UIntPtr size);
 
-            [DllImport(DllName, EntryPoint = "eg_election_description_to_bson")]
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_to_bson")]
             internal static extern Status ToBson(
-                ElectionDescriptionHandle handle, out uint* data, out UIntPtr size);
+                ManifestHandle handle, out uint* data, out UIntPtr size);
         }
 
         #endregion
 
-        #region InternalElectionDescription
+        #region InternalManifest
 
-        internal static unsafe class InternalElectionDescription
+        internal static unsafe class InternalManifest
         {
-            internal unsafe struct InternalElectionDescriptionType { };
+            internal unsafe struct InternalManifestType { };
 
-            internal class InternalElectionDescriptionHandle
-                : ElectionguardSafeHandle<InternalElectionDescriptionType>
+            internal class InternalManifestHandle
+                : ElectionguardSafeHandle<InternalManifestType>
             {
                 protected override bool Free()
                 {
                     if (IsClosed) return true;
 
-                    var status = InternalElectionDescription.Free(this);
+                    var status = InternalManifest.Free(this);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"InternalElectionDescription Error Free: {status}");
+                        Console.WriteLine($"InternalManifest Error Free: {status}");
                         return false;
                     }
                     return true;
                 }
             }
 
-            [DllImport(DllName, EntryPoint = "eg_internal_election_description_new")]
+            [DllImport(DllName, EntryPoint = "eg_internal_manifest_new")]
             internal static extern Status New(
-                ElectionDescription.ElectionDescriptionHandle election_description,
-                out InternalElectionDescriptionHandle handle);
+                Manifest.ManifestHandle manifest,
+                out InternalManifestHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_internal_election_description_free")]
+            [DllImport(DllName, EntryPoint = "eg_internal_manifest_free")]
             internal static extern Status Free(
-                InternalElectionDescriptionHandle handle);
+                InternalManifestHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_internal_election_description_get_description_hash")]
-            internal static extern Status GetDescriptionHash(
-                InternalElectionDescriptionHandle handle,
-                out ElementModQ.ElementModQHandle description_hash);
+            [DllImport(DllName, EntryPoint = "eg_internal_manifest_get_manifest_hash")]
+            internal static extern Status GetManifestHash(
+                InternalManifestHandle handle,
+                out ElementModQ.ElementModQHandle manifest_hash);
 
-            [DllImport(DllName, EntryPoint = "eg_internal_election_description_from_json")]
+            [DllImport(DllName, EntryPoint = "eg_internal_manifest_from_json")]
             internal static extern Status FromJson(
                 [MarshalAs(UnmanagedType.LPStr)] string data,
-                out InternalElectionDescriptionHandle handle);
+                out InternalManifestHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_internal_election_description_from_bson")]
+            [DllImport(DllName, EntryPoint = "eg_internal_manifest_from_bson")]
             internal static extern Status FromBson(
-                uint* data, ulong length, InternalElectionDescriptionHandle handle);
+                uint* data, ulong length, InternalManifestHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_internal_election_description_to_json")]
+            [DllImport(DllName, EntryPoint = "eg_internal_manifest_to_json")]
             internal static extern Status ToJson(
-                InternalElectionDescriptionHandle handle, out IntPtr data, out UIntPtr size);
+                InternalManifestHandle handle, out IntPtr data, out UIntPtr size);
 
-            [DllImport(DllName, EntryPoint = "eg_internal_election_description_to_bson")]
+            [DllImport(DllName, EntryPoint = "eg_internal_manifest_to_bson")]
             internal static extern Status ToBson(
-                InternalElectionDescriptionHandle handle, out uint* data, out UIntPtr size);
+                InternalManifestHandle handle, out uint* data, out UIntPtr size);
         }
 
         #endregion
@@ -399,10 +399,10 @@ namespace ElectionGuard
                 CiphertextElectionContextHandle handle,
                 out ElementModQ.ElementModQHandle commitment_hash);
 
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_get_description_hash")]
-            internal static extern Status GetDescriptionHash(
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_get_manifest_hash")]
+            internal static extern Status GetManifestHash(
                 CiphertextElectionContextHandle handle,
-                out ElementModQ.ElementModQHandle description_hash);
+                out ElementModQ.ElementModQHandle manifest_hash);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_get_crypto_base_hash")]
             internal static extern Status GetCryptoBaseHash(
@@ -420,7 +420,7 @@ namespace ElectionGuard
                 ulong quorum,
                 ElementModP.ElementModPHandle elgamal_public_key,
                 ElementModQ.ElementModQHandle commitment_hash,
-                ElementModQ.ElementModQHandle description_hash,
+                ElementModQ.ElementModQHandle manifest_hash,
                 out CiphertextElectionContextHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_from_hex")]
@@ -429,7 +429,7 @@ namespace ElectionGuard
                 ulong quorum,
                 [MarshalAs(UnmanagedType.LPStr)] string hex_elgamal_public_key,
                 [MarshalAs(UnmanagedType.LPStr)] string hex_commitment_hash,
-                [MarshalAs(UnmanagedType.LPStr)] string hex_description_hash,
+                [MarshalAs(UnmanagedType.LPStr)] string hex_manifest_hash,
                 out CiphertextElectionContextHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_from_json")]
@@ -987,7 +987,7 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_encryption_mediator_new")]
             internal static extern Status New(
-                InternalElectionDescription.InternalElectionDescriptionHandle metadata,
+                InternalManifest.InternalManifestHandle manifest,
                 CiphertextElectionContext.CiphertextElectionContextHandle context,
                 EncryptionDevice.EncryptionDeviceHandle device,
                 out EncryptionMediatorHandle handle);
@@ -1037,7 +1037,7 @@ namespace ElectionGuard
             // [DllImport(DllName, EntryPoint = "eg_encrypt_contest")]
             // internal static extern Status Contest(
             //     PlaintextBallotContest.PlaintextBallotContestHandle plaintext,
-            //     ContestDescription.InternalElectionDescriptionHandle metadata,
+            //     ContestDescription.InternalManifestHandle metadata,
             //     CiphertextElectionContext.CiphertextElectionContextHandle context,
             //     ElementModQ.ElementModQHandle ballot_code_seed,
             //     ElementModQ.ElementModQHandle nonce,
@@ -1047,7 +1047,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot")]
             internal static extern Status Ballot(
                 PlaintextBallot.PlaintextBallotHandle plaintext,
-                InternalElectionDescription.InternalElectionDescriptionHandle internal_manifest,
+                InternalManifest.InternalManifestHandle internal_manifest,
                 CiphertextElectionContext.CiphertextElectionContextHandle context,
                 ElementModQ.ElementModQHandle ballot_code_seed,
                 bool shouldVerifyProofs,
@@ -1056,7 +1056,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot_with_nonce")]
             internal static extern Status Ballot(
                 PlaintextBallot.PlaintextBallotHandle plaintext,
-                InternalElectionDescription.InternalElectionDescriptionHandle internal_manifest,
+                InternalManifest.InternalManifestHandle internal_manifest,
                 CiphertextElectionContext.CiphertextElectionContextHandle context,
                 ElementModQ.ElementModQHandle ballot_code_seed,
                 ElementModQ.ElementModQHandle nonce,
@@ -1066,7 +1066,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_encrypt_compact_ballot")]
             internal static extern Status CompactBallot(
                 PlaintextBallot.PlaintextBallotHandle plaintext,
-                InternalElectionDescription.InternalElectionDescriptionHandle internal_manifest,
+                InternalManifest.InternalManifestHandle internal_manifest,
                 CiphertextElectionContext.CiphertextElectionContextHandle context,
                 ElementModQ.ElementModQHandle ballot_code_seed,
                 bool shouldVerifyProofs,

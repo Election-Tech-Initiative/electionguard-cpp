@@ -68,7 +68,7 @@ struct eg_encryption_mediator_s;
 typedef struct eg_encryption_mediator_s eg_encryption_mediator_t;
 
 EG_API eg_electionguard_status_t eg_encryption_mediator_new(
-  eg_internal_election_description_t *in_metadata, eg_ciphertext_election_context_t *in_context,
+  eg_internal_manifest_t *in_manifest, eg_ciphertext_election_context_t *in_context,
   eg_encryption_device_t *in_encryption_device, eg_encryption_mediator_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_encryption_mediator_free(eg_encryption_mediator_t *handle);
@@ -152,16 +152,18 @@ EG_API eg_electionguard_status_t eg_encrypt_contest(
 * It will fill missing contests with `False` selections and generate `placeholder` selections that are marked `True`.
 *
 * @param[in] in_plaintext: the ballot in the valid input form
-* @param[in] in_internal_manifest: the `InternalElectionDescription` which defines this ballot's structure
+* @param[in] in_manifest: the `InternalManifest` which defines this ballot's structure
 * @param[in] in_context: all the cryptographic context for the election
 * @param[in] in_ballot_code_seed: Hash from previous ballot or starting hash from device
 * @param[in] in_should_verify_proofs: specify if the proofs should be verified prior to returning (default True)
 * @param[out] out_handle a handle to an `eg_ciphertext_ballot_t`. Caller is responsible for lifecycle.
 */
-EG_API eg_electionguard_status_t eg_encrypt_ballot(
-  eg_plaintext_ballot_t *in_plaintext, eg_internal_election_description_t *in_internal_manifest,
-  eg_ciphertext_election_context_t *in_context, eg_element_mod_q_t *in_ballot_code_seed,
-  bool in_should_verify_proofs, eg_ciphertext_ballot_t **out_handle);
+EG_API eg_electionguard_status_t eg_encrypt_ballot(eg_plaintext_ballot_t *in_plaintext,
+                                                   eg_internal_manifest_t *in_manifest,
+                                                   eg_ciphertext_election_context_t *in_context,
+                                                   eg_element_mod_q_t *in_ballot_code_seed,
+                                                   bool in_should_verify_proofs,
+                                                   eg_ciphertext_ballot_t **out_handle);
 
 /**
 * Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`.
@@ -174,7 +176,7 @@ EG_API eg_electionguard_status_t eg_encrypt_ballot(
 * It will fill missing contests with `False` selections and generate `placeholder` selections that are marked `True`.
 *
 * @param[in] in_plaintext: the ballot in the valid input form
-* @param[in] in_internal_manifest: the `InternalElectionDescription` which defines this ballot's structure
+* @param[in] in_manifest: the `InternalManifest` which defines this ballot's structure
 * @param[in] in_context: all the cryptographic context for the election
 * @param[in] in_ballot_code_seed: Hash from previous ballot or starting hash from device
 * @param[in] in_nonce_seed: an optional value used to seed the `Nonce` generated for this ballot
@@ -183,7 +185,7 @@ EG_API eg_electionguard_status_t eg_encrypt_ballot(
 * @param[out] out_handle a handle to an `eg_ciphertext_ballot_t`. Caller is responsible for lifecycle.
 */
 EG_API eg_electionguard_status_t eg_encrypt_ballot_with_nonce(
-  eg_plaintext_ballot_t *in_plaintext, eg_internal_election_description_t *in_internal_manifest,
+  eg_plaintext_ballot_t *in_plaintext, eg_internal_manifest_t *in_manifest,
   eg_ciphertext_election_context_t *in_context, eg_element_mod_q_t *in_ballot_code_seed,
   eg_element_mod_q_t *in_nonce_seed, bool in_should_verify_proofs,
   eg_ciphertext_ballot_t **out_handle);
@@ -202,14 +204,14 @@ EG_API eg_electionguard_status_t eg_encrypt_ballot_with_nonce(
 * of the plaintext ballot along with the crypto parameters that are required to expand the ballot
 *
 * @param[in] in_plaintext: the ballot in the valid input form
-* @param[in] in_internal_manifest: the `InternalElectionDescription` which defines this ballot's structure
+* @param[in] in_manifest: the `InternalManifest` which defines this ballot's structure
 * @param[in] in_context: all the cryptographic context for the election
 * @param[in] in_ballot_code_seed: Hash from previous ballot or hash from device
 * @param[in] in_should_verify_proofs: specify if the proofs should be verified prior to returning (default True)
 * @param[out] out_handle a handle to an `eg_compact_ciphertext_ballot_t`. Caller is responsible for lifecycle.
 */
 EG_API eg_electionguard_status_t eg_encrypt_compact_ballot(
-  eg_plaintext_ballot_t *in_plaintext, eg_internal_election_description_t *in_internal_manifest,
+  eg_plaintext_ballot_t *in_plaintext, eg_internal_manifest_t *in_manifest,
   eg_ciphertext_election_context_t *in_context, eg_element_mod_q_t *in_ballot_code_seed,
   bool in_should_verify_proofs, eg_compact_ciphertext_ballot_t **out_handle);
 

@@ -70,13 +70,13 @@ namespace electionguard
 #pragma region EncryptionMediator
 
     struct EncryptionMediator::Impl {
-        const InternalElectionDescription &internalManifest;
+        const InternalManifest &internalManifest;
         const CiphertextElectionContext &context;
         const EncryptionDevice &encryptionDevice;
         unique_ptr<ElementModQ> ballotCodeSeed;
 
-        Impl(const InternalElectionDescription &internalManifest,
-             const CiphertextElectionContext &context, const EncryptionDevice &encryptionDevice)
+        Impl(const InternalManifest &internalManifest, const CiphertextElectionContext &context,
+             const EncryptionDevice &encryptionDevice)
             : internalManifest(internalManifest), context(context),
               encryptionDevice(encryptionDevice)
 
@@ -84,7 +84,7 @@ namespace electionguard
         }
     };
 
-    EncryptionMediator::EncryptionMediator(const InternalElectionDescription &internalManifest,
+    EncryptionMediator::EncryptionMediator(const InternalManifest &internalManifest,
                                            const CiphertextElectionContext &context,
                                            const EncryptionDevice &encryptionDevice)
         : pimpl(new Impl(internalManifest, context, encryptionDevice))
@@ -197,13 +197,13 @@ namespace electionguard
     }
 
     unique_ptr<PlaintextBallot> emplaceMissingValues(const PlaintextBallot &ballot,
-                                                     const InternalElectionDescription &metadata)
+                                                     const InternalManifest &manifest)
     {
-        auto *style = metadata.getBallotStyle(ballot.getStyleId());
+        auto *style = manifest.getBallotStyle(ballot.getStyleId());
 
         vector<unique_ptr<PlaintextBallotContest>> contests;
         // loop through the contests for the ballot style
-        for (const auto &description : metadata.getContestsFor(style->getObjectId())) {
+        for (const auto &description : manifest.getContestsFor(style->getObjectId())) {
             bool hasContest = false;
             // loop through all the existing contests to find an existing value
             for (const auto &contest : ballot.getContests()) {
@@ -392,8 +392,7 @@ namespace electionguard
     }
 
     vector<unique_ptr<CiphertextBallotContest>>
-    encryptContests(const PlaintextBallot &ballot,
-                    const InternalElectionDescription &internalManifest,
+    encryptContests(const PlaintextBallot &ballot, const InternalManifest &internalManifest,
                     const CiphertextElectionContext &context, const ElementModQ &nonceSeed,
                     bool shouldVerifyProofs /* = true */)
     {
@@ -424,15 +423,13 @@ namespace electionguard
         return encryptedContests;
     }
 
-    unique_ptr<CiphertextBallot> encryptBallot(const PlaintextBallot &ballot,
-                                               const InternalElectionDescription &internalManifest,
-                                               const CiphertextElectionContext &context,
-                                               const ElementModQ &ballotCodeSeed,
-                                               unique_ptr<ElementModQ> nonce /* = nullptr */,
-                                               uint64_t timestamp /* = 0 */,
-                                               bool shouldVerifyProofs /* = true */)
+    unique_ptr<CiphertextBallot>
+    encryptBallot(const PlaintextBallot &ballot, const InternalManifest &manifest,
+                  const CiphertextElectionContext &context, const ElementModQ &ballotCodeSeed,
+                  unique_ptr<ElementModQ> nonce /* = nullptr */, uint64_t timestamp /* = 0 */,
+                  bool shouldVerifyProofs /* = true */)
     {
-        auto *style = internalManifest.getBallotStyle(ballot.getStyleId());
+        auto *style = manifest.getBallotStyle(ballot.getStyleId());
 
         // Validate Input
         if (style == nullptr) {
@@ -446,16 +443,16 @@ namespace electionguard
 
         // Include a representation of the election and the external Id in the nonce's used
         // to derive other nonce values on the ballot
-        auto nonceSeed = CiphertextBallot::nonceSeed(*internalManifest.getDescriptionHash(),
-                                                     ballot.getObjectId(), *nonce);
+        auto nonceSeed =
+          CiphertextBallot::nonceSeed(*manifest.getManifestHash(), ballot.getObjectId(), *nonce);
 
-        Log::debugHex(": descriptionHash   : ", internalManifest.getDescriptionHash()->toHex());
+        Log::debugHex(": manifestHash   : ", manifest.getManifestHash()->toHex());
         Log::debugHex(": ballotCodeSeed          :", ballotCodeSeed.toHex());
         Log::debug(": timestamp         : " + to_string(timestamp));
 
         // encrypt contests
         auto encryptedContests =
-          encryptContests(ballot, internalManifest, context, *nonceSeed, shouldVerifyProofs);
+          encryptContests(ballot, manifest, context, *nonceSeed, shouldVerifyProofs);
 
         // Get the system time
         if (timestamp == 0) {
@@ -463,10 +460,10 @@ namespace electionguard
         }
 
         // make the Ciphertext Ballot object
-        auto encryptedBallot = CiphertextBallot::make(
-          ballot.getObjectId(), ballot.getStyleId(), *internalManifest.getDescriptionHash(),
-          move(encryptedContests), move(nonce), timestamp, make_unique<ElementModQ>(ballotCodeSeed),
-          nullptr);
+        auto encryptedBallot =
+          CiphertextBallot::make(ballot.getObjectId(), ballot.getStyleId(),
+                                 *manifest.getManifestHash(), move(encryptedContests), move(nonce),
+                                 timestamp, make_unique<ElementModQ>(ballotCodeSeed), nullptr);
 
         if (!encryptedBallot) {
             throw runtime_error("encryptedBallot:: Error constructing encrypted ballot");
@@ -480,7 +477,7 @@ namespace electionguard
         }
 
         // verify the ballot.
-        if (encryptedBallot->isValidEncryption(*internalManifest.getDescriptionHash(),
+        if (encryptedBallot->isValidEncryption(*manifest.getManifestHash(),
                                                *context.getElGamalPublicKey(),
                                                *context.getCryptoExtendedBaseHash())) {
             return encryptedBallot;
@@ -489,14 +486,15 @@ namespace electionguard
         throw runtime_error("encryptedBallot: failed validity check");
     }
 
-    unique_ptr<CompactCiphertextBallot> encryptCompactBallot(
-      const PlaintextBallot &ballot, const InternalElectionDescription &internalManifest,
-      const CiphertextElectionContext &context, const ElementModQ &ballotCodeSeed,
-      unique_ptr<ElementModQ> nonceSeed /* = nullptr */, uint64_t timestamp /* = 0 */,
-      bool shouldVerifyProofs /* = true*/)
+    unique_ptr<CompactCiphertextBallot>
+    encryptCompactBallot(const PlaintextBallot &ballot, const InternalManifest &manifest,
+                         const CiphertextElectionContext &context,
+                         const ElementModQ &ballotCodeSeed,
+                         unique_ptr<ElementModQ> nonceSeed /* = nullptr */,
+                         uint64_t timestamp /* = 0 */, bool shouldVerifyProofs /* = true*/)
     {
-        auto normalized = emplaceMissingValues(ballot, internalManifest);
-        auto ciphertext = encryptBallot(*normalized, internalManifest, context, ballotCodeSeed,
+        auto normalized = emplaceMissingValues(ballot, manifest);
+        auto ciphertext = encryptBallot(*normalized, manifest, context, ballotCodeSeed,
                                         move(nonceSeed), timestamp, shouldVerifyProofs);
         return CompactCiphertextBallot::make(*normalized, *ciphertext);
     }

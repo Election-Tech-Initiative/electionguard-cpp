@@ -13,8 +13,8 @@ using namespace std;
 TEST_CASE("Can serialize CompactPlaintextBallot")
 {
     // Arrange
-    auto metadata = ElectionGenerator::getFakeMetadata(TWO_MOD_Q());
-    auto plaintext = BallotGenerator::getFakeBallot(*metadata);
+    auto manifest = ElectionGenerator::getFakeManifest(TWO_MOD_Q());
+    auto plaintext = BallotGenerator::getFakeBallot(*manifest);
     auto compact = CompactPlaintextBallot::make(*plaintext);
     auto msgpack = compact->toMsgPack();
     auto json = compact->toJson();

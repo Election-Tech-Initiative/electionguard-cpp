@@ -79,8 +79,8 @@ namespace electionguard::test::mocks
             return make_unique<PlaintextBallotContest>(contest.getObjectId(), move(selections));
         }
 
-        static unique_ptr<PlaintextBallot>
-        getFakeBallot(const InternalElectionDescription &metadata, uint64_t maxChoices = 1)
+        static unique_ptr<PlaintextBallot> getFakeBallot(const InternalManifest &manifest,
+                                                         uint64_t maxChoices = 1)
         {
             string ballotId =
               "ballot-id-123-ballot-id-123-ballot-id-123-ballot-id-123-ballot-id-123ballot-"
@@ -88,11 +88,11 @@ namespace electionguard::test::mocks
               "123-ballot-id-123-ballot-id-123-ballot-id-123";
 
             vector<unique_ptr<PlaintextBallotContest>> contests;
-            for (const auto &contest : metadata.getContests()) {
+            for (const auto &contest : manifest.getContests()) {
                 contests.push_back(contestFrom(contest.get()));
             }
             return make_unique<PlaintextBallot>(
-              ballotId, metadata.getBallotStyles().at(0).get().getObjectId(), move(contests));
+              ballotId, manifest.getBallotStyles().at(0).get().getObjectId(), move(contests));
         }
     };
 } // namespace electionguard::test::mocks

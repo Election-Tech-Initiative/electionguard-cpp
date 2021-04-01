@@ -3,8 +3,8 @@ using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
-    using NativeElectionDescription = NativeInterface.ElectionDescription.ElectionDescriptionHandle;
-    using NativeInternalElectionDescription = NativeInterface.InternalElectionDescription.InternalElectionDescriptionHandle;
+    using NativeManifest = NativeInterface.Manifest.ManifestHandle;
+    using NativeInternalManifest = NativeInterface.InternalManifest.InternalManifestHandle;
     using NativeCiphertextElectionContext = NativeInterface.CiphertextElectionContext.CiphertextElectionContextHandle;
     using NativeElementModP = NativeInterface.ElementModP.ElementModPHandle;
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
@@ -21,31 +21,31 @@ namespace ElectionGuard
     ///
     /// See: https://developers.google.com/elections-data/reference/election
     /// </summary>
-    public class ElectionDescription : DisposableBase
+    public class Manifest : DisposableBase
     {
         public unsafe string ElectionScopeId
         {
             get
             {
-                var status = NativeInterface.ElectionDescription.GetElectionScopeId(
+                var status = NativeInterface.Manifest.GetElectionScopeId(
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"ElectionDescription Error ObjectId: {status}");
+                    Console.WriteLine($"Manifest Error ObjectId: {status}");
                     return null;
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
         }
 
-        internal unsafe NativeElectionDescription Handle;
+        internal unsafe NativeManifest Handle;
 
-        public unsafe ElectionDescription(string json)
+        public unsafe Manifest(string json)
         {
-            var status = NativeInterface.ElectionDescription.FromJson(json, out Handle);
+            var status = NativeInterface.Manifest.FromJson(json, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"InternalElectionDescription Error Status: {status}");
+                Console.WriteLine($"Manifest Error Status: {status}");
             }
         }
 
@@ -60,11 +60,11 @@ namespace ElectionGuard
 
         public unsafe ElementModQ CryptoHash()
         {
-            var status = NativeInterface.ElectionDescription.CryptoHash(
+            var status = NativeInterface.Manifest.CryptoHash(
                     Handle, out NativeElementModQ value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"DescriptionHash Error Status: {status}");
+                Console.WriteLine($"CryptoHash Error Status: {status}");
                 return null;
             }
             return new ElementModQ(value);
@@ -72,7 +72,7 @@ namespace ElectionGuard
 
         public unsafe string ToJson()
         {
-            var status = NativeInterface.ElectionDescription.ToJson(
+            var status = NativeInterface.Manifest.ToJson(
                 Handle, out IntPtr pointer, out UIntPtr size);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
@@ -85,47 +85,47 @@ namespace ElectionGuard
     }
 
     /// <summary>
-    /// `InternalElectionDescription` is a subset of the `ElectionDescription` structure that specifies
+    /// `InternalManifest` is a subset of the `Manifest` structure that specifies
     /// the components that ElectionGuard uses for conducting an election.  The key component is the
-    /// `contests` collection, which applies placeholder selections to the `ElectionDescription` contests
+    /// `contests` collection, which applies placeholder selections to the `Manifest` contests
     /// </summary>
-    public class InternalElectionDescription : DisposableBase
+    public class InternalManifest : DisposableBase
     {
         /// <summary>
-        /// The hash of the election metadata
+        /// The hash of the election manifest
         /// </summary>
-        public unsafe ElementModQ DescriptionHash
+        public unsafe ElementModQ ManifestHash
         {
             get
             {
-                var status = NativeInterface.InternalElectionDescription.GetDescriptionHash(
+                var status = NativeInterface.InternalManifest.GetManifestHash(
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"DescriptionHash Error Status: {status}");
+                    Console.WriteLine($"ManifestHash Error Status: {status}");
                     return null;
                 }
                 return new ElementModQ(value);
             }
         }
 
-        internal unsafe NativeInternalElectionDescription Handle;
+        internal unsafe NativeInternalManifest Handle;
 
-        public unsafe InternalElectionDescription(ElectionDescription election)
+        public unsafe InternalManifest(Manifest election)
         {
-            var status = NativeInterface.InternalElectionDescription.New(election.Handle, out Handle);
+            var status = NativeInterface.InternalManifest.New(election.Handle, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"InternalElectionDescription Error Status: {status}");
+                Console.WriteLine($"InternalManifest Error Status: {status}");
             }
         }
 
-        public unsafe InternalElectionDescription(string json)
+        public unsafe InternalManifest(string json)
         {
-            var status = NativeInterface.InternalElectionDescription.FromJson(json, out Handle);
+            var status = NativeInterface.InternalManifest.FromJson(json, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"InternalElectionDescription Error Status: {status}");
+                Console.WriteLine($"InternalManifest Error Status: {status}");
             }
         }
 
@@ -140,7 +140,7 @@ namespace ElectionGuard
 
         public unsafe string ToJson()
         {
-            var status = NativeInterface.InternalElectionDescription.ToJson(
+            var status = NativeInterface.InternalManifest.ToJson(
                 Handle, out IntPtr pointer, out UIntPtr size);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
@@ -203,17 +203,17 @@ namespace ElectionGuard
         }
 
         /// <summary>
-        /// The hash of the election metadata
+        /// The hash of the election manifest
         /// </summary>
-        public unsafe ElementModQ DescriptionHash
+        public unsafe ElementModQ ManifestHash
         {
             get
             {
-                var status = NativeInterface.CiphertextElectionContext.GetDescriptionHash(
+                var status = NativeInterface.CiphertextElectionContext.GetManifestHash(
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"DescriptionHash Error Status: {status}");
+                    Console.WriteLine($"ManifestHash Error Status: {status}");
                     return null;
                 }
                 return new ElementModQ(value);

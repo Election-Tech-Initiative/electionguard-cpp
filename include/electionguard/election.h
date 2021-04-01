@@ -56,9 +56,9 @@ typedef struct eg_contest_description_with_placeholders_s
 
 #endif
 
-#ifndef ElectionDescription
+#ifndef Manifest
 
-struct eg_election_description_s;
+struct eg_election_manifest_s;
 
 /**
 * Use this entity for defining the structure of the election and associated
@@ -72,92 +72,89 @@ struct eg_election_description_s;
 *
 * @see https://developers.google.com/elections-data/reference/election
 */
-typedef struct eg_election_description_s eg_election_description_t;
+typedef struct eg_election_manifest_s eg_election_manifest_t;
 
-// no constructors defined.  use `eg_election_description_from_json` or `eg_election_description_from_bson`
+// no constructors defined.  use `eg_election_manifest_from_json` or `eg_election_manifest_from_bson`
 
-EG_API eg_electionguard_status_t eg_election_description_free(eg_election_description_t *handle);
+EG_API eg_electionguard_status_t eg_election_manifest_free(eg_election_manifest_t *handle);
 
-EG_API eg_electionguard_status_t eg_election_description_get_election_scope_id(
-  eg_election_description_t *handle, char **out_election_scope_id);
+EG_API eg_electionguard_status_t eg_election_manifest_get_election_scope_id(
+  eg_election_manifest_t *handle, char **out_election_scope_id);
 
 // TODO: ISSUE #129: implement missing members
 
 /**
- * Get a hash of the metadata components of the `ElectionDescription`
+ * Get a hash of the metadata components of the `Manifest`
  * 
- * @param[in] handle the `eg_election_description_t`
+ * @param[in] handle the `eg_election_manifest_t`
  * @param[out] out_owned_hash the `eg_element_mod_q_t` crypto hash.  
  *                            Caller is responsible fo the lifecycle and 
  *                            must call `eg_element_mod_q_free`
  */
-EG_API eg_electionguard_status_t eg_election_description_crypto_hash(
-  eg_election_description_t *handle, eg_element_mod_q_t **out_owned_hash);
+EG_API eg_electionguard_status_t eg_election_manifest_crypto_hash(
+  eg_election_manifest_t *handle, eg_element_mod_q_t **out_owned_hash);
 
 EG_API eg_electionguard_status_t
-eg_election_description_from_json(char *in_data, eg_election_description_t **out_handle);
+eg_election_manifest_from_json(char *in_data, eg_election_manifest_t **out_handle);
 
-EG_API eg_electionguard_status_t eg_election_description_from_bson(
-  uint8_t *in_data, uint64_t in_length, eg_election_description_t **out_handle);
+EG_API eg_electionguard_status_t eg_election_manifest_from_bson(
+  uint8_t *in_data, uint64_t in_length, eg_election_manifest_t **out_handle);
 
-EG_API eg_electionguard_status_t eg_election_description_to_json(eg_election_description_t *handle,
-                                                                 char **out_data, size_t *out_size);
+EG_API eg_electionguard_status_t eg_election_manifest_to_json(eg_election_manifest_t *handle,
+                                                              char **out_data, size_t *out_size);
 
 // returns the size and fills out_data, caller is responsible for freeing the out_data
-EG_API eg_electionguard_status_t eg_election_description_to_bson(eg_election_description_t *handle,
-                                                                 uint8_t **out_data,
-                                                                 size_t *out_size);
+EG_API eg_electionguard_status_t eg_election_manifest_to_bson(eg_election_manifest_t *handle,
+                                                              uint8_t **out_data, size_t *out_size);
 
 #endif
 
-#ifndef InternalElectionDescription
+#ifndef InternalManifest
 
-struct eg_internal_election_description_s;
+struct eg_internal_manifest_s;
 
 /**
-* `InternalElectionDescription` is a subset of the `ElectionDescription` structure that specifies
+* `InternalManifest` is a subset of the `Manifest` structure that specifies
 * the components that ElectionGuard uses for conducting an election.  The key component is the
-* `contests` collection, which applies placeholder selections to the `ElectionDescription` contests
+* `contests` collection, which applies placeholder selections to the `Manifest` contests
 */
-typedef struct eg_internal_election_description_s eg_internal_election_description_t;
+typedef struct eg_internal_manifest_s eg_internal_manifest_t;
 
 /**
- * Constructs an `InternalElectionDescription` by passing the `ElectionDescription` to the
+ * Constructs an `InternalManifest` by passing the `Manifest` to the
  * constructor
  * 
- * @param[in] in_election_description the `eg_election_description_t`
+ * @param[in] in_manifest the `eg_election_manifest_t`
  * @param[out] out_handle An opaque pointer to the object.  Caller is responsible for lifecycle.
  */
-EG_API eg_electionguard_status_t
-eg_internal_election_description_new(eg_election_description_t *in_election_description,
-                                     eg_internal_election_description_t **out_handle);
+EG_API eg_electionguard_status_t eg_internal_manifest_new(eg_election_manifest_t *in_manifest,
+                                                          eg_internal_manifest_t **out_handle);
 
-EG_API eg_electionguard_status_t
-eg_internal_election_description_free(eg_internal_election_description_t *handle);
+EG_API eg_electionguard_status_t eg_internal_manifest_free(eg_internal_manifest_t *handle);
 
 /**
  * The hash of the election metadata
  * 
- * @param[out] out_description_hash_ref An opaque pointer to the description hash.  
+ * @param[out] out_manifest_hash_ref An opaque pointer to the description hash.  
  *                                      The value is a reference and is not owned by the caller
  */
-EG_API eg_electionguard_status_t eg_internal_election_description_get_description_hash(
-  eg_internal_election_description_t *handle, eg_element_mod_q_t **out_description_hash_ref);
+EG_API eg_electionguard_status_t eg_internal_manifest_get_manifest_hash(
+  eg_internal_manifest_t *handle, eg_element_mod_q_t **out_manifest_hash_ref);
 
 // TODO: ISSUE #129: implement missing members
 
-EG_API eg_electionguard_status_t eg_internal_election_description_from_json(
-  char *in_data, eg_internal_election_description_t **out_handle);
+EG_API eg_electionguard_status_t
+eg_internal_manifest_from_json(char *in_data, eg_internal_manifest_t **out_handle);
 
-EG_API eg_electionguard_status_t eg_internal_election_description_from_bson(
-  uint8_t *in_data, uint64_t in_length, eg_internal_election_description_t **out_handle);
+EG_API eg_electionguard_status_t eg_internal_manifest_from_bson(
+  uint8_t *in_data, uint64_t in_length, eg_internal_manifest_t **out_handle);
 
-EG_API eg_electionguard_status_t eg_internal_election_description_to_json(
-  eg_internal_election_description_t *handle, char **out_data, size_t *out_size);
+EG_API eg_electionguard_status_t eg_internal_manifest_to_json(eg_internal_manifest_t *handle,
+                                                              char **out_data, size_t *out_size);
 
 // returns the size and fills out_data, caller is responsible for freeing the out_data
-EG_API eg_electionguard_status_t eg_internal_election_description_to_bson(
-  eg_internal_election_description_t *handle, uint8_t **out_data, size_t *out_size);
+EG_API eg_electionguard_status_t eg_internal_manifest_to_bson(eg_internal_manifest_t *handle,
+                                                              uint8_t **out_data, size_t *out_size);
 
 #endif
 
@@ -194,8 +191,8 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_get_commitment_h
  * @param[out] out_description_hash_ref An opaque pointer to the description hash.  
  *                                      The value is a reference and is not owned by the caller
  */
-EG_API eg_electionguard_status_t eg_ciphertext_election_context_get_description_hash(
-  eg_ciphertext_election_context_t *handle, eg_element_mod_q_t **out_description_hash_ref);
+EG_API eg_electionguard_status_t eg_ciphertext_election_context_get_manifest_hash(
+  eg_ciphertext_election_context_t *handle, eg_element_mod_q_t **out_manifest_hash_ref);
 
 /**
  * The `base hash code (𝑄)` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
@@ -222,12 +219,12 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_get_crypto_exten
  * @param[in] in_quorum The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians`
  * @param[in] in_elgamal_public_key the public key of the election
  * @param[in] in_commitment_hash the hash of the commitments the guardians make to each other
- * @param[in] in_description_hash the hash of the election metadata
+ * @param[in] in_manifest_hash the hash of the election metadata
  * @param[out] out_handle An opaque pointer to the object.  Caller is responsible for lifecycle.
  */
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_make(
   uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
-  eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_description_hash,
+  eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
   eg_ciphertext_election_context_t **out_handle);
 
 /**
@@ -237,12 +234,12 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_make(
  * @param[in] in_quorum The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians`
  * @param[in] in_elgamal_public_key the public key of the election
  * @param[in] in_commitment_hash the hash of the commitments the guardians make to each other
- * @param[in] in_description_hash the hash of the election metadata
+ * @param[in] in_manifest_hash the hash of the election metadata
  * @param[out] out_handle An opaque pointer to the object.  Caller is responsible for lifecycle.
  */
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_make_from_hex(
   uint64_t in_number_of_guardians, uint64_t in_quorum, const char *in_elgamal_public_key,
-  const char *in_commitment_hash, const char *in_description_hash,
+  const char *in_commitment_hash, const char *in_manifest_hash,
   eg_ciphertext_election_context_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_from_json(

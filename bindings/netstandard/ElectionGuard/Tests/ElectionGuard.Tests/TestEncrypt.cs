@@ -12,11 +12,11 @@ namespace ElectionGuard.Tests
         public void test_Compact_Encrypt_Ballot_Simple_Succeeds()
         {
             var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
-            var description = new ElectionDescription(manifest);
-            var metadata = new InternalElectionDescription(description);
-            var context = new CiphertextElectionContext(1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, metadata.DescriptionHash);
+            var description = new Manifest(manifest);
+            var manifest = new InternalManifest(description);
+            var context = new CiphertextElectionContext(1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, manifest.DescriptionHash);
             var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
-            var mediator = new EncryptionMediator(metadata, context, device);
+            var mediator = new EncryptionMediator(manifest, context, device);
 
             var ballot = new PlaintextBallot(plaintext);
 

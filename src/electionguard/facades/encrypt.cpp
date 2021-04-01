@@ -22,7 +22,7 @@ using electionguard::encryptBallot;
 using electionguard::encryptContest;
 using electionguard::EncryptionDevice;
 using electionguard::EncryptionMediator;
-using electionguard::InternalElectionDescription;
+using electionguard::InternalManifest;
 using electionguard::Log;
 using electionguard::PlaintextBallot;
 using electionguard::PlaintextBallotContest;
@@ -78,15 +78,16 @@ eg_electionguard_status_t eg_encryption_device_get_hash(eg_encryption_device_t *
 
 #pragma region EncryptionMediator
 
-eg_electionguard_status_t eg_encryption_mediator_new(
-  eg_internal_election_description_t *in_metadata, eg_ciphertext_election_context_t *in_context,
-  eg_encryption_device_t *in_encryption_device, eg_encryption_mediator_t **out_handle)
+eg_electionguard_status_t eg_encryption_mediator_new(eg_internal_manifest_t *in_manifest,
+                                                     eg_ciphertext_election_context_t *in_context,
+                                                     eg_encryption_device_t *in_encryption_device,
+                                                     eg_encryption_mediator_t **out_handle)
 {
     try {
-        auto *metadata = AS_TYPE(InternalElectionDescription, in_metadata);
+        auto *manifest = AS_TYPE(InternalManifest, in_manifest);
         auto *context = AS_TYPE(CiphertextElectionContext, in_context);
         auto *device = AS_TYPE(EncryptionDevice, in_encryption_device);
-        auto mediator = make_unique<EncryptionMediator>(*metadata, *context, *device);
+        auto mediator = make_unique<EncryptionMediator>(*manifest, *context, *device);
 
         *out_handle = AS_TYPE(eg_encryption_mediator_t, mediator.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -238,7 +239,7 @@ eg_electionguard_status_t eg_encrypt_contest(
 #pragma region EncryptBallot
 
 eg_electionguard_status_t eg_encrypt_ballot(eg_plaintext_ballot_t *in_plaintext,
-                                            eg_internal_election_description_t *in_metadata,
+                                            eg_internal_manifest_t *in_manifest,
                                             eg_ciphertext_election_context_t *in_context,
                                             eg_element_mod_q_t *in_ballot_code_seed,
                                             bool in_should_verify_proofs,
@@ -246,11 +247,11 @@ eg_electionguard_status_t eg_encrypt_ballot(eg_plaintext_ballot_t *in_plaintext,
 {
     try {
         auto *plaintext = AS_TYPE(PlaintextBallot, in_plaintext);
-        auto *metadata = AS_TYPE(InternalElectionDescription, in_metadata);
+        auto *manifest = AS_TYPE(InternalManifest, in_manifest);
         auto *context = AS_TYPE(CiphertextElectionContext, in_context);
         auto *code_seed = AS_TYPE(ElementModQ, in_ballot_code_seed);
 
-        auto ciphertext = encryptBallot(*plaintext, *metadata, *context, *code_seed, nullptr, 0ULL,
+        auto ciphertext = encryptBallot(*plaintext, *manifest, *context, *code_seed, nullptr, 0ULL,
                                         in_should_verify_proofs);
         *out_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -261,19 +262,19 @@ eg_electionguard_status_t eg_encrypt_ballot(eg_plaintext_ballot_t *in_plaintext,
 }
 
 eg_electionguard_status_t eg_encrypt_ballot_with_nonce(
-  eg_plaintext_ballot_t *in_plaintext, eg_internal_election_description_t *in_metadata,
+  eg_plaintext_ballot_t *in_plaintext, eg_internal_manifest_t *in_manifest,
   eg_ciphertext_election_context_t *in_context, eg_element_mod_q_t *in_ballot_code_seed,
   eg_element_mod_q_t *in_nonce, bool in_should_verify_proofs, eg_ciphertext_ballot_t **out_handle)
 {
     try {
         auto *plaintext = AS_TYPE(PlaintextBallot, in_plaintext);
-        auto *metadata = AS_TYPE(InternalElectionDescription, in_metadata);
+        auto *manifest = AS_TYPE(InternalManifest, in_manifest);
         auto *context = AS_TYPE(CiphertextElectionContext, in_context);
         auto *code_seed = AS_TYPE(ElementModQ, in_ballot_code_seed);
         auto *nonce = AS_TYPE(ElementModQ, in_nonce);
         unique_ptr<ElementModQ> nonce_ptr{nonce};
 
-        auto ciphertext = encryptBallot(*plaintext, *metadata, *context, *code_seed,
+        auto ciphertext = encryptBallot(*plaintext, *manifest, *context, *code_seed,
                                         move(nonce_ptr), 0, in_should_verify_proofs);
         *out_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -288,7 +289,7 @@ eg_electionguard_status_t eg_encrypt_ballot_with_nonce(
 #pragma region EncryptCompactBallot
 
 eg_electionguard_status_t eg_encrypt_compact_ballot(eg_plaintext_ballot_t *in_plaintext,
-                                                    eg_internal_election_description_t *in_metadata,
+                                                    eg_internal_manifest_t *in_manifest,
                                                     eg_ciphertext_election_context_t *in_context,
                                                     eg_element_mod_q_t *in_ballot_code_seed,
                                                     bool in_should_verify_proofs,
@@ -296,11 +297,11 @@ eg_electionguard_status_t eg_encrypt_compact_ballot(eg_plaintext_ballot_t *in_pl
 {
     try {
         auto *plaintext = AS_TYPE(PlaintextBallot, in_plaintext);
-        auto *metadata = AS_TYPE(InternalElectionDescription, in_metadata);
+        auto *manifest = AS_TYPE(InternalManifest, in_manifest);
         auto *context = AS_TYPE(CiphertextElectionContext, in_context);
         auto *code_seed = AS_TYPE(ElementModQ, in_ballot_code_seed);
 
-        auto ciphertext = encryptCompactBallot(*plaintext, *metadata, *context, *code_seed, nullptr,
+        auto ciphertext = encryptCompactBallot(*plaintext, *manifest, *context, *code_seed, nullptr,
                                                0, in_should_verify_proofs);
         *out_handle = AS_TYPE(eg_compact_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;

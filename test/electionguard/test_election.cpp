@@ -16,7 +16,7 @@ TEST_CASE("Simple Election Is Valid")
     CHECK(subject->getElectionScopeId() == "jefferson-county-primary");
 }
 
-TEST_CASE("Can serialize ElectionDescription")
+TEST_CASE("Can serialize Manifest")
 {
     // Arrange
     auto subject = ElectionGenerator::getFakeElection();
@@ -25,13 +25,13 @@ TEST_CASE("Can serialize ElectionDescription")
     Log::debug(json);
 
     // Act
-    auto result = ElectionDescription::fromJson(json);
+    auto result = Manifest::fromJson(json);
 
     // Assert
     CHECK(subject->getElectionScopeId().compare(result->getElectionScopeId()) == 0);
 }
 
-TEST_CASE("Can deserialize ElectionDescription")
+TEST_CASE("Can deserialize Manifest")
 {
     const char *election_json =
       "{\"ballot_styles\":[{\"geopolitical_unit_ids\":[\"some-geopoltical-unit-id\"],\"object_id\":"
@@ -57,48 +57,48 @@ TEST_CASE("Can deserialize ElectionDescription")
     // Arrange
 
     // Act
-    auto result = ElectionDescription::fromJson(election_json);
+    auto result = Manifest::fromJson(election_json);
 
     // Assert
     CHECK(result->getElectionScopeId().compare("some-scope-id") == 0);
 }
 
-TEST_CASE("Can construct InternalElectionDescription from ElectionDescription")
+TEST_CASE("Can construct InternalManifest from Manifest")
 {
     // Arrange
     auto data = ElectionGenerator::getFakeElection();
 
     // Act
-    auto result = make_unique<InternalElectionDescription>(*data);
+    auto result = make_unique<InternalManifest>(*data);
 
     // Assert
-    CHECK(data->crypto_hash()->toHex() == result->getDescriptionHash()->toHex());
+    CHECK(data->crypto_hash()->toHex() == result->getManifestHash()->toHex());
     CHECK(data->getContests().size() == result->getContests().size());
 }
 
-TEST_CASE("Can serialize InternalElectionDescription")
+TEST_CASE("Can serialize InternalManifest")
 {
     // Arrange
-    auto metadata = ElectionGenerator::getFakeMetadata(TWO_MOD_Q());
-    auto json = metadata->toJson();
-    auto bson = metadata->toBson();
+    auto manifest = ElectionGenerator::getFakeManifest(TWO_MOD_Q());
+    auto json = manifest->toJson();
+    auto bson = manifest->toBson();
 
     Log::debug(json);
 
     // Act
-    auto fromJson = InternalElectionDescription::fromJson(json);
-    //auto fromBson = InternalElectionDescription::fromBson(bson);
+    auto fromJson = InternalManifest::fromJson(json);
+    //auto fromBson = InternalManifest::fromBson(bson);
 
     // Assert
-    CHECK(metadata->getDescriptionHash()->toHex() == fromJson->getDescriptionHash()->toHex());
+    CHECK(manifest->getManifestHash()->toHex() == fromJson->getManifestHash()->toHex());
 }
 
 TEST_CASE("Can serialize CiphertextElectionContext")
 {
     // Arrange
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto metadata = ElectionGenerator::getFakeMetadata(TWO_MOD_Q());
-    auto context = ElectionGenerator::getFakeContext(*metadata, *keypair->getPublicKey());
+    auto manifest = ElectionGenerator::getFakeManifest(TWO_MOD_Q());
+    auto context = ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey());
     auto json = context->toJson();
     auto bson = context->toBson();
 
@@ -109,9 +109,9 @@ TEST_CASE("Can serialize CiphertextElectionContext")
     auto fromBson = CiphertextElectionContext::fromBson(bson);
 
     // Assert
-    // TODO: validate against metadata->getDescriptionHash()
-    CHECK(fromJson->getDescriptionHash()->toHex() == context->getDescriptionHash()->toHex());
-    CHECK(fromBson->getDescriptionHash()->toHex() == context->getDescriptionHash()->toHex());
+    // TODO: validate against manifest->getManifestHash()
+    CHECK(fromJson->getManifestHash()->toHex() == context->getManifestHash()->toHex());
+    CHECK(fromBson->getManifestHash()->toHex() == context->getManifestHash()->toHex());
 }
 
 TEST_CASE("Can Deserialize CiphertextElectionContext")
@@ -133,17 +133,18 @@ TEST_CASE("Can Deserialize CiphertextElectionContext")
       "7E57306BABDC3FD7F00DBA16B8CC7893E448CEED67B3FF72B0682753FDF1DF066B798422A07B4B2FE9EDF0AC5D5E"
       "FB29F530152DA4ADA4154218B93E73519B38E0F04D811C4050BBC28A575A4EEFAAF970CAEE3F1EE4575C929E53C6"
       "ABF7D2870F485DA\",\"commitment_hash\":"
-      "\"7749DF5EC06636F64780798E90D7EBD6C6E9872695629E0B68F25E4E11C068F0\",\"description_hash\":"
+      "\"7749DF5EC06636F64780798E90D7EBD6C6E9872695629E0B68F25E4E11C068F0\",\"manifest_hash\":"
       "\"7749DF5EC06636F64780798E90D7EBD6C6E9872695629E0B68F25E4E11C068F0\",\"crypto_base_hash\":"
       "\"0FA1F1BFE97937F099FD39102D1FB452500F13AC12EFDE4E5FFD0D0D1C3896056\",\"crypto_extended_"
       "base_hash\":\"0E92481188ACDBC604EC7B8563FBF4024063E874797415CC1E72C7BF5F0114BAD\"}");
-    auto descriptionHash =
+
+    auto manifestHash =
       ElementModQ::fromHex("7749DF5EC06636F64780798E90D7EBD6C6E9872695629E0B68F25E4E11C068F0");
 
     // Act
     auto fromJson = CiphertextElectionContext::fromJson(json);
 
     // Assert
-    // TODO: validate against metadata->getDescriptionHash()
-    CHECK(fromJson->getDescriptionHash()->toHex() == descriptionHash->toHex());
+    // TODO: validate against manifest->getManifestHash()
+    CHECK(fromJson->getManifestHash()->toHex() == manifestHash->toHex());
 }

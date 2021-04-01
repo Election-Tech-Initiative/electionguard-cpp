@@ -124,11 +124,11 @@ namespace electionguard
 
     EG_API std::unique_ptr<PlaintextBallot>
     expandCompactPlaintextBallot(const CompactPlaintextBallot &compactBallot,
-                                 const InternalElectionDescription &metadata);
+                                 const InternalManifest &manifest);
 
     EG_API std::unique_ptr<CiphertextBallot>
     expandCompactCiphertextBallot(const CompactCiphertextBallot &compactCiphertext,
-                                  const InternalElectionDescription &metadata,
+                                  const InternalManifest &manifest,
                                   const CiphertextElectionContext &context);
 
 } // namespace electionguard

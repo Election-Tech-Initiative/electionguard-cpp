@@ -14,11 +14,11 @@ namespace electionguard::test::mocks
     class ElectionGenerator
     {
       public:
-        static unique_ptr<ElectionDescription> getSimpleElectionFromFile()
+        static unique_ptr<Manifest> getSimpleElectionFromFile()
         {
             return getSimpleElectionFromFile("election_manifest_simple.json");
         }
-        static unique_ptr<ElectionDescription> getSimpleElectionFromFile(const string &filename)
+        static unique_ptr<Manifest> getSimpleElectionFromFile(const string &filename)
         {
 
             ifstream file;
@@ -31,7 +31,7 @@ namespace electionguard::test::mocks
             stream << file.rdbuf();
             file.close();
 
-            return ElectionDescription::fromJson(stream.str());
+            return Manifest::fromJson(stream.str());
         }
         static unique_ptr<BallotStyle> getFakeBallotStyle(string objectId, string gpUnitId)
         {
@@ -72,7 +72,7 @@ namespace electionguard::test::mocks
                                                    move(selections));
         }
 
-        static unique_ptr<ElectionDescription> getFakeElection()
+        static unique_ptr<Manifest> getFakeElection()
         {
             vector<unique_ptr<GeopoliticalUnit>> gpUnits;
             gpUnits.push_back(make_unique<GeopoliticalUnit>(
@@ -99,14 +99,13 @@ namespace electionguard::test::mocks
               "some-candidate-contest-object-id", gpUnits.at(0).get()->getObjectId(), 1UL, 2UL,
               "some-candidate-contest-name"));
 
-            return make_unique<ElectionDescription>(
+            return make_unique<Manifest>(
               "some-scope-id", ElectionType::unknown, std::chrono::system_clock::now(),
               std::chrono::system_clock::now(), move(gpUnits), move(parties), move(candidates),
               move(contests), move(ballotStyles));
         }
 
-        static unique_ptr<InternalElectionDescription>
-        getFakeMetadata(const ElementModQ &descriptionHash)
+        static unique_ptr<InternalManifest> getFakeManifest(const ElementModQ &manifestHash)
         {
             vector<unique_ptr<SelectionDescription>> selections1;
             selections1.push_back(
@@ -185,27 +184,26 @@ namespace electionguard::test::mocks
             ballotStyles.push_back(
               make_unique<BallotStyle>("some-ballot-style-id", gpunitIds, partyIds, "some-uri"));
 
-            auto metadata = make_unique<InternalElectionDescription>(
-              move(gpUnits), move(contests), move(ballotStyles), descriptionHash);
-            return metadata;
+            auto manifest = make_unique<InternalManifest>(move(gpUnits), move(contests),
+                                                          move(ballotStyles), manifestHash);
+            return manifest;
         }
 
-        static tuple<unique_ptr<InternalElectionDescription>, unique_ptr<CiphertextElectionContext>>
-        getFakeCiphertextElection(const ElectionDescription &description,
-                                  const ElementModP &publicKey)
+        static tuple<unique_ptr<InternalManifest>, unique_ptr<CiphertextElectionContext>>
+        getFakeCiphertextElection(const Manifest &description, const ElementModP &publicKey)
         {
-            auto metadata = make_unique<InternalElectionDescription>(description);
-            auto context = getFakeContext(*metadata, publicKey);
+            auto manifest = make_unique<InternalManifest>(description);
+            auto context = getFakeContext(*manifest, publicKey);
 
-            return make_tuple(move(metadata), move(context));
+            return make_tuple(move(manifest), move(context));
         }
 
         static unique_ptr<CiphertextElectionContext>
-        getFakeContext(const InternalElectionDescription &metadata, const ElementModP &publicKey)
+        getFakeContext(const InternalManifest &manifest, const ElementModP &publicKey)
         {
             auto context = CiphertextElectionContext::make(
               1UL, 1UL, make_unique<ElementModP>(publicKey), make_unique<ElementModQ>(TWO_MOD_Q()),
-              make_unique<ElementModQ>(*metadata.getDescriptionHash()));
+              make_unique<ElementModQ>(*manifest.getManifestHash()));
             return context;
         }
     };
