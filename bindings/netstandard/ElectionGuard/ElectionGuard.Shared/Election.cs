@@ -146,6 +146,9 @@ namespace ElectionGuard
             Handle = null;
         }
 
+        /// <Summary>
+        /// Export the representation as JSON
+        /// </Summary>
         public unsafe string ToJson()
         {
             var status = NativeInterface.CiphertextElectionContext.ToJson(

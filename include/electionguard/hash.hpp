@@ -24,7 +24,26 @@ namespace electionguard
       std::vector<std::reference_wrapper<const ElementModQ>>, std::vector<uint64_t>,
       std::vector<std::string>>;
 
+    /// <Summary>
+    /// Given zero or more elements, calculate their cryptographic hash
+    /// using SHA256. Allowed element types are `ElementModP`, `ElementModQ`,
+    /// `str`, or `int`, anything implementing `CryptoHashable`, and vectors
+    /// or references of any of those types.
+
+    /// <param name="a"> Zero or more elements of any of the accepted types.</param>
+    /// <returns>A cryptographic hash of these elements, concatenated.</returns>
+    /// </Summary>
     EG_API std::unique_ptr<ElementModQ> hash_elems(const std::vector<CryptoHashableType> &a);
+
+    /// <Summary>
+    /// Given zero or more elements, calculate their cryptographic hash
+    /// using SHA256. Allowed element types are `ElementModP`, `ElementModQ`,
+    /// `str`, or `int`, anything implementing `CryptoHashable`, and vectors
+    /// or references of any of those types.
+
+    /// <param name="a"> Zero or more elements of any of the accepted types.</param>
+    /// <returns>A cryptographic hash of these elements, concatenated.</returns>
+    /// </Summary>
     EG_API std::unique_ptr<ElementModQ> hash_elems(CryptoHashableType a);
 } // namespace electionguard
 

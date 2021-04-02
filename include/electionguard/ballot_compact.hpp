@@ -46,21 +46,70 @@ namespace electionguard
         CompactPlaintextBallot &operator=(CompactPlaintextBallot other);
         CompactPlaintextBallot &operator=(CompactPlaintextBallot &&other);
 
+        /// <Summary>
+        /// A unique Ballot ID that is relevant to the external system and must be unique
+        /// within the dataset of the election.
+        /// </Summary>
         std::string getObjectId() const;
+
+        /// <Summary>
+        /// The Object Id of the ballot style in the election manifest.  This value is used
+        /// to determine which contests to expect on the ballot, to fill in missing values,
+        /// and to validate that the ballot is well-formed
+        /// </Summary>
         std::string getStyleId() const;
 
+        /// <Summary>
+        /// The collection of selections on the ballot ordered by the contest sequence order
+        /// and the selection sequence order.  It is up to the consumer to guarantee the order of elements
+        /// </Summary>
         std::vector<uint64_t> getSelections() const;
+
+        /// <Summary>
+        /// The mapping of extended data selections as they apply to the selections on the ballot
+        /// by index order when calling `getSelections`.
+        /// </Summary>
         std::map<uint64_t, std::reference_wrapper<ExtendedData>> getExtendedData() const;
 
+        /// <Summary>
+        /// Make a compact representation of a plaintext ballot
+        /// </Summary>
         static std::unique_ptr<CompactPlaintextBallot> make(const PlaintextBallot &plaintext);
 
+        /// <Summary>
+        /// Convenience accessor for retrieving the extended data for a selection index
+        /// <returns>a value or a null pointer if none exists</returns>
+        /// </Summary>
         std::unique_ptr<ExtendedData> getExtendedDataFor(const uint64_t index) const;
 
+        /// <Summary>
+        /// Export the ballot representation as BSON
+        /// </Summary>
         std::vector<uint8_t> toBson() const;
+
+        /// <Summary>
+        /// Export the ballot representation as JSON
+        /// </Summary>
         std::string toJson() const;
+
+        /// <Summary>
+        /// Export the ballot representation as MsgPack
+        /// </Summary>
         std::vector<uint8_t> toMsgPack() const;
+
+        /// <Summary>
+        /// Import the ballot representation from JSON
+        /// </Summary>
         static std::unique_ptr<CompactPlaintextBallot> fromJson(std::string data);
+
+        /// <Summary>
+        /// Import the ballot representation from BSON
+        /// </Summary>
         static std::unique_ptr<CompactPlaintextBallot> fromBson(std::vector<uint8_t> data);
+
+        /// <Summary>
+        /// Import the ballot representation from MsgPack
+        /// </Summary>
         static std::unique_ptr<CompactPlaintextBallot> fromMsgPack(std::vector<uint8_t> data);
 
       private:
@@ -92,24 +141,87 @@ namespace electionguard
         CompactCiphertextBallot &operator=(CompactCiphertextBallot other);
         CompactCiphertextBallot &operator=(CompactCiphertextBallot &&other);
 
+        /// <Summary>
+        /// A unique Ballot ID that is relevant to the external system and must be unique
+        /// within the dataset of the election.
+        /// </Summary>
         std::string getObjectId() const;
+
+        /// <Summary>
+        /// Get a pointer to the plaintext representation
+        /// </Summary>
         CompactPlaintextBallot *getPlaintext() const;
+
+        /// <summary>
+        /// The seed hash for the ballot.  It may be the encryption device hash,
+        /// the hash of a previous ballot or the hash of some other value
+        /// that is meaningful to the consuming application.
+        /// </summary>
         ElementModQ *getBallotCodeSeed() const;
+
+        /// <summary>
+        /// The unique ballot code for this ballot that is derived from
+        /// the ballot seed, the timestamp, and the hash of the encrypted values
+        /// </summary>
         ElementModQ *getBallotCode() const;
+
+        /// <summary>
+        /// The nonce value used to encrypt all values in the ballot
+        /// </summary>
         ElementModQ *getNonce() const;
+
+        /// <summary>
+        /// The timestamp indicating when the ballot was encrypted
+        /// as measured by the encryption device.  This value does not
+        /// provide units as it is up to the consuming system to indicate the scale.
+        /// Typically a consumer may use seconds since epoch or ticks since epoch
+        /// </summary>
         uint64_t getTimestamp() const;
+
+        /// <summary>
+        /// Get the ballot box state for this ballot
+        /// </summary>
         BallotBoxState getBallotBoxState() const;
 
+        /// <summary>
+        /// Make a Compact Ciphertext Ballot from plaintext and ciphertext representations
+        /// </summary>
         static std::unique_ptr<CompactCiphertextBallot> make(const PlaintextBallot &plaintext,
                                                              const CiphertextBallot &ciphertext);
 
+        /// <summary>
+        /// Set the ballot box state of the ballot
+        /// </summary>
         void setBallotBoxState(BallotBoxState state);
 
+        /// <Summary>
+        /// Export the ballot representation as BSON
+        /// </Summary>
         std::vector<uint8_t> toBson() const;
+
+        /// <Summary>
+        /// Export the ballot representation as JSON
+        /// </Summary>
         std::string toJson() const;
+
+        /// <Summary>
+        /// Export the ballot representation as MsgPack
+        /// </Summary>
         std::vector<uint8_t> toMsgPack() const;
+
+        /// <Summary>
+        /// Import the ballot representation from JSON
+        /// </Summary>
         static std::unique_ptr<CompactCiphertextBallot> fromJson(std::string data);
+
+        /// <Summary>
+        /// Import the ballot representation from BSON
+        /// </Summary>
         static std::unique_ptr<CompactCiphertextBallot> fromBson(std::vector<uint8_t> data);
+
+        /// <Summary>
+        /// Import the ballot representation from MsgPack
+        /// </Summary>
         static std::unique_ptr<CompactCiphertextBallot> fromMsgPack(std::vector<uint8_t> data);
 
       private:
@@ -117,16 +229,28 @@ namespace electionguard
         std::unique_ptr<Impl> pimpl;
     };
 
+    /// <Summary>
+    /// Make a compact representation of a plaintext ballot
+    /// </Summary>
     EG_API std::unique_ptr<CompactPlaintextBallot>
     compressPlaintextBallot(const PlaintextBallot &plaintext);
 
+    /// <Summary>
+    /// Make a compact representation of a ciphertext ballot
+    /// </Summary>
     EG_API std::unique_ptr<CompactCiphertextBallot>
     compressCiphertextBallot(const PlaintextBallot &plaintext, const CiphertextBallot &ciphertext);
 
+    /// <Summary>
+    /// Expand a compact plaintext ballot into a plaintext ballot
+    /// </Summary>
     EG_API std::unique_ptr<PlaintextBallot>
     expandCompactPlaintextBallot(const CompactPlaintextBallot &compactBallot,
                                  const InternalManifest &manifest);
 
+    /// <Summary>
+    /// Expand a compact ciphertext ballot into a ciphertext ballot
+    /// </Summary>
     EG_API std::unique_ptr<CiphertextBallot>
     expandCompactCiphertextBallot(const CompactCiphertextBallot &compactCiphertext,
                                   const InternalManifest &manifest,

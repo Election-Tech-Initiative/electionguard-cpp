@@ -9,7 +9,7 @@
 namespace electionguard
 {
     /// <summary>
-    /// An exponential ElGamal keypair
+    /// An exponential ElGamal keypair.
     /// </summary>
     class EG_API ElGamalKeyPair
     {
@@ -23,9 +23,19 @@ namespace electionguard
         ElGamalKeyPair &operator=(ElGamalKeyPair rhs);
         ElGamalKeyPair &operator=(ElGamalKeyPair &&rhs);
 
+        /// <Summary>
+        /// The ElGamal Secret Key.
+        /// </Summary>
         ElementModQ *getSecretKey();
+
+        /// <Summary>
+        /// The ElGamal Public Key.
+        /// </Summary>
         ElementModP *getPublicKey();
 
+        /// <Summary>
+        /// Make an elgamal keypair from a secret.
+        /// </Summary>
         static std::unique_ptr<ElGamalKeyPair> fromSecret(const ElementModQ &secretKey);
 
       private:
@@ -51,19 +61,46 @@ namespace electionguard
         bool operator==(const ElGamalCiphertext &other);
         bool operator!=(const ElGamalCiphertext &other);
 
+        /// <Summary>
+        /// The pad value also referred to as A, a, 𝑎, or alpha in the spec.
+        /// </Summary>
         ElementModP *getPad();
+
+        /// <Summary>
+        /// The pad value also referred to as A, a, 𝑎, or alpha in the spec.
+        /// </Summary>
         ElementModP *getPad() const;
+
+        /// <Summary>
+        /// The data value also referred to as B, b, 𝛽, or beta in the spec.
+        /// </Summary>
         ElementModP *getData();
+
+        /// <Summary>
+        /// The data value also referred to as B, b, 𝛽, or beta in the spec.
+        /// </Summary>
         ElementModP *getData() const;
 
         virtual std::unique_ptr<ElementModQ> crypto_hash() override;
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
+        /// <Summary>
+        /// Make an ElGamal Ciphertext from the given pad and data
+        /// </Summary>
         static std::unique_ptr<ElGamalCiphertext> make(const ElementModP &pad,
                                                        const ElementModP &data);
 
+        /// <Summary>
+        /// Decrypt the ciphertext directly using the provided secret key.
+        ///
+        /// This is a convenience accessor useful for some use cases.
+        /// This method should not be used by consumers operating in live secret ballot elections.
+        /// </Summary>
         uint64_t decrypt(const ElementModQ &secretKey);
 
+        /// <Summary>
+        /// Clone the value by making a deep copy.
+        /// </Summary>
         std::unique_ptr<ElGamalCiphertext> clone() const;
 
       private:
@@ -82,6 +119,9 @@ namespace electionguard
     EG_API std::unique_ptr<ElGamalCiphertext>
     elgamalEncrypt(const uint64_t m, const ElementModQ &nonce, const ElementModP &publicKey);
 
+    /// <summary>
+    /// Accumulate the ciphertexts by adding them together.
+    /// </summary>
     EG_API std::unique_ptr<ElGamalCiphertext>
     elgamalAdd(const std::vector<std::reference_wrapper<ElGamalCiphertext>> &ciphertexts);
 } // namespace electionguard

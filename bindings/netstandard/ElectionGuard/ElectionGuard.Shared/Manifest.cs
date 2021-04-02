@@ -22,6 +22,11 @@ namespace ElectionGuard
     /// </summary>
     public class Manifest : DisposableBase
     {
+        /// <Summary>
+        /// Unique identifier for a GpUnit element. Associates the election with
+        /// a reporting unit that represents the geographical scope of the election,
+        /// such as a state or city.
+        /// </Summary>
         public unsafe string ElectionScopeId
         {
             get
@@ -57,6 +62,9 @@ namespace ElectionGuard
             Handle = null;
         }
 
+        /// <Summary>
+        /// A hash representation of the object
+        /// </Summary>
         public unsafe ElementModQ CryptoHash()
         {
             var status = NativeInterface.Manifest.CryptoHash(
@@ -69,6 +77,9 @@ namespace ElectionGuard
             return new ElementModQ(value);
         }
 
+        /// <Summary>
+        /// Export the ballot representation as JSON
+        /// </Summary>
         public unsafe string ToJson()
         {
             var status = NativeInterface.Manifest.ToJson(
@@ -137,6 +148,9 @@ namespace ElectionGuard
             Handle = null;
         }
 
+        /// <Summary>
+        /// Export the ballot representation as JSON
+        /// </Summary>
         public unsafe string ToJson()
         {
             var status = NativeInterface.InternalManifest.ToJson(

@@ -14,9 +14,33 @@
 
 namespace electionguard
 {
-    enum class BallotBoxState { cast = 1, spoiled = 2, unknown = 999 };
+    /// <Summary>
+    /// Enumeration used when marking a ballot as cast or spoiled
+    /// </Summary>
+    enum class BallotBoxState {
+        /// <Summary>
+        /// A ballot that has been explicitly cast
+        /// </Summary>
+        cast = 1,
+        /// <Summary>
+        /// A ballot that has been explicitly spoiled
+        /// </Summary>
+        spoiled = 2,
+        /// <Summary>
+        /// A ballot whose state is unknown to ElectionGuard and will not be included in any election results
+        /// </Summary>
+        unknown = 999
+    };
 
+    /// <Summary>
+    /// Get a string representation of a BallotBoxState enum
+    /// </Summary>
     EG_API std::string getBallotBoxStateString(const BallotBoxState &value);
+
+    /// <Summary>
+    /// Get a BallotBoxState enum from a string.
+    /// <returns>BallotBoxState.unknown if the value cannot be resolved</returns>
+    /// </Summary>
     EG_API BallotBoxState getBallotBoxState(const std::string &value);
 
     /// <summary>
@@ -26,11 +50,21 @@ namespace electionguard
     /// </summary>
     struct ExtendedData {
       public:
+        /// <Summary>
+        /// The string value
+        /// </Summary>
         std::string value;
+
+        /// <Summary>
+        /// The length of the string value
+        /// </Summary>
         uint64_t length;
 
         ExtendedData(std::string value, uint64_t length) : value(value), length(length) {}
 
+        /// <Summary>
+        /// Clone the value by making a deep copy and returning a new unique pointer
+        /// </Summary>
         std::unique_ptr<ExtendedData> clone() const
         {
             return std::make_unique<ExtendedData>(this->value, this->length);
@@ -66,7 +100,15 @@ namespace electionguard
         PlaintextBallotSelection &operator=(PlaintextBallotSelection other);
         PlaintextBallotSelection &operator=(PlaintextBallotSelection &&other);
 
+        /// <Summary>
+        /// Get the objectId of the selection, which is the unique id for
+        /// the selection in a specific contest described in the election manifest.
+        /// </Summary>
         std::string getObjectId() const;
+
+        /// <Summary>
+        /// Get the plaintext vote
+        /// </Summary>
         uint64_t getVote() const;
 
         /// <summary>
@@ -85,6 +127,9 @@ namespace electionguard
         /// </summary>
         bool isValid(const std::string &expectedObjectId) const;
 
+        /// <Summary>
+        /// Clone the value by making a deep copy and returning a new unique pointer
+        /// </Summary>
         std::unique_ptr<PlaintextBallotSelection> clone() const;
 
       private:
@@ -131,10 +176,14 @@ namespace electionguard
         CiphertextBallotSelection &operator=(CiphertextBallotSelection other);
         CiphertextBallotSelection &operator=(CiphertextBallotSelection &&other);
 
+        /// <Summary>
+        /// Get the objectId of the selection, which is the unique id for
+        /// the selection in a specific contest described in the election manifest.
+        /// </Summary>
         std::string getObjectId() const;
 
         /// <summary>
-        /// The SelectionDescription hash
+        /// The hash of the string representation of the Selection Description from the election manifest
         /// </summary>
         ElementModQ *getDescriptionHash() const;
 
@@ -159,7 +208,8 @@ namespace electionguard
         ElementModQ *getNonce();
 
         /// <summary>
-        /// The proof that demonstrates the selection is an encryption of 0 or 1, and was encrypted using the `nonce`
+        /// The proof that demonstrates the selection is an encryption of 0 or 1,
+        /// and was encrypted using the `nonce`
         /// </summary>
         DisjunctiveChaumPedersenProof *getProof() const;
 
@@ -175,6 +225,17 @@ namespace electionguard
         /// </summary>
         virtual std::unique_ptr<ElementModQ>
         crypto_hash_with(const ElementModQ &encryptionSeed) override;
+
+        /// <summary>
+        /// Given an encrypted BallotSelection, generates a hash, suitable for rolling up
+        /// into a hash / tracking code for an entire ballot. Of note, this particular hash examines
+        /// the `encryptionSeed` and `message`, but not the proof.
+        /// This is deliberate, allowing for the possibility of ElectionGuard variants running on
+        /// much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed
+        /// later on.
+        ///
+        /// In most cases the encryption_seed should match the `description_hash`
+        /// </summary>
         virtual std::unique_ptr<ElementModQ>
         crypto_hash_with(const ElementModQ &encryptionSeed) const override;
 
@@ -228,6 +289,18 @@ namespace electionguard
         //TODO: void setNonce(ElementModQ *nonce);
     };
 
+    /// <summary>
+    /// A PlaintextBallotContest represents the selections made by a voter for a specific ContestDescription
+    ///
+    /// This class can be either a partial or a complete representation of a contest dataset.  Specifically,
+    /// a partial representation must include at a minimum the "affirmative" selections of a contest.
+    /// A complete representation of a ballot must include both affirmative and negative selections of
+    /// the contest, AND the placeholder selections necessary to satisfy the ConstantChaumPedersen proof
+    /// in the CiphertextBallotContest.
+    ///
+    /// Typically partial contests may be passed into Electionguard for memory constrained systems,
+    /// while complete contests are passed into ElectionGuard when running encryption on an existing dataset.
+    /// </summary>
     class EG_API PlaintextBallotContest
     {
       public:
@@ -240,9 +313,22 @@ namespace electionguard
         PlaintextBallotContest &operator=(PlaintextBallotContest other);
         PlaintextBallotContest &operator=(PlaintextBallotContest &&other);
 
+        /// <Summary>
+        /// Get the objectId of the contest, which is the unique id for
+        /// the contest in a specific ballot style described in the election manifest.
+        /// </Summary>
         std::string getObjectId() const;
+
+        /// <Summary>
+        /// The collection of selections for this ballot contest
+        /// </Summary>
         std::vector<std::reference_wrapper<PlaintextBallotSelection>> getSelections() const;
 
+        /// <Summary>
+        /// Given a PlaintextBallotContest returns true if the state is representative of the expected values.
+        ///
+        /// Note: because this class supports partial representations, undervotes are considered a valid state.
+        /// </Summary>
         bool isValid(const std::string &expectedObjectId, uint64_t expectedNumberSelections,
                      uint64_t expectedNumberElected, uint64_t votesAllowd = 0) const;
 
@@ -281,10 +367,14 @@ namespace electionguard
         CiphertextBallotContest &operator=(CiphertextBallotContest other);
         CiphertextBallotContest &operator=(CiphertextBallotContest &&other);
 
+        /// <Summary>
+        /// Get the objectId of the contest, which is the unique id for
+        /// the contest in a specific ballot style described in the election manifest.
+        /// </Summary>
         std::string getObjectId() const;
 
         /// <summary>
-        /// Hash from contestDescription
+        /// The hash of the string representation of the Contest Description from the election manifest
         /// </summary>
         ElementModQ *getDescriptionHash() const;
 
@@ -343,13 +433,14 @@ namespace electionguard
              std::unique_ptr<ConstantChaumPedersenProof> proof = nullptr);
 
         /// <summary>
-        /// an aggregate nonce for the contest composed of the nonces of the selections
+        /// An aggregate nonce for the contest composed of the nonces of the selections.
+        /// Used when constructing the proof of selection limit
         /// </summary>
         std::unique_ptr<ElementModQ> aggregateNonce() const;
 
         /// <summary>
         /// Add the individual ballot_selections `message` fields together, suitable for use
-        /// in a Chaum-Pedersen proof.
+        /// when constructing the proof of selection limit.
         /// </summary>
         std::unique_ptr<ElGamalCiphertext> elgamalAccumulate() const;
 
@@ -384,9 +475,15 @@ namespace electionguard
     };
 
     /// <summary>
-    /// A PlaintextBallot represents a voters selections for a given ballot and ballot style
+    /// A PlaintextBallot represents a voters selections for a given ballot and ballot style.
     ///
-    /// <param name="object_id"> A unique Ballot ID that is relevant to the external system </param>
+    /// This class can be either a partial or a complete representation of the expected values of a ballot dataset.
+    /// Specifically, a partial representation must include at a minimum the "affirmative" selections
+    /// of every contest where a selection is made.  A partial representation may exclude contests for which
+    /// no selection is made.
+    ///
+    /// A complete representation of a ballot must include both affirmative and negative selections of
+    /// every contest, AND the placeholder selections necessary to satisfy the NIZKPs for each contest and selection.
     /// </summary>
     class EG_API PlaintextBallot
     {
@@ -400,16 +497,52 @@ namespace electionguard
         PlaintextBallot &operator=(PlaintextBallot other);
         PlaintextBallot &operator=(PlaintextBallot &&other);
 
+        /// <Summary>
+        /// A unique Ballot ID that is relevant to the external system and must be unique
+        /// within the dataset of the election.
+        /// </Summary>
         std::string getObjectId() const;
+
+        /// <Summary>
+        /// The Object Id of the ballot style in the election manifest.  This value is used
+        /// to determine which contests to expect on the ballot, to fill in missing values,
+        /// and to validate that the ballot is well-formed
+        /// </Summary>
         std::string getStyleId() const;
 
+        /// <Summary>
+        /// The collection of contests on the ballot
+        /// </Summary>
         std::vector<std::reference_wrapper<PlaintextBallotContest>> getContests() const;
 
+        /// <Summary>
+        /// Export the ballot representation as BSON
+        /// </Summary>
         std::vector<uint8_t> toBson() const;
+
+        /// <Summary>
+        /// Export the ballot representation as JSON
+        /// </Summary>
         std::string toJson() const;
+
+        /// <Summary>
+        /// Export the ballot representation as MsgPack
+        /// </Summary>
         std::vector<uint8_t> toMsgPack() const;
+
+        /// <Summary>
+        /// Import the ballot representation from BSON
+        /// </Summary>
         static std::unique_ptr<PlaintextBallot> fromBson(std::vector<uint8_t> data);
+
+        /// <Summary>
+        /// Import the ballot representation from JSON
+        /// </Summary>
         static std::unique_ptr<PlaintextBallot> fromJson(std::string data);
+
+        /// <Summary>
+        /// Import the ballot representation from MsgPack
+        /// </Summary>
         static std::unique_ptr<PlaintextBallot> fromMsgPack(std::vector<uint8_t> data);
 
       private:
@@ -425,7 +558,6 @@ namespace electionguard
     /// fields on `Ballotcontest` and `BallotSelection`, this value is sensitive.
     ///
     /// Don't make this directly. Use `make_ciphertext_ballot` instead.
-    /// <param name="object_id"> A unique Ballot ID that is relevant to the external system </param>
     /// </summary>
     class EG_API CiphertextBallot : public CryptoHashCheckable
     {
@@ -446,28 +578,30 @@ namespace electionguard
 
         /// <summary>
         /// The unique ballot id that is meaningful to the consuming application.
-        /// The Must be less than 256 bytes
         /// </summary>
         std::string getObjectId() const;
 
-        /// <summary>
-        /// The `object_id` of the `StyleId` in the `Election` Manifest
-        /// </summary>
+        /// <Summary>
+        /// The Object Id of the ballot style in the election manifest.  This value is used
+        /// to determine which contests to expect on the ballot, to fill in missing values,
+        /// and to validate that the ballot is well-formed
+        /// </Summary>
         std::string getStyleId() const;
 
         /// <summary>
-        /// Hash of the election manifest to which this ballot belongs
+        /// Hash of the complete Election Manifest to which this ballot belongs
         /// </summary>
         ElementModQ *getManifestHash() const;
 
         /// <summary>
-        /// The seed hash for the ballot.  It may be the encryption device hash, the hash of a previous ballot
-        /// or the hash of some other value that is meaningful to the consuming application.
+        /// The seed hash for the ballot.  It may be the encryption device hash,
+        /// the hash of a previous ballot or the hash of some other value
+        /// that is meaningful to the consuming application.
         /// </summary>
         ElementModQ *getBallotCodeSeed() const;
 
         /// <summary>
-        /// The list of contests for this ballot
+        /// The collection of contests for this ballot
         /// </summary>
         std::vector<std::reference_wrapper<CiphertextBallotContest>> getContests() const;
 
@@ -476,6 +610,13 @@ namespace electionguard
         /// the ballot seed, the timestamp, and the hash of the encrypted values
         /// </summary>
         ElementModQ *getBallotCode() const;
+
+        /// <summary>
+        /// The timestamp indicating when the ballot was encrypted
+        /// as measured by the encryption device.  This value does not
+        /// provide units as it is up to the consuming system to indicate the scale.
+        /// Typically a consumer may use seconds since epoch or ticks since epoch
+        /// </summary>
         uint64_t getTimestamp() const;
 
         /// <summary>
@@ -528,7 +669,8 @@ namespace electionguard
                                                       const ElementModQ &nonce);
 
         /// <summary>
-        /// Given an encrypted Ballot, validates the encryption state against a specific ballot seed and public key
+        /// Given an encrypted Ballot, validates the encryption state
+        /// against a specific ballot seed and public key
         /// by verifying the states of this ballot's members (BallotContest's and BallotSelection's).
         /// Calling this function expects that the object is in a well-formed encrypted state
         /// with the `contests` populated with valid encrypted ballot selections,
@@ -545,11 +687,34 @@ namespace electionguard
         /// </summary>
         std::unique_ptr<ElementModQ> nonceSeed();
 
+        /// <Summary>
+        /// Export the ballot representation as BSON
+        /// </Summary>
         std::vector<uint8_t> toBson(bool withNonces = false) const;
+
+        /// <Summary>
+        /// Export the ballot representation as JSON
+        /// </Summary>
         std::string toJson(bool withNonces = false) const;
+
+        /// <Summary>
+        /// Export the ballot representation as MsgPack
+        /// </Summary>
         std::vector<uint8_t> toMsgPack(bool withNonces = false) const;
+
+        /// <Summary>
+        /// Import the ballot representation from JSON
+        /// </Summary>
         static std::unique_ptr<CiphertextBallot> fromJson(std::string data);
+
+        /// <Summary>
+        /// Import the ballot representation from BSON
+        /// </Summary>
         static std::unique_ptr<CiphertextBallot> fromBson(std::vector<uint8_t> data);
+
+        /// <Summary>
+        /// Import the ballot representation from MsgPack
+        /// </Summary>
         static std::unique_ptr<CiphertextBallot> fromMsgPack(std::vector<uint8_t> data);
 
       protected:

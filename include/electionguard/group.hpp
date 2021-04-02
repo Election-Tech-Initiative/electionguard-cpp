@@ -34,24 +34,47 @@ namespace electionguard
 
         // TODO: ISSUE #130: math operators
 
+        /// <Summary>
+        /// Get the integer representation of the element
+        /// <returns> a pointer to the first limb</returns>
+        /// </Summary>
         uint64_t *get() const;
+
+        /// <Summary>
+        /// Validates that the element is actually within the bounds of [0,P).
+        /// </Summary>
         bool isInBounds() const;
+
+        /// <Summary>
+        /// Validates that this element is in Z^r_p.
+        /// </Summary>
         bool isValidResidue() const;
+
+        /// <Summary>
+        /// exports a bytes representation of the integer value in Big Endian format
+        /// </Summary>
         std::vector<uint8_t> toBytes() const;
+
+        /// <Summary>
+        /// exports a hex representation of the integer value in Big Endian format
+        /// </Summary>
         std::string toHex() const;
 
+        /// <Summary>
+        /// clone the object by making a deep copy
+        /// </Summary>
         std::unique_ptr<ElementModP> clone() const;
 
         /// <summary>
-        /// Converts the binary value stored by the hex string
-        /// to its big num representation stored as ElementModQ
+        /// Converts the binary value stored by the hex string in Big Endian format
+        /// to its big num representation stored as ElementModP
         /// </summary>
         static std::unique_ptr<ElementModP> fromHex(const std::string &representation);
 
         /// <summary>
         /// Converts an unsigned long integer value
         /// (that is no larger than an unsigned long int)
-        /// to its big num representation stored as ElementModQ
+        /// to its big num representation stored as ElementModP
         /// </summary>
         static std::unique_ptr<ElementModP> fromUint64(uint64_t representation);
 
@@ -81,11 +104,30 @@ namespace electionguard
 
         // TODO: ISSUE #130: overload math operators and redirect to functions
 
+        /// <Summary>
+        /// Get the integer representation of the element
+        /// <returns> a pointer to the first limb</returns>
+        /// </Summary>
         uint64_t *get() const;
+
+        /// <Summary>
+        /// Validates that the element is actually within the bounds of [0,Q).
+        /// </Summary>
         bool isInBounds() const;
+
+        /// <Summary>
+        /// exports a bytes representation of the integer value in Big Endian format
+        /// </Summary>
         std::vector<uint8_t> toBytes() const;
+
+        /// <Summary>
+        /// exports a hex representation of the integer value in Big Endian format
+        /// </Summary>
         std::string toHex() const;
 
+        /// <Summary>
+        /// clone the object by making a deep copy
+        /// </Summary>
         std::unique_ptr<ElementModQ> clone() const;
 
         /// <summary>
@@ -101,6 +143,9 @@ namespace electionguard
         /// </summary>
         static std::unique_ptr<ElementModQ> fromUint64(uint64_t representation);
 
+        /// <Summary>
+        /// create a copy of the Element in ElementModP space
+        /// </Summary>
         std::unique_ptr<ElementModP> toElementModP() const;
 
       private:
@@ -132,6 +177,9 @@ namespace electionguard
 
     using ElementModPOrQ = std::variant<ElementModP *, ElementModQ *>;
 
+    /// <summary>
+    /// Multplies together the collection and returns the product mod P
+    /// </summary>
     EG_API std::unique_ptr<ElementModP> mul_mod_p(const std::vector<ElementModPOrQ> &elems);
 
     /// <summary>
@@ -161,6 +209,9 @@ namespace electionguard
     /// </summary>
     EG_API std::unique_ptr<ElementModQ> add_mod_q(const ElementModQ &lhs, const ElementModQ &rhs);
 
+    /// <summary>
+    /// Adds together the collection and returns the sum mod Q
+    /// </summary>
     EG_API std::unique_ptr<ElementModQ>
     add_mod_q(const std::vector<std::reference_wrapper<ElementModQ>> &elements);
 

@@ -8,6 +8,9 @@
 
 namespace electionguard
 {
+    /// <summary>
+    /// Indicates that the derived class can be hashed
+    /// </summary>
     class EG_API CryptoHashable
     {
       public:
@@ -20,12 +23,19 @@ namespace electionguard
         {
             throw "CryptoHashable crypto_hash not implemented";
         };
+
+        /// <summary>
+        /// Generates a hash given the fields on the implementing instance.
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() const
         {
             throw "CryptoHashable const crypto_hash not implemented";
         };
     };
 
+    /// <summary>
+    /// Indicates that the derived class can be hashed and later checked against a specific seed
+    /// </summary>
     class EG_API CryptoHashCheckable
     {
       public:
@@ -38,6 +48,9 @@ namespace electionguard
             throw "CryptoHashCheckable crypto_hash_with not implemented";
         };
 
+        /// <summary>
+        /// Generates a hash with a given seed that can be checked later against the seed and class metadata.
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) const
         {
             throw "CryptoHashCheckable const crypto_hash_with not implemented";
