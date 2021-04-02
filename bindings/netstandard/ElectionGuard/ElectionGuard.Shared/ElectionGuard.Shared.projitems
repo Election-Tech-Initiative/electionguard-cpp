@@ -17,5 +17,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Election.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DisposableBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ElGamal.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Manifest.cs" />
   </ItemGroup>
 </Project>

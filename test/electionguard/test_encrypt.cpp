@@ -6,6 +6,7 @@
 #include <electionguard/ballot.hpp>
 #include <electionguard/election.hpp>
 #include <electionguard/encrypt.hpp>
+#include <electionguard/manifest.hpp>
 
 using namespace electionguard;
 using namespace electionguard::test::mocks;

@@ -6,6 +6,7 @@
 #include "ballot_compact.h"
 #include "election.h"
 #include "export.h"
+#include "manifest.h"
 #include "status.h"
 
 #include <stdbool.h>

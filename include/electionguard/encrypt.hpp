@@ -5,6 +5,7 @@
 #include "electionguard/ballot_compact.hpp"
 #include "electionguard/election.hpp"
 #include "electionguard/group.hpp"
+#include "electionguard/manifest.hpp"
 #include "export.h"
 
 #include <memory>

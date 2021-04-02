@@ -7,6 +7,7 @@
 #include "electionguard/election.hpp"
 #include "electionguard/export.h"
 #include "electionguard/group.hpp"
+#include "electionguard/manifest.hpp"
 #include "log.hpp"
 
 #include <cstdint>

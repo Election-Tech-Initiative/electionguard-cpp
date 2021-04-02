@@ -4,6 +4,7 @@
 #include <doctest/doctest.h>
 #include <electionguard/election.hpp>
 #include <electionguard/elgamal.hpp>
+#include <electionguard/manifest.hpp>
 
 using namespace electionguard;
 using namespace electionguard::test::mocks;

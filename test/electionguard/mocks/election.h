@@ -3,6 +3,7 @@
 #define __ELECTIONGUARD_CPP_TEST_MOCKS_ELECTION_H_INCLUDED__
 
 #include <electionguard/election.h>
+#include <electionguard/manifest.h>
 
 #ifdef __cplusplus
 extern "C" {

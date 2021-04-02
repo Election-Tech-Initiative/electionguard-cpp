@@ -8,6 +8,7 @@
 #include "elgamal.hpp"
 #include "export.h"
 #include "group.hpp"
+#include "manifest.hpp"
 
 #include <map>
 #include <memory>

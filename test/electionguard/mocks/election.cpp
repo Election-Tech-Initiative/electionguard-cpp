@@ -4,6 +4,7 @@
 #include "../../../src/electionguard/variant_cast.hpp"
 
 #include <electionguard/election.hpp>
+#include <electionguard/manifest.hpp>
 
 extern "C" {
 #include "election.h"

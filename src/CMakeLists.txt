@@ -26,11 +26,12 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/elgamal.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/encrypt.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/group.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/hash.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum256.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum256.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum4096.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum4096.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/hash.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/manifest.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_code.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_compact.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
@@ -41,6 +42,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/group.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/log.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/manifest.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/convert.hpp
@@ -94,6 +96,8 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/include/electionguard/group.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/hash.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/hash.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/manifest.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/manifest.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/status.h
     
 )

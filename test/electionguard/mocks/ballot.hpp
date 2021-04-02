@@ -5,6 +5,7 @@
 
 #include <electionguard/ballot.hpp>
 #include <electionguard/election.hpp>
+#include <electionguard/manifest.hpp>
 #include <fstream>
 #include <iostream>
 #include <sstream>
