@@ -1,19 +1,21 @@
 #include <assert.h>
-#include <electionguard/tracker.h>
+#include <electionguard/ballot_code.h>
 
-static bool test_generate_tracking_code_rotates(void);
+static bool test_ballot_code_rotates(void);
 
-bool test_tracker(void)
+bool test_ballot_code(void)
 {
-    printf("\n -------- test_tracker.c --------- \n");
-    return test_generate_tracking_code_rotates();
+    printf("\n -------- test_ballot_code.c --------- \n");
+    return test_ballot_code_rotates();
 }
 
-bool test_generate_tracking_code_rotates(void)
+bool test_ballot_code_rotates(void)
 {
+    printf("\n -------- test_ballot_code_rotates --------- \n");
     // Arrange
     eg_element_mod_q_t *device_hash = NULL;
-    if (eg_get_hash_for_device(12345UL, 23456UL, 34567UL, "some-location-string", &device_hash)) {
+    if (eg_ballot_code_get_hash_for_device(12345UL, 23456UL, 34567UL, "some-location-string",
+                                           &device_hash)) {
         assert(false);
     }
 
@@ -31,11 +33,12 @@ bool test_generate_tracking_code_rotates(void)
 
     // Act
     eg_element_mod_q_t *rotating_hash_1 = NULL;
-    if (eg_get_rotating_tracker_hash(device_hash, 1000, first_ballot_hash, &rotating_hash_1)) {
+    if (eg_ballot_code_get_ballot_code(device_hash, 1000, first_ballot_hash, &rotating_hash_1)) {
         assert(false);
     }
     eg_element_mod_q_t *rotating_hash_2 = NULL;
-    if (eg_get_rotating_tracker_hash(rotating_hash_1, 1001, second_ballot_hash, &rotating_hash_2)) {
+    if (eg_ballot_code_get_ballot_code(rotating_hash_1, 1001, second_ballot_hash,
+                                       &rotating_hash_2)) {
         assert(false);
     }
 

@@ -185,14 +185,14 @@ eg_ciphertext_ballot_selection_get_proof(eg_ciphertext_ballot_selection_t *handl
 }
 
 bool eg_ciphertext_ballot_selection_is_valid_encryption(
-  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t *in_seed_hash,
+  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t *in_encryption_seed,
   eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash)
 {
-    auto *seedHash = AS_TYPE(ElementModQ, in_seed_hash);
+    auto *encryptionSeed = AS_TYPE(ElementModQ, in_encryption_seed);
     auto *publicKey = AS_TYPE(ElementModP, in_public_key);
     auto *cryptoExtendedBaseHash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
     return AS_TYPE(CiphertextBallotSelection, handle)
-      ->isValidEncryption(*seedHash, *publicKey, *cryptoExtendedBaseHash);
+      ->isValidEncryption(*encryptionSeed, *publicKey, *cryptoExtendedBaseHash);
 }
 
 #pragma endregion
@@ -347,14 +347,14 @@ eg_ciphertext_ballot_contest_get_proof(eg_ciphertext_ballot_selection_t *handle,
 }
 
 bool eg_ciphertext_ballot_contest_is_valid_encryption(
-  eg_ciphertext_ballot_contest_t *handle, eg_element_mod_q_t *in_seed_hash,
+  eg_ciphertext_ballot_contest_t *handle, eg_element_mod_q_t *in_encryption_seed,
   eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash)
 {
-    auto *seedHash = AS_TYPE(ElementModQ, in_seed_hash);
+    auto *encryptionSeed = AS_TYPE(ElementModQ, in_encryption_seed);
     auto *publicKey = AS_TYPE(ElementModP, in_public_key);
     auto *cryptoExtendedBaseHash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
     return AS_TYPE(CiphertextBallotContest, handle)
-      ->isValidEncryption(*seedHash, *publicKey, *cryptoExtendedBaseHash);
+      ->isValidEncryption(*encryptionSeed, *publicKey, *cryptoExtendedBaseHash);
 }
 
 #pragma endregion
@@ -386,16 +386,16 @@ eg_electionguard_status_t eg_plaintext_ballot_get_object_id(eg_plaintext_ballot_
     }
 }
 
-eg_electionguard_status_t eg_plaintext_ballot_get_ballot_style(eg_plaintext_ballot_t *handle,
-                                                               char **out_ballot_style)
+eg_electionguard_status_t eg_plaintext_ballot_get_style_id(eg_plaintext_ballot_t *handle,
+                                                           char **out_style_id)
 {
     try {
-        auto ballotStyle = AS_TYPE(PlaintextBallot, handle)->getBallotStyle();
-        *out_ballot_style = dynamicCopy(ballotStyle);
+        auto ballotStyle = AS_TYPE(PlaintextBallot, handle)->getStyleId();
+        *out_style_id = dynamicCopy(ballotStyle);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_plaintext_ballot_get_ballot_style", e);
+        Log::error(": eg_plaintext_ballot_get_style_id", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -517,35 +517,35 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_object_id(eg_ciphertext_ballo
     }
 }
 
-eg_electionguard_status_t eg_ciphertext_ballot_get_ballot_style(eg_ciphertext_ballot_t *handle,
-                                                                char **out_ballot_style)
+eg_electionguard_status_t eg_ciphertext_ballot_get_style_id(eg_ciphertext_ballot_t *handle,
+                                                            char **out_style_id)
 {
     try {
-        auto ballotStyle = AS_TYPE(CiphertextBallot, handle)->getBallotStyle();
-        *out_ballot_style = dynamicCopy(ballotStyle);
+        auto ballotStyle = AS_TYPE(CiphertextBallot, handle)->getStyleId();
+        *out_style_id = dynamicCopy(ballotStyle);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_ciphertext_ballot_get_ballot_style", e);
+        Log::error(": eg_ciphertext_ballot_get_style_id", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
 
 eg_electionguard_status_t
-eg_ciphertext_ballot_get_description_hash(eg_ciphertext_ballot_t *handle,
-                                          eg_element_mod_q_t **out_hash_ref)
+eg_ciphertext_ballot_get_manifest_hash(eg_ciphertext_ballot_t *handle,
+                                       eg_element_mod_q_t **out_manifest_hash_ref)
 {
-    auto *descriptionHash = AS_TYPE(CiphertextBallot, handle)->getDescriptionHash();
-    *out_hash_ref = AS_TYPE(eg_element_mod_q_t, descriptionHash);
+    auto *manifestHash = AS_TYPE(CiphertextBallot, handle)->getManifestHash();
+    *out_manifest_hash_ref = AS_TYPE(eg_element_mod_q_t, manifestHash);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 eg_electionguard_status_t
-eg_ciphertext_ballot_get_previous_tracking_hash(eg_ciphertext_ballot_t *handle,
-                                                eg_element_mod_q_t **out_hash_ref)
+eg_ciphertext_ballot_get_ballot_code_seed(eg_ciphertext_ballot_t *handle,
+                                          eg_element_mod_q_t **out_ballot_code_seed_ref)
 {
-    auto *previousTrackingHash = AS_TYPE(CiphertextBallot, handle)->getPreviousTrackingHash();
-    *out_hash_ref = AS_TYPE(eg_element_mod_q_t, previousTrackingHash);
+    auto *codeSeed = AS_TYPE(CiphertextBallot, handle)->getBallotCodeSeed();
+    *out_ballot_code_seed_ref = AS_TYPE(eg_element_mod_q_t, codeSeed);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -573,30 +573,16 @@ eg_ciphertext_ballot_get_contest_at_index(eg_ciphertext_ballot_t *handle, size_t
 }
 
 eg_electionguard_status_t
-eg_ciphertext_ballot_get_tracking_hash(eg_ciphertext_ballot_t *handle,
-                                       eg_element_mod_q_t **out_tracking_hash_ref)
+eg_ciphertext_ballot_get_ballot_code(eg_ciphertext_ballot_t *handle,
+                                     eg_element_mod_q_t **out_ballot_code_ref)
 {
     try {
-        auto *hash = AS_TYPE(CiphertextBallot, handle)->getTrackingHash();
-        *out_tracking_hash_ref = AS_TYPE(eg_element_mod_q_t, hash);
+        auto *code = AS_TYPE(CiphertextBallot, handle)->getBallotCode();
+        *out_ballot_code_ref = AS_TYPE(eg_element_mod_q_t, code);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_ciphertext_ballot_get_tracking_hash", e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
-    }
-}
-
-eg_electionguard_status_t eg_ciphertext_ballot_get_tracking_code(eg_ciphertext_ballot_t *handle,
-                                                                 char **out_tracking_code)
-{
-    try {
-        auto code = AS_TYPE(CiphertextBallot, handle)->getTrackingCode();
-        *out_tracking_code = dynamicCopy(code);
-
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(":eg_ciphertext_ballot_get_tracking_code", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -624,16 +610,16 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_crypto_hash(eg_ciphertext_bal
 }
 
 bool eg_ciphertext_ballot_is_valid_encryption(eg_ciphertext_ballot_t *handle,
-                                              eg_element_mod_q_t *in_seed_hash,
+                                              eg_element_mod_q_t *in_encryption_seed,
                                               eg_element_mod_p_t *in_public_key,
                                               eg_element_mod_q_t *in_crypto_extended_base_hash)
 {
     auto *ciphertext = AS_TYPE(CiphertextBallot, handle);
-    auto *seed_hash = AS_TYPE(ElementModQ, in_seed_hash);
+    auto *encryptionSeed = AS_TYPE(ElementModQ, in_encryption_seed);
     auto *public_key = AS_TYPE(ElementModP, in_public_key);
     auto *extended_hash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
 
-    return ciphertext->isValidEncryption(*seed_hash, *public_key, *extended_hash);
+    return ciphertext->isValidEncryption(*encryptionSeed, *public_key, *extended_hash);
 }
 
 eg_electionguard_status_t eg_ciphertext_ballot_from_json(char *in_data,

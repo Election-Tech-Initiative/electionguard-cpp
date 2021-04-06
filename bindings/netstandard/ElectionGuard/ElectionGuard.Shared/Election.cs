@@ -3,154 +3,10 @@ using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
-    using NativeElectionDescription = NativeInterface.ElectionDescription.ElectionDescriptionHandle;
-    using NativeInternalElectionDescription = NativeInterface.InternalElectionDescription.InternalElectionDescriptionHandle;
     using NativeCiphertextElectionContext = NativeInterface.CiphertextElectionContext.CiphertextElectionContextHandle;
     using NativeElementModP = NativeInterface.ElementModP.ElementModPHandle;
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
 
-    /// <summary>
-    /// Use this entity for defining the structure of the election and associated
-    /// information such as candidates, contests, and vote counts.  This class is
-    /// based on the NIST Election Common Standard Data Specification.  Some deviations
-    /// from the standard exist.
-    ///
-    /// This structure is considered an immutable input object and should not be changed
-    /// through the course of an election, as it's hash representation is the basis for all
-    /// other hash representations within an ElectionGuard election context.
-    ///
-    /// See: https://developers.google.com/elections-data/reference/election
-    /// </summary>
-    public class ElectionDescription : DisposableBase
-    {
-        public unsafe string ElectionScopeId
-        {
-            get
-            {
-                var status = NativeInterface.ElectionDescription.GetElectionScopeId(
-                    Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"ElectionDescription Error ObjectId: {status}");
-                    return null;
-                }
-                return Marshal.PtrToStringAnsi(value);
-            }
-        }
-
-        internal unsafe NativeElectionDescription Handle;
-
-        public unsafe ElectionDescription(string json)
-        {
-            var status = NativeInterface.ElectionDescription.FromJson(json, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"InternalElectionDescription Error Status: {status}");
-            }
-        }
-
-        protected override unsafe void DisposeUnmanaged()
-        {
-            base.DisposeUnmanaged();
-
-            if (Handle == null || Handle.IsInvalid) return;
-            Handle.Dispose();
-            Handle = null;
-        }
-
-        public unsafe ElementModQ CryptoHash()
-        {
-            var status = NativeInterface.ElectionDescription.CryptoHash(
-                    Handle, out NativeElementModQ value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"DescriptionHash Error Status: {status}");
-                return null;
-            }
-            return new ElementModQ(value);
-        }
-
-        public unsafe string ToJson()
-        {
-            var status = NativeInterface.ElectionDescription.ToJson(
-                Handle, out IntPtr pointer, out UIntPtr size);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"ToJson Error Status: {status}");
-                return null;
-            }
-            var json = Marshal.PtrToStringAnsi(pointer);
-            return json;
-        }
-    }
-
-    /// <summary>
-    /// `InternalElectionDescription` is a subset of the `ElectionDescription` structure that specifies
-    /// the components that ElectionGuard uses for conducting an election.  The key component is the
-    /// `contests` collection, which applies placeholder selections to the `ElectionDescription` contests
-    /// </summary>
-    public class InternalElectionDescription : DisposableBase
-    {
-        /// <summary>
-        /// The hash of the election metadata
-        /// </summary>
-        public unsafe ElementModQ DescriptionHash
-        {
-            get
-            {
-                var status = NativeInterface.InternalElectionDescription.GetDescriptionHash(
-                    Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"DescriptionHash Error Status: {status}");
-                    return null;
-                }
-                return new ElementModQ(value);
-            }
-        }
-
-        internal unsafe NativeInternalElectionDescription Handle;
-
-        public unsafe InternalElectionDescription(ElectionDescription election)
-        {
-            var status = NativeInterface.InternalElectionDescription.New(election.Handle, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"InternalElectionDescription Error Status: {status}");
-            }
-        }
-
-        public unsafe InternalElectionDescription(string json)
-        {
-            var status = NativeInterface.InternalElectionDescription.FromJson(json, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"InternalElectionDescription Error Status: {status}");
-            }
-        }
-
-        protected override unsafe void DisposeUnmanaged()
-        {
-            base.DisposeUnmanaged();
-
-            if (Handle == null || Handle.IsInvalid) return;
-            Handle.Dispose();
-            Handle = null;
-        }
-
-        public unsafe string ToJson()
-        {
-            var status = NativeInterface.InternalElectionDescription.ToJson(
-                Handle, out IntPtr pointer, out UIntPtr size);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"ToJson Error Status: {status}");
-                return null;
-            }
-            var json = Marshal.PtrToStringAnsi(pointer);
-            return json;
-        }
-    }
 
     /// <summary>
     /// `CiphertextElectionContext` is the ElectionGuard representation of a specific election
@@ -203,17 +59,17 @@ namespace ElectionGuard
         }
 
         /// <summary>
-        /// The hash of the election metadata
+        /// The hash of the election manifest
         /// </summary>
-        public unsafe ElementModQ DescriptionHash
+        public unsafe ElementModQ ManifestHash
         {
             get
             {
-                var status = NativeInterface.CiphertextElectionContext.GetDescriptionHash(
+                var status = NativeInterface.CiphertextElectionContext.GetManifestHash(
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"DescriptionHash Error Status: {status}");
+                    Console.WriteLine($"ManifestHash Error Status: {status}");
                     return null;
                 }
                 return new ElementModQ(value);
@@ -290,6 +146,9 @@ namespace ElectionGuard
             Handle = null;
         }
 
+        /// <Summary>
+        /// Export the representation as JSON
+        /// </Summary>
         public unsafe string ToJson()
         {
             var status = NativeInterface.CiphertextElectionContext.ToJson(

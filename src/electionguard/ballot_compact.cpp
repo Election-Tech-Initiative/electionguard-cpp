@@ -1,8 +1,8 @@
 #include "electionguard/ballot.hpp"
+#include "electionguard/ballot_code.hpp"
 #include "electionguard/election_object_base.hpp"
 #include "electionguard/encrypt.hpp"
 #include "electionguard/hash.hpp"
-#include "electionguard/tracker.hpp"
 #include "log.hpp"
 #include "serialize.hpp"
 #include "utils.hpp"
@@ -19,9 +19,7 @@ using std::ref;
 using std::reference_wrapper;
 using std::runtime_error;
 using std::string;
-using std::time;
 using std::unique_ptr;
-using std::unordered_map;
 using std::vector;
 
 using CompactPlaintextBallotSerializer = electionguard::Serialize::CompactPlaintextBallot;
@@ -32,25 +30,25 @@ namespace electionguard
 #pragma region CompactPlaintextBallot
 
     struct CompactPlaintextBallot::Impl : public ElectionObjectBase {
-        string ballotStyle;
+        string styleId;
         vector<uint64_t> selections;
         map<uint64_t, unique_ptr<ExtendedData>> extendedData;
 
-        Impl(const string &objectId, const string &ballotStyle, vector<uint64_t> selections,
+        Impl(const string &objectId, const string &styleId, vector<uint64_t> selections,
              map<uint64_t, unique_ptr<ExtendedData>> extendedData)
             : selections(move(selections)), extendedData(move(extendedData))
         {
             this->object_id = objectId;
-            this->ballotStyle = ballotStyle;
+            this->styleId = styleId;
         }
     };
 
     // Lifecycle Methods
 
     CompactPlaintextBallot::CompactPlaintextBallot(
-      const string &objectId, const string &ballotStyle, vector<uint64_t> selections,
+      const string &objectId, const string &styleId, vector<uint64_t> selections,
       map<uint64_t, unique_ptr<ExtendedData>> extendedData)
-        : pimpl(new Impl(objectId, ballotStyle, move(selections), move(extendedData)))
+        : pimpl(new Impl(objectId, styleId, move(selections), move(extendedData)))
     {
     }
     CompactPlaintextBallot::~CompactPlaintextBallot() = default;
@@ -64,7 +62,7 @@ namespace electionguard
     // Property Getters
 
     string CompactPlaintextBallot::getObjectId() const { return pimpl->object_id; }
-    string CompactPlaintextBallot::getBallotStyle() const { return pimpl->ballotStyle; }
+    string CompactPlaintextBallot::getStyleId() const { return pimpl->styleId; }
 
     vector<uint64_t> CompactPlaintextBallot::getSelections() const { return pimpl->selections; }
     map<uint64_t, reference_wrapper<ExtendedData>> CompactPlaintextBallot::getExtendedData() const
@@ -132,16 +130,16 @@ namespace electionguard
     struct CompactCiphertextBallot::Impl : public ElectionObjectBase {
         unique_ptr<CompactPlaintextBallot> plaintext;
         BallotBoxState ballotBoxState;
-        unique_ptr<ElementModQ> previousTrackingHash;
-        unique_ptr<ElementModQ> trackingHash;
+        unique_ptr<ElementModQ> ballotCodeSeed;
+        unique_ptr<ElementModQ> ballotCode;
         uint64_t timestamp;
-        unique_ptr<ElementModQ> ballotNonce;
+        unique_ptr<ElementModQ> nonce;
 
         Impl(unique_ptr<CompactPlaintextBallot> plaintext, BallotBoxState ballotBoxState,
-             unique_ptr<ElementModQ> previousTrackingHash, unique_ptr<ElementModQ> trackingHash,
-             const uint64_t timestamp, unique_ptr<ElementModQ> ballotNonce)
-            : plaintext(move(plaintext)), previousTrackingHash(move(previousTrackingHash)),
-              trackingHash(move(trackingHash)), ballotNonce(move(ballotNonce))
+             unique_ptr<ElementModQ> ballotCodeSeed, unique_ptr<ElementModQ> ballotCode,
+             const uint64_t timestamp, unique_ptr<ElementModQ> nonce)
+            : plaintext(move(plaintext)), ballotCodeSeed(move(ballotCodeSeed)),
+              ballotCode(move(ballotCode)), nonce(move(nonce))
         {
             this->ballotBoxState = ballotBoxState;
             this->timestamp = timestamp;
@@ -152,12 +150,12 @@ namespace electionguard
 
     CompactCiphertextBallot::CompactCiphertextBallot(unique_ptr<CompactPlaintextBallot> plaintext,
                                                      BallotBoxState ballotBoxState,
-                                                     unique_ptr<ElementModQ> previousTrackingHash,
-                                                     unique_ptr<ElementModQ> trackingHash,
+                                                     unique_ptr<ElementModQ> ballotCodeSeed,
+                                                     unique_ptr<ElementModQ> ballotCode,
                                                      const uint64_t timestamp,
-                                                     unique_ptr<ElementModQ> ballotNonce)
-        : pimpl(new Impl(move(plaintext), ballotBoxState, move(previousTrackingHash),
-                         move(trackingHash), timestamp, move(ballotNonce)))
+                                                     unique_ptr<ElementModQ> nonce)
+        : pimpl(new Impl(move(plaintext), ballotBoxState, move(ballotCodeSeed), move(ballotCode),
+                         timestamp, move(nonce)))
     {
     }
     CompactCiphertextBallot::~CompactCiphertextBallot() = default;
@@ -180,17 +178,14 @@ namespace electionguard
         return pimpl->plaintext.get();
     }
 
-    ElementModQ *CompactCiphertextBallot::getPreviousTrackingHash() const
+    ElementModQ *CompactCiphertextBallot::getBallotCodeSeed() const
     {
-        return pimpl->previousTrackingHash.get();
+        return pimpl->ballotCodeSeed.get();
     }
 
-    ElementModQ *CompactCiphertextBallot::getTrackingHash() const
-    {
-        return pimpl->trackingHash.get();
-    }
+    ElementModQ *CompactCiphertextBallot::getBallotCode() const { return pimpl->ballotCode.get(); }
 
-    ElementModQ *CompactCiphertextBallot::getNonce() const { return pimpl->ballotNonce.get(); }
+    ElementModQ *CompactCiphertextBallot::getNonce() const { return pimpl->nonce.get(); }
 
     uint64_t CompactCiphertextBallot::getTimestamp() const { return pimpl->timestamp; }
 
@@ -253,7 +248,7 @@ namespace electionguard
     {
         vector<uint64_t> selections;
         map<uint64_t, unique_ptr<ExtendedData>> extendedData;
-        uint32_t index;
+        uint32_t index = 0;
         for (const auto &contest : plaintext.getContests()) {
             for (const auto &selection : contest.get().getSelections()) {
                 selections.push_back(selection.get().getVote());
@@ -264,20 +259,19 @@ namespace electionguard
             }
         }
 
-        return make_unique<CompactPlaintextBallot>(plaintext.getObjectId(),
-                                                   plaintext.getBallotStyle(), move(selections),
-                                                   move(extendedData));
+        return make_unique<CompactPlaintextBallot>(plaintext.getObjectId(), plaintext.getStyleId(),
+                                                   move(selections), move(extendedData));
     }
 
     unique_ptr<CompactCiphertextBallot> compressCiphertextBallot(const PlaintextBallot &plaintext,
                                                                  const CiphertextBallot &ciphertext)
     {
-        if (ciphertext.getPreviousTrackingHash() == nullptr) {
-            throw invalid_argument("The previous tracking hash was null");
+        if (ciphertext.getBallotCodeSeed() == nullptr) {
+            throw invalid_argument("The ballot code seed was null");
         }
 
-        if (ciphertext.getTrackingHash() == nullptr) {
-            throw invalid_argument("The tracking hash was null");
+        if (ciphertext.getBallotCode() == nullptr) {
+            throw invalid_argument("The ballotCode was null");
         }
 
         if (ciphertext.getNonce() == nullptr) {
@@ -287,9 +281,9 @@ namespace electionguard
         auto compactPlaintext = CompactPlaintextBallot::make(plaintext);
 
         return make_unique<CompactCiphertextBallot>(
-          move(compactPlaintext), BallotBoxState::unknown,
-          ciphertext.getPreviousTrackingHash()->clone(), ciphertext.getTrackingHash()->clone(),
-          ciphertext.getTimestamp(), ciphertext.getNonce()->clone());
+          move(compactPlaintext), BallotBoxState::unknown, ciphertext.getBallotCodeSeed()->clone(),
+          ciphertext.getBallotCode()->clone(), ciphertext.getTimestamp(),
+          ciphertext.getNonce()->clone());
     }
 
 #pragma endregion
@@ -298,13 +292,13 @@ namespace electionguard
 
     unique_ptr<PlaintextBallot>
     expandCompactPlaintextBallot(const CompactPlaintextBallot &compactBallot,
-                                 const InternalElectionDescription &metadata)
+                                 const InternalManifest &manifest)
     {
         vector<unique_ptr<PlaintextBallotContest>> contests;
         uint64_t index = 0;
 
         // Get the ballot style and iterate through the contests for that style
-        for (const auto &contest : metadata.getContestsFor(compactBallot.getBallotStyle())) {
+        for (const auto &contest : manifest.getContestsFor(compactBallot.getStyleId())) {
             vector<unique_ptr<PlaintextBallotSelection>> selections;
 
             // Iterate through the selections on the contest and expand each selection
@@ -323,37 +317,37 @@ namespace electionguard
               make_unique<PlaintextBallotContest>(contest.get().getObjectId(), move(selections)));
         }
 
-        return make_unique<PlaintextBallot>(compactBallot.getObjectId(),
-                                            compactBallot.getBallotStyle(), move(contests));
+        return make_unique<PlaintextBallot>(compactBallot.getObjectId(), compactBallot.getStyleId(),
+                                            move(contests));
     }
 
     unique_ptr<CiphertextBallot>
     expandCompactCiphertextBallot(const CompactCiphertextBallot &compactCiphertext,
-                                  const InternalElectionDescription &metadata,
+                                  const InternalManifest &manifest,
                                   const CiphertextElectionContext &context)
     {
         if (compactCiphertext.getPlaintext() == nullptr) {
             throw runtime_error("the plaintext seelctions were not found");
         }
-        if (compactCiphertext.getPreviousTrackingHash() == nullptr) {
-            throw runtime_error("the previous tracking hash was not found");
+        if (compactCiphertext.getBallotCodeSeed() == nullptr) {
+            throw runtime_error("the ballotcodeSeed hash was not found");
         }
 
-        if (compactCiphertext.getTrackingHash() == nullptr) {
-            throw runtime_error("the tracking hash was not found");
+        if (compactCiphertext.getBallotCode() == nullptr) {
+            throw runtime_error("the ballot code was not found");
         }
 
         if (compactCiphertext.getNonce() == nullptr) {
             throw runtime_error("the nonce was not found");
         }
 
-        auto plaintext = expandCompactPlaintextBallot(*compactCiphertext.getPlaintext(), metadata);
+        auto plaintext = expandCompactPlaintextBallot(*compactCiphertext.getPlaintext(), manifest);
         auto ciphertext =
-          encryptBallot(*plaintext, metadata, context, *compactCiphertext.getPreviousTrackingHash(),
+          encryptBallot(*plaintext, manifest, context, *compactCiphertext.getBallotCodeSeed(),
                         compactCiphertext.getNonce()->clone(), compactCiphertext.getTimestamp());
 
-        if (*ciphertext->getTrackingHash() != *compactCiphertext.getTrackingHash()) {
-            throw runtime_error("The regenerated tracking hash does not match");
+        if (*ciphertext->getBallotCode() != *compactCiphertext.getBallotCode()) {
+            throw runtime_error("The regenerated ballot code does not match");
         }
 
         return ciphertext;

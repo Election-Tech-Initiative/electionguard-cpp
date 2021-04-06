@@ -7,6 +7,7 @@
 #include "electionguard/election.hpp"
 #include "electionguard/export.h"
 #include "electionguard/group.hpp"
+#include "electionguard/manifest.hpp"
 #include "log.hpp"
 
 #include <cstdint>
@@ -477,10 +478,10 @@ namespace electionguard
     class Serialize
     {
       public:
-        class ElectionDescription
+        class Manifest
         {
           private:
-            static json fromObject(const electionguard::ElectionDescription &serializable)
+            static json fromObject(const electionguard::Manifest &serializable)
             {
                 json serialized;
                 serialized["election_scope_id"] = serializable.getElectionScopeId();
@@ -519,7 +520,7 @@ namespace electionguard
                 return serialized;
             }
 
-            static unique_ptr<electionguard::ElectionDescription> toObject(json j)
+            static unique_ptr<electionguard::Manifest> toObject(json j)
             {
                 auto electionScopeId = j["election_scope_id"].get<string>();
                 auto type = j["type"].get<string>();
@@ -538,14 +539,14 @@ namespace electionguard
                     auto name = internationalizedTextFromJson(j["name"]);
                     auto contactInformation = contactInformationFromJson(j["contact_information"]);
 
-                    return make_unique<electionguard::ElectionDescription>(
+                    return make_unique<electionguard::Manifest>(
                       electionScopeId, getElectionType(type),
                       timePointFromIsoString(startDate, "%FT%TZ"),
                       timePointFromIsoString(endDate, "%FT%TZ"), move(geopoliticalUnits),
                       move(parties), move(candidates), move(contests), move(ballotStyles),
                       move(name), move(contactInformation));
                 }
-                return make_unique<electionguard::ElectionDescription>(
+                return make_unique<electionguard::Manifest>(
                   electionScopeId, getElectionType(type),
                   timePointFromIsoString(startDate, "%FT%TZ"),
                   timePointFromIsoString(endDate, "%FT%TZ"), move(geopoliticalUnits), move(parties),
@@ -553,29 +554,29 @@ namespace electionguard
             }
 
           public:
-            static vector<uint8_t> toBson(const electionguard::ElectionDescription &serializable)
+            static vector<uint8_t> toBson(const electionguard::Manifest &serializable)
             {
                 return json::to_bson(fromObject(serializable));
             }
-            static string toJson(const electionguard::ElectionDescription &serializable)
+            static string toJson(const electionguard::Manifest &serializable)
             {
                 return fromObject(serializable).dump();
             }
 
-            static unique_ptr<electionguard::ElectionDescription> fromBson(vector<uint8_t> data)
+            static unique_ptr<electionguard::Manifest> fromBson(vector<uint8_t> data)
             {
                 return toObject(json::from_bson(data));
             }
 
-            static unique_ptr<electionguard::ElectionDescription> fromJson(string data)
+            static unique_ptr<electionguard::Manifest> fromJson(string data)
             {
                 return toObject(json::parse(data));
             }
         };
-        class InternalElectionDescription
+        class InternalManifest
         {
           private:
-            static json fromObject(const electionguard::InternalElectionDescription &serializable)
+            static json fromObject(const electionguard::InternalManifest &serializable)
             {
                 auto geopoliticalUnits =
                   geopoliticalUnitsToJson(serializable.getGeopoliticalUnits());
@@ -617,14 +618,14 @@ namespace electionguard
 
                 Log::debug(" serialized Ballot Styles");
 
-                json result = {{"description_hash", serializable.getDescriptionHash()->toHex()},
+                json result = {{"manifest_hash", serializable.getManifestHash()->toHex()},
                                {"geopolitical_units", geopoliticalUnits},
                                {"contests", contests},
                                {"ballot_styles", ballotStyles}};
 
                 return result;
             }
-            static unique_ptr<electionguard::InternalElectionDescription> toObject(json j)
+            static unique_ptr<electionguard::InternalManifest> toObject(json j)
             {
                 auto geopoliticalUnits = geopoliticalUnitsFromJson(j["geopolitical_units"]);
 
@@ -670,32 +671,30 @@ namespace electionguard
 
                 auto ballotStyles = ballotStylesFromJson(j["ballot_styles"]);
 
-                auto description_hash = j["description_hash"].get<string>();
-                auto descriptionHash = ElementModQ::fromHex(description_hash);
+                auto manifest_hash = j["manifest_hash"].get<string>();
+                auto manifestHash = ElementModQ::fromHex(manifest_hash);
 
-                return make_unique<electionguard::InternalElectionDescription>(
+                return make_unique<electionguard::InternalManifest>(
                   move(geopoliticalUnits), move(contestDescriptions), move(ballotStyles),
-                  *descriptionHash);
+                  *manifestHash);
             }
 
           public:
-            static vector<uint8_t>
-            toBson(const electionguard::InternalElectionDescription &serializable)
+            static vector<uint8_t> toBson(const electionguard::InternalManifest &serializable)
             {
                 return json::to_bson(fromObject(serializable));
             }
-            static string toJson(const electionguard::InternalElectionDescription &serializable)
+            static string toJson(const electionguard::InternalManifest &serializable)
             {
                 return fromObject(serializable).dump();
             }
 
-            static unique_ptr<electionguard::InternalElectionDescription>
-            fromBson(vector<uint8_t> data)
+            static unique_ptr<electionguard::InternalManifest> fromBson(vector<uint8_t> data)
             {
                 return toObject(json::from_bson(data));
             }
 
-            static unique_ptr<electionguard::InternalElectionDescription> fromJson(string data)
+            static unique_ptr<electionguard::InternalManifest> fromJson(string data)
             {
                 return toObject(json::parse(data));
             }
@@ -710,7 +709,7 @@ namespace electionguard
                   {"crypto_base_hash", serializable.getCryptoBaseHash()->toHex()},
                   {"crypto_extended_base_hash", serializable.getCryptoExtendedBaseHash()->toHex()},
                   {"commitment_hash", serializable.getCommitmentHash()->toHex()},
-                  {"description_hash", serializable.getDescriptionHash()->toHex()},
+                  {"manifest_hash", serializable.getManifestHash()->toHex()},
                   {"elgamal_public_key", serializable.getElGamalPublicKey()->toHex()},
                   {"number_of_guardians", serializable.getNumberOfGuardians()},
                   {"quorum", serializable.getQuorum()},
@@ -722,20 +721,20 @@ namespace electionguard
                 auto crypto_base_hash = j["crypto_base_hash"].get<string>();
                 auto crypto_extended_base_hash = j["crypto_extended_base_hash"].get<string>();
                 auto commitment_hash = j["commitment_hash"].get<string>();
-                auto description_hash = j["description_hash"].get<string>();
+                auto manifest_hash = j["manifest_hash"].get<string>();
                 auto elgamal_public_key = j["elgamal_public_key"].get<string>();
                 auto number_of_guardians = j["number_of_guardians"].get<uint64_t>();
                 auto quorum = j["quorum"].get<uint64_t>();
 
                 auto commitmentHash = ElementModQ::fromHex(commitment_hash);
-                auto descriptionHash = ElementModQ::fromHex(description_hash);
+                auto manifestHash = ElementModQ::fromHex(manifest_hash);
                 auto cryptoBaseHash = ElementModQ::fromHex(crypto_base_hash);
                 auto cryptoExtendedBaseHash = ElementModQ::fromHex(crypto_extended_base_hash);
                 auto elGamalPublicKey = ElementModP::fromHex(elgamal_public_key);
 
                 return make_unique<CiphertextElectionContext>(
                   number_of_guardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-                  move(descriptionHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash));
+                  move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash));
             }
 
           public:
@@ -783,7 +782,7 @@ namespace electionguard
                 }
 
                 json result = {{"object_id", serializable.getObjectId()},
-                               {"ballot_style", serializable.getBallotStyle()},
+                               {"style_id", serializable.getStyleId()},
                                {"contests", contests}};
                 return result;
             }
@@ -791,7 +790,7 @@ namespace electionguard
             {
 
                 auto object_id = j["object_id"].get<string>();
-                auto ballot_style = j["ballot_style"].get<string>();
+                auto style_id = j["style_id"].get<string>();
 
                 auto contests = j["contests"];
 
@@ -824,7 +823,7 @@ namespace electionguard
                       contest_object_id, move(plaintextSelections)));
                 }
 
-                return make_unique<electionguard::PlaintextBallot>(object_id, ballot_style,
+                return make_unique<electionguard::PlaintextBallot>(object_id, style_id,
                                                                    move(plaintextContests));
             }
 
@@ -872,7 +871,7 @@ namespace electionguard
                 }
 
                 json result = {{"object_id", serializable.getObjectId()},
-                               {"ballot_style", serializable.getBallotStyle()},
+                               {"style_id", serializable.getStyleId()},
                                {"selections", selections},
                                {"extended_data", extendedData}};
                 return result;
@@ -880,7 +879,7 @@ namespace electionguard
             static unique_ptr<electionguard::CompactPlaintextBallot> toObject(json j)
             {
                 auto object_id = j["object_id"].get<string>();
-                auto ballot_style = j["ballot_style"].get<string>();
+                auto style_id = j["style_id"].get<string>();
 
                 auto selections = j["selections"];
 
@@ -902,7 +901,7 @@ namespace electionguard
                 }
 
                 return make_unique<electionguard::CompactPlaintextBallot>(
-                  object_id, ballot_style, move(selections), move(extendedDataMap));
+                  object_id, style_id, move(selections), move(extendedDataMap));
             }
 
           public:
@@ -1002,12 +1001,11 @@ namespace electionguard
                 }
                 json result = {
                   {"object_id", serializable.getObjectId()},
-                  {"ballot_style", serializable.getBallotStyle()},
-                  {"description_hash", serializable.getDescriptionHash()->toHex()},
-                  {"previous_tracking_hash", serializable.getPreviousTrackingHash()->toHex()},
+                  {"style_id", serializable.getStyleId()},
+                  {"manifest_hash", serializable.getManifestHash()->toHex()},
+                  {"code_seed", serializable.getBallotCodeSeed()->toHex()},
                   {"contests", contests},
-                  {"tracking_hash", serializable.getTrackingHash()->toHex()},
-                  {"tracking_code", serializable.getTrackingCode()},
+                  {"ballot_code", serializable.getBallotCode()->toHex()},
                   {"timestamp", serializable.getTimestamp()},
                   {"crypto_hash", serializable.getCryptoHash()->toHex()},
                 };
@@ -1019,10 +1017,10 @@ namespace electionguard
             static unique_ptr<electionguard::CiphertextBallot> toObject(json j)
             {
                 auto object_id = j["object_id"].get<string>();
-                auto ballot_style = j["ballot_style"].get<string>();
-                auto description_hash = j["description_hash"].get<string>();
-                auto previous_tracking_hash = j["previous_tracking_hash"].get<string>();
-                auto tracking_hash = j["tracking_hash"].get<string>();
+                auto style_id = j["style_id"].get<string>();
+                auto manifest_hash = j["manifest_hash"].get<string>();
+                auto code_seed = j["code_seed"].get<string>();
+                auto ballot_code = j["ballot_code"].get<string>();
                 auto timestamp = j["timestamp"].get<uint64_t>();
                 auto ballot_nonce = j["nonce"].is_null() ? "" : j["nonce"].get<string>();
                 auto crypto_hash = j["crypto_hash"].get<string>();
@@ -1139,9 +1137,9 @@ namespace electionguard
                                                   : ElementModQ::fromHex(ballot_nonce);
 
                 return make_unique<electionguard::CiphertextBallot>(
-                  object_id, ballot_style, *ElementModQ::fromHex(description_hash),
-                  ElementModQ::fromHex(previous_tracking_hash), move(ciphertextContests),
-                  ElementModQ::fromHex(tracking_hash), timestamp, move(nonce),
+                  object_id, style_id, *ElementModQ::fromHex(manifest_hash),
+                  ElementModQ::fromHex(code_seed), move(ciphertextContests),
+                  ElementModQ::fromHex(ballot_code), timestamp, move(nonce),
                   ElementModQ::fromHex(crypto_hash));
             }
 
@@ -1199,8 +1197,8 @@ namespace electionguard
 
                 json result = {
                   {"plaintext", plaintext},
-                  {"previous_tracking_hash", serializable.getPreviousTrackingHash()->toHex()},
-                  {"tracking_hash", serializable.getTrackingHash()->toHex()},
+                  {"code_seed", serializable.getBallotCodeSeed()->toHex()},
+                  {"ballot_code", serializable.getBallotCode()->toHex()},
                   {"nonce", serializable.getNonce()->toHex()},
                   {"timestamp", serializable.getTimestamp()},
                   {"ballot_box_state", getBallotBoxStateString(serializable.getBallotBoxState())}};
@@ -1209,8 +1207,8 @@ namespace electionguard
             static unique_ptr<electionguard::CompactCiphertextBallot> toObject(json j)
             {
 
-                auto previousTrackingHash = j["previous_tracking_hash"].get<string>();
-                auto trackingHash = j["tracking_hash"].get<string>();
+                auto codeSeed = j["code_seed"].get<string>();
+                auto ballotCode = j["ballot_code"].get<string>();
                 auto nonce = j["nonce"].get<string>();
                 auto timestamp = j["timestamp"].get<uint64_t>();
                 auto ballotBoxState = j["ballot_box_state"].get<string>();
@@ -1219,8 +1217,8 @@ namespace electionguard
 
                 return make_unique<electionguard::CompactCiphertextBallot>(
                   move(plaintext), getBallotBoxState(ballotBoxState),
-                  ElementModQ::fromHex(previousTrackingHash), ElementModQ::fromHex(trackingHash),
-                  timestamp, ElementModQ::fromHex(nonce));
+                  ElementModQ::fromHex(codeSeed), ElementModQ::fromHex(ballotCode), timestamp,
+                  ElementModQ::fromHex(nonce));
             }
 
           public:

@@ -151,12 +151,12 @@ bool test_encrypt_ballot_simple_succeeds(void)
         assert(false);
     }
 
-    eg_election_description_t *description = NULL;
+    eg_election_manifest_t *description = NULL;
     if (eg_test_election_mocks_get_simple_election_from_file(&description)) {
         assert(false);
     }
 
-    eg_internal_election_description_t *metadata = NULL;
+    eg_internal_manifest_t *metadata = NULL;
     eg_ciphertext_election_context_t *context = NULL;
     if (eg_test_election_mocks_get_fake_ciphertext_election(description, public_key, &metadata,
                                                             &context)) {
@@ -186,8 +186,8 @@ bool test_encrypt_ballot_simple_succeeds(void)
     }
 
     // Assert
-    eg_element_mod_q_t *description_hash = NULL;
-    if (eg_ciphertext_election_context_get_description_hash(context, &description_hash)) {
+    eg_element_mod_q_t *manifest_hash = NULL;
+    if (eg_ciphertext_election_context_get_manifest_hash(context, &manifest_hash)) {
         assert(false);
     }
 
@@ -197,7 +197,7 @@ bool test_encrypt_ballot_simple_succeeds(void)
         assert(false);
     }
 
-    assert(eg_ciphertext_ballot_is_valid_encryption(ciphertext, description_hash, public_key,
+    assert(eg_ciphertext_ballot_is_valid_encryption(ciphertext, manifest_hash, public_key,
                                                     extended_base_hash) == true);
 
     // Clean Up
@@ -206,8 +206,8 @@ bool test_encrypt_ballot_simple_succeeds(void)
     eg_element_mod_q_free(device_hash);
     eg_encryption_device_free(device);
     eg_ciphertext_election_context_free(context);
-    eg_internal_election_description_free(metadata);
-    eg_election_description_free(description);
+    eg_internal_manifest_free(metadata);
+    eg_election_manifest_free(description);
     eg_elgamal_keypair_free(key_pair);
     eg_element_mod_q_free(two_mod_q);
 

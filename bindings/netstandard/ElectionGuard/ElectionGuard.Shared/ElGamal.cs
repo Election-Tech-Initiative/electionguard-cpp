@@ -12,6 +12,9 @@ namespace ElectionGuard
     /// </summary>
     public class ElGamalKeyPair : DisposableBase
     {
+        /// <Summary>
+        /// The ElGamal Public Key.
+        /// </Summary>
         public unsafe ElementModP PublicKey
         {
             get
@@ -27,6 +30,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The ElGamal Secret Key.
+        /// </Summary>
         public unsafe ElementModQ SecretKey
         {
             get
@@ -59,6 +65,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Make an elgamal keypair from a secret.
+        /// </Summary>
         unsafe static public ElGamalKeyPair FromSecret(ElementModQ secretKey)
         {
             return new ElGamalKeyPair(secretKey);
@@ -81,6 +90,9 @@ namespace ElectionGuard
     /// </summary>
     public class ElGamalCiphertext : DisposableBase
     {
+        /// <Summary>
+        /// The pad value also referred to as A, a, 𝑎, or alpha in the spec.
+        /// </Summary>
         public unsafe ElementModP Pad
         {
             get
@@ -96,6 +108,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The data value also referred to as B, b, 𝛽, or beta in the spec.
+        /// </Summary>
         public unsafe ElementModP Data
         {
             get
@@ -133,6 +148,12 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <Summary>
+        /// Decrypt the ciphertext directly using the provided secret key.
+        ///
+        /// This is a convenience accessor useful for some use cases.
+        /// This method should not be used by consumers operating in live secret ballot elections.
+        /// </Summary>
         unsafe public ulong? Decrypt(ElementModQ secretKey)
         {
             ulong plaintext = 0;
@@ -157,6 +178,14 @@ namespace ElectionGuard
     }
     public static unsafe class Elgamal
     {
+        /// <summary>
+        /// Encrypts a message with a given random nonce and an ElGamal public key.
+        ///
+        /// <param name="plaintext"> Message to elgamal_encrypt; must be an integer in [0,Q). </param>
+        /// <param name="nonce"> Randomly chosen nonce in [1,Q). </param>
+        /// <param name="publicKey"> ElGamal public key. </param>
+        /// <returns>A ciphertext tuple.</returns>
+        /// </summary>
         unsafe public static ElGamalCiphertext Encrypt(
             ulong plaintext, ElementModQ nonce, ElementModP publicKey)
         {

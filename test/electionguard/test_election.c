@@ -22,7 +22,7 @@ bool test_election(void)
            test_can_deserialize_ciphertext_election_context();
 }
 
-// A dump of an ElectionDescription from test_election.cpp
+// A dump of an Manifest from test_election.cpp
 char *election_json =
   "{\"ballot_styles\":[{\"geopolitical_unit_ids\":[\"some-geopoltical-unit-id\"],\"object_id\":"
   "\"some-ballot-style-id\"}],\"candidates\":[{\"object_id\":\"some-candidate-id-1\"},{"
@@ -48,21 +48,21 @@ bool test_simple_election_is_valid(void)
 {
     printf("\n -------- test_simple_election_is_valid -------- \n");
     // Act
-    eg_election_description_t *result = NULL;
+    eg_election_manifest_t *result = NULL;
     if (eg_test_election_mocks_get_simple_election_from_file(&result)) {
         assert(false);
     }
 
     // Assert
     char *election_scope_id;
-    if (eg_election_description_get_election_scope_id(result, &election_scope_id)) {
+    if (eg_election_manifest_get_election_scope_id(result, &election_scope_id)) {
         assert(false);
     }
 
     assert(strings_are_equal("jefferson-county-primary", election_scope_id) == true);
 
     // Clean Up
-    eg_election_description_free(result);
+    eg_election_manifest_free(result);
 
     free(election_scope_id);
 
@@ -73,20 +73,20 @@ bool test_can_deserialize_election_description(void)
 {
     printf("\n -------- test_can_deserialize_election_description -------- \n");
     // Act
-    eg_election_description_t *result = NULL;
-    if (eg_election_description_from_json(election_json, &result)) {
+    eg_election_manifest_t *result = NULL;
+    if (eg_election_manifest_from_json(election_json, &result)) {
         assert(false);
     }
 
     // Assert
     char *election_scope_id;
-    if (eg_election_description_get_election_scope_id(result, &election_scope_id)) {
+    if (eg_election_manifest_get_election_scope_id(result, &election_scope_id)) {
         assert(false);
     }
     assert(strings_are_equal("some-scope-id", election_scope_id) == true);
 
     // Clean Up
-    eg_election_description_free(result);
+    eg_election_manifest_free(result);
 
     free(election_scope_id);
 
@@ -98,25 +98,25 @@ bool test_can_construct_internal_election_description_from_election_description(
     printf("\n -------- test_can_construct_internal_election_description_from_election_description "
            "-------- \n");
     // Arrange
-    eg_election_description_t *data = NULL;
-    if (eg_election_description_from_json(election_json, &data)) {
+    eg_election_manifest_t *data = NULL;
+    if (eg_election_manifest_from_json(election_json, &data)) {
         assert(false);
     }
 
     // Act
-    eg_internal_election_description_t *result = NULL;
-    if (eg_internal_election_description_new(data, &result)) {
+    eg_internal_manifest_t *result = NULL;
+    if (eg_internal_manifest_new(data, &result)) {
         assert(false);
     }
 
     // Assert
     eg_element_mod_q_t *expected = NULL;
-    if (eg_election_description_crypto_hash(data, &expected)) {
+    if (eg_election_manifest_crypto_hash(data, &expected)) {
         assert(false);
     }
 
     eg_element_mod_q_t *actual = NULL;
-    if (eg_internal_election_description_get_description_hash(result, &actual)) {
+    if (eg_internal_manifest_get_manifest_hash(result, &actual)) {
         assert(false);
     }
 
@@ -138,8 +138,8 @@ bool test_can_construct_internal_election_description_from_election_description(
 
     // Clean Up
     eg_element_mod_q_free(expected);
-    eg_election_description_free(data);
-    eg_internal_election_description_free(result);
+    eg_election_manifest_free(data);
+    eg_internal_manifest_free(result);
 
     return true;
 }
@@ -148,7 +148,7 @@ bool test_can_deserlialze_internal_election_description(void)
 {
     printf("\n -------- test_can_deserlialze_internal_election_description -------- \n");
     // Arrange
-    // A dump of an InternalElectionDescription from test_election.cpp
+    // A dump of an InternalManifest from test_election.cpp
     char *internal_json =
       "{\"ballot_styles\":[{\"geopolitical_unit_ids\":[\"geopolitical-unit-1\"],\"image_uri\":"
       "\"some-uri\",\"object_id\":\"some-ballot-style-id\",\"party_ids\":[\"party-1\"]}],"
@@ -172,20 +172,20 @@ bool test_can_deserlialze_internal_election_description(void)
       "\"text\":[{\"language\":\"en\",\"value\":\"some-title-string\"},{\"language\":\"es\","
       "\"value\":\"some-title-string-es\"}]},\"electoral_district_id\":\"geopolitical-unit-1\","
       "\"name\":\"contest-2-name\",\"number_elected\":2,\"object_id\":\"contest-2-id\",\"sequence_"
-      "order\":2,\"vote_variation\":\"n_of_m\",\"votes_allowed\":2}],\"description_hash\":\"02\","
+      "order\":2,\"vote_variation\":\"n_of_m\",\"votes_allowed\":2}],\"manifest_hash\":\"02\","
       "\"geopolitical_units\":[{\"contact_information\":{\"address_line\":[\"some-street\",\"some-"
       "city\",\"some-whatever\"],\"name\":\"gp-unit-contact-info\"},\"name\":\"district-1-id\","
       "\"object_id\":\"geopolitical-unit-1\",\"type\":\"city\"}]}";
 
     // Act
-    eg_internal_election_description_t *result = NULL;
-    if (eg_internal_election_description_from_json(internal_json, &result)) {
+    eg_internal_manifest_t *result = NULL;
+    if (eg_internal_manifest_from_json(internal_json, &result)) {
         assert(false);
     }
 
     // Assert
     eg_element_mod_q_t *actual = NULL;
-    if (eg_internal_election_description_get_description_hash(result, &actual)) {
+    if (eg_internal_manifest_get_manifest_hash(result, &actual)) {
         assert(false);
     }
 
@@ -199,7 +199,7 @@ bool test_can_deserlialze_internal_election_description(void)
     assert(actual_hash_data[0] == 02);
 
     // Clean Up
-    eg_internal_election_description_free(result);
+    eg_internal_manifest_free(result);
 
     return true;
 }
@@ -211,7 +211,7 @@ bool test_can_deserialize_ciphertext_election_context(void)
       "{\"crypto_base_hash\":\"B8CF9A8915BDB19C681AFBCDD1797F2CF360F723843D977D0E1B280CA2B24245\","
       "\"crypto_extended_base_hash\":"
       "\"731052175CAE2EF7CFE0E827C65BB585CD8A9CB243320EB34C09B5DF3F75F982\",\"commitment_hash\":"
-      "\"02\",\"description_hash\":"
+      "\"02\",\"manifest_hash\":"
       "\"02\",\"elgamal_public_key\":"
       "\"F258E409B1A130E00A3793555E0EAB2F560AA12CC01A3CB6B357035C6E734256B4D67877C018CB57AF150DDBBD"
       "0AC22B9D74C0B15C1AC80953086FDDFAAB7FC503022B61BE8C6E4FECD02136F4AFC68B51390D0E7E90661763455B"

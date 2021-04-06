@@ -14,7 +14,7 @@ using namespace std;
 struct TestEncryptFixture {
 
     unique_ptr<ElGamalKeyPair> keypair;
-    unique_ptr<InternalElectionDescription> metadata;
+    unique_ptr<InternalManifest> manifest;
     unique_ptr<CiphertextElectionContext> context;
     unique_ptr<EncryptionDevice> device;
     unique_ptr<EncryptionMediator> mediator;
@@ -23,11 +23,11 @@ struct TestEncryptFixture {
 
     TestEncryptFixture()
         : keypair(ElGamalKeyPair::fromSecret(TWO_MOD_Q())),
-          metadata(ElectionGenerator::getFakeMetadata(TWO_MOD_Q())),
-          context(ElectionGenerator::getFakeContext(*metadata, *keypair->getPublicKey())),
+          manifest(ElectionGenerator::getFakeManifest(TWO_MOD_Q())),
+          context(ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey())),
           device(make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location")),
-          mediator(make_unique<EncryptionMediator>(*metadata, *context, *device)),
-          plaintext(BallotGenerator::getFakeBallot(*metadata)),
+          mediator(make_unique<EncryptionMediator>(*manifest, *context, *device)),
+          plaintext(BallotGenerator::getFakeBallot(*manifest)),
           compactCiphertext(mediator->compactEncrypt(*plaintext))
     {
     }
@@ -56,7 +56,7 @@ TEST_SUITE("Test Encrypt Compact Ballot")
     TEST_CASE("Can Expand Plaintext")
     {
         auto expandedPlaintext = expandCompactPlaintextBallot(
-          *fixture->compactCiphertext->getPlaintext(), *fixture->metadata);
+          *fixture->compactCiphertext->getPlaintext(), *fixture->manifest);
 
         // Assert
         CHECK(expandedPlaintext->getObjectId() == fixture->compactCiphertext->getObjectId());
@@ -72,13 +72,13 @@ TEST_SUITE("Test Encrypt Compact Ballot")
         Log::debug(json);
 
         auto expandedCiphertext = expandCompactCiphertextBallot(
-          *fixture->compactCiphertext, *fixture->metadata, *fixture->context);
+          *fixture->compactCiphertext, *fixture->manifest, *fixture->context);
 
         // Assert
         CHECK(expandedCiphertext->getNonce()->toHex() ==
               fixture->compactCiphertext->getNonce()->toHex());
         CHECK(expandedCiphertext->isValidEncryption(
-                *fixture->context->getDescriptionHash(), *fixture->keypair->getPublicKey(),
+                *fixture->context->getManifestHash(), *fixture->keypair->getPublicKey(),
                 *fixture->context->getCryptoExtendedBaseHash()) == true);
     }
 }

@@ -6,10 +6,16 @@ namespace ElectionGuard
     using NaiveElementModP = NativeInterface.ElementModP.ElementModPHandle;
     using NaiveElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
 
+    /// <summary>
+    /// An element of the larger `mod p` space, i.e., in [0, P), where P is a 4096-bit prime.
+    /// </summary>
     public class ElementModP : DisposableBase
     {
         public static readonly ulong MAX_SIZE = 64;
 
+        /// <Summary>
+        /// Get the integer representation of the element
+        /// </Summary>
         public ulong[] Data { get { return GetNative(); } internal set { NewNative(value); } }
         internal unsafe NaiveElementModP Handle;
 
@@ -39,6 +45,9 @@ namespace ElectionGuard
             Handle = null;
         }
 
+        /// <Summary>
+        /// exports a hex representation of the integer value in Big Endian format
+        /// </Summary>
         public unsafe string ToHex()
         {
             var status = NativeInterface.ElementModP.ToHex(Handle, out IntPtr pointer);
@@ -100,10 +109,16 @@ namespace ElectionGuard
         }
     }
 
+    /// <summary>
+    /// An element of the smaller `mod q` space, i.e., in [0, Q), where Q is a 256-bit prime.
+    /// </summary>
     public class ElementModQ : DisposableBase
     {
         public static readonly ulong MAX_SIZE = 4;
 
+        /// <Summary>
+        /// Get the integer representation of the element
+        /// </Summary>
         public ulong[] Data { get { return GetNative(); } internal set { NewNative(value); } }
         internal unsafe NaiveElementModQ Handle;
 
@@ -123,6 +138,9 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <Summary>
+        /// exports a hex representation of the integer value in Big Endian format
+        /// </Summary>
         public unsafe string ToHex()
         {
             var status = NativeInterface.ElementModQ.ToHex(Handle, out IntPtr pointer);

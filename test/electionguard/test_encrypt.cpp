@@ -6,6 +6,7 @@
 #include <electionguard/ballot.hpp>
 #include <electionguard/election.hpp>
 #include <electionguard/encrypt.hpp>
+#include <electionguard/manifest.hpp>
 
 using namespace electionguard;
 using namespace electionguard::test::mocks;
@@ -70,24 +71,24 @@ TEST_CASE("Encrypt simple selection malformed data fails")
 }
 
 TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
-          "InternalElectionDescription succeeds")
+          "InternalManifest succeeds")
 {
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
     auto election = ElectionGenerator::getFakeElection();
-    auto metadata = make_unique<InternalElectionDescription>(*election);
-    auto context = ElectionGenerator::getFakeContext(*metadata, *keypair->getPublicKey());
+    auto manifest = make_unique<InternalManifest>(*election);
+    auto context = ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
-    auto mediator = make_unique<EncryptionMediator>(*metadata, *context, *device);
+    auto mediator = make_unique<EncryptionMediator>(*manifest, *context, *device);
 
     // Act
-    auto plaintext = BallotGenerator::getFakeBallot(*metadata);
+    auto plaintext = BallotGenerator::getFakeBallot(*manifest);
     Log::debug(plaintext->toJson());
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert
-    // TODO: validate against metadata->getDescriptionHash()
-    CHECK(ciphertext->isValidEncryption(*context->getDescriptionHash(), *keypair->getPublicKey(),
+    // TODO: validate against manifest->getManifestHash()
+    CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
 }
 
@@ -95,39 +96,39 @@ TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
 {
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
     auto election = ElectionGenerator::getFakeElection();
-    auto metadata = make_unique<InternalElectionDescription>(*election);
-    auto context = ElectionGenerator::getFakeContext(*metadata, *keypair->getPublicKey());
+    auto manifest = make_unique<InternalManifest>(*election);
+    auto context = ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
-    auto mediator = make_unique<EncryptionMediator>(*metadata, *context, *device);
+    auto mediator = make_unique<EncryptionMediator>(*manifest, *context, *device);
 
     // Act
-    auto plaintext = BallotGenerator::getFakeBallot(*metadata, 0UL);
+    auto plaintext = BallotGenerator::getFakeBallot(*manifest, 0UL);
     Log::debug(plaintext->toJson());
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert
-    // TODO: validate against metadata->getDescriptionHash()
-    CHECK(ciphertext->isValidEncryption(*context->getDescriptionHash(), *keypair->getPublicKey(),
+    // TODO: validate against manifest->getManifestHash()
+    CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
 }
 
 TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds")
 {
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto metadata = ElectionGenerator::getFakeMetadata(TWO_MOD_Q());
-    auto context = ElectionGenerator::getFakeContext(*metadata, *keypair->getPublicKey());
+    auto manifest = ElectionGenerator::getFakeManifest(TWO_MOD_Q());
+    auto context = ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
-    auto mediator = make_unique<EncryptionMediator>(*metadata, *context, *device);
+    auto mediator = make_unique<EncryptionMediator>(*manifest, *context, *device);
 
     // Act
-    auto plaintext = BallotGenerator::getFakeBallot(*metadata);
+    auto plaintext = BallotGenerator::getFakeBallot(*manifest);
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert
-    // TODO: validate against metadata->getDescriptionHash()
-    CHECK(ciphertext->isValidEncryption(*context->getDescriptionHash(), *keypair->getPublicKey(),
+    // TODO: validate against metadata->getManifestHash()
+    CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
 
     // Can Serialize CiphertextBallot
@@ -150,11 +151,11 @@ TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds")
 TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeeds")
 {
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto metadata = ElectionGenerator::getFakeMetadata(TWO_MOD_Q());
-    auto context = ElectionGenerator::getFakeContext(*metadata, *keypair->getPublicKey());
+    auto manifest = ElectionGenerator::getFakeManifest(TWO_MOD_Q());
+    auto context = ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
-    auto mediator = make_unique<EncryptionMediator>(*metadata, *context, *device);
-    auto plaintext = BallotGenerator::getFakeBallot(*metadata);
+    auto mediator = make_unique<EncryptionMediator>(*manifest, *context, *device);
+    auto plaintext = BallotGenerator::getFakeBallot(*manifest);
 
     // Act
     auto compactCiphertext = mediator->compactEncrypt(*plaintext);
@@ -168,16 +169,16 @@ TEST_CASE("Encrypt simple ballot from file succeeds")
     // Arrange
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
     auto description = ElectionGenerator::getSimpleElectionFromFile();
-    auto [metadata, context] =
+    auto [manifest, context] =
       ElectionGenerator::getFakeCiphertextElection(*description, *keypair->getPublicKey());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
     auto ballot = BallotGenerator::getSimpleBallotFromFile();
 
     // Act
-    auto ciphertext = encryptBallot(*ballot, *metadata, *context, *device->getHash());
+    auto ciphertext = encryptBallot(*ballot, *manifest, *context, *device->getHash());
 
     // Assert
-    CHECK(ciphertext->isValidEncryption(*context->getDescriptionHash(), *keypair->getPublicKey(),
+    CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
 }

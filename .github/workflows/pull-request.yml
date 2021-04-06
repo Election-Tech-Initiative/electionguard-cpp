@@ -32,12 +32,17 @@ jobs:
       matrix:
         name:
           [
+            "ubuntu-20.04-clang-10.0.0",
             "ubuntu-18.04-gcc-9.3.0",
             "ubuntu-18.04-clang-10.0.0",
             "macos-10.15-xcode-12.0",
             "windows-2019-gcc-9.2.0",
           ]
         include:
+          - name: ubuntu-20.04-clang-10.0.0
+            os: ubuntu-20.04
+            compiler: clang
+            version: "10"
           - name: ubuntu-18.04-gcc-9.3.0
             os: ubuntu-18.04
             compiler: gcc
@@ -90,14 +95,17 @@ jobs:
       - name: Configure Environment
         run: make environment
       - name: Run Tests
-        if: runner.os == 'Linux'
-        run: make sanitize-asan
+        if: (runner.os == 'Linux' && matrix.os != 'ubuntu-20.04')
+        run: make test
       - name: Run Tests
         if: runner.os == 'macOS'
         run: make test
       - name: Run Tests
         if: runner.os == 'Windows'
         run: make test
+      - name: Run Sanitizer
+        if: (runner.os == 'Linux' && matrix.os == 'ubuntu-20.04')
+        run: make sanitize-asan
       - name: Make Release Build
         if: runner.os == 'Linux'
         env:

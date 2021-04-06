@@ -43,10 +43,13 @@ endif
 ifeq ($(OPERATING_SYSTEM),Linux)
 	@echo 🐧 LINUX INSTALL
 	sudo apt install -y build-essential
+	sudo apt install -y iwyu
 	sudo apt install -y llvm
+	sudo apt install -y clang-9
 	sudo apt install -y cmake
 	sudo apt install -y lcov
 	sudo apt install -y cppcheck
+	sudo apt install -y clang-format
 	sudo apt install -y clang-tidy
 	sudo apt install -y valgrind
 endif
@@ -206,6 +209,9 @@ else
 		-DUSE_STATIC_ANALYSIS=ON \
 		-DUSE_DYNAMIC_ANALYSIS=ON \
 		-DUSE_SANITIZER="address" \
+		-DCLANG_TIDY=ON \
+		-DCPPCHECK=ON \
+		-DIWYU=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests

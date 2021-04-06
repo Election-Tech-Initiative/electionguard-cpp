@@ -35,6 +35,10 @@ namespace ElectionGuard
     /// </summary>
     public class PlaintextBallotSelection : DisposableBase
     {
+        /// <Summary>
+        /// Get the objectId of the selection, which is the unique id for
+        /// the selection in a specific contest described in the election manifest.
+        /// </Summary>
         public unsafe string ObjectId
         {
             get
@@ -130,7 +134,7 @@ namespace ElectionGuard
     /// or keep both values.
     ///
     /// By discarding the `nonce`, the encrypted representation and `proof`
-    /// can only be regenerated if the nonce was derived from the ballot's master nonce.  If the nonce
+    /// can only be regenerated if the nonce was derived from the ballot's seed nonce.  If the nonce
     /// used for this selection is truly random, and it is discarded, then the proofs cannot be regenerated.
     ///
     /// By keeping the `nonce`, or deriving the selection nonce from the ballot nonce, an external system can
@@ -140,6 +144,10 @@ namespace ElectionGuard
     /// </summary>
     public class CiphertextBallotSelection : DisposableBase
     {
+        /// <Summary>
+        /// Get the objectId of the selection, which is the unique id for
+        /// the selection in a specific contest described in the election manifest.
+        /// </Summary>
         public unsafe string ObjectId
         {
             get
@@ -156,7 +164,7 @@ namespace ElectionGuard
         }
 
         /// <summary>
-        /// The SelectionDescription hash
+        /// The hash of the string representation of the Selection Description from the election manifest
         /// </summary>
         public unsafe ElementModQ DescriptionHash
         {
@@ -252,18 +260,18 @@ namespace ElectionGuard
         /// the DisjunctiveChaumPedersenProof`proof` populated.
         /// the ElementModQ `description_hash` and the ElementModQ `crypto_hash` are also checked.
         ///
-        /// <param name="seed_hash">The hash of the SelectionDescription, or
+        /// <param name="encryptionSeed">The hash of the SelectionDescription, or
         ///                         whatever `ElementModQ` was used to populate the `description_hash` field. </param>
         /// <param name="elgamalPublicKey">The election public key</param>
         /// <param name="cryptoExtendedBaseHash">The extended base hash of the election</param>
         /// </summary>
         public unsafe bool IsValidEncryption(
-            ElementModQ seedHash,
+            ElementModQ encryptionSeed,
             ElementModP elGamalPublicKey,
             ElementModQ cryptoExtendedBaseHash)
         {
             return NativeInterface.CiphertextBallotSelection.IsValidEncryption(
-                Handle, seedHash.Handle,
+                Handle, encryptionSeed.Handle,
                 elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
         }
 
@@ -283,6 +291,10 @@ namespace ElectionGuard
 
     public class PlaintextBallotContest : DisposableBase
     {
+        /// <Summary>
+        /// Get the objectId of the contest, which is the unique id for
+        /// the contest in a specific ballot style described in the election manifest.
+        /// </Summary>
         public unsafe string ObjectId
         {
             get
@@ -353,11 +365,15 @@ namespace ElectionGuard
     ///
     /// Similar to `CiphertextBallotSelection` the consuming application can choose to discard or keep both
     /// the `nonce` and the `proof` in some circumstances.  For deterministic nonce's derived from the
-    /// master nonce, both values can be regenerated.  If the `nonce` for this contest is completely random,
+    /// seed nonce, both values can be regenerated.  If the `nonce` for this contest is completely random,
     /// then it is required in order to regenerate the proof.
     /// </summary>
     public class CiphertextBallotContest : DisposableBase
     {
+        /// <Summary>
+        /// Get the objectId of the contest, which is the unique id for
+        /// the contest in a specific ballot style described in the election manifest.
+        /// </Summary>
         public unsafe string ObjectId
         {
             get
@@ -373,6 +389,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// The hash of the string representation of the Contest Description from the election manifest
+        /// </summary>
         public unsafe ElementModQ DescriptionHash
         {
             get
@@ -397,6 +416,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Hash of the encrypted values
+        /// </summary>
         public unsafe ElementModQ CryptoHash
         {
             get
@@ -412,6 +434,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// The nonce used to generate the encryption. Sensitive & should be treated as a secret
+        /// </summary>
         public unsafe ElementModQ Nonce
         {
             get
@@ -446,13 +471,24 @@ namespace ElectionGuard
             return new CiphertextBallotSelection(value);
         }
 
+        /// <summary>
+        /// Given an encrypted BallotContest, validates the encryption state against
+        /// a specific encryption seed and public key
+        /// by verifying the accumulated sum of selections match the proof.
+        /// Calling this function expects that the object is in a well-formed encrypted state
+        /// with the `ballot_selections` populated with valid encrypted ballot selections,
+        /// the ElementModQ `description_hash`, the ElementModQ `crypto_hash`,
+        /// and the ConstantChaumPedersenProof all populated.
+        /// Specifically, the seed hash in this context is the hash of the ContestDescription,
+        /// or whatever `ElementModQ` was used to populate the `description_hash` field.
+        /// </summary>
         public unsafe bool IsValidEncryption(
-            ElementModQ seedHash,
+            ElementModQ encryptionSeed,
             ElementModP elGamalPublicKey,
             ElementModQ cryptoExtendedBaseHash)
         {
             return NativeInterface.CiphertextBallotContest.IsValidEncryption(
-                Handle, seedHash.Handle, elGamalPublicKey.Handle,
+                Handle, encryptionSeed.Handle, elGamalPublicKey.Handle,
                 cryptoExtendedBaseHash.Handle);
         }
 
@@ -471,12 +507,22 @@ namespace ElectionGuard
     #region PlaintextBallot
 
     /// <summary>
-    /// A PlaintextBallot represents a voters selections for a given ballot and ballot style
+    /// A PlaintextBallot represents a voters selections for a given ballot and ballot style.
     ///
-    /// <param name="object_id"> A unique Ballot ID that is relevant to the external system </param>
+    /// This class can be either a partial or a complete representation of the expected values of a ballot dataset.
+    /// Specifically, a partial representation must include at a minimum the "affirmative" selections
+    /// of every contest where a selection is made.  A partial representation may exclude contests for which
+    /// no selection is made.
+    ///
+    /// A complete representation of a ballot must include both affirmative and negative selections of
+    /// every contest, AND the placeholder selections necessary to satisfy the NIZKPs for each contest and selection.
     /// </summary>
     public class PlaintextBallot : DisposableBase
     {
+        /// <Summary>
+        /// A unique Ballot ID that is relevant to the external system and must be unique
+        /// within the dataset of the election.
+        /// </Summary>
         public unsafe string ObjectId
         {
             get
@@ -492,15 +538,20 @@ namespace ElectionGuard
             }
         }
 
-        public unsafe string BallotStyle
+        /// <Summary>
+        /// The Object Id of the ballot style in the election manifest.  This value is used
+        /// to determine which contests to expect on the ballot, to fill in missing values,
+        /// and to validate that the ballot is well-formed
+        /// </Summary>
+        public unsafe string StyleId
         {
             get
             {
-                var status = NativeInterface.PlaintextBallot.GetBallotStyle(
+                var status = NativeInterface.PlaintextBallot.GetStyleId(
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"PlaintextBallot Error BallotStyle: {status}");
+                    Console.WriteLine($"PlaintextBallot Error StyleId: {status}");
                     return null;
                 }
                 return Marshal.PtrToStringAnsi(value);
@@ -533,7 +584,7 @@ namespace ElectionGuard
                 Handle, index, out NativePlaintextBallotContest value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"PlaintextBallot Error BallotStyle: {status}");
+                Console.WriteLine($"PlaintextBallot Error GetContestAt: {status}");
                 return null;
             }
             return new PlaintextBallotContest(value);
@@ -548,6 +599,9 @@ namespace ElectionGuard
             Handle = null;
         }
 
+        /// <Summary>
+        /// Export the ballot representation as JSON
+        /// </Summary>
         public unsafe string ToJson()
         {
             var status = NativeInterface.PlaintextBallot.ToJson(
@@ -596,6 +650,9 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <Summary>
+        /// Export the ballot representation as MsgPack
+        /// </Summary>
         public unsafe byte[] ToMsgPack()
         {
 
@@ -635,7 +692,7 @@ namespace ElectionGuard
     /// <summary>
     /// A CiphertextBallot represents a voters encrypted selections for a given ballot and ballot style.
     ///
-    /// When a ballot is in it's complete, encrypted state, the `nonce` is the master nonce
+    /// When a ballot is in it's complete, encrypted state, the `nonce` is the seed nonce
     /// from which all other nonces can be derived to encrypt the ballot.  Allong with the `nonce`
     /// fields on `Ballotcontest` and `BallotSelection`, this value is sensitive.
     ///
@@ -646,6 +703,9 @@ namespace ElectionGuard
     {
         internal unsafe NativeCiphertextBallot Handle;
 
+        /// <summary>
+        /// The unique ballot id that is meaningful to the consuming application.
+        /// </summary>
         public unsafe string ObjectId
         {
             get
@@ -661,45 +721,58 @@ namespace ElectionGuard
             }
         }
 
-        public unsafe string BallotStyle
+        /// <Summary>
+        /// The Object Id of the ballot style in the election manifest.  This value is used
+        /// to determine which contests to expect on the ballot, to fill in missing values,
+        /// and to validate that the ballot is well-formed
+        /// </Summary>
+        public unsafe string StyleId
         {
             get
             {
-                var status = NativeInterface.CiphertextBallot.GetBallotStyle(
+                var status = NativeInterface.CiphertextBallot.GetStyleId(
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error BallotStyle: {status}");
+                    Console.WriteLine($"CiphertextBallot Error StyleId: {status}");
                     return null;
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
         }
 
-        public unsafe ElementModQ DescriptionHash
+        /// <summary>
+        /// Hash of the complete Election Manifest to which this ballot belongs
+        /// </summary>
+        public unsafe ElementModQ ManifestHash
         {
             get
             {
-                var status = NativeInterface.CiphertextBallot.GetDescriptionHash(
+                var status = NativeInterface.CiphertextBallot.GetManifestHash(
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error DescriptionHash: {status}");
+                    Console.WriteLine($"CiphertextBallot Error ManifestHash: {status}");
                     return null;
                 }
                 return new ElementModQ(value);
             }
         }
 
-        public unsafe ElementModQ PreviousTrackingHash
+        /// <summary>
+        /// The seed hash for the ballot.  It may be the encryption device hash,
+        /// the hash of a previous ballot or the hash of some other value
+        /// that is meaningful to the consuming application.
+        /// </summary>
+        public unsafe ElementModQ BallotCodeSeed
         {
             get
             {
-                var status = NativeInterface.CiphertextBallot.GetPreviousTrackingHash(
+                var status = NativeInterface.CiphertextBallot.GetBallotCodeSeed(
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error PreviousTrackingHash: {status}");
+                    Console.WriteLine($"CiphertextBallot Error BallotCodeSeed: {status}");
                     return null;
                 }
                 return new ElementModQ(value);
@@ -715,36 +788,28 @@ namespace ElectionGuard
             }
         }
 
-        public unsafe ElementModQ TrackingHash
+        /// <summary>
+        /// The unique ballot code for this ballot that is derived from
+        /// the ballot seed, the timestamp, and the hash of the encrypted values
+        /// </summary>
+        public unsafe ElementModQ BallotCode
         {
             get
             {
-                var status = NativeInterface.CiphertextBallot.GetTrackingHash(
+                var status = NativeInterface.CiphertextBallot.GetBallotCode(
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error TrackingHash: {status}");
+                    Console.WriteLine($"CiphertextBallot Error BallotCode: {status}");
                     return null;
                 }
                 return new ElementModQ(value);
             }
         }
 
-        public unsafe string TrackingCode
-        {
-            get
-            {
-                var status = NativeInterface.CiphertextBallot.GetTrackingCode(
-                    Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallot Error TrackingCode: {status}");
-                    return null;
-                }
-                return Marshal.PtrToStringAnsi(value);
-            }
-        }
-
+        /// <summary>
+        /// The nonce value used to encrypt all values in the ballot
+        /// </summary>
         public unsafe ElementModQ Nonce
         {
             get
@@ -786,15 +851,28 @@ namespace ElectionGuard
             return new CiphertextBallotContest(value);
         }
 
+        /// <summary>
+        /// Given an encrypted Ballot, validates the encryption state
+        /// against a specific ballot seed and public key
+        /// by verifying the states of this ballot's members (BallotContest's and BallotSelection's).
+        /// Calling this function expects that the object is in a well-formed encrypted state
+        /// with the `contests` populated with valid encrypted ballot selections,
+        /// and the ElementModQ `manifest_hash` also populated.
+        /// Specifically, the seed in this context is the hash of the Election Manifest,
+        /// or whatever `ElementModQ` was used to populate the `manifest_hash` field.
+        /// </summary>
         public unsafe bool IsValidEncryption(
-            ElementModQ seedHash, ElementModP elGamalPublicKey, ElementModQ cryptoExtendedBaseHash)
+            ElementModQ manifestHash, ElementModP elGamalPublicKey, ElementModQ cryptoExtendedBaseHash)
         {
             return NativeInterface.CiphertextBallot.IsValidEncryption(
-                Handle, seedHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
+                Handle, manifestHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
         }
 
         // TODO: ISSUE #129: To bson
 
+        /// <Summary>
+        /// Export the ballot representation as JSON
+        /// </Summary>
         public unsafe string ToJson(bool withNonces = false)
         {
             var status = withNonces
@@ -844,6 +922,10 @@ namespace ElectionGuard
     {
         internal unsafe NativeCompactCiphertextBallot Handle;
 
+        /// <Summary>
+        /// A unique Ballot ID that is relevant to the external system and must be unique
+        /// within the dataset of the election.
+        /// </Summary>
         public unsafe string ObjectId
         {
             get
@@ -876,9 +958,12 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <Summary>
+        /// Export the ballot representation as MsgPack
+        /// </Summary>
         public unsafe byte[] ToMsgPack()
         {
- 
+
             var status = NativeInterface.CompactCiphertextBallot.ToMsgPack(
                 Handle, out IntPtr data, out UIntPtr size);
 
