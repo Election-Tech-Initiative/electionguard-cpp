@@ -25,7 +25,7 @@ ifeq ($(OPERATING_SYSTEM),Linux)
 NDK_PATH?=/usr/local/lib/android/sdk/ndk/21.3.6528147
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
-NDK_PATH?=C:\Microsoft\AndroidNDK\android-ndk-r16b
+NDK_PATH?=C:\Android\android-sdk\ndk-bundle
 endif
 
 all: environment build
