@@ -142,6 +142,8 @@ namespace electionguard
     {
         auto data_size = data.length() + 1;
         auto *data_array = static_cast<char *>(malloc(data_size));
+// TODO: allow warning and change to safe?
+#pragma warning(suppress : 4996)
         strncpy(data_array, data.c_str(), data_size);
         *out_size = data_size;
         return data_array;

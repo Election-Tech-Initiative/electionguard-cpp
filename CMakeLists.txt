@@ -59,7 +59,6 @@ include(cmake/tools.cmake)
 
 # --- Properties ---
 
-
 set(CMAKE_CXX_STANDARD_REQUIRED     ON)
 set(CMAKE_CXX_EXTENSIONS            OFF)
 
@@ -73,11 +72,9 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
     add_compile_definitions(DEBUG)
 endif()
 
-# HACK: Disable x86 intrinsics
-# TODO: load the appropriate intrinsics for the processor architecture
-# this is currently only being set when the platform is explicitly set (such as on ios)
-if(DEFINED CMAKE_OSX_DEPLOYMENT_TARGET OR DEFINED CMAKE_ANDROID_ARCH_ABI)
-    add_compile_definitions(BROKEN_INTRINSICS)
+if(CAN_USE_VECTOR_INTRINSICS)
+    add_compile_definitions(EVERCRYPT_CAN_COMPILE_VEC128)
+    add_compile_definitions(EVERCRYPT_CAN_COMPILE_VEC256)
 endif()
 
 # HACK: Disable explicit bzero on android
@@ -91,6 +88,7 @@ endif()
 add_subdirectory(src)
 
 if (OPTION_ENABLE_TESTS)
+    # TODO: move mocks to their own folder
     add_subdirectory(test)
 endif()
 

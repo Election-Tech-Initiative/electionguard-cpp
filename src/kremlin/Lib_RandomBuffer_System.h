@@ -34,11 +34,18 @@ extern "C" {
 #include "kremlin/lowstar_endianness.h"
 #include <string.h>
 #include "kremlin/internal/target.h"
+#include "kremlin/internal/builtin.h"
 
 
 
+
+KRML_DEPRECATED("random_crypto")
 
 extern bool Lib_RandomBuffer_System_randombytes(uint8_t *buf, uint32_t len);
+
+extern void *Lib_RandomBuffer_System_entropy_p;
+
+extern void Lib_RandomBuffer_System_crypto_random(uint8_t *buf, uint32_t len);
 
 #if defined(__cplusplus)
 }

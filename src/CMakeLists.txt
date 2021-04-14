@@ -112,15 +112,21 @@ add_library(${META_PROJECT_TARGET}::${META_PROJECT_TARGET} ALIAS ${META_PROJECT_
 target_compile_features(${META_PROJECT_TARGET} PRIVATE cxx_std_17)
 target_compile_options(${META_PROJECT_TARGET} PUBLIC "$<$<BOOL:${MSVC}>:/permissive->")
 
+# define dll export markers
+if (BUILD_SHARED_LIBS)
+    message("++ Building Shared Libs")  
+    add_compile_definitions(ELECTIONGUARD_BUILD_SHARED)
+endif()
+
 if (MINGW)
     message("++ Building with MINGW")
     # Remove lib prefix
     set_target_properties(${META_PROJECT_TARGET} PROPERTIES PREFIX "")
+endif()
 
-    # define dll export markers
-    if (BUILD_SHARED_LIBS)
-        add_compile_definitions(ELECTIONGUARD_BUILD_SHARED)
-    endif()
+if (MSVC)
+    message("++ Building with MSVC")
+    target_compile_options(${META_PROJECT_TARGET} PUBLIC /wd4067)
 endif()
 
 if (IOS AND CMAKE_IOS_INSTALL_COMBINED)
@@ -149,12 +155,12 @@ target_include_directories(${META_PROJECT_TARGET}
 add_library(nlohmann_json INTERFACE IMPORTED)
 target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
 
-if (WIN32)
+if (MINGW)
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
     target_link_libraries(${META_PROJECT_TARGET} PRIVATE nlohmann_json -static-libstdc++)
 else()
-target_link_libraries(${META_PROJECT_TARGET} PRIVATE nlohmann_json)
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE nlohmann_json)
 endif()
 
 # ---- Install ----
@@ -201,7 +207,9 @@ if(OPTION_ENABLE_TESTS)
 
     # When running tests, set some specific compiler flags
     if(MSVC)
-        target_compile_options(${META_PROJECT_TARGET} PUBLIC /W4 /WX)
+        #TODO: renenable warnings as errors whne the correct ones are defined
+       #target_compile_options(${META_PROJECT_TARGET} PUBLIC /W4 /WX)C5059
+       target_compile_options(${META_PROJECT_TARGET} PUBLIC /Zi)
     endif()
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
@@ -215,7 +223,7 @@ if(OPTION_ENABLE_TESTS)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-variable)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-redundant-decls)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unknown-pragmas)
-        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-parameter)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-useless-cast)
     endif()
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")

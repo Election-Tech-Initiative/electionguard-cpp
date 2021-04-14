@@ -20,7 +20,7 @@ using std::vector;
 namespace electionguard
 {
     template <typename T> string hash_inner_vector(vector<T> inner_vector);
-    void push_hash_update(Hacl_Streaming_Functor_state_s___uint32_t____ *p, CryptoHashableType a);
+    void push_hash_update(Hacl_Streaming_SHA2_state_sha2_224 *p, CryptoHashableType a);
 
     const char delimiter_char = '|';
     const string null_string = "null";
@@ -30,7 +30,7 @@ namespace electionguard
     unique_ptr<ElementModQ> hash_elems(const vector<CryptoHashableType> &a)
     {
         uint8_t output[MAX_Q_SIZE] = {};
-        Hacl_Streaming_Functor_state_s___uint32_t____ *p = Hacl_Streaming_SHA2_create_in_256();
+        Hacl_Streaming_SHA2_state_sha2_224 *p = Hacl_Streaming_SHA2_create_in_256();
         Hacl_Streaming_SHA2_update_256(p, static_cast<uint8_t *>(delimiter), sizeof(delimiter));
 
         if (a.empty()) {
@@ -101,7 +101,7 @@ namespace electionguard
         VECTOR_STRING = 22
     };
 
-    void push_hash_update(Hacl_Streaming_Functor_state_s___uint32_t____ *p, CryptoHashableType a)
+    void push_hash_update(Hacl_Streaming_SHA2_state_sha2_224 *p, CryptoHashableType a)
     {
         string input_string;
         switch (a.index()) {

@@ -139,16 +139,17 @@ namespace electionguard
         const auto &p = P();
         auto secret = secretKey.toElementModP();
         uint64_t divisor[MAX_P_LEN] = {};
-        bool success = Hacl_Bignum4096_mod_exp(p.get(), this->getPad()->get(), MAX_P_SIZE,
-                                               secret->get(), static_cast<uint64_t *>(divisor));
+        bool success =
+          Hacl_Bignum4096_mod_exp_consttime(p.get(), this->getPad()->get(), MAX_P_SIZE,
+                                            secret->get(), static_cast<uint64_t *>(divisor));
         if (!success) {
             Log::debug(": could not calculate mod exp");
             return 0;
         }
 
         uint64_t inverse[MAX_P_LEN] = {};
-        Hacl_Bignum4096_mod_inv_prime(p.get(), static_cast<uint64_t *>(divisor),
-                                      static_cast<uint64_t *>(inverse));
+        Hacl_Bignum4096_mod_inv_prime_vartime(p.get(), static_cast<uint64_t *>(divisor),
+                                              static_cast<uint64_t *>(inverse));
 
         uint64_t mulResult[MAX_P_LEN_DOUBLE] = {};
         Hacl_Bignum4096_mul(this->getData()->get(), static_cast<uint64_t *>(inverse),

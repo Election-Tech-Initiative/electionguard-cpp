@@ -12,7 +12,7 @@ extern "C" {
 using namespace electionguard;
 using namespace std;
 
-eg_electionguard_status_t
+EG_API eg_electionguard_status_t
 eg_test_ballot_mocks_get_simple_ballot_from_file(eg_plaintext_ballot_t **out_handle)
 {
     try {

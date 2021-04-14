@@ -35,12 +35,35 @@ extern "C" {
 #include "kremlin/lowstar_endianness.h"
 #include <string.h>
 #include "kremlin/internal/target.h"
+#include "kremlin/internal/builtin.h"
 
 
+#include "Hacl_Kremlib.h"
 
+uint64_t
+Hacl_Bignum_Base_mul_wide_add2_u64(uint64_t a, uint64_t b, uint64_t c_in, uint64_t *out);
+
+uint64_t Hacl_Bignum_Lib_bn_get_top_index_u64(uint32_t len, uint64_t *b);
+
+uint64_t
+Hacl_Bignum_Addition_bn_add_eq_len_u64(uint32_t aLen, uint64_t *a, uint64_t *b, uint64_t *res);
 
 void
-Hacl_Bignum_add_mod_n64(uint32_t len1, uint64_t *n, uint64_t *a, uint64_t *b, uint64_t *res);
+Hacl_Bignum_Karatsuba_bn_karatsuba_mul_uint64(
+  uint32_t aLen,
+  uint64_t *a,
+  uint64_t *b,
+  uint64_t *tmp,
+  uint64_t *res
+);
+
+void
+Hacl_Bignum_Karatsuba_bn_karatsuba_sqr_uint64(
+  uint32_t aLen,
+  uint64_t *a,
+  uint64_t *tmp,
+  uint64_t *res
+);
 
 uint64_t Hacl_Bignum_ModInvLimb_mod_inv_uint64(uint64_t n0);
 

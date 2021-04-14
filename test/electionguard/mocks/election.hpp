@@ -2,6 +2,7 @@
 #define __ELECTIONGUARD_CPP_TEST_MOCKS_ELECTION_HPP_INCLUDED__
 
 #include <electionguard/election.hpp>
+#include <electionguard/export.h>
 #include <electionguard/manifest.hpp>
 #include <fstream>
 #include <iostream>

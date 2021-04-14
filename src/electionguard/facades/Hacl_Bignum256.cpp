@@ -21,7 +21,10 @@ namespace hacl
 
     bool Bignum256::modExp(uint64_t *n, uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res)
     {
-        return Hacl_Bignum256_mod_exp(n, a, bBits, b, res);
+        if (bBits <= 0) {
+            return false;
+        }
+        return Hacl_Bignum256_mod_exp_consttime(n, a, bBits, b, res);
     }
 
     uint64_t *Bignum256::fromBytes(uint32_t len, uint8_t *bytes)

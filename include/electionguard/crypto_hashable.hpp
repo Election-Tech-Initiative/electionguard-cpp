@@ -40,17 +40,19 @@ namespace electionguard
     {
       public:
         virtual ~CryptoHashCheckable(){};
-        /// <summary>
-        /// Generates a hash with a given seed that can be checked later against the seed and class metadata.
-        /// </summary>
+/// <summary>
+/// Generates a hash with a given seed that can be checked later against the seed and class metadata.
+/// </summary>
+#pragma warning(suppress : 4100)
         virtual std::unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash)
         {
             throw "CryptoHashCheckable crypto_hash_with not implemented";
         };
 
-        /// <summary>
-        /// Generates a hash with a given seed that can be checked later against the seed and class metadata.
-        /// </summary>
+/// <summary>
+/// Generates a hash with a given seed that can be checked later against the seed and class metadata.
+/// </summary>
+#pragma warning(suppress : 4100)
         virtual std::unique_ptr<ElementModQ> crypto_hash_with(const ElementModQ &seedHash) const
         {
             throw "CryptoHashCheckable const crypto_hash_with not implemented";

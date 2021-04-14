@@ -40,6 +40,7 @@ namespace electionguard
 
       private:
         class Impl;
+#pragma warning(suppress : 4251)
         std::unique_ptr<Impl> pimpl;
     };
 
@@ -105,6 +106,7 @@ namespace electionguard
 
       private:
         class Impl;
+#pragma warning(suppress : 4251)
         std::unique_ptr<Impl> pimpl;
     };
 

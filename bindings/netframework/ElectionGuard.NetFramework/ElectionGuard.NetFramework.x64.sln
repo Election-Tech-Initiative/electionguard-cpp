@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31129.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuard.Tests", "Tests\ElectionGuard.Tests\ElectionGuard.Tests.csproj", "{3309CD0B-68E0-4769-A9AE-D795985BA53D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "electionguard", "..\..\..\build\libs\msvc\x64\src\electionguard.vcxproj", "{4944669C-1FEB-3025-BDF6-901832F0D21E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ElectionGuardInterop", "ElectionGuardInterop\ElectionGuardInterop.vcxproj", "{84DFC423-E292-41C0-ACC4-7AEB3BC50853}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		MinSizeRel|x64 = MinSizeRel|x64
+		Release|x64 = Release|x64
+		RelWithDebInfo|x64 = RelWithDebInfo|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3309CD0B-68E0-4769-A9AE-D795985BA53D}.Debug|x64.ActiveCfg = Debug|x64
+		{3309CD0B-68E0-4769-A9AE-D795985BA53D}.Debug|x64.Build.0 = Debug|x64
+		{3309CD0B-68E0-4769-A9AE-D795985BA53D}.MinSizeRel|x64.ActiveCfg = Debug|x64
+		{3309CD0B-68E0-4769-A9AE-D795985BA53D}.MinSizeRel|x64.Build.0 = Debug|x64
+		{3309CD0B-68E0-4769-A9AE-D795985BA53D}.Release|x64.ActiveCfg = Release|x64
+		{3309CD0B-68E0-4769-A9AE-D795985BA53D}.Release|x64.Build.0 = Release|x64
+		{3309CD0B-68E0-4769-A9AE-D795985BA53D}.RelWithDebInfo|x64.ActiveCfg = Release|x64
+		{3309CD0B-68E0-4769-A9AE-D795985BA53D}.RelWithDebInfo|x64.Build.0 = Release|x64
+		{4944669C-1FEB-3025-BDF6-901832F0D21E}.Debug|x64.ActiveCfg = Debug|x64
+		{4944669C-1FEB-3025-BDF6-901832F0D21E}.Debug|x64.Build.0 = Debug|x64
+		{4944669C-1FEB-3025-BDF6-901832F0D21E}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{4944669C-1FEB-3025-BDF6-901832F0D21E}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
+		{4944669C-1FEB-3025-BDF6-901832F0D21E}.Release|x64.ActiveCfg = Release|x64
+		{4944669C-1FEB-3025-BDF6-901832F0D21E}.Release|x64.Build.0 = Release|x64
+		{4944669C-1FEB-3025-BDF6-901832F0D21E}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{4944669C-1FEB-3025-BDF6-901832F0D21E}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
+		{84DFC423-E292-41C0-ACC4-7AEB3BC50853}.Debug|x64.ActiveCfg = Debug|x64
+		{84DFC423-E292-41C0-ACC4-7AEB3BC50853}.Debug|x64.Build.0 = Debug|x64
+		{84DFC423-E292-41C0-ACC4-7AEB3BC50853}.MinSizeRel|x64.ActiveCfg = Debug|x64
+		{84DFC423-E292-41C0-ACC4-7AEB3BC50853}.MinSizeRel|x64.Build.0 = Debug|x64
+		{84DFC423-E292-41C0-ACC4-7AEB3BC50853}.Release|x64.ActiveCfg = Release|x64
+		{84DFC423-E292-41C0-ACC4-7AEB3BC50853}.Release|x64.Build.0 = Release|x64
+		{84DFC423-E292-41C0-ACC4-7AEB3BC50853}.RelWithDebInfo|x64.ActiveCfg = Release|x64
+		{84DFC423-E292-41C0-ACC4-7AEB3BC50853}.RelWithDebInfo|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F9309C44-4768-4E3D-9A7B-56BD23A87FF2}
+	EndGlobalSection
+EndGlobal
