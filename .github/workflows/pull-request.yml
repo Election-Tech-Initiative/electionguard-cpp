@@ -95,7 +95,6 @@ jobs:
         with:
           update: true
           install: mingw-w64-x86_64-gcc
-        run: echo "msys installed"
       - name: Configure Environment
         run: make environment
       - name: Run Tests
