@@ -50,10 +50,10 @@ if (BUILD_SHARED_LIBS)
 endif()
 
 if(MSVC)
-    target_compile_options(${UTILS_PROJECT_TARGET} /WX-)
+    #target_compile_options(${UTILS_PROJECT_TARGET} /WX-)
     # TODO: validate the compiler warnings
-    # target_compile_options(${UTILS_PROJECT_TARGET} 
-    #     PUBLIC /WX- /wd4067 /wd4100 /wd4266 /wd4365 /wd4464 /wd4505 /wd4554 /wd4668 /wd4820 /wd4996 /wd5045 /wd5059)
+    target_compile_options(${UTILS_PROJECT_TARGET} 
+        PUBLIC /WX- /wd4067 /wd4100 /wd4266 /wd4365 /wd4464 /wd4505 /wd4554 /wd4668 /wd4820 /wd4996 /wd5045 /wd5059)
 endif()
 
 # C++ Tests ---------------------------------------------------
@@ -79,10 +79,10 @@ target_compile_features(${CPPTEST_PROJECT_TARGET} PRIVATE cxx_std_17)
 if(MSVC)
     target_compile_definitions(${CPPTEST_PROJECT_TARGET} PUBLIC DOCTEST_CONFIG_USE_STD_HEADERS)
 
-    target_compile_options(${UTILS_PROJECT_TARGET} /WX-)
+    #target_compile_options(${UTILS_PROJECT_TARGET} /WX-)
     # TODO: validate the compiler warnings
-    # target_compile_options(${CPPTEST_PROJECT_TARGET} 
-    #     PUBLIC /WX- /wd4067 /wd4189 /wd4251 /wd4266 /wd4365 /wd4464 /wd4505 /wd4554 /wd4623 /wd4625 /wd4626 /wd4668 /wd4820 /wd4866 /wd4996 /wd5027 /wd5045 /wd5059 /wd5219)
+    target_compile_options(${CPPTEST_PROJECT_TARGET} 
+        PUBLIC /WX- /wd4067 /wd4189 /wd4251 /wd4266 /wd4365 /wd4464 /wd4505 /wd4554 /wd4623 /wd4625 /wd4626 /wd4668 /wd4820 /wd4866 /wd4996 /wd5027 /wd5045 /wd5059 /wd5219)
 endif()
 
 # C Tests -----------------------------------------------------
