@@ -76,6 +76,13 @@ namespace electionguard
         {
         }
 
+        [[nodiscard]] unique_ptr<ElGamalCiphertext::Impl> clone() const
+        {
+            auto _pad = make_unique<ElementModP>(*pad);
+            auto _data = make_unique<ElementModP>(*data);
+            return make_unique<ElGamalCiphertext::Impl>(move(_pad), move(_data));
+        }
+
         [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
         {
             return hash_elems({pad.get(), data.get()});
@@ -85,6 +92,11 @@ namespace electionguard
     };
 
     // Lifecycle Methods
+
+    ElGamalCiphertext::ElGamalCiphertext(const ElGamalCiphertext &other)
+        : pimpl(other.pimpl->clone())
+    {
+    }
 
     ElGamalCiphertext::ElGamalCiphertext(unique_ptr<ElementModP> pad, unique_ptr<ElementModP> data)
         : pimpl(new Impl(move(pad), move(data)))
