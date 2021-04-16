@@ -182,3 +182,30 @@ TEST_CASE("Encrypt simple ballot from file succeeds")
     CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
 }
+
+TEST_CASE("Encrypt simple ballot from file submitted is valid")
+{
+    // Arrange
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto description = ElectionGenerator::getSimpleElectionFromFile();
+    auto [manifest, context] =
+      ElectionGenerator::getFakeCiphertextElection(*description, *keypair->getPublicKey());
+    auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
+
+    auto ballot = BallotGenerator::getSimpleBallotFromFile();
+
+    // Act
+    auto ciphertext = encryptBallot(*ballot, *manifest, *context, *device->getHash());
+    auto submitted = SubmittedBallot::from(*ciphertext, BallotBoxState::cast);
+    auto serialized = submitted->toJson();
+
+    Log::debug(serialized);
+    auto deserialized = SubmittedBallot::fromJson(serialized);
+
+    // Assert
+    // TODO: compare other values
+    CHECK(submitted->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
+                                       *context->getCryptoExtendedBaseHash()) == true);
+    CHECK(deserialized->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
+                                          *context->getCryptoExtendedBaseHash()) == true);
+}

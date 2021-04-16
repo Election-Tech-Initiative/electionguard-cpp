@@ -16,7 +16,7 @@ else
 endif
 
 # Debug or Release (capitalized)
-TARGET?=Release
+TARGET?=Debug
 
 ifeq ($(OPERATING_SYSTEM),Darwin)
 NDK_PATH?=/Users/$$USER/Library/Android/sdk/ndk/21.3.6528147

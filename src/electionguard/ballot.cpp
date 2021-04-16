@@ -24,6 +24,7 @@ using std::vector;
 
 using PlaintextBallotSerializer = electionguard::Serialize::PlaintextBallot;
 using CiphertextBallotSerializer = electionguard::Serialize::CiphertextBallot;
+using SubmittedBallotSerializer = electionguard::Serialize::SubmittedBallot;
 
 namespace electionguard
 {
@@ -151,6 +152,21 @@ namespace electionguard
             this->isPlaceholder = isPlaceholder;
         }
 
+        [[nodiscard]] unique_ptr<CiphertextBallotSelection::Impl> clone() const
+        {
+            auto _descriptionHash = make_unique<ElementModQ>(*descriptionHash);
+            auto _ciphertext = make_unique<ElGamalCiphertext>(*ciphertext);
+            auto _nonce = make_unique<ElementModQ>(*nonce);
+            auto _cryptoHash = make_unique<ElementModQ>(*cryptoHash);
+            auto _proof = make_unique<DisjunctiveChaumPedersenProof>(*proof);
+            auto _extendedData =
+              extendedData != nullptr ? make_unique<ElGamalCiphertext>(*extendedData) : nullptr;
+
+            return make_unique<CiphertextBallotSelection::Impl>(
+              objectId, move(_descriptionHash), move(_ciphertext), isPlaceholder, move(_nonce),
+              move(_cryptoHash), move(_proof), move(_extendedData));
+        }
+
         [[nodiscard]] unique_ptr<ElementModQ>
         crypto_hash_with(const ElementModQ &encryptionSeed) const
         {
@@ -159,6 +175,11 @@ namespace electionguard
     };
 
     // Lifecycle Methods
+
+    CiphertextBallotSelection::CiphertextBallotSelection(const CiphertextBallotSelection &other)
+        : pimpl(other.pimpl->clone())
+    {
+    }
 
     CiphertextBallotSelection::CiphertextBallotSelection(
       const string &objectId, const ElementModQ &descriptionHash,
@@ -402,9 +423,33 @@ namespace electionguard
         {
             this->object_id = objectId;
         }
+
+        [[nodiscard]] unique_ptr<CiphertextBallotContest::Impl> clone() const
+        {
+            vector<unique_ptr<CiphertextBallotSelection>> _selections;
+            _selections.reserve(selections.size());
+            for (const auto &element : selections) {
+                _selections.push_back(make_unique<CiphertextBallotSelection>(*element));
+            }
+
+            auto _descriptionHash = make_unique<ElementModQ>(*descriptionHash);
+            auto _nonce = make_unique<ElementModQ>(*nonce);
+            auto _accumulation = make_unique<ElGamalCiphertext>(*ciphertextAccumulation);
+            auto _cryptoHash = make_unique<ElementModQ>(*cryptoHash);
+            auto _proof = make_unique<ConstantChaumPedersenProof>(*proof);
+
+            return make_unique<CiphertextBallotContest::Impl>(
+              object_id, move(_descriptionHash), move(_selections), move(_nonce),
+              move(_accumulation), move(_cryptoHash), move(_proof));
+        }
     };
 
     // Lifecycle Methods
+
+    CiphertextBallotContest::CiphertextBallotContest(const CiphertextBallotContest &other)
+        : pimpl(other.pimpl->clone())
+    {
+    }
 
     CiphertextBallotContest::CiphertextBallotContest(
       const string &objectId, const ElementModQ &descriptionHash,
@@ -709,9 +754,31 @@ namespace electionguard
             this->styleId = styleId;
             this->timestamp = timestamp;
         }
+
+        [[nodiscard]] unique_ptr<CiphertextBallot::Impl> clone() const
+        {
+            vector<unique_ptr<CiphertextBallotContest>> _contests;
+            _contests.reserve(contests.size());
+            for (const auto &element : contests) {
+                _contests.push_back(make_unique<CiphertextBallotContest>(*element));
+            }
+
+            auto _manifestHash = make_unique<ElementModQ>(*manifestHash);
+            auto _ballotCodeSeed = make_unique<ElementModQ>(*ballotCodeSeed);
+            auto _ballotCode = make_unique<ElementModQ>(*ballotCode);
+            auto _nonce = make_unique<ElementModQ>(*nonce);
+            auto _cryptoHash = make_unique<ElementModQ>(*cryptoHash);
+            return make_unique<CiphertextBallot::Impl>(
+              object_id, styleId, move(_manifestHash), move(_ballotCodeSeed), move(_contests),
+              move(_ballotCode), timestamp, move(_nonce), move(_cryptoHash));
+        }
     };
 
     // Lifecycle Methods
+
+    CiphertextBallot::CiphertextBallot(const CiphertextBallot &other) : pimpl(other.pimpl->clone())
+    {
+    }
 
     CiphertextBallot::CiphertextBallot(const string &objectId, const string &styleId,
                                        const ElementModQ &manifestHash,
@@ -916,6 +983,104 @@ namespace electionguard
             elems.emplace_back(ref(*contest.get().getCryptoHash()));
         }
         return hash_elems(elems);
+    }
+
+#pragma endregion
+
+#pragma region SubmittedBallot
+
+    struct SubmittedBallot::Impl {
+        BallotBoxState state;
+
+        Impl(BallotBoxState state) { this->state = state; }
+    };
+
+    // Lifecycle Methods
+
+    SubmittedBallot::SubmittedBallot(const CiphertextBallot &other, BallotBoxState state)
+        : CiphertextBallot(other), pimpl(new Impl(state))
+    {
+    }
+
+    SubmittedBallot::SubmittedBallot(const string &objectId, const string &styleId,
+                                     const ElementModQ &manifestHash,
+                                     unique_ptr<ElementModQ> ballotCodeSeed,
+                                     vector<unique_ptr<CiphertextBallotContest>> contests,
+                                     unique_ptr<ElementModQ> ballotCode, const uint64_t timestamp,
+                                     unique_ptr<ElementModQ> nonce,
+                                     unique_ptr<ElementModQ> cryptoHash, BallotBoxState state)
+        : CiphertextBallot(objectId, styleId, manifestHash, move(ballotCodeSeed), move(contests),
+                           move(ballotCode), timestamp, move(nonce), move(cryptoHash)),
+          pimpl(new Impl(state))
+    {
+    }
+    SubmittedBallot::~SubmittedBallot() = default;
+
+    SubmittedBallot &SubmittedBallot::operator=(SubmittedBallot other)
+    {
+        swap(pimpl, other.pimpl);
+        return *this;
+    }
+
+    // Property Getters
+
+    BallotBoxState SubmittedBallot::getState() const { return pimpl->state; }
+
+    // Public Static Methods
+
+    unique_ptr<SubmittedBallot>
+    SubmittedBallot::from(const CiphertextBallot &ballot,
+                          BallotBoxState state /* = BallotBoxState::unknown */)
+    {
+        return make_unique<SubmittedBallot>(ballot, state);
+    }
+
+    unique_ptr<SubmittedBallot> SubmittedBallot::make(
+      const string &objectId, const string &styleId, const ElementModQ &manifestHash,
+      vector<unique_ptr<CiphertextBallotContest>> contests,
+      unique_ptr<ElementModQ> nonce /* = nullptr */, const uint64_t timestamp /* = 0 */,
+      unique_ptr<ElementModQ> ballotCodeSeed /* = nullptr */,
+      unique_ptr<ElementModQ> ballotCode /* = nullptr */,
+      BallotBoxState state /* = BallotBoxState::unknown */)
+    {
+        if (contests.empty()) {
+            Log::debug(":ballot must have at least some contests");
+            throw invalid_argument("ballot must have at least some contests");
+        }
+
+        auto ciphertextBallot =
+          CiphertextBallot::make(objectId, styleId, manifestHash, move(contests), move(nonce),
+                                 timestamp, move(ballotCodeSeed), move(ballotCode));
+        return SubmittedBallot::from(*ciphertextBallot, state);
+    }
+
+    // Public Methods
+
+    vector<uint8_t> SubmittedBallot::toBson() const
+    {
+        return SubmittedBallotSerializer::toBson(*this);
+    }
+
+    string SubmittedBallot::toJson() const { return SubmittedBallotSerializer::toJson(*this); }
+
+    vector<uint8_t> SubmittedBallot::toMsgPack() const
+    {
+        return SubmittedBallotSerializer::toMsgPack(*this);
+    }
+
+    unique_ptr<SubmittedBallot> SubmittedBallot::fromJson(string data)
+    {
+        return SubmittedBallotSerializer::fromJson(data);
+    }
+
+    unique_ptr<SubmittedBallot> SubmittedBallot::fromBson(vector<uint8_t> data)
+    {
+        return SubmittedBallotSerializer::fromBson(move(data));
+    }
+
+    unique_ptr<SubmittedBallot> SubmittedBallot::fromMsgPack(vector<uint8_t> data)
+    {
+        return SubmittedBallotSerializer::fromMsgPack(move(data));
     }
 
 #pragma endregion

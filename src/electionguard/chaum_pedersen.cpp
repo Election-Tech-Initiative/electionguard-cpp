@@ -20,6 +20,16 @@ namespace electionguard
 
     struct DisjunctiveChaumPedersenProof::Impl {
 
+        unique_ptr<ElementModP> proof_zero_pad;
+        unique_ptr<ElementModP> proof_zero_data;
+        unique_ptr<ElementModP> proof_one_pad;
+        unique_ptr<ElementModP> proof_one_data;
+        unique_ptr<ElementModQ> proof_zero_challenge;
+        unique_ptr<ElementModQ> proof_one_challenge;
+        unique_ptr<ElementModQ> challenge;
+        unique_ptr<ElementModQ> proof_zero_response;
+        unique_ptr<ElementModQ> proof_one_response;
+
         Impl(unique_ptr<ElementModP> proof_zero_pad, unique_ptr<ElementModP> proof_zero_data,
              unique_ptr<ElementModP> proof_one_pad, unique_ptr<ElementModP> proof_one_data,
              unique_ptr<ElementModQ> proof_zero_challenge,
@@ -35,18 +45,32 @@ namespace electionguard
         {
         }
 
-        unique_ptr<ElementModP> proof_zero_pad;
-        unique_ptr<ElementModP> proof_zero_data;
-        unique_ptr<ElementModP> proof_one_pad;
-        unique_ptr<ElementModP> proof_one_data;
-        unique_ptr<ElementModQ> proof_zero_challenge;
-        unique_ptr<ElementModQ> proof_one_challenge;
-        unique_ptr<ElementModQ> challenge;
-        unique_ptr<ElementModQ> proof_zero_response;
-        unique_ptr<ElementModQ> proof_one_response;
+        [[nodiscard]] unique_ptr<DisjunctiveChaumPedersenProof::Impl> clone() const
+        {
+            auto _proof_zero_pad = make_unique<ElementModP>(*proof_zero_pad);
+            auto _proof_zero_data = make_unique<ElementModP>(*proof_zero_data);
+            auto _proof_one_pad = make_unique<ElementModP>(*proof_one_pad);
+            auto _proof_one_data = make_unique<ElementModP>(*proof_one_data);
+            auto _proof_zero_challenge = make_unique<ElementModQ>(*proof_zero_challenge);
+            auto _proof_one_challenge = make_unique<ElementModQ>(*proof_one_challenge);
+            auto _challenge = make_unique<ElementModQ>(*challenge);
+            auto _proof_zero_response = make_unique<ElementModQ>(*proof_zero_response);
+            auto _proof_one_response = make_unique<ElementModQ>(*proof_one_response);
+
+            return make_unique<DisjunctiveChaumPedersenProof::Impl>(
+              move(_proof_zero_pad), move(_proof_zero_data), move(_proof_one_pad),
+              move(_proof_one_data), move(_proof_zero_challenge), move(_proof_one_challenge),
+              move(_challenge), move(_proof_zero_response), move(_proof_one_response));
+        }
     };
 
     // Lifecycle Methods
+
+    DisjunctiveChaumPedersenProof::DisjunctiveChaumPedersenProof(
+      const DisjunctiveChaumPedersenProof &other)
+        : pimpl(other.pimpl->clone())
+    {
+    }
 
     DisjunctiveChaumPedersenProof::DisjunctiveChaumPedersenProof(
       unique_ptr<ElementModP> proof_zero_pad, unique_ptr<ElementModP> proof_zero_data,
@@ -314,9 +338,25 @@ namespace electionguard
         {
             this->constant = constant;
         }
+
+        [[nodiscard]] unique_ptr<ConstantChaumPedersenProof::Impl> clone() const
+        {
+            auto _pad = make_unique<ElementModP>(*pad);
+            auto _data = make_unique<ElementModP>(*data);
+            auto _challenge = make_unique<ElementModQ>(*challenge);
+            auto _response = make_unique<ElementModQ>(*response);
+
+            return make_unique<ConstantChaumPedersenProof::Impl>(
+              move(_pad), move(_data), move(_challenge), move(_response), constant);
+        }
     };
 
     // Lifecycle Methods
+
+    ConstantChaumPedersenProof::ConstantChaumPedersenProof(const ConstantChaumPedersenProof &other)
+        : pimpl(other.pimpl->clone())
+    {
+    }
 
     ConstantChaumPedersenProof::ConstantChaumPedersenProof(unique_ptr<ElementModP> pad,
                                                            unique_ptr<ElementModP> data,
