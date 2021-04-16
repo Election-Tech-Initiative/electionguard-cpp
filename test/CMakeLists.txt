@@ -2,10 +2,9 @@ cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 
 # ---- Project ----
 
-project("ElectionGuardTests"
-    VERSION 0.0.1 
-    LANGUAGES C CXX
-)
+set(UTILS_PROJECT_TARGET      "ElectionGuardUtils")
+set(CPPTEST_PROJECT_TARGET    "ElectionGuardTests")
+set(CTEST_PROJECT_TARGET      "ElectionGuardCTests")
 
 # --- Import tools ----
 
@@ -27,8 +26,9 @@ CPMAddPackage(
 
 # ---- Sources ----
 
-# Utils Library
-add_library(ElectionGuardUtils SHARED
+# Utils Library -----------------------------------------------
+
+add_library(${UTILS_PROJECT_TARGET} SHARED
 ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.cpp
@@ -38,11 +38,27 @@ ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/constants.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h
 )
+add_library(${UTILS_PROJECT_TARGET}::${UTILS_PROJECT_TARGET} ALIAS ${UTILS_PROJECT_TARGET})
 
-target_compile_features(ElectionGuardUtils PRIVATE cxx_std_17)
+target_compile_features(${UTILS_PROJECT_TARGET} PRIVATE cxx_std_17)
+target_compile_options(${UTILS_PROJECT_TARGET} PUBLIC "$<$<BOOL:${MSVC}>:/permissive->")
 
-# C++ Tests
-add_executable(ElectionGuardTests 
+# define dll export markers
+if (BUILD_SHARED_LIBS)
+    message("++ Building Shared Libs")  
+    add_compile_definitions(ELECTIONGUARD_BUILD_SHARED)
+endif()
+
+if(MSVC)
+    #target_compile_options(${UTILS_PROJECT_TARGET} /WX-)
+    # TODO: validate the compiler warnings
+    target_compile_options(${UTILS_PROJECT_TARGET} 
+        PUBLIC /WX- /wd4067 /wd4100 /wd4266 /wd4365 /wd4464 /wd4505 /wd4554 /wd4668 /wd4820 /wd4996 /wd5045 /wd5059)
+endif()
+
+# C++ Tests ---------------------------------------------------
+
+add_executable(${CPPTEST_PROJECT_TARGET} 
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot_code.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot_compact.cpp
@@ -58,14 +74,20 @@ add_executable(ElectionGuardTests
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_nonces.cpp
 )
 
-target_compile_features(ElectionGuardTests PRIVATE cxx_std_17)
+target_compile_features(${CPPTEST_PROJECT_TARGET} PRIVATE cxx_std_17)
 
 if(MSVC)
-    target_compile_definitions(ElectionGuardTests PUBLIC DOCTEST_CONFIG_USE_STD_HEADERS)
+    target_compile_definitions(${CPPTEST_PROJECT_TARGET} PUBLIC DOCTEST_CONFIG_USE_STD_HEADERS)
+
+    #target_compile_options(${UTILS_PROJECT_TARGET} /WX-)
+    # TODO: validate the compiler warnings
+    target_compile_options(${CPPTEST_PROJECT_TARGET} 
+        PUBLIC /WX- /wd4067 /wd4189 /wd4251 /wd4266 /wd4365 /wd4464 /wd4505 /wd4554 /wd4623 /wd4625 /wd4626 /wd4668 /wd4820 /wd4866 /wd4996 /wd5027 /wd5045 /wd5059 /wd5219)
 endif()
 
-# C Tests
-add_executable(ElectionGuardCTests
+# C Tests -----------------------------------------------------
+
+add_executable(${CTEST_PROJECT_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/main.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot_code.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot.c
@@ -77,30 +99,30 @@ add_executable(ElectionGuardCTests
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.c
 )
 
-target_compile_features(ElectionGuardCTests PRIVATE c_std_99)
+target_compile_features(${CTEST_PROJECT_TARGET} PRIVATE c_std_99)
 
 # ---- Link Libraries ----
 
-target_link_libraries(ElectionGuardUtils PUBLIC ${META_PROJECT_TARGET})
+target_link_libraries(${UTILS_PROJECT_TARGET} PUBLIC ${META_PROJECT_TARGET})
 
-if (WIN32)
+if (MINGW)
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
-    target_link_libraries(ElectionGuardTests PRIVATE doctest ElectionGuardUtils ${META_PROJECT_TARGET} -static-libstdc++)
+    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET} -static-libstdc++)
 else()
-    target_link_libraries(ElectionGuardTests PRIVATE doctest ElectionGuardUtils ${META_PROJECT_TARGET})
+    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
 endif()
 
-target_link_libraries(ElectionGuardCTests PRIVATE ElectionGuardUtils ${META_PROJECT_TARGET})
+target_link_libraries(${CTEST_PROJECT_TARGET} PRIVATE ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
 
 if (WIN32)
     # sometimes windows struggles with paths (particularly in CI)
     # so, copy the .dll file to the test execution folder
     add_custom_command(
-        TARGET ElectionGuardTests POST_BUILD
+        TARGET ${CPPTEST_PROJECT_TARGET} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         $<TARGET_FILE_DIR:${META_PROJECT_TARGET}>
-        $<TARGET_FILE_DIR:ElectionGuardTests>)
+        $<TARGET_FILE_DIR:${CPPTEST_PROJECT_TARGET}>)
 endif()
 
 # ---- Add Tests ----
@@ -109,17 +131,17 @@ ENABLE_TESTING()
 
 if (WIN32)
     include(${doctest_SOURCE_DIR}/scripts/cmake/common.cmake)
-    doctest_add_test(NAME ElectionGuardTests COMMAND $<TARGET_FILE:ElectionGuardTests> --no-version)
+    doctest_add_test(NAME ${CPPTEST_PROJECT_TARGET} COMMAND $<TARGET_FILE:${CPPTEST_PROJECT_TARGET}> --no-version)
 else()
     include(${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake)
-    doctest_discover_tests(ElectionGuardTests)
+    doctest_discover_tests(${CPPTEST_PROJECT_TARGET})
 endif()
 
 if (USE_DYNAMIC_ANALYSIS AND VALGRIND_PROGRAM)
         message("++ Building with dynamic analysis")
-        USE_VALGRIND(ElectionGuardTests --trace-children=yes --leak-check=full --sim-hints=no-nptl-pthread-stackcache --track-fds=yes)
+        USE_VALGRIND(${CPPTEST_PROJECT_TARGET} --trace-children=yes --leak-check=full --sim-hints=no-nptl-pthread-stackcache --track-fds=yes)
 endif()
 
 if (CODE_COVERAGE)
-    target_code_coverage(ElectionGuardTests AUTO)
+    target_code_coverage(${CPPTEST_PROJECT_TARGET} AUTO)
 endif()

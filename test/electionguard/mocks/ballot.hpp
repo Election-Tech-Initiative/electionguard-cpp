@@ -5,6 +5,7 @@
 
 #include <electionguard/ballot.hpp>
 #include <electionguard/election.hpp>
+#include <electionguard/export.h>
 #include <electionguard/manifest.hpp>
 #include <fstream>
 #include <iostream>
@@ -90,7 +91,7 @@ namespace electionguard::test::mocks
 
             vector<unique_ptr<PlaintextBallotContest>> contests;
             for (const auto &contest : manifest.getContests()) {
-                contests.push_back(contestFrom(contest.get()));
+                contests.push_back(contestFrom(contest.get(), maxChoices));
             }
             return make_unique<PlaintextBallot>(
               ballotId, manifest.getBallotStyles().at(0).get().getObjectId(), move(contests));

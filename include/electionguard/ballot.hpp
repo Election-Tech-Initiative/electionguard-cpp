@@ -134,6 +134,7 @@ namespace electionguard
 
       private:
         class Impl;
+#pragma warning(suppress : 4251)
         std::unique_ptr<Impl> pimpl;
     };
 
@@ -278,6 +279,7 @@ namespace electionguard
 
       private:
         class Impl;
+#pragma warning(suppress : 4251)
         std::unique_ptr<Impl> pimpl;
 
         /// set the hash of the encrypted values.
@@ -334,6 +336,7 @@ namespace electionguard
 
       private:
         class Impl;
+#pragma warning(suppress : 4251)
         std::unique_ptr<Impl> pimpl;
     };
 
@@ -471,6 +474,7 @@ namespace electionguard
 
       private:
         class Impl;
+#pragma warning(suppress : 4251)
         std::unique_ptr<Impl> pimpl;
     };
 
@@ -547,6 +551,7 @@ namespace electionguard
 
       private:
         class Impl;
+#pragma warning(suppress : 4251)
         std::unique_ptr<Impl> pimpl;
     };
 
@@ -725,6 +730,7 @@ namespace electionguard
 
       private:
         class Impl;
+#pragma warning(suppress : 4251)
         std::unique_ptr<Impl> pimpl;
     };
 

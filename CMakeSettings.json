@@ -1,0 +1,32 @@
+﻿{
+  "configurations": [
+    {
+      "name": "x64-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [
+        "msvc_x64_x64"
+      ],
+      "buildRoot": "${projectDir}\\build\\libs\\x64\\${name}",
+      "installRoot": "${projectDir}\\build\\install\\x64\\${name}",
+      "cmakeCommandArgs": "-DBUILD_SHARED_LIBS=ON",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "intelliSenseMode": "windows-msvc-x64"
+    },
+    {
+      "name": "x86-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${projectDir}\\build\\libs\\x86\\${name}",
+      "installRoot": "${projectDir}\\build\\install\\x86\\${name}",
+      "cmakeCommandArgs": "-DBUILD_SHARED_LIBS=ON",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [
+        "msvc_x86"
+      ],
+      "intelliSenseMode": "windows-msvc-x86"
+    }
+  ]
+}

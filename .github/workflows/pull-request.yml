@@ -37,6 +37,7 @@ jobs:
             "ubuntu-18.04-clang-10.0.0",
             "macos-10.15-xcode-12.0",
             "windows-2019-gcc-9.2.0",
+            "windows-2019-msvc-latest",
           ]
         include:
           - name: ubuntu-20.04-clang-10.0.0
@@ -59,6 +60,10 @@ jobs:
             os: windows-2019
             compiler: gcc
             version: "9"
+          - name: windows-2019-msvc-latest
+            os: windows-2019
+            compiler: msvc
+            version: "latest"
 
     steps:
       - name: Checkout Code
@@ -84,14 +89,12 @@ jobs:
           ls -ls /Applications/
           ls -ls $ANDROID_SDK_ROOT/ndk
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
-      - uses: msys2/setup-msys2@v2
+      - name: Update Environment
+        if: (runner.os == 'Windows' && matrix.compiler != 'msvc')
+        uses: msys2/setup-msys2@v2
         with:
           update: true
           install: mingw-w64-x86_64-gcc
-        if: runner.os == 'Windows'
-      - name: Update Environment
-        if: runner.os == 'Windows'
-        run: echo "msys installed"
       - name: Configure Environment
         run: make environment
       - name: Run Tests
@@ -101,8 +104,11 @@ jobs:
         if: runner.os == 'macOS'
         run: make test
       - name: Run Tests
-        if: runner.os == 'Windows'
+        if: (runner.os == 'Windows' && matrix.compiler != 'msvc')
         run: make test
+      - name: Run Tests
+        if: (runner.os == 'Windows' && matrix.compiler == 'msvc')
+        run: make test-msvc
       - name: Run Sanitizer
         if: (runner.os == 'Linux' && matrix.os == 'ubuntu-20.04')
         run: make sanitize-asan

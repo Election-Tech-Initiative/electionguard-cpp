@@ -150,10 +150,6 @@ TEST_CASE("Hacl_Bignum256_mod Test mod for BigNum 256 invalid preconditions fail
     uint64_t mod_zero[MAX_Q_LEN] = {0x00};
     bool n_is_in_range = Bignum256::mod(mod_zero, a_valid, result);
     CHECK(n_is_in_range == false);
-
-    // verify a < (n * n)
-    bool a_is_in_range = Bignum256::mod(mod_valid, a_invalid, result);
-    CHECK(a_is_in_range == false);
 }
 
 TEST_CASE("Hacl_Bignum256_mod Test mod for BigNum 256 valid preconditions succeeds")
@@ -180,7 +176,7 @@ TEST_CASE("Hacl_Bignum4096_mod_exp Test mod exp for BigNum 4096 invalid precondi
     uint64_t a_valid[MAX_P_LEN] = {0x04};
     uint64_t a_invalid[MAX_P_LEN] = {0x0a};
     uint64_t b_valid[MAX_P_LEN] = {0x01};
-    uint64_t b_invalid[MAX_P_LEN] = {0x00};
+    uint32_t bBits_invalid = 0;
 
     uint64_t result[MAX_P_LEN] = {};
 
@@ -193,8 +189,8 @@ TEST_CASE("Hacl_Bignum4096_mod_exp Test mod exp for BigNum 4096 invalid precondi
     bool n_is_in_range = Bignum4096::modExp(mod_zero, a_valid, MAX_P_SIZE, b_valid, result);
     CHECK(n_is_in_range == false);
 
-    // verify that 0 < b
-    bool b_is_in_range = Bignum4096::modExp(mod_valid, a_valid, MAX_P_SIZE, b_invalid, result);
+    // verify that 0 < bBits
+    bool b_is_in_range = Bignum4096::modExp(mod_valid, a_valid, bBits_invalid, b_valid, result);
     CHECK(b_is_in_range == false);
 
     // TODO: verify b < pow2 bBits
@@ -225,7 +221,7 @@ TEST_CASE("Hacl_Bignum256_mod_exp Test mod exp for BigNum 256 invalid preconditi
     uint64_t a_valid[MAX_Q_LEN] = {0x04};
     uint64_t a_invalid[MAX_Q_LEN] = {0x0a};
     uint64_t b_valid[MAX_Q_LEN] = {0x01};
-    uint64_t b_invalid[MAX_Q_LEN] = {0x00};
+    uint32_t bBits_invalid = 0;
 
     uint64_t result[MAX_Q_LEN] = {};
 
@@ -238,8 +234,8 @@ TEST_CASE("Hacl_Bignum256_mod_exp Test mod exp for BigNum 256 invalid preconditi
     bool n_is_in_range = Bignum256::modExp(mod_zero, a_valid, MAX_Q_SIZE, b_valid, result);
     CHECK(n_is_in_range == false);
 
-    // verify that 0 < b
-    bool b_is_in_range = Bignum256::modExp(mod_valid, a_valid, MAX_Q_SIZE, b_invalid, result);
+    // verify that 0 < bBits
+    bool b_is_in_range = Bignum256::modExp(mod_valid, a_valid, bBits_invalid, b_valid, result);
     CHECK(b_is_in_range == false);
 
     // TODO: verify b < pow2 bBits

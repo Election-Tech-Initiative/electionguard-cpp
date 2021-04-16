@@ -545,8 +545,8 @@ namespace electionguard
         }
 
         uint64_t result[MAX_P_LEN] = {};
-        bool success = Hacl_Bignum4096_mod_exp(p.get(), base.get(), MAX_P_SIZE, exponent.get(),
-                                               static_cast<uint64_t *>(result));
+        bool success = Hacl_Bignum4096_mod_exp_consttime(
+          p.get(), base.get(), MAX_P_SIZE, exponent.get(), static_cast<uint64_t *>(result));
         if (!success) {
             throw runtime_error(" pow_mod_p mod operation failed");
         }

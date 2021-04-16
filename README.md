@@ -54,14 +54,6 @@ To build for android, you need the Android SDK and platforms 21 and 26.  The eas
 - [SDK 26](https://developer.android.com/studio/releases/platforms#8.0)
 - [NDK 21](https://developer.android.com/ndk/downloads/)
 
-### 🌐 .NET
-
-A .NET Standard binding library is provided so that this package can be consumed from C# applications.  At this time, only Android and iOS binaries are included and they can be consumed from a Xamarin application.  Building for Xamarin currently requires a Mac
-
-- Other dependencies for Android and iOS
-- [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/)
-- [NuGet Command Line (CLI)](https://docs.microsoft.com/en-us/nuget/reference/nuget-exe-cli-reference#macoslinux)
-
 ### 🍏 iOS
 
 To build for iOS you need XCode installed
@@ -69,11 +61,28 @@ To build for iOS you need XCode installed
 - [XCode](https://developer.apple.com/xcode/resources/) and the [Command Line Tools for XCode](#)
 - [CMake 3.19](https://cmake.org/) may be necessary, along with changes to the Makefile.  [See ISSUE #138](https://github.com/microsoft/electionguard-cpp/issues/138)
 
+### Linux
+
+The automated install of dependencies is currently only supported on debian-based systems.  See the makefile for more information.
+
+### 🖥️ Windows (using MSVC)
+
+Building on windows is supported using the `MSVC` toolchain.
+
+- Install [Chocolatey](https://chocolatey.org/install)
+- Install [Powershell Core](https://github.com/powershell/powershell)
+- Install [VS 2019](https://visualstudio.microsoft.com/vs/)
+- Open the Visual Studio Installer and install
+-- MSVC v142 - VS 2019 C++ x64/x86 build tools
+-- Windows 10 SDK (latest)
+-- C++ CMake tools for Windows
+-- C++/CLI support for v142 build tools
+
 ### 🖥️ Windows (using MSYS2)
 
-Building on windows is currently supported using the `MSYS2` toolchain.  `MSVC` support will be included in a future release.
+Building on windows is supported using the `MSYS2` toolchain. MSYS is the default toolchain on Windows.
 
-- Install [Chocolatey]()
+- Install [Chocolatey](https://chocolatey.org/install)
 - Install [Powershell Core](https://github.com/powershell/powershell)
 - Install [MSYS2](https://www.msys2.org)
 - Open the MSYS2 prompt by running the newly-created "MSYS2 MSYS" shortcut in your start menu.
@@ -93,6 +102,14 @@ Building on windows is currently supported using the `MSYS2` toolchain.  `MSVC` 
 
 When compiling with shared libraries, you may encounter an error running the unit tests project.  This is likely due to windows resolving the incorrect implementation of `libstdc++-6.dll`.  Solving this depends on your use case, but you can either ensure that the path modifications made above appear before any other paths which include this library (e.g. c\Windows\System32\), or you can include a copy of the correct DLL in the output folder.  [See this StackOverflow post for more information](https://stackoverflow.com/questions/18668003/the-procedure-entry-point-gxx-personality-v0-could-not-be-located)
 
+### 🌐 .NET Standard
+
+A .NET Standard binding library is provided so that this package can be consumed from C# applications.  At this time, only Android and iOS binaries are included and they can be consumed from a Xamarin application.  Building for Xamarin currently requires a Mac.
+
+- Other dependencies for Android and iOS
+- [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/)
+- [NuGet Command Line (CLI)](https://docs.microsoft.com/en-us/nuget/reference/nuget-exe-cli-reference#macoslinux)
+
 ## Build
 
 Using **make**,
@@ -103,13 +120,13 @@ Using **make**,
 make environment
 ```
 
-### Build the Library for the current host (Release)
+### Build the Library for the current host (Release, default toolchain)
 
 ```sh
 make build
 ```
 
-### Build the Library for the current host (Debug)
+### Build the Library for the current host (Debug, default toolchain)
 
 ```sh
 export TARGET=Debug && make build
@@ -137,9 +154,28 @@ make build-ios
 
 ### Build for Windows
 
+Using the default MSYS2 toolchain:
+
 ```pwsh
 make build
 ```
+
+Using the MSVC toolchain:
+
+```pwsh
+make build-msvc
+```
+
+### Build for .Net Framework v4.8
+
+Wraps the MSVC build artifacts in a C++/CLI wrapper to be consumed from a .Net Framework 4.8 application (windows desktop only).  Only works on Windows.
+
+```pwsh
+// ensure the windows msvc binaries are built
+make build-msvc
+```
+
+open `./bindings/netframework//ElectionGuard.NetFramework/ElectionGuard.NetFramework.XXX.sln` in VS 2019 and build.
 
 ### Build for Xamarin
 
@@ -157,6 +193,12 @@ make build-netstandard
 
 ```sh
 make test
+```
+
+#### Running the tests on Windows using the MSVC toolchain
+
+```sh
+make test-msvc
 ```
 
 ### Running the netstandard tests
@@ -186,12 +228,14 @@ Please report any bugs, feature requests, or enhancements using the [GitHub Issu
 
 ### Have Questions?
 
-ElectionGuard would love for you to ask questions out in the open using GitHub Issues. If you really want to email the ElectionGuard team, reach out at electionguard@microsoft.com.
+ElectionGuard would love for you to ask questions out in the open using GitHub Discussions. If you really want to email the ElectionGuard team, reach out at electionguard@microsoft.com.
 
 ## License
+
 This repository is licensed under the [MIT License]
 
 ## Thanks! 🎉
+
 A huge thank you to those who helped to contribute to this project so far, including:
 
 **[Josh Benaloh _(Microsoft)_](https://www.microsoft.com/en-us/research/people/benaloh/)**

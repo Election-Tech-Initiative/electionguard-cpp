@@ -1,4 +1,4 @@
-.PHONY: all build build-debug build-debug-all build-release build-android build-ios clean environment format memcheck sanitize sanitize-asan sanitize-tsan test
+.PHONY: all build build-debug build-msvc build-debug-all build-release build-android build-ios clean environment format memcheck sanitize sanitize-asan sanitize-tsan test
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_BUILD_DIR=$(realpath .)/build
@@ -25,7 +25,7 @@ ifeq ($(OPERATING_SYSTEM),Linux)
 NDK_PATH?=/usr/local/lib/android/sdk/ndk/21.3.6528147
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
-# TODO:
+NDK_PATH?=C:\Android\android-sdk\ndk-bundle
 endif
 
 all: environment build
@@ -71,14 +71,34 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DBUILD_SHARED_LIBS=ON \
+		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DBUILD_SHARED_LIBS=ON \
+		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
+
+build-msvc:
+	@echo 🐛 BUILD DEBUG
+ifeq ($(OPERATING_SYSTEM),Windows)
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/Win32 -G "Visual Studio 16 2019" -A Win32 \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DBUILD_SHARED_LIBS=ON \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 16 2019" -A x64 \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DBUILD_SHARED_LIBS=ON \
+		-DCAN_USE_VECTOR_INTRINSICS=ON \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/Win32
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64
+else
+	echo "MSVC builds are only supported on Windows"
+endif
 
 build-release: clean
 	@echo 🧱 BUILD RELEASE
@@ -86,11 +106,13 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Release -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DBUILD_SHARED_LIBS=ON \
+		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Release \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DBUILD_SHARED_LIBS=ON \
+		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Release
@@ -152,6 +174,14 @@ else
 	echo "iOS builds are only supported on MacOS"
 endif
 
+build-netframework: build-msvc
+	@echo 🖥️ BUILD NET FRAMEWORK
+ifeq ($(OPERATING_SYSTEM),Windows)
+	pwsh -Command "msbuild ./bindings/netframework/ElectionGuard.NetFramework/ElectionGuard.NetFramework.x64.sln /t:Build /p:Configuration=$(TARGET); $$null"
+else
+	echo "Net Framework builds are only supported on Windows"
+endif
+
 build-netstandard: build-android build-ios
 	@echo 🖥️ BUILD NETSTANDARD
 ifeq ($(OPERATING_SYSTEM),Darwin)
@@ -199,11 +229,21 @@ sanitize: sanitize-asan sanitize-tsan
 sanitize-asan:
 	@echo 🧼 SANITIZE ADDRESS AND UNDEFINED
 ifeq ($(OPERATING_SYSTEM),Windows)
-	@echo "Address sanitizer is only supported on Linux & Mac"
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 16 2019" -A x64 \
+		-DCMAKE_BUILD_TYPE=Debug \
+		-DBUILD_SHARED_LIBS=ON \
+		-DCAN_USE_VECTOR_INTRINSICS=ON \
+		-DOPTION_ENABLE_TESTS=ON \
+		-DUSE_SANITIZER="address" \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64/test/Debug/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64/test/Debug/ElectionGuardCTests
 else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DBUILD_SHARED_LIBS=ON \
+		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DOPTION_ENABLE_TESTS=ON \
 		-DCODE_COVERAGE=ON \
 		-DUSE_STATIC_ANALYSIS=ON \
@@ -226,6 +266,7 @@ else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DBUILD_SHARED_LIBS=ON \
+		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DOPTION_ENABLE_TESTS=ON \
 		-DCODE_COVERAGE=ON \
 		-DUSE_STATIC_ANALYSIS=ON \
@@ -243,12 +284,14 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DBUILD_SHARED_LIBS=ON \
+		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DOPTION_ENABLE_TESTS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DBUILD_SHARED_LIBS=ON \
+		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DOPTION_ENABLE_TESTS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 endif
@@ -256,12 +299,27 @@ endif
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
 
+test-msvc:
+	@echo 🧪 TEST
+ifeq ($(OPERATING_SYSTEM),Windows)
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 16 2019" -A x64 \
+		-DCMAKE_BUILD_TYPE=Debug \
+		-DBUILD_SHARED_LIBS=ON \
+		-DCAN_USE_VECTOR_INTRINSICS=ON \
+		-DOPTION_ENABLE_TESTS=ON \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64/test/Debug/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64/test/Debug/ElectionGuardCTests
+endif
+
 coverage:
 	@echo ✅ CHECK COVERAGE
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DBUILD_SHARED_LIBS=ON \
+		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DOPTION_ENABLE_TESTS=ON \
 		-DCODE_COVERAGE=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
@@ -269,6 +327,7 @@ else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DBUILD_SHARED_LIBS=ON \
+		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DOPTION_ENABLE_TESTS=ON \
 		-DCODE_COVERAGE=ON \
 		-DUSE_STATIC_ANALYSIS=ON \
