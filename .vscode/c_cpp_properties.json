@@ -21,7 +21,6 @@
             ],
             "defines": [],
             "macFrameworkPath": [
-                "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks",
                 "/System/Library/Frameworks",
                 "/Library/Frameworks"
             ],

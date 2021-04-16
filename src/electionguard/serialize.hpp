@@ -935,7 +935,7 @@ namespace electionguard
 
         class CiphertextBallot
         {
-          private:
+          protected:
             static json fromObject(const electionguard::CiphertextBallot &serializable,
                                    bool withNonces)
             {
@@ -1168,6 +1168,66 @@ namespace electionguard
                 return toObject(json::parse(data));
             }
             static unique_ptr<electionguard::CiphertextBallot> fromMsgPack(vector<uint8_t> data)
+            {
+                return toObject(json::from_msgpack(data));
+            }
+        };
+
+        class SubmittedBallot
+        {
+            class SubmittedBallotWrapper : CiphertextBallot
+            {
+              public:
+                static json fromObjectWrapper(const electionguard::CiphertextBallot &serializable)
+                {
+                    return CiphertextBallot::fromObject(serializable, false);
+                }
+                static unique_ptr<electionguard::CiphertextBallot> toObjectWrapper(json j)
+                {
+                    return CiphertextBallot::toObject(j);
+                }
+            };
+
+          private:
+            static json fromObject(const electionguard::SubmittedBallot &serializable)
+            {
+
+                auto result = SubmittedBallotWrapper::fromObjectWrapper(serializable);
+                result["state"] = getBallotBoxStateString(serializable.getState());
+
+                return result;
+            }
+
+            static unique_ptr<electionguard::SubmittedBallot> toObject(json j)
+            {
+                auto ciphertext = SubmittedBallotWrapper::toObjectWrapper(j);
+                auto state = getBallotBoxState(j["state"].get<string>());
+                // TODO: make this a move instead of a copy
+                return electionguard::SubmittedBallot::from(*ciphertext, state);
+            }
+
+          public:
+            static vector<uint8_t> toBson(const electionguard::SubmittedBallot &serializable)
+            {
+                return json::to_bson(fromObject(serializable));
+            }
+            static string toJson(const electionguard::SubmittedBallot &serializable)
+            {
+                return fromObject(serializable).dump();
+            }
+            static vector<uint8_t> toMsgPack(const electionguard::SubmittedBallot &serializable)
+            {
+                return json::to_msgpack(fromObject(serializable));
+            }
+            static unique_ptr<electionguard::SubmittedBallot> fromBson(vector<uint8_t> data)
+            {
+                return toObject(json::from_bson(data));
+            }
+            static unique_ptr<electionguard::SubmittedBallot> fromJson(string data)
+            {
+                return toObject(json::parse(data));
+            }
+            static unique_ptr<electionguard::SubmittedBallot> fromMsgPack(vector<uint8_t> data)
             {
                 return toObject(json::from_msgpack(data));
             }

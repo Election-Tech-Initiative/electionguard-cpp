@@ -734,6 +734,103 @@ namespace electionguard
         std::unique_ptr<Impl> pimpl;
     };
 
+    /// <summary>
+    /// A `SubmittedBallot` represents a ballot that is submitted for inclusion in election results.
+    /// A submitted ballot is or is about to be either cast or spoiled.
+    /// The state supports the `BallotBoxState.UNKNOWN` enumeration to indicate that this object is mutable
+    /// and has not yet been explicitly assigned a specific state.
+    ///
+    /// Note, additionally, this ballot includes all proofs but no nonces.
+    ///
+    /// Do not make this class directly. Use `make_ciphertext_submitted_ballot` or `from_ciphertext_ballot` instead.
+    /// </summary>
+    class EG_API SubmittedBallot : public CiphertextBallot
+    {
+      public:
+        SubmittedBallot(const SubmittedBallot &other);
+        SubmittedBallot(const SubmittedBallot &&other);
+        explicit SubmittedBallot(const CiphertextBallot &other, BallotBoxState state);
+        explicit SubmittedBallot(const std::string &objectId, const std::string &styleId,
+                                 const ElementModQ &manifestHash,
+                                 std::unique_ptr<ElementModQ> ballotCodeSeed,
+                                 std::vector<std::unique_ptr<CiphertextBallotContest>> contests,
+                                 std::unique_ptr<ElementModQ> ballotCode, const uint64_t timestamp,
+                                 std::unique_ptr<ElementModQ> nonce,
+                                 std::unique_ptr<ElementModQ> cryptoHash, BallotBoxState state);
+        ~SubmittedBallot();
+
+        SubmittedBallot &operator=(SubmittedBallot other);
+        SubmittedBallot &operator=(SubmittedBallot &&other);
+
+        /// <summary>
+        /// The unique ballot id that is meaningful to the consuming application.
+        /// </summary>
+        BallotBoxState getState() const;
+
+        /// <summary>
+        /// Convert a `CiphertextBallot` into a `SubmittedBallot`, with all nonces removed.
+        /// </summary>
+        static std::unique_ptr<SubmittedBallot>
+        from(const CiphertextBallot &ballot, BallotBoxState state = BallotBoxState::unknown);
+
+        /// <summary>
+        /// Makes a `SubmittedBallot`, initially in the state where it's neither been cast nor spoiled.
+        ///
+        /// <param name="objectId"> the object_id of this specific ballot</param>
+        /// <param name="styleId"> The `object_id` of the `StyleId` in the `Election` Manifest</param>
+        /// <param name="manifestHash"> Hash of the election manifest</param>
+        /// <param name="nonce"> optional nonce used as part of the encryption process</param>
+        /// <param name="contests"> List of contests for this ballot</param>
+        /// <param name="timestamp"> Timestamp at which the ballot encryption is generated in tick.
+        ///                          Will use the system time if none provided</param>
+        /// <param name="ballotCode"> Previous ballot code or seed.
+        ///                           Will use the manifestHash if none provided</param>
+        /// <param name="contests"> List of contests for this ballot</param>
+        /// </summary>
+        static std::unique_ptr<SubmittedBallot>
+        make(const std::string &objectId, const std::string &styleId,
+             const ElementModQ &manifestHash,
+             std::vector<std::unique_ptr<CiphertextBallotContest>> contests,
+             std::unique_ptr<ElementModQ> nonce = nullptr, const uint64_t timestamp = 0,
+             std::unique_ptr<ElementModQ> ballotCodeSeed = nullptr,
+             std::unique_ptr<ElementModQ> ballotCode = nullptr,
+             BallotBoxState state = BallotBoxState::unknown);
+
+        /// <Summary>
+        /// Export the ballot representation as BSON
+        /// </Summary>
+        std::vector<uint8_t> toBson() const;
+
+        /// <Summary>
+        /// Export the ballot representation as JSON
+        /// </Summary>
+        std::string toJson() const;
+
+        /// <Summary>
+        /// Export the ballot representation as MsgPack
+        /// </Summary>
+        std::vector<uint8_t> toMsgPack() const;
+
+        /// <Summary>
+        /// Import the ballot representation from JSON
+        /// </Summary>
+        static std::unique_ptr<SubmittedBallot> fromJson(std::string data);
+
+        /// <Summary>
+        /// Import the ballot representation from BSON
+        /// </Summary>
+        static std::unique_ptr<SubmittedBallot> fromBson(std::vector<uint8_t> data);
+
+        /// <Summary>
+        /// Import the ballot representation from MsgPack
+        /// </Summary>
+        static std::unique_ptr<SubmittedBallot> fromMsgPack(std::vector<uint8_t> data);
+
+      private:
+        class Impl;
+        std::unique_ptr<Impl> pimpl;
+    };
+
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD_CPP_BALLOT_HPP_INCLUDED__ */

@@ -1059,7 +1059,7 @@ namespace electionguard
 
 #pragma region ContestDescriptionWithPlaceholders
 
-    struct ContestDescriptionWithPlaceholders::Impl : ElectionObjectBase {
+    struct ContestDescriptionWithPlaceholders::Impl {
         vector<unique_ptr<SelectionDescription>> placeholderSelections;
 
         explicit Impl(vector<unique_ptr<SelectionDescription>> placeholderSelections)
