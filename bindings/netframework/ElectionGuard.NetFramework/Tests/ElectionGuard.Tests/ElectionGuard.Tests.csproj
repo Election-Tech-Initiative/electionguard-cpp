@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="TestBallot.cs" />
     <Compile Include="TestElGamal.cs" />
+    <Compile Include="TestEncrypt.cs" />
     <Compile Include="TestGroup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

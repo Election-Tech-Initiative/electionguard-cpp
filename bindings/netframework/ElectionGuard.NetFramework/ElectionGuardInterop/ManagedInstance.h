@@ -10,6 +10,7 @@ namespace ElectionGuardInterop
     public:
         ManagedInstance() {}
         ManagedInstance(T *instance, bool owned) : _instance(instance), _owned(owned) {}
+        ManagedInstance(const T *instance) : _instance(const_cast<T*>(instance)), _owned(false) {}
         ManagedInstance(T *instance) : _instance(instance) {}
 
     public:

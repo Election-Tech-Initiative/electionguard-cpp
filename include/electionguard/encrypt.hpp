@@ -1,11 +1,11 @@
 #ifndef __ELECTIONGUARD_CPP_ENCRYPT_HPP_INCLUDED__
 #define __ELECTIONGUARD_CPP_ENCRYPT_HPP_INCLUDED__
 
-#include "electionguard/ballot.hpp"
-#include "electionguard/ballot_compact.hpp"
-#include "electionguard/election.hpp"
-#include "electionguard/group.hpp"
-#include "electionguard/manifest.hpp"
+#include "ballot.hpp"
+#include "ballot_compact.hpp"
+#include "election.hpp"
+#include "group.hpp"
+#include "manifest.hpp"
 #include "export.h"
 
 #include <memory>

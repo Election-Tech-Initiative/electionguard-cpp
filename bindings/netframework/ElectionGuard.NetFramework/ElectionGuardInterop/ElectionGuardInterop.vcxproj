@@ -46,7 +46,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CLRSupport>true</CLRSupport>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -152,6 +152,7 @@ if $(ConfigurationName) == Debug copy "..\..\..\..\build\libs\msvc\$(PlatformNam
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Ballot.h" />
+    <ClInclude Include="ChaumPedersen.h" />
     <ClInclude Include="Election.h" />
     <ClInclude Include="ElectionGuardInterop.h" />
     <ClInclude Include="ElGamal.h" />
@@ -161,10 +162,12 @@ if $(ConfigurationName) == Debug copy "..\..\..\..\build\libs\msvc\$(PlatformNam
     <ClInclude Include="Manifest.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="Ballot.cpp" />
+    <ClCompile Include="ChaumPedersen.cpp" />
     <ClCompile Include="Election.cpp" />
     <ClCompile Include="ElectionGuardInterop.cpp" />
     <ClCompile Include="ElGamal.cpp" />
@@ -178,6 +181,7 @@ if $(ConfigurationName) == Debug copy "..\..\..\..\build\libs\msvc\$(PlatformNam
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />
