@@ -149,6 +149,7 @@ namespace ElectionGuardInterop
         {
             this->_instance = other.release();
         }
+
         PlaintextBallotContest(electionguard::PlaintextBallotContest *unowned)
             : ManagedInstance(unowned, false)
         {
@@ -204,47 +205,47 @@ namespace ElectionGuardInterop
               }
           }
 
-          public : property array<PlaintextBallotContest ^> ^
-                   Contests {
-                       array<PlaintextBallotContest ^> ^ get() {
-                           auto value = this->_instance->getContests();
-                           auto elements = gcnew array<PlaintextBallotContest ^>(value.size());
+          property array<PlaintextBallotContest ^> ^
+          Contests {
+              array<PlaintextBallotContest ^> ^ get() {
+                  auto value = this->_instance->getContests();
+                  auto elements = gcnew array<PlaintextBallotContest ^>(value.size());
 
-                           int index = 0;
-                           for (const auto &item : value) {
-                               elements[index] = gcnew PlaintextBallotContest(&item.get());
-                               index++;
-                           }
+                  int index = 0;
+                  for (const auto &item : value) {
+                      elements[index] = gcnew PlaintextBallotContest(&item.get());
+                      index++;
+                  }
 
-                           return elements;
-                       }
-                   }
+                  return elements;
+              }
+          }
 
-                   property array<Byte> ^
-                   Bson {
-                       array<Byte> ^ get() {
-                           auto value = this->_instance->toBson();
+          property array<Byte> ^
+          Bson {
+              array<Byte> ^ get() {
+                  auto value = this->_instance->toBson();
 
-                           array<Byte> ^ byteArray = gcnew array<Byte>(value.size());
-                           Marshal::Copy((IntPtr)value.data(), byteArray, 0, value.size());
-                           return byteArray;
-                       }
-                   }
+                  array<Byte> ^ byteArray = gcnew array<Byte>(value.size());
+                  Marshal::Copy((IntPtr)value.data(), byteArray, 0, value.size());
+                  return byteArray;
+              }
+          }
 
-                   property String ^
-                   Json {
-                       String ^ get() {
-                           auto value = this->_instance->toJson();
-                           return gcnew String(value.c_str());
-                       }
-                   }
+          property String ^
+          Json {
+              String ^ get() {
+                  auto value = this->_instance->toJson();
+                  return gcnew String(value.c_str());
+              }
+          }
 
-                   static PlaintextBallot ^
-                   FromBson(array<Byte> ^ data) {
-                       auto data_ = Utilities::MarshalByteArray(data);
-                       auto value = electionguard::PlaintextBallot::fromBson(items);
-                       return gcnew PlaintextBallot(move(value));
-                   }
+          static PlaintextBallot ^
+          FromBson(array<Byte> ^ data) {
+              auto data_ = Utilities::MarshalByteArray(data);
+              auto value = electionguard::PlaintextBallot::fromBson(items);
+              return gcnew PlaintextBallot(move(value));
+          }
     };
 
   public

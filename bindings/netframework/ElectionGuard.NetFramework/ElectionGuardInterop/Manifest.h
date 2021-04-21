@@ -6,10 +6,6 @@
 
 #include "manifest.hpp"
 
-//#include <iostream>
-//#include <stdio.h>
-//#include <vcclr.h>
-
 using namespace System;
 using namespace System::Runtime::InteropServices;
 
