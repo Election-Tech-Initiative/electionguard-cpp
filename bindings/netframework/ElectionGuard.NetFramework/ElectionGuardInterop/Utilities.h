@@ -8,9 +8,9 @@ using namespace System;
 
 namespace ElectionGuardInterop
 {
-    ref struct Utilities
-    {
-        static void MarshalString(System::String^ s, std::string& os) {
+    ref struct Utilities {
+        static void MarshalString(System::String ^ s, std::string &os)
+        {
             using namespace System::Runtime::InteropServices;
             const char *chars = (const char *)(Marshal::StringToHGlobalAnsi(s)).ToPointer();
             os = chars;
@@ -28,4 +28,4 @@ namespace ElectionGuardInterop
             return native;
         }
     };
-}
+} // namespace ElectionGuardInterop

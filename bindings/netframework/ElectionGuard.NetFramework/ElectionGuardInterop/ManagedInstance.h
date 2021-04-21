@@ -4,16 +4,15 @@ using namespace System;
 
 namespace ElectionGuardInterop
 {
-    template <class T>
-    public ref class ManagedInstance
+    template <class T> public ref class ManagedInstance
     {
-    public:
+      public:
         ManagedInstance() {}
         ManagedInstance(T *instance, bool owned) : _instance(instance), _owned(owned) {}
-        ManagedInstance(const T *instance) : _instance(const_cast<T*>(instance)), _owned(false) {}
+        ManagedInstance(const T *instance) : _instance(const_cast<T *>(instance)), _owned(false) {}
         ManagedInstance(T *instance) : _instance(instance) {}
 
-    public:
+      public:
         virtual ~ManagedInstance()
         {
             if (_instance != nullptr && _owned) {
@@ -27,8 +26,7 @@ namespace ElectionGuardInterop
             }
         }
 
-    internal:
-        T *_instance;
+        internal : T *_instance;
         bool _owned = true;
     };
 } // namespace ElectionGuardInterop

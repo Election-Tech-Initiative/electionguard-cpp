@@ -71,8 +71,8 @@ namespace ElectionGuardInterop
         property String ^
           ObjectId {
               String ^ get() {
-                  auto value = this->_instance->getObjectId();
-                  return gcnew String(value.c_str());
+                  auto unmanaged = this->_instance->getObjectId();
+                  return gcnew String(unmanaged.c_str());
               }
           }
 
@@ -120,8 +120,8 @@ namespace ElectionGuardInterop
       public:
         property String ^ ObjectId {
             String ^ get() {
-                auto value = this->_instance->getObjectId();
-                return gcnew String(value.c_str());
+                auto unmanaged = this->_instance->getObjectId();
+                return gcnew String(unmanaged.c_str());
             }
         }
     };
@@ -159,19 +159,19 @@ namespace ElectionGuardInterop
         property String ^
           ObjectId {
               String ^ get() {
-                  auto value = this->_instance->getObjectId();
-                  return gcnew String(value.c_str());
+                  auto unmanaged = this->_instance->getObjectId();
+                  return gcnew String(unmanaged.c_str());
               }
           }
 
           property array<PlaintextBallotSelection ^> ^
           Selections {
               array<PlaintextBallotSelection ^> ^ get() {
-                  auto value = this->_instance->getSelections();
-                  auto elements = gcnew array<PlaintextBallotSelection ^>(value.size());
+                  auto unmanaged = this->_instance->getSelections();
+                  auto elements = gcnew array<PlaintextBallotSelection ^>(unmanaged.size());
 
                   int index = 0;
-                  for (const auto &item : value) {
+                  for (const auto &item : unmanaged) {
                       elements[index] = gcnew PlaintextBallotSelection(&item.get());
                       index++;
                   }
@@ -200,19 +200,19 @@ namespace ElectionGuardInterop
         property String ^
           ObjectId {
               String ^ get() {
-                  auto value = this->_instance->getObjectId();
-                  return gcnew String(value.c_str());
+                  auto unmanaged = this->_instance->getObjectId();
+                  return gcnew String(unmanaged.c_str());
               }
           }
 
           property array<PlaintextBallotContest ^> ^
           Contests {
               array<PlaintextBallotContest ^> ^ get() {
-                  auto value = this->_instance->getContests();
-                  auto elements = gcnew array<PlaintextBallotContest ^>(value.size());
+                  auto unmanaged = this->_instance->getContests();
+                  auto elements = gcnew array<PlaintextBallotContest ^>(unmanaged.size());
 
                   int index = 0;
-                  for (const auto &item : value) {
+                  for (const auto &item : unmanaged) {
                       elements[index] = gcnew PlaintextBallotContest(&item.get());
                       index++;
                   }
@@ -224,10 +224,10 @@ namespace ElectionGuardInterop
           property array<Byte> ^
           Bson {
               array<Byte> ^ get() {
-                  auto value = this->_instance->toBson();
+                  auto unmanaged = this->_instance->toBson();
 
-                  array<Byte> ^ byteArray = gcnew array<Byte>(value.size());
-                  Marshal::Copy((IntPtr)value.data(), byteArray, 0, value.size());
+                  array<Byte> ^ byteArray = gcnew array<Byte>(unmanaged.size());
+                  Marshal::Copy((IntPtr)unmanaged.data(), byteArray, 0, unmanaged.size());
                   return byteArray;
               }
           }
@@ -235,16 +235,16 @@ namespace ElectionGuardInterop
           property String ^
           Json {
               String ^ get() {
-                  auto value = this->_instance->toJson();
-                  return gcnew String(value.c_str());
+                  auto unmanaged = this->_instance->toJson();
+                  return gcnew String(unmanaged.c_str());
               }
           }
 
           static PlaintextBallot ^
           FromBson(array<Byte> ^ data) {
               auto data_ = Utilities::MarshalByteArray(data);
-              auto value = electionguard::PlaintextBallot::fromBson(items);
-              return gcnew PlaintextBallot(move(value));
+              auto unmanaged = electionguard::PlaintextBallot::fromBson(data_);
+              return gcnew PlaintextBallot(move(unmanaged));
           }
     };
 
@@ -267,66 +267,66 @@ namespace ElectionGuardInterop
         property String ^
           ObjectId {
               String ^ get() {
-                  auto value = this->_instance->getObjectId();
-                  return gcnew String(value.c_str());
+                  auto unmanaged = this->_instance->getObjectId();
+                  return gcnew String(unmanaged.c_str());
               }
           }
 
           property String ^
           StyleId {
               String ^ get() {
-                  auto value = this->_instance->getStyleId();
-                  return gcnew String(value.c_str());
+                  auto unmanaged = this->_instance->getStyleId();
+                  return gcnew String(unmanaged.c_str());
               }
           }
 
           property ElementModQ ^
           ManifestHash {
               ElementModQ ^ get() {
-                  auto value = this->_instance->getManifestHash();
-                  return gcnew ElementModQ(value);
+                  auto unmanaged = this->_instance->getManifestHash();
+                  return gcnew ElementModQ(unmanaged);
               }
           }
 
           property ElementModQ ^
           BallotCodeSeed {
               ElementModQ ^ get() {
-                  auto value = this->_instance->getBallotCodeSeed();
-                  return gcnew ElementModQ(value);
+                  auto unmanaged = this->_instance->getBallotCodeSeed();
+                  return gcnew ElementModQ(unmanaged);
               }
           }
 
           property ElementModQ ^
           BallotCode {
               ElementModQ ^ get() {
-                  auto value = this->_instance->getBallotCode();
-                  return gcnew ElementModQ(value);
+                  auto unmanaged = this->_instance->getBallotCode();
+                  return gcnew ElementModQ(unmanaged);
               }
           }
 
           property ElementModQ ^
           Nonce {
               ElementModQ ^ get() {
-                  auto value = this->_instance->getNonce();
-                  return gcnew ElementModQ(value);
+                  auto unmanaged = this->_instance->getNonce();
+                  return gcnew ElementModQ(unmanaged);
               }
           }
 
           property ElementModQ ^
           CryptoHash {
               ElementModQ ^ get() {
-                  auto value = this->_instance->getCryptoHash();
-                  return gcnew ElementModQ(value);
+                  auto unmanaged = this->_instance->getCryptoHash();
+                  return gcnew ElementModQ(unmanaged);
               }
           }
 
           property array<Byte> ^
           Bson {
               array<Byte> ^ get() {
-                  auto value = this->_instance->toBson();
+                  auto unmanaged = this->_instance->toBson();
 
-                  array<Byte> ^ byteArray = gcnew array<Byte>(value.size());
-                  Marshal::Copy((IntPtr)value.data(), byteArray, 0, value.size());
+                  array<Byte> ^ byteArray = gcnew array<Byte>(unmanaged.size());
+                  Marshal::Copy((IntPtr)unmanaged.data(), byteArray, 0, unmanaged.size());
                   return byteArray;
               }
           }
@@ -334,8 +334,8 @@ namespace ElectionGuardInterop
           property String ^
           Json {
               String ^ get() {
-                  auto value = this->_instance->toJson();
-                  return gcnew String(value.c_str());
+                  auto unmanaged = this->_instance->toJson();
+                  return gcnew String(unmanaged.c_str());
               }
           }
 
@@ -349,8 +349,8 @@ namespace ElectionGuardInterop
 
         static CiphertextBallot ^ FromBson(array<Byte> ^ data) {
             auto data_ = Utilities::MarshalByteArray(data);
-            auto value = electionguard::CiphertextBallot::fromBson(data_);
-            return gcnew CiphertextBallot(move(value));
+            auto unmanaged = electionguard::CiphertextBallot::fromBson(data_);
+            return gcnew CiphertextBallot(move(unmanaged));
         }
     };
 
@@ -372,18 +372,18 @@ namespace ElectionGuardInterop
       public:
         static SubmittedBallot ^
           From(CiphertextBallot ^ ballot, BallotBoxState state) {
-              auto value = electionguard::SubmittedBallot::from(
+              auto unmanaged = electionguard::SubmittedBallot::from(
                 *ballot->_instance, static_cast<electionguard::BallotBoxState>(state));
 
-              return gcnew SubmittedBallot(move(value));
+              return gcnew SubmittedBallot(move(unmanaged));
           }
 
           property String
           ^
           ObjectId {
               String ^ get() {
-                  auto value = this->_instance->getObjectId();
-                  return gcnew String(value.c_str());
+                  auto unmanaged = this->_instance->getObjectId();
+                  return gcnew String(unmanaged.c_str());
               }
           }
 
@@ -391,8 +391,8 @@ namespace ElectionGuardInterop
         {
             BallotBoxState get()
             {
-                auto value = this->_instance->getState();
-                switch (value) {
+                auto unmanaged = this->_instance->getState();
+                switch (unmanaged) {
                     case electionguard::BallotBoxState::cast:
                         return BallotBoxState::cast;
                     case electionguard::BallotBoxState::spoiled:
@@ -406,8 +406,8 @@ namespace ElectionGuardInterop
 
         property String ^ Json {
             String ^ get() {
-                auto value = this->_instance->toJson();
-                return gcnew String(value.c_str());
+                auto unmanaged = this->_instance->toJson();
+                return gcnew String(unmanaged.c_str());
             }
         }
     };

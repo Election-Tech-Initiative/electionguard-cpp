@@ -23,15 +23,18 @@ namespace ElectionGuardInterop
             }
             this->_instance = new electionguard::ElementModP(array);
         }
-        internal: 
-            ElementModP(electionguard::ElementModP *elem) : ManagedInstance(elem, false) {}
-            ElementModP(const electionguard::ElementModP *elem) : ManagedInstance(elem) {}
+        internal : ElementModP(electionguard::ElementModP *unowned)
+            : ManagedInstance(unowned, false)
+        {
+        }
+        ElementModP(const electionguard::ElementModP *unowned) : ManagedInstance(unowned) {}
 
       public:
         property bool IsInBounds
         {
             bool get() { return _instance->isInBounds(); }
         }
+
         property array<uint8_t> ^
           Bytes {
               array<uint8_t> ^ get() {
@@ -40,13 +43,14 @@ namespace ElectionGuardInterop
                   Marshal::Copy((IntPtr)&bytes, byteArray, 0, bytes.size());
                   return byteArray;
               }
-          } 
-        
-        property String ^
-          Hex { String ^ get() { return gcnew String(_instance->toHex().c_str()); } } 
-        
-      internal: 
-        std::unique_ptr<electionguard::ElementModP> clone() {
+          }
+
+          property String ^
+          Hex { String ^ get() { return gcnew String(_instance->toHex().c_str()); } }
+
+          internal : std::unique_ptr<electionguard::ElementModP>
+                     clone()
+        {
             return _instance->clone();
         }
     };
@@ -69,14 +73,15 @@ namespace ElectionGuardInterop
             : ManagedInstance(new electionguard::ElementModQ(elem))
         {
         }
-        ElementModQ(electionguard::ElementModQ *elem) : ManagedInstance(elem, false) {}
-        ElementModQ(const electionguard::ElementModQ *elem) : ManagedInstance(elem) {}
+        ElementModQ(electionguard::ElementModQ *unowned) : ManagedInstance(unowned, false) {}
+        ElementModQ(const electionguard::ElementModQ *unowned) : ManagedInstance(unowned) {}
 
       public:
         property bool IsInBounds
         {
             bool get() { return _instance->isInBounds(); }
         }
+
         property array<uint8_t> ^
           Bytes {
               array<uint8_t> ^ get() {
@@ -85,7 +90,9 @@ namespace ElectionGuardInterop
                   Marshal::Copy((IntPtr)&bytes, byteArray, 0, bytes.size());
                   return byteArray;
               }
-          } property String ^
+          }
+
+          property String ^
           Hex { String ^ get() { return gcnew String(_instance->toHex().c_str()); } }
 
           internal : std::unique_ptr<electionguard::ElementModQ>
