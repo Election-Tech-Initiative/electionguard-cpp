@@ -24,6 +24,18 @@ namespace ElectionGuardInterop
             this->_instance =
               new electionguard::EncryptionDevice(deviceUuid, sessionUuid, launchCode, _location);
         }
+
+      public:
+        property ElementModQ ^
+          Hash {
+              ElementModQ ^ get() {
+                  auto unmanaged = this->_instance->getHash();
+                  return gcnew ElementModQ(std::move(unmanaged));
+              }
+          }
+
+          property uint64_t ^
+          Timestamp { uint64_t ^ get() { return this->_instance->getTimestamp(); } }
     };
   public
     ref class EncryptionMediator : ManagedInstance<electionguard::EncryptionMediator>
@@ -44,5 +56,56 @@ namespace ElectionGuardInterop
                 auto ciphertext = this->_instance->encrypt(*ballot->_instance, shouldVerifyProofs);
                 return gcnew CiphertextBallot(move(ciphertext));
             }
+    };
+
+  public
+    ref struct Encrypt {
+        CiphertextBallotSelection ^
+          Selection(PlaintextBallotSelection ^ selection, SelectionDescription ^ description,
+                    ElementModP ^ elGamalPublicKey, ElementModQ ^ cryptoExtendedBaseHash,
+                    ElementModQ ^ nonceSeed, bool isPlaceholder, bool shouldVerifyProofs) {
+              auto ciphertext = electionguard::encryptSelection(
+                *selection->_instance, *description->_instance, *elGamalPublicKey->_instance,
+                *cryptoExtendedBaseHash->_instance, *nonceSeed->_instance, isPlaceholder,
+                shouldVerifyProofs);
+              return gcnew CiphertextBallotSelection(std::move(ciphertext));
+          }
+
+          CiphertextBallotContest
+          ^
+          Contest(PlaintextBallotContest ^ contest,
+                  ContestDescriptionWithPlaceholders ^ description, ElementModP ^ elGamalPublicKey,
+                  ElementModQ ^ cryptoExtendedBaseHash, ElementModQ ^ nonceSeed,
+                  bool shouldVerifyProofs) {
+              auto ciphertext = electionguard::encryptContest(
+                *contest->_instance, *description->_instance, *elGamalPublicKey->_instance,
+                *cryptoExtendedBaseHash->_instance, *nonceSeed->_instance, shouldVerifyProofs);
+              return gcnew CiphertextBallotContest(std::move(ciphertext));
+          }
+
+          CiphertextBallot
+          ^
+          Ballot(PlaintextBallot ^ ballot, InternalManifest ^ internalManifest,
+                 CiphertextElectionContext ^ context, ElementModQ ^ ballotCodeSeed) {
+              auto ciphertext = electionguard::encryptBallot(
+                *ballot->_instance, *internalManifest->_instance, *context->_instance,
+                *ballotCodeSeed->_instance);
+
+              return gcnew CiphertextBallot(std::move(ciphertext));
+          }
+
+          CiphertextBallot
+          ^
+          Ballot(PlaintextBallot ^ ballot, InternalManifest ^ internalManifest,
+                 CiphertextElectionContext ^ context, ElementModQ ^ ballotCodeSeed,
+                 ElementModQ ^ nonce, uint64_t timestamp, bool shouldVerifyProofs) {
+              auto ciphertext = electionguard::encryptBallot(
+                *ballot->_instance, *internalManifest->_instance, *context->_instance,
+                *ballotCodeSeed->_instance,
+                std::make_unique<electionguard::ElementModQ>(*nonce->_instance), timestamp,
+                shouldVerifyProofs);
+
+              return gcnew CiphertextBallot(std::move(ciphertext));
+          }
     };
 } // namespace ElectionGuardInterop
