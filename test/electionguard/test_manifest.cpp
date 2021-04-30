@@ -15,6 +15,7 @@ TEST_CASE("Simple Election Is Valid")
     auto subject = ElectionGenerator::getSimpleElectionFromFile();
 
     CHECK(subject->getElectionScopeId() == "jefferson-county-primary");
+    CHECK(subject->isValid() == true);
 }
 
 TEST_CASE("Can serialize Manifest")
@@ -62,6 +63,7 @@ TEST_CASE("Can deserialize Manifest")
 
     // Assert
     CHECK(result->getElectionScopeId().compare("some-scope-id") == 0);
+    CHECK(result->isValid() == true);
 }
 
 TEST_CASE("Can construct InternalManifest from Manifest")

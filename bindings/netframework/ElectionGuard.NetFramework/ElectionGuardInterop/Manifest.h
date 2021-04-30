@@ -368,6 +368,7 @@ namespace ElectionGuardInterop
 
             this->_instance = new electionguard::GeopoliticalUnit(_objectId, _name, _type);
         }
+        // TODO: Constructor with Contact Info
         internal : GeopoliticalUnit(std::unique_ptr<electionguard::GeopoliticalUnit> other)
         {
             this->_instance = other.release();
@@ -405,6 +406,7 @@ namespace ElectionGuardInterop
               }
           }
 
+          // TODO: contact information
 
           property ElementModQ ^
           CryptoHash {
@@ -619,6 +621,7 @@ namespace ElectionGuardInterop
               }
           }
 
+          // TODO: contact information
 
           property ElementModQ ^
           CryptoHash {
@@ -976,6 +979,12 @@ namespace ElectionGuardInterop
                   return gcnew ElementModQ(std::move(unmanaged));
               }
           }
+
+          bool
+          IsValid()
+        {
+            return this->_instance->isValid();
+        }
     };
 
   public
@@ -1157,6 +1166,7 @@ namespace ElectionGuardInterop
             std::string _electionScopeId;
             Utilities::MarshalString(electionScopeId, _electionScopeId);
 
+            // TODO: auto startTime = startDate.Ticks;
 
             std::vector<std::unique_ptr<electionguard::GeopoliticalUnit>> _gpUnits;
             for each (auto item in geopoliticalUnits) {
@@ -1225,6 +1235,7 @@ namespace ElectionGuardInterop
             }
         }
 
+        // TODO: datetime fields
 
         property array<GeopoliticalUnit ^> ^
           GeopoliticalUnits {
@@ -1306,6 +1317,13 @@ namespace ElectionGuardInterop
               }
           }
 
+          // TODO: name and contact info
+
+          bool
+          IsValid()
+        {
+            return this->_instance->isValid();
+        }
 
           property array<Byte> ^
           Bson {
@@ -1495,7 +1513,7 @@ namespace ElectionGuardInterop
               }
           }
 
-          static InternalManifest ^
+          // TODO: MSGPACK
 
           static InternalManifest
           ^ FromJson(String ^ json) {

@@ -73,7 +73,7 @@ namespace electionguard::test::mocks
                                                    VoteVariationType::one_of_m, numberElected, name,
                                                    move(selections));
         }
-
+        // TODO: rename these
         static unique_ptr<Manifest> getFakeElection()
         {
             vector<unique_ptr<GeopoliticalUnit>> gpUnits;

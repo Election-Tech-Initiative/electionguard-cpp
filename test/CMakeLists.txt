@@ -64,7 +64,6 @@ add_executable(${CPPTEST_PROJECT_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot_compact.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_election.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt_compact.cpp
@@ -72,6 +71,7 @@ add_executable(${CPPTEST_PROJECT_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hacl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_nonces.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_manifest.cpp
 )
 
 target_compile_features(${CPPTEST_PROJECT_TARGET} PRIVATE cxx_std_17)

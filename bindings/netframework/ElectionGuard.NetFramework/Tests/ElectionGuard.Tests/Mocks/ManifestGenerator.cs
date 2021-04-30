@@ -36,11 +36,11 @@ namespace ElectionGuard.Tests.Mocks
                 selections: new[]
                 {
                     new SelectionDescription(
-                        "benjamin-franklin-selection", candidates[0].CandidateId,sequenceOrder: 0),
+                        "benjamin-franklin-selection", candidates[0].CandidateId, sequenceOrder: 0),
                     new SelectionDescription(
-                        "john-adams-selection", candidates[1].CandidateId,sequenceOrder: 1),
+                        "john-adams-selection", candidates[1].CandidateId, sequenceOrder: 1),
                     new SelectionDescription(
-                        "write-in-selection", candidates[2].CandidateId,sequenceOrder: 1)
+                        "write-in-selection", candidates[2].CandidateId, sequenceOrder: 2)
                 })
         };
 

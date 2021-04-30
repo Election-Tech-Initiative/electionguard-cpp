@@ -7,6 +7,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <set>
 #include <utility>
 
 using std::make_unique;
@@ -1106,6 +1107,59 @@ namespace electionguard
     unique_ptr<ElementModQ> ContestDescription::crypto_hash() { return pimpl->crypto_hash(); }
     unique_ptr<ElementModQ> ContestDescription::crypto_hash() const { return pimpl->crypto_hash(); }
 
+    bool ContestDescription::isValid() const
+    {
+        auto contest_has_valid_number_elected = pimpl->numberElected <= pimpl->selections.size();
+        auto contest_has_valid_votes_allowed =
+          pimpl->votesAllowed == 0 || pimpl->numberElected <= pimpl->votesAllowed;
+
+        std::set<string> candidateIds;
+        std::set<string> selectionIds;
+        std::set<uint64_t> sequenceIds;
+
+        uint64_t selectionCount = 0;
+        auto expectedSelectionCount = pimpl->selections.size();
+
+        for (const auto &selection : getSelections()) {
+            selectionCount++;
+
+            auto selectionId = selection.get().getObjectId();
+            if (!selectionId.empty()) {
+                selectionIds.insert(selectionId);
+            }
+
+            auto candidateId = selection.get().getCandidateId();
+            if (!candidateId.empty()) {
+                candidateIds.insert(candidateId);
+            }
+
+            auto sequenceOrder = selection.get().getSequenceOrder();
+            sequenceIds.insert(sequenceOrder);
+        }
+
+        auto selections_have_valid_candidate_ids = candidateIds.size() == expectedSelectionCount;
+        auto selections_have_valid_selection_ids = selectionIds.size() == expectedSelectionCount;
+        auto selections_have_valid_sequence_ids = sequenceIds.size() == expectedSelectionCount;
+
+        auto success = contest_has_valid_number_elected && contest_has_valid_votes_allowed &&
+                       selections_have_valid_candidate_ids && selections_have_valid_selection_ids &&
+                       selections_have_valid_sequence_ids;
+
+        if (!success) {
+            // TODO: better logging
+            map<string, bool> printMap{
+              {"contest_has_valid_number_elected", contest_has_valid_number_elected},
+              {"contest_has_valid_votes_allowed", contest_has_valid_votes_allowed},
+              {"selections_have_valid_candidate_ids", selections_have_valid_candidate_ids},
+              {"selections_have_valid_selection_ids", selections_have_valid_selection_ids},
+              {"selections_have_valid_sequence_ids", selections_have_valid_sequence_ids}};
+
+            Log::debug(printMap, ": Contest " + getObjectId() + " failed validation check: ");
+        }
+
+        return success;
+    }
+
 #pragma endregion
 
 #pragma region ContestDescriptionWithPlaceholders
@@ -1430,6 +1484,141 @@ namespace electionguard
     }
 
     // Public Methods
+
+    bool Manifest::isValid() const
+    {
+
+        std::set<string> gpUnitIds;
+        std::set<string> ballotStyleIds;
+        std::set<string> partyIds;
+        std::set<string> candidateIds;
+        std::set<string> contestIds;
+
+        // Validate GP Units
+        for (const auto &item : getGeopoliticalUnits()) {
+            auto id = item.get().getObjectId();
+            if (!id.empty()) {
+                gpUnitIds.insert(id);
+            }
+        }
+
+        auto geopolitical_units_valid = gpUnitIds.size() == pimpl->geopoliticalUnits.size();
+
+        // Validate Ballot Styles
+        auto ballot_styles_have_valid_gp_unit_ids = true;
+
+        for (const auto &item : getBallotStyles()) {
+            auto id = item.get().getObjectId();
+            if (!id.empty()) {
+                ballotStyleIds.insert(id);
+            }
+
+            if (item.get().getGeopoliticalUnitIds().size() == 0) {
+                ballot_styles_have_valid_gp_unit_ids = false;
+                break;
+            }
+            for (const auto &gpUnitId : item.get().getGeopoliticalUnitIds()) {
+                ballot_styles_have_valid_gp_unit_ids = ballot_styles_have_valid_gp_unit_ids &&
+                                                       gpUnitIds.find(gpUnitId) != gpUnitIds.end();
+            }
+        }
+
+        auto ballot_styles_have_valid_length = ballotStyleIds.size() == pimpl->ballotStyles.size();
+        auto ballot_styles_valid =
+          ballot_styles_have_valid_length && ballot_styles_have_valid_gp_unit_ids;
+
+        // Validate Parties
+        for (const auto &item : getParties()) {
+            auto id = item.get().getObjectId();
+            if (!id.empty()) {
+                partyIds.insert(id);
+            }
+        }
+
+        auto parties_valid = partyIds.size() == pimpl->parties.size();
+
+        // Validate Candidates
+        auto candidates_have_valid_party_ids = true;
+
+        for (const auto &item : getCandidates()) {
+            auto id = item.get().getObjectId();
+            if (!id.empty()) {
+                candidateIds.insert(id);
+            }
+
+            candidates_have_valid_party_ids =
+              candidates_have_valid_party_ids &&
+              (item.get().getPartyId().empty() || partyIds.find(id) != gpUnitIds.end());
+        }
+
+        auto candidates_have_valid_length = candidateIds.size() == pimpl->candidates.size();
+        auto candidates_valid = candidates_have_valid_length && candidates_have_valid_party_ids;
+
+        // Validate Contests
+        auto contests_validate_their_properties = true;
+        auto contests_have_valid_electoral_district_id = true;
+        auto candidate_contests_have_valid_party_ids = true;
+
+        std::set<uint64_t> contestSequenceIds;
+
+        for (const auto &item : getContests()) {
+            contests_validate_their_properties =
+              contests_validate_their_properties && item.get().isValid();
+
+            auto id = item.get().getObjectId();
+            if (!id.empty()) {
+                contestIds.insert(id);
+            }
+
+            // Validate the sequence order
+            auto sequenceOrder = item.get().getSequenceOrder();
+            contestSequenceIds.insert(sequenceOrder);
+
+            // Validate the associated gp unit id
+            auto electoralDistrictId = item.get().getElectoralDistrictId();
+            contests_have_valid_electoral_district_id =
+              contests_have_valid_electoral_district_id && !electoralDistrictId.empty() &&
+              gpUnitIds.find(electoralDistrictId) != gpUnitIds.end();
+
+            // Validate the party's if they exist
+            // TODO: #174: validate party id's
+        }
+
+        auto contests_have_valid_object_ids = contestIds.size() == pimpl->contests.size();
+        auto contests_have_valid_sequence_ids = contestSequenceIds.size() == pimpl->contests.size();
+
+        auto contests_valid = contests_have_valid_object_ids && contests_have_valid_sequence_ids &&
+                              contests_validate_their_properties &&
+                              contests_have_valid_electoral_district_id &&
+                              candidate_contests_have_valid_party_ids;
+
+        auto success = geopolitical_units_valid && ballot_styles_valid && parties_valid &&
+                       candidates_valid && contests_valid;
+
+        if (!success) {
+            map<string, bool> printMap{
+              {"geopolitical_units_valid", geopolitical_units_valid},
+              {"ballot_styles_valid", ballot_styles_valid},
+              {"ballot_styles_have_valid_length", ballot_styles_have_valid_length},
+              {"ballot_styles_have_valid_gp_unit_ids", ballot_styles_have_valid_gp_unit_ids},
+              {"parties_valid", parties_valid},
+              {"candidates_valid", candidates_valid},
+              {"candidates_have_valid_length", candidates_have_valid_length},
+              {"candidates_have_valid_party_ids", candidates_have_valid_party_ids},
+              {"contests_valid", contests_valid},
+              {"contests_have_valid_object_ids", contests_have_valid_object_ids},
+              {"contests_have_valid_sequence_ids", contests_have_valid_sequence_ids},
+              {"contests_validate_their_properties", contests_validate_their_properties},
+              {"contests_have_valid_electoral_district_id",
+               contests_have_valid_electoral_district_id},
+              {"candidate_contests_have_valid_party_ids", candidate_contests_have_valid_party_ids},
+            };
+
+            Log::debug(printMap, ": Election failed Validation check: ");
+        }
+
+        return success;
+    }
 
     vector<uint8_t> Manifest::toBson() const { return ManifestSerializer::toBson(*this); }
 

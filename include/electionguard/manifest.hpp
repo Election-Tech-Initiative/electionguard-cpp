@@ -712,7 +712,7 @@ namespace electionguard
         /// </Summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
-        // TODO: ISSUE #119: isValid() const;
+        bool isValid() const;
 
       private:
         class Impl;
@@ -763,7 +763,7 @@ namespace electionguard
         /// </Summary>
         bool IsPlaceholder(SelectionDescription &selection) const;
 
-        // TODO: ISSUE #119: isValid() const;
+        // TODO: bool isValid() const;
 
         /// <Summary>
         /// Get a selection for a specific selection id.
@@ -858,7 +858,7 @@ namespace electionguard
         InternationalizedText *getName() const;
         ContactInformation *getContactInformation() const;
 
-        // TODO: ISSUE #119: isValid() const;
+        bool isValid() const;
 
         /// <Summary>
         /// Export the ballot representation as BSON

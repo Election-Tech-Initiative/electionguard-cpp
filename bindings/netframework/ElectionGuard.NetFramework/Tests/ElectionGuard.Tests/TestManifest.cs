@@ -15,7 +15,7 @@ namespace ElectionGuard.Tests
             var internalManifest = new InternalManifest(manifest);
 
             Assert.That(manifest.CryptoHash.Hex == internalManifest.ManifestHash.Hex);
-
+            Assert.That(manifest.IsValid());
         }
     }
 }
