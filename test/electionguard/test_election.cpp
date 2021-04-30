@@ -34,7 +34,7 @@ TEST_CASE("Can serialize Manifest")
 
 TEST_CASE("Can deserialize Manifest")
 {
-    const char *election_json =
+    const char *manifest_json =
       "{\"ballot_styles\":[{\"geopolitical_unit_ids\":[\"some-geopoltical-unit-id\"],\"object_id\":"
       "\"some-ballot-style-id\"}],\"candidates\":[{\"object_id\":\"some-candidate-id-1\"},{"
       "\"object_id\":\"some-candidate-id-2\"},{\"object_id\":\"some-candidate-id-3\"}],"
@@ -58,7 +58,7 @@ TEST_CASE("Can deserialize Manifest")
     // Arrange
 
     // Act
-    auto result = Manifest::fromJson(election_json);
+    auto result = Manifest::fromJson(manifest_json);
 
     // Assert
     CHECK(result->getElectionScopeId().compare("some-scope-id") == 0);

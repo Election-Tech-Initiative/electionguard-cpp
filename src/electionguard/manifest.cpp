@@ -671,6 +671,12 @@ namespace electionguard
 
         explicit Impl(const string &objectId) { this->object_id = objectId; }
 
+        explicit Impl(const string &objectId, const string &abbreviation)
+            : abbreviation(abbreviation)
+        {
+            this->object_id = objectId;
+        }
+
         explicit Impl(const string &objectId, const string &abbreviation, const string &color,
                       const string &logoUri)
             : abbreviation(abbreviation), color(color), logoUri(logoUri)
@@ -709,6 +715,11 @@ namespace electionguard
     Party::Party(const Party &other) : pimpl(other.pimpl->clone()) {}
 
     Party::Party(const string &objectId) : pimpl(new Impl(objectId)) {}
+
+    Party::Party(const string &objectId, const string &abbreviation)
+        : pimpl(new Impl(objectId, abbreviation))
+    {
+    }
 
     Party::Party(const string &objectId, unique_ptr<InternationalizedText> name,
                  const string &abbreviation, const string &color, const string &logoUri)
@@ -753,9 +764,32 @@ namespace electionguard
             this->isWriteIn = isWriteIn;
         }
 
+        explicit Impl(const string &objectId, const string &partyId, bool isWriteIn)
+            : partyId(partyId)
+        {
+            this->object_id = objectId;
+            this->isWriteIn = isWriteIn;
+        }
+
         explicit Impl(const string &objectId, const string &partyId, const string &imageUri,
                       bool isWriteIn)
             : partyId(partyId), imageUri(imageUri)
+        {
+            this->object_id = objectId;
+            this->isWriteIn = isWriteIn;
+        }
+
+        explicit Impl(const string &objectId, unique_ptr<InternationalizedText> name,
+                      bool isWriteIn)
+            : name(move(name))
+        {
+            this->object_id = objectId;
+            this->isWriteIn = isWriteIn;
+        }
+
+        explicit Impl(const string &objectId, unique_ptr<InternationalizedText> name,
+                      const string &partyId, bool isWriteIn)
+            : name(move(name)), partyId(partyId)
         {
             this->object_id = objectId;
             this->isWriteIn = isWriteIn;
@@ -795,6 +829,23 @@ namespace electionguard
 
     Candidate::Candidate(const string &objectId, bool isWriteIn)
         : pimpl(new Impl(objectId, isWriteIn))
+    {
+    }
+
+    Candidate::Candidate(const string &objectId, const string &partyId, bool isWriteIn)
+        : pimpl(new Impl(objectId, partyId, isWriteIn))
+    {
+    }
+
+    Candidate::Candidate(const string &objectId, unique_ptr<InternationalizedText> name,
+                         bool isWriteIn)
+        : pimpl(new Impl(objectId, move(name), isWriteIn))
+    {
+    }
+
+    Candidate::Candidate(const string &objectId, unique_ptr<InternationalizedText> name,
+                         const string &partyId, bool isWriteIn)
+        : pimpl(new Impl(objectId, move(name), partyId, isWriteIn))
     {
     }
 
@@ -1066,9 +1117,26 @@ namespace electionguard
             : placeholderSelections(move(placeholderSelections))
         {
         }
+
+        [[nodiscard]] unique_ptr<ContestDescriptionWithPlaceholders::Impl> clone() const
+        {
+            vector<unique_ptr<SelectionDescription>> _placeholderSelections;
+            _placeholderSelections.reserve(placeholderSelections.size());
+            for (const auto &element : placeholderSelections) {
+                _placeholderSelections.push_back(make_unique<SelectionDescription>(*element));
+            }
+            return make_unique<ContestDescriptionWithPlaceholders::Impl>(
+              move(_placeholderSelections));
+        }
     };
 
     // Lifecycle Methods
+
+    ContestDescriptionWithPlaceholders::ContestDescriptionWithPlaceholders(
+      const ContestDescriptionWithPlaceholders &other)
+        : ContestDescription(other), pimpl(other.pimpl->clone())
+    {
+    }
 
     ContestDescriptionWithPlaceholders::ContestDescriptionWithPlaceholders(
       const ContestDescription &other,

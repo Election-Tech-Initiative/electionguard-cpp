@@ -61,9 +61,12 @@ namespace ElectionGuardInterop
         {
             this->_instance = other.release();
         }
-
         PlaintextBallotSelection(electionguard::PlaintextBallotSelection *unowned)
             : ManagedInstance(unowned, false)
+        {
+        }
+        PlaintextBallotSelection(const electionguard::PlaintextBallotSelection *unowned)
+            : ManagedInstance(unowned)
         {
         }
 
@@ -116,14 +119,31 @@ namespace ElectionGuardInterop
         {
             this->_instance = other.release();
         }
+        CiphertextBallotSelection(electionguard::CiphertextBallotSelection *unowned)
+            : ManagedInstance(unowned, false)
+        {
+        }
+        CiphertextBallotSelection(const electionguard::CiphertextBallotSelection *unowned)
+            : ManagedInstance(unowned)
+        {
+        }
 
       public:
-        property String ^ ObjectId {
-            String ^ get() {
-                auto unmanaged = this->_instance->getObjectId();
-                return gcnew String(unmanaged.c_str());
-            }
-        }
+        property String ^
+          ObjectId {
+              String ^ get() {
+                  auto unmanaged = this->_instance->getObjectId();
+                  return gcnew String(unmanaged.c_str());
+              }
+          }
+
+          property ElementModQ ^
+          DescriptionHash {
+              ElementModQ ^ get() {
+                  auto unmanaged = this->_instance->getDescriptionHash();
+                  return gcnew ElementModQ(unmanaged);
+              }
+          }
     };
 
   public
@@ -149,9 +169,12 @@ namespace ElectionGuardInterop
         {
             this->_instance = other.release();
         }
-
         PlaintextBallotContest(electionguard::PlaintextBallotContest *unowned)
             : ManagedInstance(unowned, false)
+        {
+        }
+        PlaintextBallotContest(const electionguard::PlaintextBallotContest *unowned)
+            : ManagedInstance(unowned)
         {
         }
 
@@ -195,6 +218,10 @@ namespace ElectionGuardInterop
         {
             this->_instance = other.release();
         }
+        PlaintextBallot(electionguard::PlaintextBallot *unowned) : ManagedInstance(unowned, false)
+        {
+        }
+        PlaintextBallot(const electionguard::PlaintextBallot *unowned) : ManagedInstance(unowned) {}
 
       public:
         property String ^
@@ -261,6 +288,12 @@ namespace ElectionGuardInterop
         internal : CiphertextBallot(std::unique_ptr<electionguard::CiphertextBallot> other)
         {
             this->_instance = other.release();
+        }
+        CiphertextBallot(electionguard::CiphertextBallot *unowned) : ManagedInstance(unowned, false)
+        {
+        }
+        CiphertextBallot(const electionguard::CiphertextBallot *unowned) : ManagedInstance(unowned)
+        {
         }
 
       public:
@@ -368,6 +401,10 @@ namespace ElectionGuardInterop
         {
             this->_instance = other.release();
         }
+        SubmittedBallot(electionguard::SubmittedBallot *unowned) : ManagedInstance(unowned, false)
+        {
+        }
+        SubmittedBallot(const electionguard::SubmittedBallot *unowned) : ManagedInstance(unowned) {}
 
       public:
         static SubmittedBallot ^
