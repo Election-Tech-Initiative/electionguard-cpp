@@ -58,7 +58,7 @@ namespace electionguard
         for (const auto &element : serializable.getText()) {
             serialized.push_back(languageToJson(element.get()));
         }
-        return serialized;
+        return {{"text", serialized}};
     }
 
     static unique_ptr<InternationalizedText> internationalizedTextFromJson(const json &j)
@@ -416,13 +416,13 @@ namespace electionguard
         serialized["name"] = serializable.getName();
 
         if (serializable.getBallotTitle() != nullptr) {
-            serialized["ballot_title"] = {
-              {"text", internationalizedTextToJson(*serializable.getBallotTitle())}};
+            serialized["ballot_title"] =
+              internationalizedTextToJson(*serializable.getBallotTitle());
         }
 
         if (serializable.getBallotSubtitle() != nullptr) {
-            serialized["ballot_subtitle"] = {
-              {"text", internationalizedTextToJson(*serializable.getBallotSubtitle())}};
+            serialized["ballot_subtitle"] =
+              internationalizedTextToJson(*serializable.getBallotSubtitle());
         }
 
         serialized["ballot_selections"] = selectionDescriptionsToJson(serializable.getSelections());

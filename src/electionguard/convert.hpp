@@ -8,6 +8,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <locale>
+#include <codecvt>
+#include "date/date.h"
 
 using std::bad_cast;
 using std::begin;
@@ -24,6 +27,7 @@ using std::mktime;
 using std::stringstream;
 using std::uppercase;
 using std::chrono::system_clock;
+using std::wstring;
 
 namespace electionguard
 {
@@ -137,6 +141,22 @@ namespace electionguard
         return sanitized;
     }
 
+    inline wstring stringToWideString(const std::string &str)
+    {
+        using convert_typeX = std::codecvt_utf8<wchar_t>;
+        std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+        return converterX.from_bytes(str);
+    }
+
+    inline string wideStringToString(const std::wstring &wstr)
+    {
+        using convert_typeX = std::codecvt_utf8<wchar_t>;
+        std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+        return converterX.to_bytes(wstr);
+    }
+
     /// Copy the string to a heap-allocated null-termianted array
     inline char *dynamicCopy(const string &data, size_t *out_size)
     {
@@ -183,11 +203,10 @@ namespace electionguard
 
     inline time_point timePointFromIsoString(const string &time, const string &format)
     {
-        std::tm tm = {};
-        stringstream ss(time);
-        ss >> get_time(&tm, format.c_str());
-        auto tp = system_clock::from_time_t(mktime(&tm));
-        return tp;
+        date::sys_seconds tm;
+        std::istringstream ss{time};
+        ss >> date::parse(format, tm);
+        return tm;
     }
 } // namespace electionguard
 

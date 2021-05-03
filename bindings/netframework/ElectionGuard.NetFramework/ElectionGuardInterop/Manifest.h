@@ -1166,7 +1166,8 @@ namespace ElectionGuardInterop
             std::string _electionScopeId;
             Utilities::MarshalString(electionScopeId, _electionScopeId);
 
-            // TODO: auto startTime = startDate.Ticks;
+            auto nativeStartDate = Utilities::ToNativeTime(startDate);
+            auto nativeEndDate = Utilities::ToNativeTime(startDate);
 
             std::vector<std::unique_ptr<electionguard::GeopoliticalUnit>> _gpUnits;
             for each (auto item in geopoliticalUnits) {
@@ -1197,8 +1198,8 @@ namespace ElectionGuardInterop
             }
 
             this->_instance = new electionguard::Manifest(
-              _electionScopeId, static_cast<electionguard::ElectionType>(type),
-              std::chrono::system_clock::now(), std::chrono::system_clock::now(),
+              _electionScopeId, static_cast<electionguard::ElectionType>(type), nativeStartDate,
+              nativeEndDate,
               std::move(_gpUnits), std::move(_parties), std::move(_candidates),
               std::move(_contests), std::move(_ballotStyles));
         }
@@ -1206,7 +1207,6 @@ namespace ElectionGuardInterop
         {
             std::string _json;
             Utilities::MarshalString(json, _json);
-            Console::WriteLine(gcnew String(_json.c_str()));
             auto unmanaged = electionguard::Manifest::fromJson(_json);
             this->_instance = unmanaged.release();
         }
@@ -1512,8 +1512,6 @@ namespace ElectionGuardInterop
                   return gcnew String(unmanaged.c_str());
               }
           }
-
-          // TODO: MSGPACK
 
           static InternalManifest
           ^ FromJson(String ^ json) {

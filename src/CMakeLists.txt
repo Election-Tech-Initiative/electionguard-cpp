@@ -9,6 +9,12 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 include(../cmake/CPM.cmake)
 
 CPMAddPackage(
+        NAME date
+        GITHUB_REPOSITORY HowardHinnant/date
+        VERSION 3.0.0
+)
+
+CPMAddPackage(
     NAME nlohmann_json
     VERSION 3.9.1
     URL https://github.com/nlohmann/json/releases/download/v3.9.1/include.zip
@@ -158,9 +164,9 @@ target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/i
 if (MINGW)
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
-    target_link_libraries(${META_PROJECT_TARGET} PRIVATE nlohmann_json -static-libstdc++)
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json -static-libstdc++)
 else()
-    target_link_libraries(${META_PROJECT_TARGET} PRIVATE nlohmann_json)
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json)
 endif()
 
 # ---- Install ----
