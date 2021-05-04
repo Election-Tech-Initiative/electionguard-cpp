@@ -638,11 +638,28 @@ namespace electionguard
                                     const std::string &electoralDistrictId,
                                     const uint64_t sequenceOrder,
                                     const VoteVariationType voteVariation,
+                                    const uint64_t numberElected, const std::string &name,
+                                    std::vector<std::unique_ptr<SelectionDescription>> selections,
+                                    std::vector<std::string> primaryPartyIds);
+        explicit ContestDescription(const std::string &objectId,
+                                    const std::string &electoralDistrictId,
+                                    const uint64_t sequenceOrder,
+                                    const VoteVariationType voteVariation,
                                     const uint64_t numberElected, const uint64_t votesAllowed,
                                     const std::string &name,
                                     std::unique_ptr<InternationalizedText> ballotTitle,
                                     std::unique_ptr<InternationalizedText> ballotSubtitle,
                                     std::vector<std::unique_ptr<SelectionDescription>> selections);
+        explicit ContestDescription(const std::string &objectId,
+                                    const std::string &electoralDistrictId,
+                                    const uint64_t sequenceOrder,
+                                    const VoteVariationType voteVariation,
+                                    const uint64_t numberElected, const uint64_t votesAllowed,
+                                    const std::string &name,
+                                    std::unique_ptr<InternationalizedText> ballotTitle,
+                                    std::unique_ptr<InternationalizedText> ballotSubtitle,
+                                    std::vector<std::unique_ptr<SelectionDescription>> selections,
+                                    std::vector<std::string> primaryPartyIds);
         ~ContestDescription();
 
         ContestDescription &operator=(ContestDescription other);
@@ -743,10 +760,26 @@ namespace electionguard
         explicit ContestDescriptionWithPlaceholders(
           const std::string &objectId, const std::string &electoralDistrictId,
           const uint64_t sequenceOrder, const VoteVariationType voteVariation,
+          const uint64_t numberElected, const std::string &name,
+          std::vector<std::unique_ptr<SelectionDescription>> selections,
+          std::vector<std::string> primaryPartyIds,
+          std::vector<std::unique_ptr<SelectionDescription>> placeholderSelections);
+        explicit ContestDescriptionWithPlaceholders(
+          const std::string &objectId, const std::string &electoralDistrictId,
+          const uint64_t sequenceOrder, const VoteVariationType voteVariation,
           const uint64_t numberElected, const uint64_t votesAllowed, const std::string &name,
           std::unique_ptr<InternationalizedText> ballotTitle,
           std::unique_ptr<InternationalizedText> ballotSubtitle,
           std::vector<std::unique_ptr<SelectionDescription>> selections,
+          std::vector<std::unique_ptr<SelectionDescription>> placeholderSelections);
+        explicit ContestDescriptionWithPlaceholders(
+          const std::string &objectId, const std::string &electoralDistrictId,
+          const uint64_t sequenceOrder, const VoteVariationType voteVariation,
+          const uint64_t numberElected, const uint64_t votesAllowed, const std::string &name,
+          std::unique_ptr<InternationalizedText> ballotTitle,
+          std::unique_ptr<InternationalizedText> ballotSubtitle,
+          std::vector<std::unique_ptr<SelectionDescription>> selections,
+          std::vector<std::string> primaryPartyIds,
           std::vector<std::unique_ptr<SelectionDescription>> placeholderSelections);
         ~ContestDescriptionWithPlaceholders();
 

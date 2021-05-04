@@ -953,12 +953,28 @@ namespace electionguard
         unique_ptr<InternationalizedText> ballotTitle;
         unique_ptr<InternationalizedText> ballotSubtitle;
         vector<unique_ptr<SelectionDescription>> selections;
+        vector<string> primaryPartyIds;
 
         Impl(const string &objectId, const string &electoralDistrictId,
              const uint64_t sequenceOrder, const VoteVariationType voteVariation,
              const uint64_t numberElected, const string &name,
              vector<unique_ptr<SelectionDescription>> selections)
             : electoralDistrictId(electoralDistrictId), name(name), selections(move(selections))
+        {
+            this->object_id = objectId;
+            this->sequenceOrder = sequenceOrder;
+            this->voteVariation = voteVariation;
+            this->numberElected = numberElected;
+            this->votesAllowed = 0UL;
+            this->primaryPartyIds = {};
+        }
+
+        Impl(const string &objectId, const string &electoralDistrictId,
+             const uint64_t sequenceOrder, const VoteVariationType voteVariation,
+             const uint64_t numberElected, const string &name,
+             vector<unique_ptr<SelectionDescription>> selections, vector<string> primaryPartyIds)
+            : electoralDistrictId(electoralDistrictId), name(name), selections(move(selections)),
+              primaryPartyIds(move(primaryPartyIds))
         {
             this->object_id = objectId;
             this->sequenceOrder = sequenceOrder;
@@ -975,6 +991,24 @@ namespace electionguard
              vector<unique_ptr<SelectionDescription>> selections)
             : electoralDistrictId(electoralDistrictId), name(name), ballotTitle(move(ballotTitle)),
               ballotSubtitle(move(ballotSubtitle)), selections(move(selections))
+        {
+            this->object_id = objectId;
+            this->sequenceOrder = sequenceOrder;
+            this->voteVariation = voteVariation;
+            this->numberElected = numberElected;
+            this->votesAllowed = votesAllowed;
+            this->primaryPartyIds = {};
+        }
+
+        Impl(const string &objectId, const string &electoralDistrictId,
+             const uint64_t sequenceOrder, const VoteVariationType voteVariation,
+             const uint64_t numberElected, const uint64_t votesAllowed, const string &name,
+             unique_ptr<InternationalizedText> ballotTitle,
+             unique_ptr<InternationalizedText> ballotSubtitle,
+             vector<unique_ptr<SelectionDescription>> selections, vector<string> primaryPartyIds)
+            : electoralDistrictId(electoralDistrictId), name(name), ballotTitle(move(ballotTitle)),
+              ballotSubtitle(move(ballotSubtitle)), selections(move(selections)),
+              primaryPartyIds(move(primaryPartyIds))
         {
             this->object_id = objectId;
             this->sequenceOrder = sequenceOrder;
@@ -1044,6 +1078,15 @@ namespace electionguard
     {
     }
 
+    ContestDescription::ContestDescription(
+      const string &objectId, const string &electoralDistrictId, const uint64_t sequenceOrder,
+      const VoteVariationType voteVariation, const uint64_t numberElected, const string &name,
+      vector<unique_ptr<SelectionDescription>> selections, vector<string> primaryPartyIds)
+        : pimpl(new Impl(objectId, electoralDistrictId, sequenceOrder, voteVariation, numberElected,
+                         name, move(selections), move(primaryPartyIds)))
+    {
+    }
+
     ContestDescription::ContestDescription(const string &objectId,
                                            const string &electoralDistrictId,
                                            const uint64_t sequenceOrder,
@@ -1058,6 +1101,20 @@ namespace electionguard
                          move(selections)))
     {
     }
+
+    ContestDescription::ContestDescription(
+      const string &objectId, const string &electoralDistrictId, const uint64_t sequenceOrder,
+      const VoteVariationType voteVariation, const uint64_t numberElected,
+      const uint64_t votesAllowed, const string &name,
+      unique_ptr<InternationalizedText> ballotTitle,
+      unique_ptr<InternationalizedText> ballotSubtitle,
+      vector<unique_ptr<SelectionDescription>> selections, vector<string> primaryPartyIds)
+        : pimpl(new Impl(objectId, electoralDistrictId, sequenceOrder, voteVariation, numberElected,
+                         votesAllowed, name, move(ballotTitle), move(ballotSubtitle),
+                         move(selections), move(primaryPartyIds)))
+    {
+    }
+
     ContestDescription::~ContestDescription() = default;
 
     ContestDescription &ContestDescription::operator=(ContestDescription other)
@@ -1212,6 +1269,17 @@ namespace electionguard
 
     ContestDescriptionWithPlaceholders::ContestDescriptionWithPlaceholders(
       const string &objectId, const string &electoralDistrictId, const uint64_t sequenceOrder,
+      const VoteVariationType voteVariation, const uint64_t numberElected, const string &name,
+      vector<unique_ptr<SelectionDescription>> selections, vector<string> primaryPartyIds,
+      vector<unique_ptr<SelectionDescription>> placeholderSelections)
+        : ContestDescription(objectId, electoralDistrictId, sequenceOrder, voteVariation,
+                             numberElected, name, move(selections), move(primaryPartyIds)),
+          pimpl(new Impl(move(placeholderSelections)))
+    {
+    }
+
+    ContestDescriptionWithPlaceholders::ContestDescriptionWithPlaceholders(
+      const string &objectId, const string &electoralDistrictId, const uint64_t sequenceOrder,
       const VoteVariationType voteVariation, const uint64_t numberElected,
       const uint64_t votesAllowed, const string &name,
       unique_ptr<InternationalizedText> ballotTitle,
@@ -1221,6 +1289,21 @@ namespace electionguard
         : ContestDescription(objectId, electoralDistrictId, sequenceOrder, voteVariation,
                              numberElected, votesAllowed, name, move(ballotTitle),
                              move(ballotSubtitle), move(selections)),
+          pimpl(new Impl(move(placeholderSelections)))
+    {
+    }
+
+    ContestDescriptionWithPlaceholders::ContestDescriptionWithPlaceholders(
+      const string &objectId, const string &electoralDistrictId, const uint64_t sequenceOrder,
+      const VoteVariationType voteVariation, const uint64_t numberElected,
+      const uint64_t votesAllowed, const string &name,
+      unique_ptr<InternationalizedText> ballotTitle,
+      unique_ptr<InternationalizedText> ballotSubtitle,
+      vector<unique_ptr<SelectionDescription>> selections, vector<string> primaryPartyIds,
+      vector<unique_ptr<SelectionDescription>> placeholderSelections)
+        : ContestDescription(objectId, electoralDistrictId, sequenceOrder, voteVariation,
+                             numberElected, votesAllowed, name, move(ballotTitle),
+                             move(ballotSubtitle), move(selections), move(primaryPartyIds)),
           pimpl(new Impl(move(placeholderSelections)))
     {
     }

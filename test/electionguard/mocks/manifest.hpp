@@ -18,9 +18,9 @@ namespace electionguard::test::mocks
       public:
         static unique_ptr<Manifest> getJeffersonCountryManifest_multipleBallotStyle_fromFile()
         {
-            return getSimpleElectionFromFile("election_manifest_jefferson_county.json");
+            return getSimpleManifestFromFile("election_manifest_jefferson_county.json");
         }
-        static unique_ptr<Manifest> getSimpleElectionFromFile(const string &filename)
+        static unique_ptr<Manifest> getSimpleManifestFromFile(const string &filename)
         {
 
             ifstream file;
@@ -46,10 +46,11 @@ namespace electionguard::test::mocks
                                             uint64_t sequenceOrder, string name)
         {
             vector<unique_ptr<SelectionDescription>> selections;
-            selections.push_back(make_unique<SelectionDescription>("some-object-id-affirmative",
-                                                                   "some-candidate-id-1", 0UL));
-            selections.push_back(make_unique<SelectionDescription>("some-object-id-negative",
-                                                                   "some-candidate-id-2", 1UL));
+            selections.push_back(
+              make_unique<SelectionDescription>("referendum-pineapple-affirmative-selection",
+                                                "referendum-pineapple-affirmative", 0UL));
+            selections.push_back(make_unique<SelectionDescription>(
+              "referendum-pineapple-negative-selection", "referendum-pineapple-negative", 1UL));
             auto numberElected = 1UL;
             return make_unique<ContestDescription>(objectId, electoralDistrictId, sequenceOrder,
                                                    VoteVariationType::one_of_m, numberElected, name,
@@ -62,133 +63,90 @@ namespace electionguard::test::mocks
                                            string name)
         {
             vector<unique_ptr<SelectionDescription>> selections;
-            selections.push_back(make_unique<SelectionDescription>("some-object-id-candidate-1",
-                                                                   "some-candidate-id-1", 0UL));
-            selections.push_back(make_unique<SelectionDescription>("some-object-id-candidate-2",
-                                                                   "some-candidate-id-2", 1UL));
-            selections.push_back(make_unique<SelectionDescription>("some-object-id-candidate-3",
-                                                                   "some-candidate-id-3", 2UL));
+            selections.push_back(make_unique<SelectionDescription>("benjamin-franklin-selection",
+                                                                   "benjamin-franklin", 0UL));
+            selections.push_back(
+              make_unique<SelectionDescription>("john-adams-selection", "john-adams", 1UL));
+            selections.push_back(
+              make_unique<SelectionDescription>("write-in-selection", "write-in", 2UL));
 
             return make_unique<ContestDescription>(objectId, electoralDistrictId, sequenceOrder,
                                                    VoteVariationType::one_of_m, numberElected, name,
                                                    move(selections));
         }
         // TODO: rename these
-        static unique_ptr<Manifest> getFakeElection()
+        static unique_ptr<Manifest> getJeffersonCountyManifest_Minimal()
         {
             vector<unique_ptr<GeopoliticalUnit>> gpUnits;
-            gpUnits.push_back(make_unique<GeopoliticalUnit>(
-              "some-geopoltical-unit-id", "some-gp-unit-name", ReportingUnitType::unknown));
+            gpUnits.push_back(make_unique<GeopoliticalUnit>("jefferson-county", "jefferson-county",
+                                                            ReportingUnitType::county));
 
-            vector<unique_ptr<Party>> parties;
-            parties.push_back(make_unique<Party>("some-party-id-1"));
-            parties.push_back(make_unique<Party>("some-party-id-2"));
+            vector<unique_ptr<Party>> parties = {};
+            parties.push_back(make_unique<Party>("whig"));
+            parties.push_back(make_unique<Party>("federalist"));
 
             vector<unique_ptr<Candidate>> candidates;
-            candidates.push_back(make_unique<Candidate>("some-candidate-id-1"));
-            candidates.push_back(make_unique<Candidate>("some-candidate-id-2"));
-            candidates.push_back(make_unique<Candidate>("some-candidate-id-3"));
-
-            vector<unique_ptr<BallotStyle>> ballotStyles;
-            ballotStyles.push_back(
-              getFakeBallotStyle("some-ballot-style-id", gpUnits.at(0).get()->getObjectId()));
+            candidates.push_back(make_unique<Candidate>("benjamin-franklin", false));
+            candidates.push_back(make_unique<Candidate>("john-adams", false));
+            candidates.push_back(make_unique<Candidate>("write-in", true));
 
             vector<unique_ptr<ContestDescription>> contests;
-            contests.push_back(getFakeReferendumContestDescription(
-              "some-referendum-contest-object-id", gpUnits.at(0).get()->getObjectId(), 0UL,
-              "some-referendum-contest-name"));
             contests.push_back(getFakeCandidateContestDescription(
-              "some-candidate-contest-object-id", gpUnits.at(0).get()->getObjectId(), 1UL, 2UL,
-              "some-candidate-contest-name"));
-
-            return make_unique<Manifest>(
-              "some-scope-id", ElectionType::unknown, std::chrono::system_clock::now(),
-              std::chrono::system_clock::now(), move(gpUnits), move(parties), move(candidates),
-              move(contests), move(ballotStyles));
-        }
-
-        static unique_ptr<InternalManifest> getFakeManifest(const ElementModQ &manifestHash)
-        {
-            vector<unique_ptr<SelectionDescription>> selections1;
-            selections1.push_back(
-              make_unique<SelectionDescription>("contest-1-selection-1-id", "candidate-1-id", 1UL));
-            selections1.push_back(
-              make_unique<SelectionDescription>("contest-1-selection-2-id", "candidate-2-id", 2UL));
-            selections1.push_back(
-              make_unique<SelectionDescription>("contest-1-selection-3-id", "candidate-3-id", 3UL));
-
-            vector<unique_ptr<SelectionDescription>> placeholderSelections1;
-            placeholderSelections1.push_back(make_unique<SelectionDescription>(
-              "contest-1-placeholder-selection-4-id", "candidate-4-id", 4UL));
-
-            vector<unique_ptr<SelectionDescription>> selections2;
-            selections2.push_back(
-              make_unique<SelectionDescription>("contest-2-selection-1-id", "candidate-1-id", 1UL));
-            selections2.push_back(
-              make_unique<SelectionDescription>("contest-2-selection-2-id", "candidate-2-id", 2UL));
-
-            vector<unique_ptr<SelectionDescription>> placeholderSelections2;
-            placeholderSelections2.push_back(make_unique<SelectionDescription>(
-              "contest-2-placeholder-selection-3-id", "candidate-3-id", 3UL));
-
-            vector<unique_ptr<Language>> contest1TitleText;
-            contest1TitleText.push_back(make_unique<Language>("some-title-string", "en"));
-            contest1TitleText.push_back(make_unique<Language>("some-title-string-es", "es"));
-
-            vector<unique_ptr<Language>> contest1SubTitleText;
-            contest1SubTitleText.push_back(make_unique<Language>("some-title-string", "en"));
-            contest1SubTitleText.push_back(make_unique<Language>("some-title-string-es", "es"));
-
-            auto title1 = make_unique<InternationalizedText>(move(contest1TitleText));
-            auto subtitle1 = make_unique<InternationalizedText>(move(contest1SubTitleText));
-
-            vector<unique_ptr<Language>> contest2TitleText;
-            contest2TitleText.push_back(make_unique<Language>("some-title-string", "en"));
-            contest2TitleText.push_back(make_unique<Language>("some-title-string-es", "es"));
-            vector<unique_ptr<Language>> contest2SubTitleText;
-            contest2SubTitleText.push_back(make_unique<Language>("some-title-string", "en"));
-            contest2SubTitleText.push_back(make_unique<Language>("some-title-string-es", "es"));
-
-            auto title2 = make_unique<InternationalizedText>(move(contest2TitleText));
-            auto subtitle2 = make_unique<InternationalizedText>(move(contest2SubTitleText));
-
-            vector<string> addressLine{"some-street", "some-city", "some-whatever"};
-            auto gpUnit_contactInfo =
-              make_unique<ContactInformation>(addressLine, "gp-unit-contact-info");
-
-            vector<unique_ptr<GeopoliticalUnit>> gpUnits;
-            gpUnits.push_back(make_unique<GeopoliticalUnit>("geopolitical-unit-1", "district-1-id",
-                                                            ReportingUnitType::city,
-                                                            move(gpUnit_contactInfo)));
-
-            vector<unique_ptr<Party>> parties;
-            vector<unique_ptr<Language>> party1Name;
-            party1Name.push_back(make_unique<Language>("some-party-1-string", "en"));
-            auto partyName = make_unique<InternationalizedText>(move(party1Name));
-            parties.push_back(make_unique<Party>("party-1", move(partyName), "party1", "some-color",
-                                                 "some-logo-uri"));
-
-            vector<unique_ptr<ContestDescriptionWithPlaceholders>> contests;
-            const auto numElected = 2UL;
-            contests.push_back(make_unique<ContestDescriptionWithPlaceholders>(
-              "contest-1-id", gpUnits.at(0).get()->getObjectId(), 1UL, VoteVariationType::n_of_m,
-              numElected, numElected, "contest-1-name", move(title1), move(subtitle1),
-              move(selections1), move(placeholderSelections1)));
-
-            contests.push_back(make_unique<ContestDescriptionWithPlaceholders>(
-              "contest-2-id", gpUnits.at(0).get()->getObjectId(), 2UL, VoteVariationType::n_of_m,
-              numElected, numElected, "contest-2-name", move(title2), move(subtitle2),
-              move(selections2), move(placeholderSelections2)));
+              "justice-supreme-court", gpUnits.at(0).get()->getObjectId(), 0UL, 1UL,
+              "Justice of the Supreme Court"));
 
             vector<unique_ptr<BallotStyle>> ballotStyles;
             vector<string> gpunitIds{gpUnits.at(0).get()->getObjectId()};
-            vector<string> partyIds{parties.at(0).get()->getObjectId()};
             ballotStyles.push_back(
-              make_unique<BallotStyle>("some-ballot-style-id", gpunitIds, partyIds, "some-uri"));
+              make_unique<BallotStyle>("jefferson-county-ballot-style", gpunitIds));
 
-            auto manifest = make_unique<InternalManifest>(move(gpUnits), move(contests),
-                                                          move(ballotStyles), manifestHash);
-            return manifest;
+            return make_unique<Manifest>(
+              "jefferson-county-open-primary", ElectionType::primary,
+              std::chrono::system_clock::now(), std::chrono::system_clock::now(), move(gpUnits),
+              move(parties), move(candidates), move(contests), move(ballotStyles));
+        }
+
+        static unique_ptr<Manifest> getJeffersonCountyManifest_MultipleBallotStyles()
+        {
+            vector<unique_ptr<GeopoliticalUnit>> gpUnits;
+            gpUnits.push_back(make_unique<GeopoliticalUnit>("jefferson-county", "jefferson-county",
+                                                            ReportingUnitType::county));
+            gpUnits.push_back(make_unique<GeopoliticalUnit>("jefferson-county-school-district-1",
+                                                            "Jefferson County School District 1",
+                                                            ReportingUnitType::school));
+
+            vector<unique_ptr<Party>> parties;
+            parties.push_back(make_unique<Party>("whig"));
+            parties.push_back(make_unique<Party>("federalist"));
+
+            vector<unique_ptr<Candidate>> candidates;
+            candidates.push_back(make_unique<Candidate>("benjamin-franklin", false));
+            candidates.push_back(make_unique<Candidate>("john-adams", false));
+            candidates.push_back(make_unique<Candidate>("write-in", true));
+            candidates.push_back(make_unique<Candidate>("referendum-pineapple-affirmative", false));
+            candidates.push_back(make_unique<Candidate>("referendum-pineapple-negative", false));
+
+            vector<unique_ptr<ContestDescription>> contests;
+            contests.push_back(getFakeCandidateContestDescription(
+              "justice-supreme-court", gpUnits.at(0).get()->getObjectId(), 0UL, 1UL,
+              "Justice of the Supreme Court"));
+            contests.push_back(getFakeCandidateContestDescription(
+              "referendum-pineapple", gpUnits.at(1).get()->getObjectId(), 1UL, 1UL,
+              "The Pineapple Question"));
+
+            vector<unique_ptr<BallotStyle>> ballotStyles;
+            vector<string> jeffersonGPUnitIds{gpUnits.at(0).get()->getObjectId()};
+            ballotStyles.push_back(
+              make_unique<BallotStyle>("jefferson-county-ballot-style", jeffersonGPUnitIds));
+            vector<string> schoolGPUnitIds{gpUnits.at(0).get()->getObjectId(),
+                                           gpUnits.at(1).get()->getObjectId()};
+            ballotStyles.push_back(
+              make_unique<BallotStyle>("jefferson-county-school-district-1", schoolGPUnitIds));
+
+            return make_unique<Manifest>(
+              "jefferson-county-open-primary", ElectionType::primary,
+              std::chrono::system_clock::now(), std::chrono::system_clock::now(), move(gpUnits),
+              move(parties), move(candidates), move(contests), move(ballotStyles));
         }
     };
 } // namespace electionguard::test::mocks

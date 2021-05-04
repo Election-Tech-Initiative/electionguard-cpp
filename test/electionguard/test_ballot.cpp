@@ -58,8 +58,9 @@ TEST_CASE("Plaintext Ballot Selection Is InValid")
 TEST_CASE("Can serialize PlaintextBallot")
 {
     // Arrange
-    auto manifest = ManifestGenerator::getFakeManifest(TWO_MOD_Q());
-    auto plaintext = BallotGenerator::getFakeBallot(*manifest);
+    auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto plaintext = BallotGenerator::getFakeBallot(*internal);
     auto json = plaintext->toJson();
     auto bson = plaintext->toBson();
     auto msgPack = plaintext->toMsgPack();

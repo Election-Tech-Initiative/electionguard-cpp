@@ -67,6 +67,7 @@ add_executable(${CPPTEST_PROJECT_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot_compact.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_election.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt_compact.cpp
@@ -100,20 +101,23 @@ add_executable(${CTEST_PROJECT_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt_compact.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_manifest.c
 )
 
 target_compile_features(${CTEST_PROJECT_TARGET} PRIVATE c_std_99)
 
 # ---- Link Libraries ----
 
-target_link_libraries(${UTILS_PROJECT_TARGET} PUBLIC ${META_PROJECT_TARGET} PRIVATE date::date)
+target_link_libraries(${UTILS_PROJECT_TARGET} PUBLIC ${META_PROJECT_TARGET})
 
 if (MINGW)
+    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
+
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
-    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET} date::date -static-libstdc++)
+    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE -static-libstdc++)
 else()
-    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET} date::date)
+    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
 endif()
 
 target_link_libraries(${CTEST_PROJECT_TARGET} PRIVATE ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})

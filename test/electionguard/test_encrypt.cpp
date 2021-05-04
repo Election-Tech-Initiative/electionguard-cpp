@@ -75,15 +75,15 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
           "InternalManifest succeeds")
 {
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto manifest = ManifestGenerator::getFakeElection();
+    auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
     auto internal = make_unique<InternalManifest>(*manifest);
     auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
-    auto mediator = make_unique<EncryptionMediator>(*manifest, *context, *device);
+    auto mediator = make_unique<EncryptionMediator>(*internal, *context, *device);
 
     // Act
-    auto plaintext = BallotGenerator::getFakeBallot(*manifest);
+    auto plaintext = BallotGenerator::getFakeBallot(*internal);
     Log::debug(plaintext->toJson());
     auto ciphertext = mediator->encrypt(*plaintext);
 
@@ -96,15 +96,15 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
 TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
 {
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto manifest = ManifestGenerator::getFakeElection();
+    auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
     auto internal = make_unique<InternalManifest>(*manifest);
     auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
-    auto mediator = make_unique<EncryptionMediator>(*manifest, *context, *device);
+    auto mediator = make_unique<EncryptionMediator>(*internal, *context, *device);
 
     // Act
-    auto plaintext = BallotGenerator::getFakeBallot(*manifest, 0UL);
+    auto plaintext = BallotGenerator::getFakeBallot(*internal, 0UL);
     Log::debug(plaintext->toJson());
     auto ciphertext = mediator->encrypt(*plaintext);
 
@@ -117,11 +117,12 @@ TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
 TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds")
 {
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto manifest = ManifestGenerator::getFakeManifest(TWO_MOD_Q());
-    auto context = ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey());
+    auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
-    auto mediator = make_unique<EncryptionMediator>(*manifest, *context, *device);
+    auto mediator = make_unique<EncryptionMediator>(*internal, *context, *device);
 
     // Act
     auto plaintext = BallotGenerator::getFakeBallot(*manifest);
@@ -152,11 +153,12 @@ TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds")
 TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeeds")
 {
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto manifest = ManifestGenerator::getFakeManifest(TWO_MOD_Q());
-    auto context = ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey());
+    auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
-    auto mediator = make_unique<EncryptionMediator>(*manifest, *context, *device);
-    auto plaintext = BallotGenerator::getFakeBallot(*manifest);
+    auto mediator = make_unique<EncryptionMediator>(*internal, *context, *device);
+    auto plaintext = BallotGenerator::getFakeBallot(*internal);
 
     // Act
     auto compactCiphertext = mediator->compactEncrypt(*plaintext);

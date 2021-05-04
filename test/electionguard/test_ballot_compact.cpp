@@ -13,8 +13,9 @@ using namespace std;
 TEST_CASE("Can serialize CompactPlaintextBallot")
 {
     // Arrange
-    auto manifest = ManifestGenerator::getFakeManifest(TWO_MOD_Q());
-    auto plaintext = BallotGenerator::getFakeBallot(*manifest);
+    auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto plaintext = BallotGenerator::getFakeBallot(*internal);
     auto compact = CompactPlaintextBallot::make(*plaintext);
     auto msgpack = compact->toMsgPack();
     auto json = compact->toJson();

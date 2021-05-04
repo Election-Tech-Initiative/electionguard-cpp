@@ -2,15 +2,13 @@
 #define __ELECTIONGUARD_CPP_CONVERT_HPP_INCLUDED__
 
 #include <chrono>
+#include <codecvt>
 #include <iomanip>
 #include <iostream>
 #include <kremlin/lowstar_endianness.h>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <locale>
-#include <codecvt>
-#include "date/date.h"
 
 using std::bad_cast;
 using std::begin;
@@ -26,8 +24,8 @@ using std::gmtime;
 using std::mktime;
 using std::stringstream;
 using std::uppercase;
-using std::chrono::system_clock;
 using std::wstring;
+using std::chrono::system_clock;
 
 namespace electionguard
 {
@@ -185,29 +183,9 @@ namespace electionguard
         return data_array;
     }
 
-    inline string timePointToIsoString(const time_point &time, const string &format)
-    {
-        auto c_time = system_clock::to_time_t(time);
-        struct tm gmt;
+    string timePointToIsoString(const time_point &time, const string &format);
+    time_point timePointFromIsoString(const string &time, const string &format);
 
-#ifdef _WIN32
-        // TODO: ISSUE #136: handle err
-        gmtime_s(&gmt, &c_time);
-#else
-        gmtime_r(&c_time, &gmt);
-#endif
-        stringstream ss;
-        ss << std::put_time(&gmt, format.c_str());
-        return ss.str();
-    }
-
-    inline time_point timePointFromIsoString(const string &time, const string &format)
-    {
-        date::sys_seconds tm;
-        std::istringstream ss{time};
-        ss >> date::parse(format, tm);
-        return tm;
-    }
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD_CPP_CONVERT_HPP_INCLUDED__ */

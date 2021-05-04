@@ -70,10 +70,10 @@ namespace electionguard::test::mocks
                 }
                 if (choices < maxChoices) {
                     ++choices;
-                    Log::debug(" Adding Selection: TRUE");
+                    Log::debug(" " + description.get().getObjectId() + " Adding Selection: TRUE");
                     selections.push_back(selectionFrom(description.get(), true));
                 } else {
-                    Log::debug(" Adding Selection: FALSE");
+                    Log::debug(" " + description.get().getObjectId() + " Adding Selection: FALSE");
                     selections.push_back(selectionFrom(description.get(), false));
                 }
             }

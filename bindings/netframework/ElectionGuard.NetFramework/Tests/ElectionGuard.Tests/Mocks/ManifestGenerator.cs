@@ -84,6 +84,8 @@ namespace ElectionGuard.Tests.Mocks
                 "jefferson-county-school-district-1", "Jefferson County School District 1", ReportingUnitType.school)
         };
 
+            // TODO: Add parties
+
             var candidates = new List<Candidate>
         {
             new Candidate("benjamin-franklin", isWriteIn: false),
