@@ -162,9 +162,11 @@ add_library(nlohmann_json INTERFACE IMPORTED)
 target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
 
 if (MINGW)
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json)
+    
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
-    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json -static-libstdc++)
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE -static-libstdc++)
 else()
     target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json)
 endif()
@@ -213,7 +215,7 @@ if(OPTION_ENABLE_TESTS)
 
     # When running tests, set some specific compiler flags
     if(MSVC)
-        #TODO: renenable warnings as errors whne the correct ones are defined
+        #TODO: renenable warnings as errors when the correct ones are defined
        #target_compile_options(${META_PROJECT_TARGET} PUBLIC /W4 /WX)C5059
        target_compile_options(${META_PROJECT_TARGET} PUBLIC /Zi)
     endif()

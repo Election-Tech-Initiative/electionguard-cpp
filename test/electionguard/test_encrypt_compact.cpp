@@ -1,6 +1,7 @@
 #include "../../src/electionguard/log.hpp"
 #include "mocks/ballot.hpp"
 #include "mocks/election.hpp"
+#include "mocks/manifest.hpp"
 
 #include <doctest/doctest.h>
 #include <electionguard/ballot.hpp>
@@ -23,7 +24,7 @@ struct TestEncryptFixture {
 
     TestEncryptFixture()
         : keypair(ElGamalKeyPair::fromSecret(TWO_MOD_Q())),
-          manifest(ElectionGenerator::getFakeManifest(TWO_MOD_Q())),
+          manifest(ManifestGenerator::getFakeManifest(TWO_MOD_Q())),
           context(ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey())),
           device(make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location")),
           mediator(make_unique<EncryptionMediator>(*manifest, *context, *device)),

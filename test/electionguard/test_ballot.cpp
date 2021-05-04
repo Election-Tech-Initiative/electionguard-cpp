@@ -1,6 +1,6 @@
 #include "../../src/electionguard/log.hpp"
 #include "mocks/ballot.hpp"
-#include "mocks/election.hpp"
+#include "mocks/manifest.hpp"
 
 #include <doctest/doctest.h>
 #include <electionguard/ballot.hpp>
@@ -58,7 +58,7 @@ TEST_CASE("Plaintext Ballot Selection Is InValid")
 TEST_CASE("Can serialize PlaintextBallot")
 {
     // Arrange
-    auto manifest = ElectionGenerator::getFakeManifest(TWO_MOD_Q());
+    auto manifest = ManifestGenerator::getFakeManifest(TWO_MOD_Q());
     auto plaintext = BallotGenerator::getFakeBallot(*manifest);
     auto json = plaintext->toJson();
     auto bson = plaintext->toBson();

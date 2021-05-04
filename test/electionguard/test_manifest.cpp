@@ -1,5 +1,6 @@
 #include "../../src/electionguard/log.hpp"
 #include "mocks/election.hpp"
+#include "mocks/manifest.hpp"
 
 #include <doctest/doctest.h>
 #include <electionguard/election.hpp>
@@ -12,7 +13,7 @@ using namespace std;
 
 TEST_CASE("Simple Election Is Valid")
 {
-    auto subject = ElectionGenerator::getSimpleElectionFromFile();
+    auto subject = ManifestGenerator::getJeffersonCountryManifest_multipleBallotStyle_fromFile();
 
     CHECK(subject->getElectionScopeId() == "jefferson-county-primary");
     CHECK(subject->isValid() == true);
@@ -21,7 +22,7 @@ TEST_CASE("Simple Election Is Valid")
 TEST_CASE("Can serialize Manifest")
 {
     // Arrange
-    auto subject = ElectionGenerator::getFakeElection();
+    auto subject = ManifestGenerator::getFakeElection();
     auto json = subject->toJson();
 
     Log::debug(json);
@@ -69,7 +70,7 @@ TEST_CASE("Can deserialize Manifest")
 TEST_CASE("Can construct InternalManifest from Manifest")
 {
     // Arrange
-    auto data = ElectionGenerator::getFakeElection();
+    auto data = ManifestGenerator::getFakeElection();
 
     // Act
     auto result = make_unique<InternalManifest>(*data);
@@ -82,7 +83,7 @@ TEST_CASE("Can construct InternalManifest from Manifest")
 TEST_CASE("Can serialize InternalManifest")
 {
     // Arrange
-    auto manifest = ElectionGenerator::getFakeManifest(TWO_MOD_Q());
+    auto manifest = ManifestGenerator::getFakeManifest(TWO_MOD_Q());
     auto json = manifest->toJson();
     auto bson = manifest->toBson();
 
@@ -100,7 +101,7 @@ TEST_CASE("Can serialize CiphertextElectionContext")
 {
     // Arrange
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto manifest = ElectionGenerator::getFakeManifest(TWO_MOD_Q());
+    auto manifest = ManifestGenerator::getFakeManifest(TWO_MOD_Q());
     auto context = ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey());
     auto json = context->toJson();
     auto bson = context->toBson();

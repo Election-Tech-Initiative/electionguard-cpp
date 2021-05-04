@@ -35,6 +35,9 @@ ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.h
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/manifest.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/manifest.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/manifest.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/constants.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h
 )
@@ -103,14 +106,14 @@ target_compile_features(${CTEST_PROJECT_TARGET} PRIVATE c_std_99)
 
 # ---- Link Libraries ----
 
-target_link_libraries(${UTILS_PROJECT_TARGET} PUBLIC ${META_PROJECT_TARGET})
+target_link_libraries(${UTILS_PROJECT_TARGET} PUBLIC ${META_PROJECT_TARGET} PRIVATE date::date)
 
 if (MINGW)
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
-    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET} -static-libstdc++)
+    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET} date::date -static-libstdc++)
 else()
-    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
+    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET} date::date)
 endif()
 
 target_link_libraries(${CTEST_PROJECT_TARGET} PRIVATE ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})

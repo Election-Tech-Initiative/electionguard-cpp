@@ -1,6 +1,7 @@
 #include "../../src/electionguard/log.hpp"
 #include "mocks/ballot.hpp"
 #include "mocks/election.hpp"
+#include "mocks/manifest.hpp"
 
 #include <doctest/doctest.h>
 #include <electionguard/ballot.hpp>
@@ -74,9 +75,9 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
           "InternalManifest succeeds")
 {
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto election = ElectionGenerator::getFakeElection();
-    auto manifest = make_unique<InternalManifest>(*election);
-    auto context = ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey());
+    auto manifest = ManifestGenerator::getFakeElection();
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
     auto mediator = make_unique<EncryptionMediator>(*manifest, *context, *device);
@@ -95,9 +96,9 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
 TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
 {
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto election = ElectionGenerator::getFakeElection();
-    auto manifest = make_unique<InternalManifest>(*election);
-    auto context = ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey());
+    auto manifest = ManifestGenerator::getFakeElection();
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
     auto mediator = make_unique<EncryptionMediator>(*manifest, *context, *device);
@@ -116,7 +117,7 @@ TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
 TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds")
 {
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto manifest = ElectionGenerator::getFakeManifest(TWO_MOD_Q());
+    auto manifest = ManifestGenerator::getFakeManifest(TWO_MOD_Q());
     auto context = ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
@@ -151,7 +152,7 @@ TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds")
 TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeeds")
 {
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto manifest = ElectionGenerator::getFakeManifest(TWO_MOD_Q());
+    auto manifest = ManifestGenerator::getFakeManifest(TWO_MOD_Q());
     auto context = ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
     auto mediator = make_unique<EncryptionMediator>(*manifest, *context, *device);
@@ -168,15 +169,16 @@ TEST_CASE("Encrypt simple ballot from file succeeds")
 {
     // Arrange
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto description = ElectionGenerator::getSimpleElectionFromFile();
-    auto [manifest, context] =
-      ElectionGenerator::getFakeCiphertextElection(*description, *keypair->getPublicKey());
+    auto manifest = ManifestGenerator::getJeffersonCountryManifest_multipleBallotStyle_fromFile();
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
+
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
     auto ballot = BallotGenerator::getSimpleBallotFromFile();
 
     // Act
-    auto ciphertext = encryptBallot(*ballot, *manifest, *context, *device->getHash());
+    auto ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash());
 
     // Assert
     CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
@@ -187,15 +189,15 @@ TEST_CASE("Encrypt simple ballot from file submitted is valid")
 {
     // Arrange
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto description = ElectionGenerator::getSimpleElectionFromFile();
-    auto [manifest, context] =
-      ElectionGenerator::getFakeCiphertextElection(*description, *keypair->getPublicKey());
+    auto manifest = ManifestGenerator::getJeffersonCountryManifest_multipleBallotStyle_fromFile();
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
     auto ballot = BallotGenerator::getSimpleBallotFromFile();
 
     // Act
-    auto ciphertext = encryptBallot(*ballot, *manifest, *context, *device->getHash());
+    auto ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash());
     auto submitted = SubmittedBallot::from(*ciphertext, BallotBoxState::cast);
     auto serialized = submitted->toJson();
 

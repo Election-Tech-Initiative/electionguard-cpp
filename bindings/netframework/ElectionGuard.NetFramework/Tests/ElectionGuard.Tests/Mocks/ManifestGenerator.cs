@@ -96,7 +96,7 @@ namespace ElectionGuard.Tests.Mocks
                     // but is useful for providing what data was displayed to users
                     // since it is included in the manifest hash.
                     new Language("Pineapple should be banned on pizza", "en"),
-                   // new Language("La piña debe prohibirse en la pizza", "es"),
+                    // TODO: #176: new Language("La piña debe prohibirse en la pizza", "es"),
             }), isWriteIn: false),
             new Candidate("referendum-pineapple-negative", new InternationalizedText (
                 new []{
@@ -143,12 +143,12 @@ namespace ElectionGuard.Tests.Mocks
                 ballotTitle: new InternationalizedText (
                     new []{
                         new Language("Should pineapple be banned on pizza?", "en"),
-                      //  new Language("¿Debería prohibirse la piña en la pizza?", "es"),
+                      // TODO: #176: new Language("¿Debería prohibirse la piña en la pizza?", "es"),
                     }),
                 ballotSubtitle: new InternationalizedText (
                     new []{
                         new Language("The township considers this issue to be very important", "en"),
-                      //  new Language("El municipio considera que esta cuestión es muy importante", "es"),
+                      // TODO: #176: new Language("El municipio considera que esta cuestión es muy importante", "es"),
                     }),
                 selections: new[]
                 {
