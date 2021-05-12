@@ -1,4 +1,5 @@
 #include "date/date.h"
+#include "log.hpp"
 
 #include <chrono>
 #include <codecvt>
@@ -19,6 +20,9 @@ using std::chrono::system_clock;
 
 namespace electionguard
 {
+    const string defaultFormat = "%FT%TZ";
+    const string secondaryFormat = "%FT%T%Ez";
+
     string timePointToIsoString(const time_point &time, const string &format)
     {
         auto c_time = system_clock::to_time_t(time);
@@ -30,17 +34,35 @@ namespace electionguard
 #else
         gmtime_r(&c_time, &gmt);
 #endif
-        stringstream ss;
+        std::ostringstream ss;
         ss << std::put_time(&gmt, format.c_str());
         return ss.str();
     }
 
+    string timePointToIsoString(const time_point &time)
+    {
+        return timePointToIsoString(time, defaultFormat);
+    }
+
     time_point timePointFromIsoString(const string &time, const string &format)
     {
-        date::sys_seconds tm;
+        date::sys_time<std::chrono::seconds> tm;
         std::istringstream ss{time};
         ss >> date::parse(format, tm);
+        if (ss.fail()) {
+            ss.clear();
+            ss.exceptions(std::ios::failbit);
+            ss.str(time);
+            ss >> date::parse(secondaryFormat, tm);
+        }
+
+        auto testTime = timePointToIsoString(tm, format);
         return tm;
+    }
+
+    time_point timePointFromIsoString(const string &time)
+    {
+        return timePointFromIsoString(time, defaultFormat);
     }
 
 } // namespace electionguard

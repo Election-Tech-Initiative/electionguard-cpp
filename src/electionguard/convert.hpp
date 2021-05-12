@@ -183,7 +183,9 @@ namespace electionguard
         return data_array;
     }
 
+    string timePointToIsoString(const time_point &time);
     string timePointToIsoString(const time_point &time, const string &format);
+    time_point timePointFromIsoString(const string &time);
     time_point timePointFromIsoString(const string &time, const string &format);
 
 } // namespace electionguard

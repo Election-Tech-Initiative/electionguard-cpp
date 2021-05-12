@@ -167,6 +167,26 @@ TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeed
     CHECK(compactCiphertext->getObjectId() == plaintext->getObjectId());
 }
 
+TEST_CASE("Encrypt simple ballot from file with mediator succeeds")
+{
+    // Arrange
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto manifest = ManifestGenerator::getJeffersonCountryManifest_multipleBallotStyle_fromFile();
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
+
+    auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
+    auto mediator = make_unique<EncryptionMediator>(*internal, *context, *device);
+    auto ballot = BallotGenerator::getSimpleBallotFromFile();
+
+    // Act
+    auto ciphertext = mediator->encrypt(*ballot);
+
+    // Assert
+    CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
+                                        *context->getCryptoExtendedBaseHash()) == true);
+}
+
 TEST_CASE("Encrypt simple ballot from file succeeds")
 {
     // Arrange
@@ -180,7 +200,10 @@ TEST_CASE("Encrypt simple ballot from file succeeds")
     auto ballot = BallotGenerator::getSimpleBallotFromFile();
 
     // Act
-    auto ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash());
+    auto ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash(),
+                                    make_unique<ElementModQ>(TWO_MOD_Q()));
+
+    Log::debug(ciphertext->toJson());
 
     // Assert
     CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),

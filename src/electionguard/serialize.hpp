@@ -198,11 +198,7 @@ namespace electionguard
         }
 
         if (serializable.getName() != nullptr) {
-            json names;
-            for (const auto &element : serializable.getName()->getText()) {
-                names.push_back(languageToJson(element.get()));
-            }
-            serialized["name"] = names;
+            serialized["name"] = internationalizedTextToJson(*serializable.getName());
         }
 
         return serialized;
@@ -211,7 +207,7 @@ namespace electionguard
     static unique_ptr<Party> partyFromJson(const json &j)
     {
         // TODO: other cases
-        if (j.contains("name") && j["name"].is_null()) {
+        if (j.contains("name") && !j["name"].is_null()) {
             return make_unique<Party>(j["object_id"].get<string>(),
                                       internationalizedTextFromJson(j["name"]),
                                       j["abbreviation"].get<string>(), j["color"].get<string>(),
@@ -486,9 +482,8 @@ namespace electionguard
                 json serialized;
                 serialized["election_scope_id"] = serializable.getElectionScopeId();
                 serialized["type"] = getElectionTypeString(serializable.getElectionType());
-                serialized["start_date"] =
-                  timePointToIsoString(serializable.getStartDate(), "%FT%TZ");
-                serialized["end_date"] = timePointToIsoString(serializable.getEndDate(), "%FT%TZ");
+                serialized["start_date"] = timePointToIsoString(serializable.getStartDate());
+                serialized["end_date"] = timePointToIsoString(serializable.getEndDate());
 
                 json geopoliticalUnits =
                   geopoliticalUnitsToJson(serializable.getGeopoliticalUnits());
@@ -540,16 +535,14 @@ namespace electionguard
                     auto contactInformation = contactInformationFromJson(j["contact_information"]);
 
                     return make_unique<electionguard::Manifest>(
-                      electionScopeId, getElectionType(type),
-                      timePointFromIsoString(startDate, "%FT%TZ"),
-                      timePointFromIsoString(endDate, "%FT%TZ"), move(geopoliticalUnits),
-                      move(parties), move(candidates), move(contests), move(ballotStyles),
-                      move(name), move(contactInformation));
+                      electionScopeId, getElectionType(type), timePointFromIsoString(startDate),
+                      timePointFromIsoString(endDate), move(geopoliticalUnits), move(parties),
+                      move(candidates), move(contests), move(ballotStyles), move(name),
+                      move(contactInformation));
                 }
                 return make_unique<electionguard::Manifest>(
-                  electionScopeId, getElectionType(type),
-                  timePointFromIsoString(startDate, "%FT%TZ"),
-                  timePointFromIsoString(endDate, "%FT%TZ"), move(geopoliticalUnits), move(parties),
+                  electionScopeId, getElectionType(type), timePointFromIsoString(startDate),
+                  timePointFromIsoString(endDate), move(geopoliticalUnits), move(parties),
                   move(candidates), move(contests), move(ballotStyles));
             }
 

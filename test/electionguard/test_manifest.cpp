@@ -36,6 +36,23 @@ TEST_CASE("Can serialize Jefferson County Minimal Manifest")
     CHECK(result->isValid() == true);
 }
 
+TEST_CASE("Can deserialize Jefferson County Manifest from file")
+{
+    // Arrange
+    auto subject = ManifestGenerator::getJeffersonCountryManifest_multipleBallotStyle_fromFile();
+    auto json = subject->toJson();
+
+    Log::debug(json);
+
+    // Act
+    auto result = Manifest::fromJson(json);
+
+    // Assert
+    CHECK(subject->getElectionScopeId().compare(result->getElectionScopeId()) == 0);
+    CHECK(subject->crypto_hash()->toHex() == result->crypto_hash()->toHex());
+    CHECK(result->isValid() == true);
+}
+
 TEST_CASE("Can construct InternalManifest from Manifest")
 {
     // Arrange
