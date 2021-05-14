@@ -1664,7 +1664,8 @@ namespace electionguard
 
             candidates_have_valid_party_ids =
               candidates_have_valid_party_ids &&
-              (item.get().getPartyId().empty() || partyIds.find(id) != gpUnitIds.end());
+              (item.get().getPartyId().empty() ||
+               partyIds.find(item.get().getPartyId()) != partyIds.end());
         }
 
         auto candidates_have_valid_length = candidateIds.size() == pimpl->candidates.size();

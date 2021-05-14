@@ -51,7 +51,6 @@ namespace electionguard
         ss >> date::parse(format, tm);
         if (ss.fail()) {
             ss.clear();
-            ss.exceptions(std::ios::failbit);
             ss.str(time);
             ss >> date::parse(secondaryFormat, tm);
         }
