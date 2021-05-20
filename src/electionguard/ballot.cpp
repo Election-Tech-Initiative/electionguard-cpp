@@ -73,9 +73,21 @@ namespace electionguard
         {
             this->object_id = move(objectId);
         }
+
+        [[nodiscard]] unique_ptr<PlaintextBallotSelection::Impl> clone() const
+        {
+            return make_unique<PlaintextBallotSelection::Impl>(
+              this->object_id, this->vote, this->isPlaceholderSelection,
+              this->extendedData == nullptr ? nullptr : this->extendedData->clone());
+        }
     };
 
     // Lifecycle Methods
+
+    PlaintextBallotSelection::PlaintextBallotSelection(const PlaintextBallotSelection &other)
+        : pimpl(other.pimpl->clone())
+    {
+    }
 
     PlaintextBallotSelection::PlaintextBallotSelection(
       string objectId, uint64_t vote, bool isPlaceholderSelection /* = false */,

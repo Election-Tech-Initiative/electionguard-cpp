@@ -425,7 +425,7 @@ namespace electionguard
 
     unique_ptr<CiphertextBallot>
     encryptBallot(const PlaintextBallot &ballot, const InternalManifest &manifest,
-                  const CiphertextElectionContext &context, const ElementModQ &ballotCodeSeed,
+                  const CiphertextElectionContext &context, const ElementModQ &encryptionSeed,
                   unique_ptr<ElementModQ> nonce /* = nullptr */, uint64_t timestamp /* = 0 */,
                   bool shouldVerifyProofs /* = true */)
     {
@@ -447,7 +447,7 @@ namespace electionguard
           CiphertextBallot::nonceSeed(*manifest.getManifestHash(), ballot.getObjectId(), *nonce);
 
         Log::debugHex(": manifestHash   : ", manifest.getManifestHash()->toHex());
-        Log::debugHex(": ballotCodeSeed          :", ballotCodeSeed.toHex());
+        Log::debugHex(": encryptionSeed          :", encryptionSeed.toHex());
         Log::debug(": timestamp         : " + to_string(timestamp));
 
         // encrypt contests
@@ -463,14 +463,11 @@ namespace electionguard
         auto encryptedBallot =
           CiphertextBallot::make(ballot.getObjectId(), ballot.getStyleId(),
                                  *manifest.getManifestHash(), move(encryptedContests), move(nonce),
-                                 timestamp, make_unique<ElementModQ>(ballotCodeSeed), nullptr);
+                                 timestamp, make_unique<ElementModQ>(encryptionSeed), nullptr);
 
         if (!encryptedBallot) {
             throw runtime_error("encryptedBallot:: Error constructing encrypted ballot");
         }
-
-        Log::debug(": Encrypted Ballot: encrypted: " + encryptedBallot->getObjectId());
-        Log::debug(encryptedBallot->toJson());
 
         if (!shouldVerifyProofs) {
             return encryptedBallot;

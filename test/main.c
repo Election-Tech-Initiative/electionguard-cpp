@@ -13,6 +13,7 @@ bool test_elgamal(void);
 bool test_encrypt_compact(void);
 bool test_encrypt(void);
 bool test_hash(void);
+bool test_manifest(void);
 
 int main(void)
 {
@@ -24,6 +25,7 @@ int main(void)
     assert(test_encrypt_compact() == true);
     assert(test_encrypt() == true);
     assert(test_hash() == true);
+    assert(test_manifest() == true);
 
     printf("\n C TEST STATUS SUCCESS! \n");
 }

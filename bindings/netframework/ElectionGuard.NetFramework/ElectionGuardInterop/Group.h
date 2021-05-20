@@ -23,10 +23,11 @@ namespace ElectionGuardInterop
             }
             this->_instance = new electionguard::ElementModP(array);
         }
-        internal : ElementModP(electionguard::ElementModP *unowned)
-            : ManagedInstance(unowned, false)
+        internal : ElementModP(std::unique_ptr<electionguard::ElementModP> other)
         {
+            this->_instance = other.release();
         }
+        ElementModP(electionguard::ElementModP *unowned) : ManagedInstance(unowned, false) {}
         ElementModP(const electionguard::ElementModP *unowned) : ManagedInstance(unowned) {}
 
       public:
@@ -72,6 +73,10 @@ namespace ElectionGuardInterop
         internal : ElementModQ(const uint64_t (&elem)[MAX_Q_LEN])
             : ManagedInstance(new electionguard::ElementModQ(elem))
         {
+        }
+        ElementModQ(std::unique_ptr<electionguard::ElementModQ> other)
+        {
+            this->_instance = other.release();
         }
         ElementModQ(electionguard::ElementModQ *unowned) : ManagedInstance(unowned, false) {}
         ElementModQ(const electionguard::ElementModQ *unowned) : ManagedInstance(unowned) {}

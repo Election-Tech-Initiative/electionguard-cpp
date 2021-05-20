@@ -94,7 +94,16 @@ TEST_CASE("Hash of same values in list are the same hash")
     CHECK((*hash_elems({"0", "0"}) == *hash_elems({"0", "0"})));
 }
 
-TEST_CASE("Same Hash Value from nested-list and taking result of hashed list and hashing it's hex")
+TEST_CASE("Hash of empty list same as hash of null string")
+{
+    vector<string> null_vector;
+    vector<string> empty_vector = {};
+    CHECK((*hash_elems(null_vector) == *hash_elems(empty_vector)));
+    CHECK((*hash_elems(empty_vector) == *hash_elems(nullptr)));
+    CHECK((*hash_elems(empty_vector) == *hash_elems("")));
+}
+
+TEST_CASE("Same Hash Value from nested-list and result of hashed list by hashing the hex")
 {
     auto nestedHash = hash_elems({vector<string>{"0", "1"}, "3"});
     auto nonNestedHash1 = hash_elems({"0", "1"});

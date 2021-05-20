@@ -39,6 +39,14 @@ namespace ElectionGuardInterop
         {
             this->_instance = other.release();
         }
+        DisjunctiveChaumPedersenProof(electionguard::DisjunctiveChaumPedersenProof *unowned)
+            : ManagedInstance(unowned, false)
+        {
+        }
+        DisjunctiveChaumPedersenProof(const electionguard::DisjunctiveChaumPedersenProof *unowned)
+            : ManagedInstance(unowned)
+        {
+        }
 
       public:
         property ElementModP ^
@@ -47,49 +55,65 @@ namespace ElectionGuardInterop
                   auto unmanaged = this->_instance->getProofZeroPad();
                   return gcnew ElementModP(unmanaged);
               }
-          } property ElementModP ^
+          }
+
+          property ElementModP ^
           ProofZeroData {
               ElementModP ^ get() {
                   auto unmanaged = this->_instance->getProofZeroData();
                   return gcnew ElementModP(unmanaged);
               }
-          } property ElementModP ^
+          }
+
+          property ElementModP ^
           ProofOnePad {
               ElementModP ^ get() {
                   auto unmanaged = this->_instance->getProofOnePad();
                   return gcnew ElementModP(unmanaged);
               }
-          } property ElementModP ^
+          }
+
+          property ElementModP ^
           ProofOneData {
               ElementModP ^ get() {
                   auto unmanaged = this->_instance->getProofOneData();
                   return gcnew ElementModP(unmanaged);
               }
-          } property ElementModQ ^
+          }
+
+          property ElementModQ ^
           ProofZeroChallenge {
               ElementModQ ^ get() {
                   auto unmanaged = this->_instance->getProofZeroChallenge();
                   return gcnew ElementModQ(unmanaged);
               }
-          } property ElementModQ ^
+          }
+
+          property ElementModQ ^
           ProofOneChallenge {
               ElementModQ ^ get() {
                   auto unmanaged = this->_instance->getProofOneChallenge();
                   return gcnew ElementModQ(unmanaged);
               }
-          } property ElementModQ ^
+          }
+
+          property ElementModQ ^
           Challenge {
               ElementModQ ^ get() {
                   auto unmanaged = this->_instance->getChallenge();
                   return gcnew ElementModQ(unmanaged);
               }
-          } property ElementModQ ^
+          }
+
+          property ElementModQ ^
           ProofZeroResponse {
               ElementModQ ^ get() {
                   auto unmanaged = this->_instance->getProofZeroResponse();
                   return gcnew ElementModQ(unmanaged);
               }
-          } property ElementModQ ^
+          }
+
+          property ElementModQ ^
           ProofOneResponse {
               ElementModQ ^ get() {
                   auto unmanaged = this->_instance->getProofOneResponse();
@@ -121,6 +145,14 @@ namespace ElectionGuardInterop
                      std::unique_ptr<electionguard::ConstantChaumPedersenProof> other)
         {
             this->_instance = other.release();
+        }
+        ConstantChaumPedersenProof(electionguard::ConstantChaumPedersenProof *unowned)
+            : ManagedInstance(unowned, false)
+        {
+        }
+        ConstantChaumPedersenProof(const electionguard::ConstantChaumPedersenProof *unowned)
+            : ManagedInstance(unowned)
+        {
         }
 
       public:

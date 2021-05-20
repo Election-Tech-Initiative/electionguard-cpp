@@ -434,6 +434,7 @@ namespace electionguard
         Party(const Party &other);
         Party(const Party &&other);
         explicit Party(const std::string &objectId);
+        explicit Party(const std::string &objectId, const std::string &abbreviation);
         explicit Party(const std::string &objectId, std::unique_ptr<InternationalizedText> name,
                        const std::string &abbreviation, const std::string &color,
                        const std::string &logoUri);
@@ -499,6 +500,11 @@ namespace electionguard
         Candidate(const Candidate &other);
         Candidate(const Candidate &&other);
         explicit Candidate(const std::string &objectId, bool isWriteIn = false);
+        explicit Candidate(const std::string &objectId, const std::string &partyId, bool isWriteIn);
+        explicit Candidate(const std::string &objectId, std::unique_ptr<InternationalizedText> name,
+                           bool isWriteIn);
+        explicit Candidate(const std::string &objectId, std::unique_ptr<InternationalizedText> name,
+                           const std::string &partyId, bool isWriteIn);
         explicit Candidate(const std::string &objectId, std::unique_ptr<InternationalizedText> name,
                            const std::string &partyId, const std::string &imageUri, bool isWriteIn);
         ~Candidate();
@@ -632,11 +638,28 @@ namespace electionguard
                                     const std::string &electoralDistrictId,
                                     const uint64_t sequenceOrder,
                                     const VoteVariationType voteVariation,
+                                    const uint64_t numberElected, const std::string &name,
+                                    std::vector<std::unique_ptr<SelectionDescription>> selections,
+                                    std::vector<std::string> primaryPartyIds);
+        explicit ContestDescription(const std::string &objectId,
+                                    const std::string &electoralDistrictId,
+                                    const uint64_t sequenceOrder,
+                                    const VoteVariationType voteVariation,
                                     const uint64_t numberElected, const uint64_t votesAllowed,
                                     const std::string &name,
                                     std::unique_ptr<InternationalizedText> ballotTitle,
                                     std::unique_ptr<InternationalizedText> ballotSubtitle,
                                     std::vector<std::unique_ptr<SelectionDescription>> selections);
+        explicit ContestDescription(const std::string &objectId,
+                                    const std::string &electoralDistrictId,
+                                    const uint64_t sequenceOrder,
+                                    const VoteVariationType voteVariation,
+                                    const uint64_t numberElected, const uint64_t votesAllowed,
+                                    const std::string &name,
+                                    std::unique_ptr<InternationalizedText> ballotTitle,
+                                    std::unique_ptr<InternationalizedText> ballotSubtitle,
+                                    std::vector<std::unique_ptr<SelectionDescription>> selections,
+                                    std::vector<std::string> primaryPartyIds);
         ~ContestDescription();
 
         ContestDescription &operator=(ContestDescription other);
@@ -706,7 +729,7 @@ namespace electionguard
         /// </Summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
-        // TODO: ISSUE #119: isValid() const;
+        bool isValid() const;
 
       private:
         class Impl;
@@ -737,10 +760,26 @@ namespace electionguard
         explicit ContestDescriptionWithPlaceholders(
           const std::string &objectId, const std::string &electoralDistrictId,
           const uint64_t sequenceOrder, const VoteVariationType voteVariation,
+          const uint64_t numberElected, const std::string &name,
+          std::vector<std::unique_ptr<SelectionDescription>> selections,
+          std::vector<std::string> primaryPartyIds,
+          std::vector<std::unique_ptr<SelectionDescription>> placeholderSelections);
+        explicit ContestDescriptionWithPlaceholders(
+          const std::string &objectId, const std::string &electoralDistrictId,
+          const uint64_t sequenceOrder, const VoteVariationType voteVariation,
           const uint64_t numberElected, const uint64_t votesAllowed, const std::string &name,
           std::unique_ptr<InternationalizedText> ballotTitle,
           std::unique_ptr<InternationalizedText> ballotSubtitle,
           std::vector<std::unique_ptr<SelectionDescription>> selections,
+          std::vector<std::unique_ptr<SelectionDescription>> placeholderSelections);
+        explicit ContestDescriptionWithPlaceholders(
+          const std::string &objectId, const std::string &electoralDistrictId,
+          const uint64_t sequenceOrder, const VoteVariationType voteVariation,
+          const uint64_t numberElected, const uint64_t votesAllowed, const std::string &name,
+          std::unique_ptr<InternationalizedText> ballotTitle,
+          std::unique_ptr<InternationalizedText> ballotSubtitle,
+          std::vector<std::unique_ptr<SelectionDescription>> selections,
+          std::vector<std::string> primaryPartyIds,
           std::vector<std::unique_ptr<SelectionDescription>> placeholderSelections);
         ~ContestDescriptionWithPlaceholders();
 
@@ -757,7 +796,7 @@ namespace electionguard
         /// </Summary>
         bool IsPlaceholder(SelectionDescription &selection) const;
 
-        // TODO: ISSUE #119: isValid() const;
+        // TODO: bool isValid() const;
 
         /// <Summary>
         /// Get a selection for a specific selection id.
@@ -852,7 +891,7 @@ namespace electionguard
         InternationalizedText *getName() const;
         ContactInformation *getContactInformation() const;
 
-        // TODO: ISSUE #119: isValid() const;
+        bool isValid() const;
 
         /// <Summary>
         /// Export the ballot representation as BSON

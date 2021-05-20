@@ -1,6 +1,7 @@
 #include "../../src/electionguard/log.hpp"
 #include "mocks/ballot.hpp"
 #include "mocks/election.hpp"
+#include "mocks/manifest.hpp"
 
 #include <doctest/doctest.h>
 #include <electionguard/ballot.hpp>
@@ -14,7 +15,8 @@ using namespace std;
 struct TestEncryptFixture {
 
     unique_ptr<ElGamalKeyPair> keypair;
-    unique_ptr<InternalManifest> manifest;
+    unique_ptr<Manifest> manifest;
+    unique_ptr<InternalManifest> internal;
     unique_ptr<CiphertextElectionContext> context;
     unique_ptr<EncryptionDevice> device;
     unique_ptr<EncryptionMediator> mediator;
@@ -23,11 +25,12 @@ struct TestEncryptFixture {
 
     TestEncryptFixture()
         : keypair(ElGamalKeyPair::fromSecret(TWO_MOD_Q())),
-          manifest(ElectionGenerator::getFakeManifest(TWO_MOD_Q())),
-          context(ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey())),
+          manifest(ManifestGenerator::getJeffersonCountyManifest_Minimal()),
+          internal(make_unique<InternalManifest>(*manifest)),
+          context(ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey())),
           device(make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location")),
-          mediator(make_unique<EncryptionMediator>(*manifest, *context, *device)),
-          plaintext(BallotGenerator::getFakeBallot(*manifest)),
+          mediator(make_unique<EncryptionMediator>(*internal, *context, *device)),
+          plaintext(BallotGenerator::getFakeBallot(*internal)),
           compactCiphertext(mediator->compactEncrypt(*plaintext))
     {
     }

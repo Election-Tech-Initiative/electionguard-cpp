@@ -1,5 +1,6 @@
 #include "mocks/ballot.h"
 #include "mocks/election.h"
+#include "mocks/manifest.h"
 #include "utils/utils.h"
 
 #include <assert.h>

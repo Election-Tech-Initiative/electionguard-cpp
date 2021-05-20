@@ -9,6 +9,12 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 include(../cmake/CPM.cmake)
 
 CPMAddPackage(
+        NAME date
+        GITHUB_REPOSITORY HowardHinnant/date
+        VERSION 3.0.0
+)
+
+CPMAddPackage(
     NAME nlohmann_json
     VERSION 3.9.1
     URL https://github.com/nlohmann/json/releases/download/v3.9.1/include.zip
@@ -36,6 +42,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_compact.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/chaum_pedersen.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/convert.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/election.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/elgamal.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt.cpp
@@ -156,11 +163,13 @@ add_library(nlohmann_json INTERFACE IMPORTED)
 target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
 
 if (MINGW)
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json)
+
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
-    target_link_libraries(${META_PROJECT_TARGET} PRIVATE nlohmann_json -static-libstdc++)
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE -static-libstdc++)
 else()
-    target_link_libraries(${META_PROJECT_TARGET} PRIVATE nlohmann_json)
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json)
 endif()
 
 # ---- Install ----
@@ -207,7 +216,7 @@ if(OPTION_ENABLE_TESTS)
 
     # When running tests, set some specific compiler flags
     if(MSVC)
-        #TODO: renenable warnings as errors whne the correct ones are defined
+        #TODO: renenable warnings as errors when the correct ones are defined
        #target_compile_options(${META_PROJECT_TARGET} PUBLIC /W4 /WX)C5059
        target_compile_options(${META_PROJECT_TARGET} PUBLIC /Zi)
     endif()
@@ -220,10 +229,11 @@ if(OPTION_ENABLE_TESTS)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -pedantic)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -pedantic-errors)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wmissing-field-initializers)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-deprecated-declarations)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-variable)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-redundant-decls)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unknown-pragmas)
-        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-useless-cast)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-useless-cast) 
     endif()
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -231,6 +241,7 @@ if(OPTION_ENABLE_TESTS)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-static-in-inline)
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         message("++ Configuring compile options for GNU")
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-effc++)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-but-set-parameter)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-but-set-variable)
     endif()

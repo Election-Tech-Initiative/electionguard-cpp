@@ -14,7 +14,8 @@ namespace ElectionGuard.Tests
             var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
             var description = new Manifest(jsonManifest);
             var manifest = new InternalManifest(description);
-            var context = new CiphertextElectionContext(1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, manifest.ManifestHash);
+            var context = new CiphertextElectionContext(
+                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, manifest.ManifestHash);
             var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
             var mediator = new EncryptionMediator(manifest, context, device);
 

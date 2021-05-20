@@ -1,5 +1,6 @@
 #include "../../src/electionguard/log.hpp"
 #include "mocks/election.hpp"
+#include "mocks/manifest.hpp"
 
 #include <doctest/doctest.h>
 #include <electionguard/election.hpp>
@@ -10,96 +11,13 @@ using namespace electionguard;
 using namespace electionguard::test::mocks;
 using namespace std;
 
-TEST_CASE("Simple Election Is Valid")
-{
-    auto subject = ElectionGenerator::getSimpleElectionFromFile();
-
-    CHECK(subject->getElectionScopeId() == "jefferson-county-primary");
-}
-
-TEST_CASE("Can serialize Manifest")
-{
-    // Arrange
-    auto subject = ElectionGenerator::getFakeElection();
-    auto json = subject->toJson();
-
-    Log::debug(json);
-
-    // Act
-    auto result = Manifest::fromJson(json);
-
-    // Assert
-    CHECK(subject->getElectionScopeId().compare(result->getElectionScopeId()) == 0);
-}
-
-TEST_CASE("Can deserialize Manifest")
-{
-    const char *election_json =
-      "{\"ballot_styles\":[{\"geopolitical_unit_ids\":[\"some-geopoltical-unit-id\"],\"object_id\":"
-      "\"some-ballot-style-id\"}],\"candidates\":[{\"object_id\":\"some-candidate-id-1\"},{"
-      "\"object_id\":\"some-candidate-id-2\"},{\"object_id\":\"some-candidate-id-3\"}],"
-      "\"contests\":[{\"ballot_selections\":[{\"candidate_id\":\"some-candidate-id-1\",\"object_"
-      "id\":\"some-object-id-affirmative\",\"sequence_order\":0},{\"candidate_id\":\"some-"
-      "candidate-id-2\",\"object_id\":\"some-object-id-negative\",\"sequence_order\":1}],"
-      "\"electoral_district_id\":\"some-geopoltical-unit-id\",\"name\":\"some-referendum-contest-"
-      "name\",\"number_elected\":1,\"object_id\":\"some-referendum-contest-object-id\",\"sequence_"
-      "order\":0,\"vote_variation\":\"one_of_m\"},{\"ballot_selections\":[{\"candidate_id\":\"some-"
-      "candidate-id-1\",\"object_id\":\"some-object-id-candidate-1\",\"sequence_order\":0},{"
-      "\"candidate_id\":\"some-candidate-id-2\",\"object_id\":\"some-object-id-candidate-2\","
-      "\"sequence_order\":1},{\"candidate_id\":\"some-candidate-id-3\",\"object_id\":\"some-object-"
-      "id-candidate-3\",\"sequence_order\":2}],\"electoral_district_id\":\"some-geopoltical-unit-"
-      "id\",\"name\":\"some-candidate-contest-name\",\"number_elected\":2,\"object_id\":\"some-"
-      "candidate-contest-object-id\",\"sequence_order\":1,\"vote_variation\":\"one_of_m\"}],"
-      "\"election_scope_id\":\"some-scope-id\",\"end_date\":\"2021-02-04T13:30:10Z\","
-      "\"geopolitical_units\":[{\"name\":\"some-gp-unit-name\",\"object_id\":\"some-geopoltical-"
-      "unit-id\",\"type\":\"unknown\"}],\"parties\":[{\"object_id\":\"some-party-id-1\"},{\"object_"
-      "id\":\"some-party-id-2\"}],\"start_date\":\"2021-02-04T13:30:10Z\",\"type\":\"unknown\"}";
-
-    // Arrange
-
-    // Act
-    auto result = Manifest::fromJson(election_json);
-
-    // Assert
-    CHECK(result->getElectionScopeId().compare("some-scope-id") == 0);
-}
-
-TEST_CASE("Can construct InternalManifest from Manifest")
-{
-    // Arrange
-    auto data = ElectionGenerator::getFakeElection();
-
-    // Act
-    auto result = make_unique<InternalManifest>(*data);
-
-    // Assert
-    CHECK(data->crypto_hash()->toHex() == result->getManifestHash()->toHex());
-    CHECK(data->getContests().size() == result->getContests().size());
-}
-
-TEST_CASE("Can serialize InternalManifest")
-{
-    // Arrange
-    auto manifest = ElectionGenerator::getFakeManifest(TWO_MOD_Q());
-    auto json = manifest->toJson();
-    auto bson = manifest->toBson();
-
-    Log::debug(json);
-
-    // Act
-    auto fromJson = InternalManifest::fromJson(json);
-    //auto fromBson = InternalManifest::fromBson(bson);
-
-    // Assert
-    CHECK(manifest->getManifestHash()->toHex() == fromJson->getManifestHash()->toHex());
-}
-
 TEST_CASE("Can serialize CiphertextElectionContext")
 {
     // Arrange
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-    auto manifest = ElectionGenerator::getFakeManifest(TWO_MOD_Q());
-    auto context = ElectionGenerator::getFakeContext(*manifest, *keypair->getPublicKey());
+    auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
     auto json = context->toJson();
     auto bson = context->toBson();
 

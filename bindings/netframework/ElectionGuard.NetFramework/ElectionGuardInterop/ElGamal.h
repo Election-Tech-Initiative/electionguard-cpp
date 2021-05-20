@@ -24,6 +24,8 @@ namespace ElectionGuardInterop
         {
             this->_instance = other.release();
         }
+        ElGamalKeyPair(electionguard::ElGamalKeyPair *unowned) : ManagedInstance(unowned, false) {}
+        ElGamalKeyPair(const electionguard::ElGamalKeyPair *unowned) : ManagedInstance(unowned) {}
 
       public:
         property ElementModQ ^
@@ -52,6 +54,14 @@ namespace ElectionGuardInterop
         internal : ElGamalCiphertext(std::unique_ptr<electionguard::ElGamalCiphertext> other)
         {
             this->_instance = other.release();
+        }
+        ElGamalCiphertext(electionguard::ElGamalCiphertext *unowned)
+            : ManagedInstance(unowned, false)
+        {
+        }
+        ElGamalCiphertext(const electionguard::ElGamalCiphertext *unowned)
+            : ManagedInstance(unowned)
+        {
         }
 
       public:

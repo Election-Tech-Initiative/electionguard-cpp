@@ -2,6 +2,7 @@
 #define __ELECTIONGUARD_CPP_CONVERT_HPP_INCLUDED__
 
 #include <chrono>
+#include <codecvt>
 #include <iomanip>
 #include <iostream>
 #include <kremlin/lowstar_endianness.h>
@@ -23,6 +24,7 @@ using std::gmtime;
 using std::mktime;
 using std::stringstream;
 using std::uppercase;
+using std::wstring;
 using std::chrono::system_clock;
 
 namespace electionguard
@@ -137,6 +139,22 @@ namespace electionguard
         return sanitized;
     }
 
+    inline wstring stringToWideString(const std::string &str)
+    {
+        using convert_typeX = std::codecvt_utf8<wchar_t>;
+        std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+        return converterX.from_bytes(str);
+    }
+
+    inline string wideStringToString(const std::wstring &wstr)
+    {
+        using convert_typeX = std::codecvt_utf8<wchar_t>;
+        std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+        return converterX.to_bytes(wstr);
+    }
+
     /// Copy the string to a heap-allocated null-termianted array
     inline char *dynamicCopy(const string &data, size_t *out_size)
     {
@@ -165,30 +183,11 @@ namespace electionguard
         return data_array;
     }
 
-    inline string timePointToIsoString(const time_point &time, const string &format)
-    {
-        auto c_time = system_clock::to_time_t(time);
-        struct tm gmt;
+    string timePointToIsoString(const time_point &time);
+    string timePointToIsoString(const time_point &time, const string &format);
+    time_point timePointFromIsoString(const string &time);
+    time_point timePointFromIsoString(const string &time, const string &format);
 
-#ifdef _WIN32
-        // TODO: ISSUE #136: handle err
-        gmtime_s(&gmt, &c_time);
-#else
-        gmtime_r(&c_time, &gmt);
-#endif
-        stringstream ss;
-        ss << std::put_time(&gmt, format.c_str());
-        return ss.str();
-    }
-
-    inline time_point timePointFromIsoString(const string &time, const string &format)
-    {
-        std::tm tm = {};
-        stringstream ss(time);
-        ss >> get_time(&tm, format.c_str());
-        auto tp = system_clock::from_time_t(mktime(&tm));
-        return tp;
-    }
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD_CPP_CONVERT_HPP_INCLUDED__ */

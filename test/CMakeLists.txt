@@ -35,6 +35,9 @@ ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.h
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/manifest.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/manifest.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/manifest.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/constants.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h
 )
@@ -72,6 +75,7 @@ add_executable(${CPPTEST_PROJECT_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hacl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_nonces.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_manifest.cpp
 )
 
 target_compile_features(${CPPTEST_PROJECT_TARGET} PRIVATE cxx_std_17)
@@ -97,6 +101,7 @@ add_executable(${CTEST_PROJECT_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt_compact.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_manifest.c
 )
 
 target_compile_features(${CTEST_PROJECT_TARGET} PRIVATE c_std_99)
@@ -106,9 +111,11 @@ target_compile_features(${CTEST_PROJECT_TARGET} PRIVATE c_std_99)
 target_link_libraries(${UTILS_PROJECT_TARGET} PUBLIC ${META_PROJECT_TARGET})
 
 if (MINGW)
+    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
+
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
-    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET} -static-libstdc++)
+    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE -static-libstdc++)
 else()
     target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
 endif()

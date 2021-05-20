@@ -46,15 +46,23 @@ namespace ElectionGuardInterop
         {
             this->_instance = other.release();
         }
+        CiphertextElectionContext(electionguard::CiphertextElectionContext *unowned)
+            : ManagedInstance(unowned, false)
+        {
+        }
+        CiphertextElectionContext(const electionguard::CiphertextElectionContext *unowned)
+            : ManagedInstance(unowned)
+        {
+        }
 
       public:
         property uint64_t ^
           NumberOfGuardians { uint64_t ^ get() { return this->_instance->getNumberOfGuardians(); } }
 
           property uint64_t ^
-          Quorum {
-              uint64_t ^ get() { return this->_instance->getQuorum(); }
-          } property ElementModP ^
+          Quorum { uint64_t ^ get() { return this->_instance->getQuorum(); } }
+
+          property ElementModP ^
           ElGamalPublicKey {
               ElementModP ^ get() {
                   auto value = this->_instance->getElGamalPublicKey();

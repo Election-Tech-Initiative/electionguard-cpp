@@ -27,6 +27,12 @@ namespace ElectionGuardInterop
 
             this->_instance = new electionguard::ExtendedData(_value, length);
         }
+        internal : ExtendedData(std::unique_ptr<electionguard::ExtendedData> other)
+        {
+            this->_instance = other.release();
+        }
+        ExtendedData(electionguard::ExtendedData *unowned) : ManagedInstance(unowned, false) {}
+        ExtendedData(const electionguard::ExtendedData *unowned) : ManagedInstance(unowned) {}
     };
 
   public
@@ -61,9 +67,12 @@ namespace ElectionGuardInterop
         {
             this->_instance = other.release();
         }
-
         PlaintextBallotSelection(electionguard::PlaintextBallotSelection *unowned)
             : ManagedInstance(unowned, false)
+        {
+        }
+        PlaintextBallotSelection(const electionguard::PlaintextBallotSelection *unowned)
+            : ManagedInstance(unowned)
         {
         }
 
@@ -81,6 +90,14 @@ namespace ElectionGuardInterop
 
           property bool ^
           IsPlaceholder { bool ^ get() { return this->_instance->getIsPlaceholder(); } }
+
+          property ExtendedData ^
+          ExtraData {
+              ExtendedData ^ get() {
+                  auto unmanaged = this->_instance->getExtendedData();
+                  return gcnew ExtendedData(unmanaged);
+              }
+          }
 
           bool IsValid(String ^ expectedObjectId)
         {
@@ -116,13 +133,73 @@ namespace ElectionGuardInterop
         {
             this->_instance = other.release();
         }
+        CiphertextBallotSelection(electionguard::CiphertextBallotSelection *unowned)
+            : ManagedInstance(unowned, false)
+        {
+        }
+        CiphertextBallotSelection(const electionguard::CiphertextBallotSelection *unowned)
+            : ManagedInstance(unowned)
+        {
+        }
 
       public:
-        property String ^ ObjectId {
-            String ^ get() {
-                auto unmanaged = this->_instance->getObjectId();
-                return gcnew String(unmanaged.c_str());
-            }
+        property String ^
+          ObjectId {
+              String ^ get() {
+                  auto unmanaged = this->_instance->getObjectId();
+                  return gcnew String(unmanaged.c_str());
+              }
+          }
+
+          property ElementModQ ^
+          DescriptionHash {
+              ElementModQ ^ get() {
+                  auto unmanaged = this->_instance->getDescriptionHash();
+                  return gcnew ElementModQ(unmanaged);
+              }
+          }
+
+          property bool ^
+          IsPlaceholder { bool ^ get() { return this->_instance->getIsPlaceholder(); } }
+
+          property ElGamalCiphertext ^
+          Ciphertext {
+              ElGamalCiphertext ^ get() {
+                  auto unmanaged = this->_instance->getCiphertext();
+                  return gcnew ElGamalCiphertext(unmanaged);
+              }
+          }
+
+          property ElementModQ ^
+          CryptoHash {
+              ElementModQ ^ get() {
+                  auto unmanaged = this->_instance->getCryptoHash();
+                  return gcnew ElementModQ(unmanaged);
+              }
+          }
+
+          property ElementModQ ^
+          Nonce {
+              ElementModQ ^ get() {
+                  auto unmanaged = this->_instance->getNonce();
+                  return gcnew ElementModQ(unmanaged);
+              }
+          }
+
+          property DisjunctiveChaumPedersenProof ^
+          Proof {
+              DisjunctiveChaumPedersenProof ^ get() {
+                  auto unmanaged = this->_instance->getProof();
+                  return gcnew DisjunctiveChaumPedersenProof(unmanaged);
+              }
+          }
+
+          bool IsValidencryption(ElementModQ ^ manifestHash, ElementModP ^ elGamalPublicKey,
+                                 ElementModQ ^ cryptoExtendedBaseHash)
+        {
+            return this->_instance->isValidEncryption(*manifestHash->_instance,
+                                                      *elGamalPublicKey->_instance,
+                                                      *cryptoExtendedBaseHash->_instance);
         }
     };
 
@@ -149,9 +226,12 @@ namespace ElectionGuardInterop
         {
             this->_instance = other.release();
         }
-
         PlaintextBallotContest(electionguard::PlaintextBallotContest *unowned)
             : ManagedInstance(unowned, false)
+        {
+        }
+        PlaintextBallotContest(const electionguard::PlaintextBallotContest *unowned)
+            : ManagedInstance(unowned)
         {
         }
 
@@ -179,6 +259,156 @@ namespace ElectionGuardInterop
                   return elements;
               }
           }
+
+          bool
+          isValid(String ^ expectedObjectId, uint64_t expectedNumberSelections,
+                  uint64_t expectedNumberElected)
+        {
+            std::string _expectedObjectId;
+            Utilities::MarshalString(expectedObjectId, _expectedObjectId);
+
+            return this->_instance->isValid(_expectedObjectId, expectedNumberSelections,
+                                            expectedNumberElected);
+        }
+
+        bool isValid(String ^ expectedObjectId, uint64_t expectedNumberSelections,
+                     uint64_t expectedNumberElected, uint64_t votesAllowed)
+        {
+            std::string _expectedObjectId;
+            Utilities::MarshalString(expectedObjectId, _expectedObjectId);
+
+            return this->_instance->isValid(_expectedObjectId, expectedNumberSelections,
+                                            expectedNumberElected, votesAllowed);
+        }
+    };
+
+  public
+    ref class CiphertextBallotContest : ManagedInstance<electionguard::CiphertextBallotContest>
+    {
+      public:
+        CiphertextBallotContest(String ^ objectId, ElementModQ ^ descriptionHash,
+                                array<CiphertextBallotSelection ^> ^ selections,
+                                ElementModQ ^ nonce, ElGamalCiphertext ^ ciphertextAccumulation,
+                                ElementModQ ^ cryptoHash, ConstantChaumPedersenProof ^ proof)
+        {
+            std::string _objectId;
+            Utilities::MarshalString(objectId, _objectId);
+
+            std::vector<std::unique_ptr<electionguard::CiphertextBallotSelection>> elements;
+
+            for each (auto item in selections) {
+                elements.push_back(
+                  std::make_unique<electionguard::CiphertextBallotSelection>(*item->_instance));
+            }
+
+            this->_instance = new electionguard::CiphertextBallotContest(
+              _objectId, *descriptionHash->_instance, std::move(elements),
+              std::make_unique<electionguard::ElementModQ>(*nonce->_instance),
+              std::make_unique<electionguard::ElGamalCiphertext>(
+                *ciphertextAccumulation->_instance),
+              std::make_unique<electionguard::ElementModQ>(*cryptoHash->_instance),
+              std::make_unique<electionguard::ConstantChaumPedersenProof>(*proof->_instance)
+            );
+        }
+        internal
+            : CiphertextBallotContest(std::unique_ptr<electionguard::CiphertextBallotContest> other)
+        {
+            this->_instance = other.release();
+        }
+        CiphertextBallotContest(electionguard::CiphertextBallotContest *unowned)
+            : ManagedInstance(unowned, false)
+        {
+        }
+        CiphertextBallotContest(const electionguard::CiphertextBallotContest *unowned)
+            : ManagedInstance(unowned)
+        {
+        }
+
+      public:
+        property String ^
+          ObjectId {
+              String ^ get() {
+                  auto unmanaged = this->_instance->getObjectId();
+                  return gcnew String(unmanaged.c_str());
+              }
+          }
+
+          property ElementModQ ^
+          DescriptionHash {
+              ElementModQ ^ get() {
+                  auto unmanaged = this->_instance->getDescriptionHash();
+                  return gcnew ElementModQ(unmanaged);
+              }
+          }
+
+          property array<CiphertextBallotSelection ^> ^
+          Selections {
+              array<CiphertextBallotSelection ^> ^ get() {
+                  auto unmanaged = this->_instance->getSelections();
+                  auto elements = gcnew array<CiphertextBallotSelection ^>(unmanaged.size());
+
+                  int index = 0;
+                  for (const auto &item : unmanaged) {
+                      elements[index] = gcnew CiphertextBallotSelection(&item.get());
+                      index++;
+                  }
+
+                  return elements;
+              }
+          }
+
+          property ElementModQ ^
+          Nonce {
+              ElementModQ ^ get() {
+                  auto unmanaged = this->_instance->getNonce();
+                  return gcnew ElementModQ(unmanaged);
+              }
+          }
+
+          property ElGamalCiphertext ^
+          CiphertextAccumulation {
+              ElGamalCiphertext ^ get() {
+                  auto unmanaged = this->_instance->getCiphertextAccumulation();
+                  return gcnew ElGamalCiphertext(unmanaged);
+              }
+          }
+
+          property ElementModQ ^
+          CryptoHash {
+              ElementModQ ^ get() {
+                  auto unmanaged = this->_instance->getCryptoHash();
+                  return gcnew ElementModQ(unmanaged);
+              }
+          }
+
+          property ConstantChaumPedersenProof ^
+          Proof {
+              ConstantChaumPedersenProof ^ get() {
+                  auto unmanaged = this->_instance->getProof();
+                  return gcnew ConstantChaumPedersenProof(unmanaged);
+              }
+          }
+
+          ElementModQ ^
+          aggregateNonce() {
+              auto unmanaged = this->_instance->aggregateNonce();
+              return gcnew ElementModQ(std::move(unmanaged));
+          }
+
+          ElGamalCiphertext
+          ^
+          elgamalAccumulate() {
+              auto unmanaged = this->_instance->elgamalAccumulate();
+              return gcnew ElGamalCiphertext(std::move(unmanaged));
+          }
+
+          bool IsValidencryption(ElementModQ ^ manifestHash, ElementModP ^ elGamalPublicKey,
+                                 ElementModQ ^ cryptoExtendedBaseHash)
+        {
+            return this->_instance->isValidEncryption(*manifestHash->_instance,
+                                                      *elGamalPublicKey->_instance,
+                                                      *cryptoExtendedBaseHash->_instance);
+        }
     };
 
   public
@@ -195,6 +425,10 @@ namespace ElectionGuardInterop
         {
             this->_instance = other.release();
         }
+        PlaintextBallot(electionguard::PlaintextBallot *unowned) : ManagedInstance(unowned, false)
+        {
+        }
+        PlaintextBallot(const electionguard::PlaintextBallot *unowned) : ManagedInstance(unowned) {}
 
       public:
         property String ^
@@ -261,6 +495,12 @@ namespace ElectionGuardInterop
         internal : CiphertextBallot(std::unique_ptr<electionguard::CiphertextBallot> other)
         {
             this->_instance = other.release();
+        }
+        CiphertextBallot(electionguard::CiphertextBallot *unowned) : ManagedInstance(unowned, false)
+        {
+        }
+        CiphertextBallot(const electionguard::CiphertextBallot *unowned) : ManagedInstance(unowned)
+        {
         }
 
       public:
@@ -368,6 +608,10 @@ namespace ElectionGuardInterop
         {
             this->_instance = other.release();
         }
+        SubmittedBallot(electionguard::SubmittedBallot *unowned) : ManagedInstance(unowned, false)
+        {
+        }
+        SubmittedBallot(const electionguard::SubmittedBallot *unowned) : ManagedInstance(unowned) {}
 
       public:
         static SubmittedBallot ^
