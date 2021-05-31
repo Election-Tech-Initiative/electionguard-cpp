@@ -329,9 +329,24 @@ namespace electionguard
         {
             this->object_id = objectId;
         }
+
+        [[nodiscard]] unique_ptr<PlaintextBallotContest::Impl> clone() const
+        {
+            vector<unique_ptr<PlaintextBallotSelection>> _selections;
+            _selections.reserve(selections.size());
+            for (const auto &element : selections) {
+                _selections.push_back(make_unique<PlaintextBallotSelection>(*element));
+            }
+            return make_unique<PlaintextBallotContest::Impl>(this->object_id, move(_selections));
+        }
     };
 
     // Lifecycle Methods
+
+    PlaintextBallotContest::PlaintextBallotContest(const PlaintextBallotContest &other)
+        : pimpl(other.pimpl->clone())
+    {
+    }
 
     PlaintextBallotContest::PlaintextBallotContest(
       const string &objectId, vector<unique_ptr<PlaintextBallotSelection>> selections)
@@ -671,9 +686,22 @@ namespace electionguard
             this->object_id = objectId;
             this->styleId = styleId;
         }
+
+        [[nodiscard]] unique_ptr<PlaintextBallot::Impl> clone() const
+        {
+            vector<unique_ptr<PlaintextBallotContest>> _contests;
+            _contests.reserve(contests.size());
+            for (const auto &element : contests) {
+                _contests.push_back(make_unique<PlaintextBallotContest>(*element));
+            }
+            return make_unique<PlaintextBallot::Impl>(this->object_id, this->styleId,
+                                                      move(_contests));
+        }
     };
 
     // Lifecycle Methods
+
+    PlaintextBallot::PlaintextBallot(const PlaintextBallot &other) : pimpl(other.pimpl->clone()) {}
 
     PlaintextBallot::PlaintextBallot(const string &objectId, const string &styleId,
                                      vector<unique_ptr<PlaintextBallotContest>> contests)

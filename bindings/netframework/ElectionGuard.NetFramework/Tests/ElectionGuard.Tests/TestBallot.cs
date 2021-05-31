@@ -46,5 +46,16 @@ namespace ElectionGuard.Tests
             var fromBson = PlaintextBallot.FromBson(bson);
             Assert.That(ballot.ObjectId == fromBson.ObjectId);
         }
+
+        [Test]
+        public void Test_Manually_Construct_Ballot()
+        {
+            var selection1 = new PlaintextBallotSelection("selection-1", 1, false);
+            var selection2 = new PlaintextBallotSelection("selection-2", 0, false);
+
+            var contest = new PlaintextBallotContest("contest-1", new[] { selection1, selection2 });
+
+            var ballot = new PlaintextBallot("some-ballot-id", "some-style", new[] { contest });
+        }
     }
 }
