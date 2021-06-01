@@ -307,8 +307,7 @@ namespace ElectionGuardInterop
               std::make_unique<electionguard::ElGamalCiphertext>(
                 *ciphertextAccumulation->_instance),
               std::make_unique<electionguard::ElementModQ>(*cryptoHash->_instance),
-              std::make_unique<electionguard::ConstantChaumPedersenProof>(*proof->_instance)
-            );
+              std::make_unique<electionguard::ConstantChaumPedersenProof>(*proof->_instance));
         }
         internal
             : CiphertextBallotContest(std::unique_ptr<electionguard::CiphertextBallotContest> other)
@@ -415,6 +414,25 @@ namespace ElectionGuardInterop
     ref class PlaintextBallot : ManagedInstance<electionguard::PlaintextBallot>
     {
       public:
+        PlaintextBallot(String ^ objectId, String ^ styleId,
+                        array<PlaintextBallotContest ^> ^ contests)
+        {
+            std::string _objectId;
+            Utilities::MarshalString(objectId, _objectId);
+
+            std::string _styleId;
+            Utilities::MarshalString(styleId, _styleId);
+
+            std::vector<std::unique_ptr<electionguard::PlaintextBallotContest>> _contests;
+
+            for each (auto item in contests) {
+                _contests.push_back(
+                  std::make_unique<electionguard::PlaintextBallotContest>(*item->_instance));
+            }
+
+            this->_instance =
+              new electionguard::PlaintextBallot(_objectId, _styleId, std::move(_contests));
+        }
         PlaintextBallot(String ^ json)
         {
             std::string _json;
@@ -474,12 +492,39 @@ namespace ElectionGuardInterop
               }
           }
 
+          property array<Byte> ^
+          MsgPack {
+              array<Byte> ^ get() {
+                  auto unmanaged = this->_instance->toMsgPack();
+
+                  array<Byte> ^ byteArray = gcnew array<Byte>(unmanaged.size());
+                  Marshal::Copy((IntPtr)unmanaged.data(), byteArray, 0, unmanaged.size());
+                  return byteArray;
+              }
+          }
+
           static PlaintextBallot ^
           FromBson(array<Byte> ^ data) {
               auto data_ = Utilities::MarshalByteArray(data);
               auto unmanaged = electionguard::PlaintextBallot::fromBson(data_);
               return gcnew PlaintextBallot(move(unmanaged));
           }
+
+          static PlaintextBallot
+          ^
+          FromJson(String ^ json) {
+              std::string json_;
+              Utilities::MarshalString(json, json_);
+              auto unmanaged = electionguard::PlaintextBallot::fromJson(json_);
+              return gcnew PlaintextBallot(move(unmanaged));
+          }
+
+          static PlaintextBallot
+          ^ FromMsgPack(array<Byte> ^ data) {
+                auto data_ = Utilities::MarshalByteArray(data);
+                auto unmanaged = electionguard::PlaintextBallot::fromMsgPack(data_);
+                return gcnew PlaintextBallot(move(unmanaged));
+            }
     };
 
   public
@@ -579,6 +624,17 @@ namespace ElectionGuardInterop
               }
           }
 
+          property array<Byte> ^
+          MsgPack {
+              array<Byte> ^ get() {
+                  auto unmanaged = this->_instance->toMsgPack();
+
+                  array<Byte> ^ byteArray = gcnew array<Byte>(unmanaged.size());
+                  Marshal::Copy((IntPtr)unmanaged.data(), byteArray, 0, unmanaged.size());
+                  return byteArray;
+              }
+          }
+
           bool IsValidencryption(ElementModQ ^ manifestHash, ElementModP ^ elGamalPublicKey,
                                  ElementModQ ^ cryptoExtendedBaseHash)
         {
@@ -587,11 +643,28 @@ namespace ElectionGuardInterop
                                                       *cryptoExtendedBaseHash->_instance);
         }
 
-        static CiphertextBallot ^ FromBson(array<Byte> ^ data) {
-            auto data_ = Utilities::MarshalByteArray(data);
-            auto unmanaged = electionguard::CiphertextBallot::fromBson(data_);
-            return gcnew CiphertextBallot(move(unmanaged));
-        }
+        static CiphertextBallot ^
+          FromBson(array<Byte> ^ data) {
+              auto data_ = Utilities::MarshalByteArray(data);
+              auto unmanaged = electionguard::CiphertextBallot::fromBson(data_);
+              return gcnew CiphertextBallot(move(unmanaged));
+          }
+
+          static CiphertextBallot
+          ^
+          FromJson(String ^ json) {
+              std::string json_;
+              Utilities::MarshalString(json, json_);
+              auto unmanaged = electionguard::CiphertextBallot::fromJson(json_);
+              return gcnew CiphertextBallot(move(unmanaged));
+          }
+
+          static CiphertextBallot
+          ^ FromMsgPack(array<Byte> ^ data) {
+                auto data_ = Utilities::MarshalByteArray(data);
+                auto unmanaged = electionguard::CiphertextBallot::fromMsgPack(data_);
+                return gcnew CiphertextBallot(move(unmanaged));
+            }
     };
 
   public
