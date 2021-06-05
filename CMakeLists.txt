@@ -74,8 +74,9 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
 endif()
 
 if(CAN_USE_VECTOR_INTRINSICS)
-    add_compile_definitions(EVERCRYPT_CAN_COMPILE_VEC128)
-    add_compile_definitions(EVERCRYPT_CAN_COMPILE_VEC256)
+    message("++ Using Vector Intrinsics")
+    add_compile_definitions(HACL_CAN_COMPILE_VEC128)
+    add_compile_definitions(HACL_CAN_COMPILE_VEC256)
 endif()
 
 # HACK: Disable explicit bzero on android
