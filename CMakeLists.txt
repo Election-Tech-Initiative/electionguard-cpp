@@ -31,6 +31,7 @@ endif()
 
 option(CMAKE_BUILD_TYPE         "Build with or without debug symbols"                       Release)
 option(BUILD_SHARED_LIBS         "Build SHARED libraries"                                   OFF)
+option(EXPORT_INTERNALS         "Export Internal Headers"                                   OFF)
 option(OPTION_ENABLE_TESTS      "Enable support for testing private headers"                OFF)
 option(CODE_COVERAGE            "Use code coverage"                                         OFF)
 option(OPTION_GENERATE_DOCS     "Generate documentation"                                    OFF)
@@ -71,6 +72,13 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
     message("++ Setting DEBUG during compile")
     add_compile_definitions(DEBUG)
     add_compile_definitions(JSON_DIAGNOSTICS=1)
+    # Always export internals for debug builds
+    set(EXPORT_INTERNALS ON)
+endif()
+
+if(EXPORT_INTERNALS)
+    message("++ Exporting Internal Headers")
+    add_compile_definitions(EXPORT_INTERNALS)
 endif()
 
 if(CAN_USE_VECTOR_INTRINSICS)
