@@ -223,6 +223,11 @@ namespace electionguard
 
         ~Impl() { Lib_Memzero0_memzero(static_cast<uint64_t *>(data), MAX_P_LEN); };
 
+        [[nodiscard]] unique_ptr<ElementModP::Impl> clone() const
+        {
+            return make_unique<ElementModP::Impl>(data, true);
+        }
+
         bool operator==(const Impl &other)
         {
             // TODO: ISSUE #137: safety, specifically when the object underflows its max size
@@ -247,7 +252,7 @@ namespace electionguard
 
     // Lifecycle Methods
 
-    ElementModP::ElementModP(const ElementModP &other) : pimpl(new Impl(*other.pimpl)) {}
+    ElementModP::ElementModP(const ElementModP &other) : pimpl(other.pimpl->clone()) {}
 
     ElementModP::ElementModP(const vector<uint64_t> &elem, bool unchecked /* = false */)
         : pimpl(new Impl(elem, unchecked))
@@ -311,7 +316,7 @@ namespace electionguard
 
     std::unique_ptr<ElementModP> ElementModP::clone() const
     {
-        return make_unique<ElementModP>(pimpl->data);
+        make_unique<ElementModP>(pimpl->data);
     }
 
     // Static Methods
@@ -362,6 +367,11 @@ namespace electionguard
 
         ~Impl() { Lib_Memzero0_memzero(static_cast<uint64_t *>(data), MAX_Q_LEN); };
 
+        [[nodiscard]] unique_ptr<ElementModQ::Impl> clone() const
+        {
+            return make_unique<ElementModQ::Impl>(data, true);
+        }
+
         bool operator==(const Impl &other)
         {
             // TODO: ISSUE #137: safety, specifically when the object underflows its max size
@@ -386,7 +396,7 @@ namespace electionguard
 
     // Lifecycle Methods
 
-    ElementModQ::ElementModQ(const ElementModQ &other) : pimpl(new Impl(*other.pimpl)) {}
+    ElementModQ::ElementModQ(const ElementModQ &other) : pimpl(other.pimpl->clone()) {}
 
     ElementModQ::ElementModQ(const vector<uint64_t> &elem, bool unchecked /* = false */)
         : pimpl(new Impl(elem, unchecked))

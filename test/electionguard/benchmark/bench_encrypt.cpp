@@ -12,6 +12,8 @@ using namespace electionguard;
 using namespace electionguard::test::mocks;
 using namespace std;
 
+#pragma region encryptSelection
+
 class EncryptSelectionFixture : public benchmark::Fixture
 {
   public:
@@ -39,7 +41,7 @@ class EncryptSelectionFixture : public benchmark::Fixture
     unique_ptr<CiphertextBallotSelection> ciphertext;
 };
 
-BENCHMARK_DEFINE_F(EncryptSelectionFixture, Encrypt)(benchmark::State &state)
+BENCHMARK_DEFINE_F(EncryptSelectionFixture, encryptSelection)(benchmark::State &state)
 {
     for (auto _ : state) {
         auto nonce = rand_q();
@@ -48,18 +50,20 @@ BENCHMARK_DEFINE_F(EncryptSelectionFixture, Encrypt)(benchmark::State &state)
     }
 }
 
-BENCHMARK_REGISTER_F(EncryptSelectionFixture, Encrypt)->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(EncryptSelectionFixture, encryptSelection)->Unit(benchmark::kMillisecond);
 
-BENCHMARK_DEFINE_F(EncryptSelectionFixture, CheckEncryption)(benchmark::State &state)
+BENCHMARK_DEFINE_F(EncryptSelectionFixture, encryptSelection_isValid)(benchmark::State &state)
 {
     while (state.KeepRunning()) {
         ciphertext->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q());
     }
 }
 
-BENCHMARK_REGISTER_F(EncryptSelectionFixture, CheckEncryption)->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(EncryptSelectionFixture, encryptSelection_isValid)
+  ->Unit(benchmark::kMillisecond);
 
-BENCHMARK_DEFINE_F(EncryptSelectionFixture, CheckProof)(benchmark::State &state)
+BENCHMARK_DEFINE_F(EncryptSelectionFixture, encryptSelection_getProof_isValid)
+(benchmark::State &state)
 {
     while (state.KeepRunning()) {
         ciphertext->getProof()->isValid(*ciphertext->getCiphertext(), *keypair->getPublicKey(),
@@ -67,4 +71,50 @@ BENCHMARK_DEFINE_F(EncryptSelectionFixture, CheckProof)(benchmark::State &state)
     }
 }
 
-BENCHMARK_REGISTER_F(EncryptSelectionFixture, CheckProof)->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(EncryptSelectionFixture, encryptSelection_getProof_isValid)
+  ->Unit(benchmark::kMillisecond);
+
+#pragma endregion
+
+#pragma region encryptBallot
+
+class EncryptBallotFixture : public benchmark::Fixture
+{
+  public:
+    void SetUp(const ::benchmark::State &state)
+    {
+        keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+        manifest = ManifestGenerator::getJeffersonCountryManifest_multipleBallotStyle_fromFile();
+        internal = make_unique<InternalManifest>(*manifest);
+        context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
+        device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
+        ballot = BallotGenerator::getSimpleBallotFromFile();
+
+        nonce = rand_q();
+        ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash(),
+                                   make_unique<ElementModQ>(*nonce), 0ULL, false);
+    }
+
+    void TearDown(const ::benchmark::State &state) {}
+
+    unique_ptr<ElGamalKeyPair> keypair;
+    unique_ptr<Manifest> manifest;
+    unique_ptr<InternalManifest> internal;
+    unique_ptr<CiphertextElectionContext> context;
+    unique_ptr<EncryptionDevice> device;
+    unique_ptr<ElementModQ> nonce;
+    unique_ptr<PlaintextBallot> ballot;
+    unique_ptr<CiphertextBallot> ciphertext;
+};
+
+BENCHMARK_DEFINE_F(EncryptBallotFixture, encryptBallot)(benchmark::State &state)
+{
+    for (auto _ : state) {
+        auto result = encryptBallot(*ballot, *internal, *context, *device->getHash(),
+                                    make_unique<ElementModQ>(*nonce), 0ULL, false);
+    }
+}
+
+BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptBallot)->Unit(benchmark::kMillisecond);
+
+#pragma endregion
