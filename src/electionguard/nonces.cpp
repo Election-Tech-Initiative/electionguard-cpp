@@ -12,6 +12,9 @@ namespace electionguard
 {
     struct Nonces::Impl {
 
+        unique_ptr<ElementModQ> seed;
+        uint64_t nextItem;
+
         Impl(const ElementModQ &seed, const NoncesHeaderType &headers)
         {
             CryptoHashableType headers_ = variant_cast(headers);
@@ -37,9 +40,6 @@ namespace electionguard
         }
 
         unique_ptr<ElementModQ> next() { return this->get(nextItem); }
-
-        unique_ptr<ElementModQ> seed;
-        uint64_t nextItem;
     };
 
     Nonces::Nonces(const ElementModQ &seed, const NoncesHeaderType &headers)

@@ -6,6 +6,23 @@
 using namespace electionguard;
 using namespace std;
 
+class DisjunctiveChaumPedersenProofHarness : DisjunctiveChaumPedersenProof
+{
+  public:
+    static unique_ptr<DisjunctiveChaumPedersenProof>
+    make_zero(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
+              const ElementModQ &q, const ElementModQ &seed)
+    {
+        return DisjunctiveChaumPedersenProof::make_zero(message, r, k, q, seed);
+    }
+    static unique_ptr<DisjunctiveChaumPedersenProof>
+    make_one(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
+             const ElementModQ &q, const ElementModQ &seed)
+    {
+        return DisjunctiveChaumPedersenProof::make_one(message, r, k, q, seed);
+    }
+};
+
 class ChaumPedersenFixture : public benchmark::Fixture
 {
   public:
@@ -19,6 +36,8 @@ class ChaumPedersenFixture : public benchmark::Fixture
         message = elgamalEncrypt(1UL, *nonce, *keypair->getPublicKey());
         disjunctive = DisjunctiveChaumPedersenProof::make(
           *message, *nonce, *keypair->getPublicKey(), ONE_MOD_Q(), *seed, 1);
+        constant = ConstantChaumPedersenProof::make(*message, *nonce, *keypair->getPublicKey(),
+                                                    *seed, ONE_MOD_Q(), 1UL);
     }
 
     void TearDown(const ::benchmark::State &state) {}
@@ -42,6 +61,26 @@ BENCHMARK_DEFINE_F(ChaumPedersenFixture, MakeDisjunctiveChaumPedersen)(benchmark
 BENCHMARK_REGISTER_F(ChaumPedersenFixture, MakeDisjunctiveChaumPedersen)
   ->Unit(benchmark::kMillisecond);
 
+BENCHMARK_DEFINE_F(ChaumPedersenFixture, MakeDisjunctiveZero)(benchmark::State &state)
+{
+    while (state.KeepRunning()) {
+        auto item = DisjunctiveChaumPedersenProofHarness::make_zero(
+          *message, *nonce, *keypair->getPublicKey(), ONE_MOD_Q(), *seed);
+    }
+}
+
+BENCHMARK_REGISTER_F(ChaumPedersenFixture, MakeDisjunctiveZero)->Unit(benchmark::kMillisecond);
+
+BENCHMARK_DEFINE_F(ChaumPedersenFixture, MakeDisjunctiveOne)(benchmark::State &state)
+{
+    while (state.KeepRunning()) {
+        auto item = DisjunctiveChaumPedersenProofHarness::make_one(
+          *message, *nonce, *keypair->getPublicKey(), ONE_MOD_Q(), *seed);
+    }
+}
+
+BENCHMARK_REGISTER_F(ChaumPedersenFixture, MakeDisjunctiveOne)->Unit(benchmark::kMillisecond);
+
 BENCHMARK_DEFINE_F(ChaumPedersenFixture, CheckDisjunctiveChaumPedersen)(benchmark::State &state)
 {
     while (state.KeepRunning()) {
@@ -50,6 +89,16 @@ BENCHMARK_DEFINE_F(ChaumPedersenFixture, CheckDisjunctiveChaumPedersen)(benchmar
 }
 
 BENCHMARK_REGISTER_F(ChaumPedersenFixture, CheckDisjunctiveChaumPedersen)
+  ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_DEFINE_F(ChaumPedersenFixture, CloneDisjunctiveChaumPedersen)(benchmark::State &state)
+{
+    while (state.KeepRunning()) {
+        auto result = make_unique<DisjunctiveChaumPedersenProof>(*disjunctive);
+    }
+}
+
+BENCHMARK_REGISTER_F(ChaumPedersenFixture, CloneDisjunctiveChaumPedersen)
   ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_DEFINE_F(ChaumPedersenFixture, MakeConstantChaumPedersen)(benchmark::State &state)
@@ -61,4 +110,14 @@ BENCHMARK_DEFINE_F(ChaumPedersenFixture, MakeConstantChaumPedersen)(benchmark::S
 }
 
 BENCHMARK_REGISTER_F(ChaumPedersenFixture, MakeConstantChaumPedersen)
+  ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_DEFINE_F(ChaumPedersenFixture, CheckConstantChaumPedersen)(benchmark::State &state)
+{
+    for (auto _ : state) {
+        auto proof = constant->isValid(*message, *keypair->getPublicKey(), ONE_MOD_Q());
+    }
+}
+
+BENCHMARK_REGISTER_F(ChaumPedersenFixture, CheckConstantChaumPedersen)
   ->Unit(benchmark::kMillisecond);

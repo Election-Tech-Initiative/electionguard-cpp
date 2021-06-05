@@ -81,6 +81,9 @@ add_executable(${CPP_BENCHMARK_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_chaum_pedersen.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_elgamal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_encrypt.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_group.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_hash.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_nonces.cpp
 )
 
 target_compile_features(${CPP_BENCHMARK_TARGET} PRIVATE cxx_std_17)
