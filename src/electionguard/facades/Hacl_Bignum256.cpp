@@ -14,6 +14,8 @@ namespace hacl
         return Hacl_Bignum256_sub(a, b, res);
     }
 
+    void Bignum256::mul(uint64_t *a, uint64_t *b, uint64_t *res) { Hacl_Bignum256_mul(a, b, res); }
+
     bool Bignum256::mod(uint64_t *n, uint64_t *a, uint64_t *res)
     {
         return Hacl_Bignum256_mod(n, a, res);

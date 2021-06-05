@@ -14,6 +14,11 @@ namespace hacl
         return Hacl_Bignum4096_sub(a, b, res);
     }
 
+    void Bignum4096::mul(uint64_t *a, uint64_t *b, uint64_t *res)
+    {
+        Hacl_Bignum4096_mul(a, b, res);
+    }
+
     bool Bignum4096::mod(uint64_t *n, uint64_t *a, uint64_t *res)
     {
         return Hacl_Bignum4096_mod(n, a, res);

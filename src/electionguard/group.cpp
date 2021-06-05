@@ -1,11 +1,11 @@
 #include "electionguard/group.hpp"
 
-#include "../kremlin/Hacl_Bignum256.h"
-#include "../kremlin/Hacl_Bignum4096.h"
 #include "../kremlin/Hacl_HMAC_DRBG.h"
 #include "../kremlin/Lib_Memzero0.h"
 #include "../kremlin/Lib_RandomBuffer_System.h"
 #include "convert.hpp"
+#include "facades/Hacl_Bignum256.hpp"
+#include "facades/Hacl_Bignum4096.hpp"
 #include "log.hpp"
 #include "random.hpp"
 
@@ -17,6 +17,8 @@
 #include <stdexcept>
 #include <vector>
 
+using hacl::Bignum256;
+using hacl::Bignum4096;
 using std::copy;
 using std::get;
 using std::holds_alternative;
@@ -41,7 +43,7 @@ unique_ptr<electionguard::ElementModP> bytes_to_p(const uint8_t *bytes, size_t s
         throw out_of_range("Cannot convert ElementModP with size: " + to_string(size));
     }
 
-    auto *bigNum = Hacl_Bignum4096_new_bn_from_bytes_be(size, const_cast<uint8_t *>(bytes));
+    auto *bigNum = Bignum4096::fromBytes(size, const_cast<uint8_t *>(bytes));
     if (bigNum == nullptr) {
         throw bad_alloc();
     }
@@ -81,7 +83,7 @@ unique_ptr<electionguard::ElementModQ> bytes_to_q(const uint8_t *bytes, size_t s
         throw out_of_range("Cannot convert ElementModQ with size: " + to_string(size));
     }
 
-    auto *bigNum = Hacl_Bignum256_new_bn_from_bytes_be(size, const_cast<uint8_t *>(bytes));
+    auto *bigNum = Bignum256::fromBytes(size, const_cast<uint8_t *>(bytes));
     if (bigNum == nullptr) {
         throw bad_alloc();
     }
@@ -203,8 +205,8 @@ namespace electionguard
         {
             uint64_t array[MAX_P_LEN] = {};
             copy(elem.begin(), elem.end(), static_cast<uint64_t *>(array));
-            if (!unchecked && Hacl_Bignum4096_lt_mask(const_cast<uint64_t *>(P_ARRAY_REVERSE),
-                                                      static_cast<uint64_t *>(array)) > 0) {
+            if (!unchecked && Bignum4096::lessThan(const_cast<uint64_t *>(P_ARRAY_REVERSE),
+                                                   static_cast<uint64_t *>(array)) > 0) {
                 throw out_of_range("Value for ElementModP is greater than allowed");
             }
             copy(begin(array), end(array), begin(data));
@@ -212,8 +214,8 @@ namespace electionguard
 
         Impl(const uint64_t (&elem)[MAX_P_LEN], bool unchecked)
         {
-            if (!unchecked && Hacl_Bignum4096_lt_mask(const_cast<uint64_t *>(P_ARRAY_REVERSE),
-                                                      const_cast<uint64_t *>(elem)) > 0) {
+            if (!unchecked && Bignum4096::lessThan(const_cast<uint64_t *>(P_ARRAY_REVERSE),
+                                                   const_cast<uint64_t *>(elem)) > 0) {
                 throw out_of_range("Value for ElementModP is greater than allowed");
             }
             copy(begin(elem), end(elem), begin(data));
@@ -292,8 +294,8 @@ namespace electionguard
     {
         uint8_t byteResult[MAX_P_SIZE] = {};
         // Use Hacl to convert the bignum to byte array
-        Hacl_Bignum4096_bn_to_bytes_be(static_cast<uint64_t *>(pimpl->data),
-                                       static_cast<uint8_t *>(byteResult));
+        Bignum4096::toBytes(static_cast<uint64_t *>(pimpl->data),
+                            static_cast<uint8_t *>(byteResult));
         return vector<uint8_t>(begin(byteResult), end(byteResult));
     }
 
@@ -302,8 +304,8 @@ namespace electionguard
         // Returned bytes array from Hacl needs to be pre-allocated to 512 bytes
         uint8_t byteResult[MAX_P_SIZE] = {};
         // Use Hacl to convert the bignum to byte array
-        Hacl_Bignum4096_bn_to_bytes_be(static_cast<uint64_t *>(pimpl->data),
-                                       static_cast<uint8_t *>(byteResult));
+        Bignum4096::toBytes(static_cast<uint64_t *>(pimpl->data),
+                            static_cast<uint8_t *>(byteResult));
         return bytes_to_hex(byteResult);
     }
 
@@ -342,8 +344,8 @@ namespace electionguard
         {
             uint64_t array[MAX_Q_LEN] = {};
             copy(elem.begin(), elem.end(), static_cast<uint64_t *>(array));
-            if (!unchecked && Hacl_Bignum256_lt_mask(const_cast<uint64_t *>(Q_ARRAY_REVERSE),
-                                                     static_cast<uint64_t *>(array)) > 0) {
+            if (!unchecked && Bignum256::lessThan(const_cast<uint64_t *>(Q_ARRAY_REVERSE),
+                                                  static_cast<uint64_t *>(array)) > 0) {
                 throw out_of_range("Value for ElementModQ is greater than allowed");
             }
             copy(begin(array), end(array), begin(data));
@@ -351,8 +353,8 @@ namespace electionguard
 
         Impl(const uint64_t (&elem)[MAX_Q_LEN], bool unchecked)
         {
-            if (!unchecked && Hacl_Bignum256_lt_mask(const_cast<uint64_t *>(Q_ARRAY_REVERSE),
-                                                     const_cast<uint64_t *>(elem)) > 0) {
+            if (!unchecked && Bignum256::lessThan(const_cast<uint64_t *>(Q_ARRAY_REVERSE),
+                                                  const_cast<uint64_t *>(elem)) > 0) {
                 throw out_of_range("Value for ElementModQ is greater than allowed");
             }
             copy(begin(elem), end(elem), begin(data));
@@ -377,8 +379,8 @@ namespace electionguard
         bool operator<(const Impl &other)
         {
             auto other_ = other;
-            return Hacl_Bignum256_lt_mask(static_cast<uint64_t *>(data),
-                                          static_cast<uint64_t *>(other_.data)) > 0;
+            return Bignum256::lessThan(static_cast<uint64_t *>(data),
+                                       static_cast<uint64_t *>(other_.data)) > 0;
         }
     };
 
@@ -425,8 +427,8 @@ namespace electionguard
     {
         uint8_t byteResult[MAX_Q_SIZE] = {};
         // Use Hacl to convert the bignum to byte array
-        Hacl_Bignum256_bn_to_bytes_be(static_cast<uint64_t *>(pimpl->data),
-                                      static_cast<uint8_t *>(byteResult));
+        Bignum256::toBytes(static_cast<uint64_t *>(pimpl->data),
+                           static_cast<uint8_t *>(byteResult));
         return vector<uint8_t>(begin(byteResult), end(byteResult));
     }
 
@@ -435,8 +437,8 @@ namespace electionguard
         // Returned bytes array from Hacl needs to be pre-allocated to 32 bytes
         uint8_t byteResult[MAX_Q_SIZE] = {};
         // Use Hacl to convert the bignum to byte array
-        Hacl_Bignum256_bn_to_bytes_be(static_cast<uint64_t *>(pimpl->data),
-                                      static_cast<uint8_t *>(byteResult));
+        Bignum256::toBytes(static_cast<uint64_t *>(pimpl->data),
+                           static_cast<uint8_t *>(byteResult));
         return bytes_to_hex(byteResult);
     }
 
@@ -480,9 +482,9 @@ namespace electionguard
     {
         const auto &p = P();
         uint64_t result[MAX_P_LEN_DOUBLE] = {};
-        uint64_t carry = Hacl_Bignum4096_add(const_cast<ElementModP &>(lhs).get(),
-                                             const_cast<ElementModP &>(rhs).get(),
-                                             static_cast<uint64_t *>(result));
+        uint64_t carry =
+          Bignum4096::add(const_cast<ElementModP &>(lhs).get(),
+                          const_cast<ElementModP &>(rhs).get(), static_cast<uint64_t *>(result));
 
         // handle the specific case where the the sum == MAX_4096
         // but the carry value is not set.  We still need to offset.
@@ -492,8 +494,8 @@ namespace electionguard
         }
 
         uint64_t modResult[MAX_P_LEN] = {};
-        bool success = Hacl_Bignum4096_mod(p.get(), static_cast<uint64_t *>(result),
-                                           static_cast<uint64_t *>(modResult));
+        bool success = Bignum4096::mod(p.get(), static_cast<uint64_t *>(result),
+                                       static_cast<uint64_t *>(modResult));
         if (!success) {
             throw runtime_error(" add_mod_p mod operation failed");
         }
@@ -504,12 +506,11 @@ namespace electionguard
     {
         const auto &p = P();
         uint64_t mulResult[MAX_P_LEN_DOUBLE] = {};
-        Hacl_Bignum4096_mul(const_cast<ElementModP &>(lhs).get(),
-                            const_cast<ElementModP &>(rhs).get(),
-                            static_cast<uint64_t *>(mulResult));
+        Bignum4096::mul(const_cast<ElementModP &>(lhs).get(), const_cast<ElementModP &>(rhs).get(),
+                        static_cast<uint64_t *>(mulResult));
         uint64_t modResult[MAX_P_LEN] = {};
-        bool success = Hacl_Bignum4096_mod(p.get(), static_cast<uint64_t *>(mulResult),
-                                           static_cast<uint64_t *>(modResult));
+        bool success = Bignum4096::mod(p.get(), static_cast<uint64_t *>(mulResult),
+                                       static_cast<uint64_t *>(modResult));
         if (!success) {
             throw runtime_error(" mul_mod_p mod operation failed");
         }
@@ -545,8 +546,8 @@ namespace electionguard
         }
 
         uint64_t result[MAX_P_LEN] = {};
-        bool success = Hacl_Bignum4096_mod_exp_consttime(
-          p.get(), base.get(), MAX_P_SIZE, exponent.get(), static_cast<uint64_t *>(result));
+        bool success = Bignum4096::modExp(p.get(), base.get(), MAX_P_SIZE, exponent.get(),
+                                          static_cast<uint64_t *>(result));
         if (!success) {
             throw runtime_error(" pow_mod_p mod operation failed");
         }
@@ -576,9 +577,9 @@ namespace electionguard
     {
         const auto &q = Q();
         uint64_t addResult[MAX_Q_LEN_DOUBLE] = {};
-        uint64_t carry = Hacl_Bignum256_add(const_cast<ElementModQ &>(lhs).get(),
-                                            const_cast<ElementModQ &>(rhs).get(),
-                                            static_cast<uint64_t *>(addResult));
+        uint64_t carry =
+          Bignum256::add(const_cast<ElementModQ &>(lhs).get(), const_cast<ElementModQ &>(rhs).get(),
+                         static_cast<uint64_t *>(addResult));
 
         // handle the specific case where the the sum == MAX_256
         // but the carry value is not set.  We still need to offset.
@@ -592,39 +593,37 @@ namespace electionguard
                 uint64_t offset[MAX_Q_LEN] = {};
                 // TODO: ISSUE #135: precompute?
                 if (big_a) {
-                    Hacl_Bignum256_add(static_cast<uint64_t *>(offset),
-                                       const_cast<uint64_t *>(Q_ARRAY_INVERSE_REVERSE),
-                                       static_cast<uint64_t *>(offset));
-                    Hacl_Bignum256_add(static_cast<uint64_t *>(offset),
-                                       const_cast<uint64_t *>(ONE_MOD_Q_ARRAY),
-                                       static_cast<uint64_t *>(offset));
+                    Bignum256::add(static_cast<uint64_t *>(offset),
+                                   const_cast<uint64_t *>(Q_ARRAY_INVERSE_REVERSE),
+                                   static_cast<uint64_t *>(offset));
+                    Bignum256::add(static_cast<uint64_t *>(offset),
+                                   const_cast<uint64_t *>(ONE_MOD_Q_ARRAY),
+                                   static_cast<uint64_t *>(offset));
                 }
 
                 if (big_b) {
-                    Hacl_Bignum256_add(static_cast<uint64_t *>(offset),
-                                       const_cast<uint64_t *>(Q_ARRAY_INVERSE_REVERSE),
-                                       static_cast<uint64_t *>(offset));
-                    Hacl_Bignum256_add(static_cast<uint64_t *>(offset),
-                                       const_cast<uint64_t *>(ONE_MOD_Q_ARRAY),
-                                       static_cast<uint64_t *>(offset));
+                    Bignum256::add(static_cast<uint64_t *>(offset),
+                                   const_cast<uint64_t *>(Q_ARRAY_INVERSE_REVERSE),
+                                   static_cast<uint64_t *>(offset));
+                    Bignum256::add(static_cast<uint64_t *>(offset),
+                                   const_cast<uint64_t *>(ONE_MOD_Q_ARRAY),
+                                   static_cast<uint64_t *>(offset));
                 }
 
                 // adjust
-                Hacl_Bignum256_add(static_cast<uint64_t *>(addResult),
-                                   static_cast<uint64_t *>(offset),
-                                   static_cast<uint64_t *>(addResult));
+                Bignum256::add(static_cast<uint64_t *>(addResult), static_cast<uint64_t *>(offset),
+                               static_cast<uint64_t *>(addResult));
 
             } else {
                 const uint64_t offset[MAX_Q_LEN] = {0x00000000000000bd};
-                Hacl_Bignum256_add(static_cast<uint64_t *>(addResult),
-                                   const_cast<uint64_t *>(offset),
-                                   static_cast<uint64_t *>(addResult));
+                Bignum256::add(static_cast<uint64_t *>(addResult), const_cast<uint64_t *>(offset),
+                               static_cast<uint64_t *>(addResult));
             }
         }
 
         uint64_t result[MAX_Q_LEN] = {};
-        bool modSuccess = Hacl_Bignum256_mod(q.get(), static_cast<uint64_t *>(addResult),
-                                             static_cast<uint64_t *>(result));
+        bool modSuccess = Bignum256::mod(q.get(), static_cast<uint64_t *>(addResult),
+                                         static_cast<uint64_t *>(result));
         if (!modSuccess) {
             throw runtime_error("add_mod_q mod operation failed");
         }
@@ -650,8 +649,8 @@ namespace electionguard
         const auto &q = Q();
         uint64_t subResult[MAX_Q_LEN_DOUBLE] = {};
         uint64_t carry =
-          Hacl_Bignum256_sub(const_cast<ElementModQ &>(a).get(), const_cast<ElementModQ &>(b).get(),
-                             static_cast<uint64_t *>(subResult));
+          Bignum256::sub(const_cast<ElementModQ &>(a).get(), const_cast<ElementModQ &>(b).get(),
+                         static_cast<uint64_t *>(subResult));
 
         if (carry > 0) {
 
@@ -664,29 +663,27 @@ namespace electionguard
 
                 uint64_t offset[MAX_Q_LEN] = {};
 
-                Hacl_Bignum256_add(static_cast<uint64_t *>(offset),
-                                   const_cast<uint64_t *>(Q_ARRAY_INVERSE_REVERSE),
-                                   static_cast<uint64_t *>(offset));
-                Hacl_Bignum256_add(static_cast<uint64_t *>(offset),
-                                   const_cast<uint64_t *>(ONE_MOD_Q_ARRAY),
-                                   static_cast<uint64_t *>(offset));
+                Bignum256::add(static_cast<uint64_t *>(offset),
+                               const_cast<uint64_t *>(Q_ARRAY_INVERSE_REVERSE),
+                               static_cast<uint64_t *>(offset));
+                Bignum256::add(static_cast<uint64_t *>(offset),
+                               const_cast<uint64_t *>(ONE_MOD_Q_ARRAY),
+                               static_cast<uint64_t *>(offset));
 
                 // adjust
-                Hacl_Bignum256_sub(static_cast<uint64_t *>(subResult),
-                                   static_cast<uint64_t *>(offset),
-                                   static_cast<uint64_t *>(subResult));
+                Bignum256::sub(static_cast<uint64_t *>(subResult), static_cast<uint64_t *>(offset),
+                               static_cast<uint64_t *>(subResult));
 
             } else {
                 const uint64_t offset[MAX_Q_LEN] = {0x00000000000000bd};
-                Hacl_Bignum256_sub(static_cast<uint64_t *>(subResult),
-                                   const_cast<uint64_t *>(offset),
-                                   static_cast<uint64_t *>(subResult));
+                Bignum256::sub(static_cast<uint64_t *>(subResult), const_cast<uint64_t *>(offset),
+                               static_cast<uint64_t *>(subResult));
             }
         }
 
         uint64_t resModQ[MAX_Q_LEN] = {};
-        bool modSuccess = Hacl_Bignum256_mod(q.get(), static_cast<uint64_t *>(subResult),
-                                             static_cast<uint64_t *>(resModQ));
+        bool modSuccess = Bignum256::mod(q.get(), static_cast<uint64_t *>(subResult),
+                                         static_cast<uint64_t *>(resModQ));
         if (!modSuccess) {
             throw runtime_error(" a_minus_b_mod_q mod operation failed");
         }
@@ -700,15 +697,15 @@ namespace electionguard
         // use P's length and 4096 Hacl for rest of calculation
 
         uint64_t resultBC[MAX_P_LEN] = {}; // init to MAX_P_LEN
-        Hacl_Bignum256_mul(const_cast<ElementModQ &>(b).get(), const_cast<ElementModQ &>(c).get(),
-                           static_cast<uint64_t *>(resultBC));
+        Bignum256::mul(const_cast<ElementModQ &>(b).get(), const_cast<ElementModQ &>(c).get(),
+                       static_cast<uint64_t *>(resultBC));
 
         auto bc_as_p = make_unique<ElementModP>(resultBC);
         auto a_as_p = a.toElementModP();
 
         uint64_t a_plus_bc_result[MAX_P_LEN_DOUBLE] = {};
-        uint64_t carry = Hacl_Bignum4096_add(a_as_p->get(), bc_as_p->get(),
-                                             static_cast<uint64_t *>(a_plus_bc_result));
+        uint64_t carry =
+          Bignum4096::add(a_as_p->get(), bc_as_p->get(), static_cast<uint64_t *>(a_plus_bc_result));
 
         // we should never overflow P space since our max size
         // is resultBC[MAX_Q_LEN_DOUBLE] + a[MAX_Q_LEN]
@@ -719,9 +716,8 @@ namespace electionguard
         const auto &q = Q();
         auto q_as_p = q.toElementModP();
         uint64_t resModQ[MAX_P_LEN] = {};
-        bool modSuccess =
-          Hacl_Bignum4096_mod(q_as_p->get(), static_cast<uint64_t *>(a_plus_bc_result),
-                              static_cast<uint64_t *>(resModQ));
+        bool modSuccess = Bignum4096::mod(q_as_p->get(), static_cast<uint64_t *>(a_plus_bc_result),
+                                          static_cast<uint64_t *>(resModQ));
         if (!modSuccess) {
             throw runtime_error("a_plus_bc_mod_q mod operation failed");
         }
@@ -734,8 +730,8 @@ namespace electionguard
     unique_ptr<ElementModQ> sub_from_q(const ElementModQ &a)
     {
         uint64_t result[MAX_Q_LEN] = {};
-        Hacl_Bignum256_sub(const_cast<ElementModQ &>(Q()).get(), const_cast<ElementModQ &>(a).get(),
-                           static_cast<uint64_t *>(result));
+        Bignum256::sub(const_cast<ElementModQ &>(Q()).get(), const_cast<ElementModQ &>(a).get(),
+                       static_cast<uint64_t *>(result));
         // TODO: python version doesn't perform % Q on results,
         // but we still need to handle the overflow values between (Q, MAX_256]
         return make_unique<ElementModQ>(result, true);
@@ -745,8 +741,7 @@ namespace electionguard
     {
         auto bytes = Random::getBytes();
 
-        auto *bigNum =
-          Hacl_Bignum256_new_bn_from_bytes_be(MAX_Q_SIZE, const_cast<uint8_t *>(bytes.data()));
+        auto *bigNum = Bignum256::fromBytes(MAX_Q_SIZE, const_cast<uint8_t *>(bytes.data()));
         if (bigNum == nullptr) {
             throw bad_alloc();
         }
