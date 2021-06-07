@@ -12,10 +12,6 @@ set(CTEST_PROJECT_TARGET      "ElectionGuardCTests")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
-# ---- Options ----
-
-set(CMAKE_BUILD_TYPE        Debug)
-
 # ---- Dependencies ----
 
 include(../cmake/CPM.cmake)
@@ -35,7 +31,7 @@ CPMAddPackage(
 
 if(benchmark_ADDED)
   # enable c++11 to avoid compilation errors
-  set_target_properties(benchmark PROPERTIES CXX_STANDARD 11)
+  set_target_properties(benchmark PROPERTIES CXX_STANDARD 17)
 endif()
 
 # ---- Sources ----
@@ -87,6 +83,12 @@ add_executable(${CPP_BENCHMARK_TARGET}
 )
 
 target_compile_features(${CPP_BENCHMARK_TARGET} PRIVATE cxx_std_17)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    target_compile_options(${CPP_BENCHMARK_TARGET} PUBLIC -Wno-switch-default)
+    target_compile_options(${CPP_BENCHMARK_TARGET} PUBLIC -Wno-unused-parameter)
+    target_compile_options(${CPP_BENCHMARK_TARGET} PUBLIC -Wno-overloaded-virtual)
+endif()
 
 
 # C++ Tests ---------------------------------------------------
@@ -141,15 +143,12 @@ target_compile_features(${CTEST_PROJECT_TARGET} PRIVATE c_std_99)
 target_link_libraries(${UTILS_PROJECT_TARGET} PUBLIC ${META_PROJECT_TARGET})
 
 target_link_libraries(${CPP_BENCHMARK_TARGET} PRIVATE benchmark::benchmark ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
+target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
 
 if (MINGW)
-    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
-
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
     target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE -static-libstdc++)
-else()
-    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
 endif()
 
 target_link_libraries(${CTEST_PROJECT_TARGET} PRIVATE ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
