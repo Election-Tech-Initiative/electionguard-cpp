@@ -16,7 +16,7 @@ else
 endif
 
 # Debug or Release (capitalized)
-TARGET?=Debug
+TARGET?=Release
 
 ifeq ($(OPERATING_SYSTEM),Darwin)
 NDK_PATH?=/Users/$$USER/Library/Android/sdk/ndk/21.3.6528147
@@ -83,7 +83,7 @@ endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
 
 build-msvc:
-	@echo 🐛 BUILD DEBUG
+	@echo 🖥️ BUILD MSVC
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/Win32 -G "Visual Studio 16 2019" -A Win32 \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
@@ -94,8 +94,8 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 		-DBUILD_SHARED_LIBS=ON \
 		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/Win32
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/Win32 --config $(TARGET)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 --config $(TARGET)
 else
 	echo "MSVC builds are only supported on Windows"
 endif

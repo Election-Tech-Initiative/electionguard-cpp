@@ -316,7 +316,7 @@ namespace electionguard
 
     std::unique_ptr<ElementModP> ElementModP::clone() const
     {
-        make_unique<ElementModP>(pimpl->data);
+        return make_unique<ElementModP>(pimpl->data);
     }
 
     // Static Methods

@@ -43,7 +43,7 @@ endif()
 # Utils Library -----------------------------------------------
 
 add_library(${UTILS_PROJECT_TARGET} SHARED
-${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.h
