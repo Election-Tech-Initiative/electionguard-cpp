@@ -245,8 +245,8 @@ namespace electionguard
         bool operator<(const Impl &other)
         {
             auto other_ = other;
-            return Hacl_Bignum4096_lt_mask(static_cast<uint64_t *>(data),
-                                           static_cast<uint64_t *>(other_.data)) > 0;
+            return Bignum4096::lessThan(static_cast<uint64_t *>(data),
+                                        static_cast<uint64_t *>(other_.data)) > 0;
         }
     };
 
