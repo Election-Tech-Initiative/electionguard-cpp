@@ -1,4 +1,4 @@
-.PHONY: all build build-debug build-msvc build-debug-all build-release build-android build-ios clean environment format memcheck sanitize sanitize-asan sanitize-tsan test
+.PHONY: all build build-msvc build-debug-all build-android build-ios clean environment format memcheck sanitize sanitize-asan sanitize-tsan test
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_BUILD_DIR=$(realpath .)/build
@@ -59,28 +59,22 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 endif
 	wget -O cmake/CPM.cmake https://github.com/TheLartians/CPM.cmake/releases/latest/download/CPM.cmake
 
-ifeq ($(TARGET),Release)
-build: build-release
-else
-build: build-debug
-endif
-
-build-debug:
-	@echo 🐛 BUILD DEBUG
+build:
+	@echo 🧱 BUILD $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug -G "MSYS Makefiles" \
-		-DCMAKE_BUILD_TYPE=Debug \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) -G "MSYS Makefiles" \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug \
-		-DCMAKE_BUILD_TYPE=Debug \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 endif
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
 
 build-msvc:
 	@echo 🖥️ BUILD MSVC
@@ -99,23 +93,6 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 else
 	echo "MSVC builds are only supported on Windows"
 endif
-
-build-release: clean
-	@echo 🧱 BUILD RELEASE
-ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Release -G "MSYS Makefiles" \
-		-DCMAKE_BUILD_TYPE=Release \
-		-DBUILD_SHARED_LIBS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Release \
-		-DCMAKE_BUILD_TYPE=Release \
-		-DBUILD_SHARED_LIBS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-endif
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Release
 
 build-android:
 	@echo 🤖 BUILD ANDROID
@@ -237,7 +214,7 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 		-DOPTION_ENABLE_TESTS=ON \
 		-DUSE_SANITIZER="address" \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 --config Debug
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64/test/Debug/ElectionGuardTests
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64/test/Debug/ElectionGuardCTests
 else
@@ -284,9 +261,16 @@ endif
 bench:
 	@echo 🧪 BENCHMARK
 ifeq ($(OPERATING_SYSTEM),Windows)
-	echo "Benchmark is only supported on Linux & Mac"
+	echo "Benchmark is currently only supported on Linux & Mac"
+	# cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) -G "MSYS Makefiles" \
+	# 	-DCMAKE_BUILD_TYPE=$(TARGET) \
+	# 	-DBUILD_SHARED_LIBS=ON \
+	# 	-DEXPORT_INTERNALS=ON \
+	# 	-DCAN_USE_VECTOR_INTRINSICS=ON \
+	# 	-DOPTION_ENABLE_TESTS=ON \
+	# 	-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Release \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DEXPORT_INTERNALS=ON \
@@ -300,28 +284,28 @@ endif
 test:
 	@echo 🧪 TEST
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug -G "MSYS Makefiles" \
-		-DCMAKE_BUILD_TYPE=Debug \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) -G "MSYS Makefiles" \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DEXPORT_INTERNALS=ON \
 		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DOPTION_ENABLE_TESTS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug \
-		-DCMAKE_BUILD_TYPE=Debug \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DEXPORT_INTERNALS=ON \
 		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DOPTION_ENABLE_TESTS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 endif
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardCTests
 
 test-msvc:
-	@echo 🧪 TEST
+	@echo 🧪 TEST MSVC
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 16 2019" -A x64 \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
@@ -338,8 +322,8 @@ endif
 coverage:
 	@echo ✅ CHECK COVERAGE
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug -G "MSYS Makefiles" \
-		-DCMAKE_BUILD_TYPE=Debug \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) -G "MSYS Makefiles" \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DEXPORT_INTERNALS=ON \
 		-DCAN_USE_VECTOR_INTRINSICS=ON \
@@ -347,8 +331,8 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 		-DCODE_COVERAGE=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug \
-		-DCMAKE_BUILD_TYPE=Debug \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DEXPORT_INTERNALS=ON \
 		-DCAN_USE_VECTOR_INTRINSICS=ON \
@@ -357,6 +341,6 @@ else
 		-DUSE_STATIC_ANALYSIS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 endif
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardCTests
