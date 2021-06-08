@@ -24,7 +24,7 @@
 
 #include "Hacl_Bignum.h"
 
-inline uint32_t
+uint32_t
 Hacl_Bignum_Base_mul_wide_add2_u32(uint32_t a, uint32_t b, uint32_t c_in, uint32_t *out)
 {
   uint32_t out0 = out[0U];
@@ -33,7 +33,7 @@ Hacl_Bignum_Base_mul_wide_add2_u32(uint32_t a, uint32_t b, uint32_t c_in, uint32
   return (uint32_t)(res >> (uint32_t)32U);
 }
 
-inline uint64_t
+uint64_t
 Hacl_Bignum_Base_mul_wide_add2_u64(uint64_t a, uint64_t b, uint64_t c_in, uint64_t *out)
 {
   uint64_t out0 = out[0U];
@@ -164,7 +164,7 @@ bn_sub_eq_len_u64(uint32_t aLen, uint64_t *a, uint64_t *b, uint64_t *res)
   return c;
 }
 
-inline uint32_t
+uint32_t
 Hacl_Bignum_Addition_bn_add_eq_len_u32(uint32_t aLen, uint32_t *a, uint32_t *b, uint32_t *res)
 {
   uint32_t c = (uint32_t)0U;
@@ -209,7 +209,7 @@ Hacl_Bignum_Addition_bn_add_eq_len_u32(uint32_t aLen, uint32_t *a, uint32_t *b, 
   return c;
 }
 
-inline uint64_t
+uint64_t
 Hacl_Bignum_Addition_bn_add_eq_len_u64(uint32_t aLen, uint64_t *a, uint64_t *b, uint64_t *res)
 {
   uint64_t c = (uint64_t)0U;
@@ -1117,7 +1117,7 @@ Hacl_Bignum_Karatsuba_bn_karatsuba_sqr_uint64(
   }
 }
 
-inline uint32_t Hacl_Bignum_ModInvLimb_mod_inv_uint32(uint32_t n0)
+uint32_t Hacl_Bignum_ModInvLimb_mod_inv_uint32(uint32_t n0)
 {
   uint32_t alpha = (uint32_t)2147483648U;
   uint32_t beta = n0;
@@ -1143,7 +1143,7 @@ inline uint32_t Hacl_Bignum_ModInvLimb_mod_inv_uint32(uint32_t n0)
   return vb;
 }
 
-inline uint64_t Hacl_Bignum_ModInvLimb_mod_inv_uint64(uint64_t n0)
+uint64_t Hacl_Bignum_ModInvLimb_mod_inv_uint64(uint64_t n0)
 {
   uint64_t alpha = (uint64_t)9223372036854775808U;
   uint64_t beta = n0;
