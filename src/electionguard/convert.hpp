@@ -183,6 +183,15 @@ namespace electionguard
         return data_array;
     }
 
+    /// Copy the vector byte array to a heap-allocated byte array
+    inline uint64_t *dynamicCopy(vector<uint64_t> &data, size_t *out_size)
+    {
+        auto *data_array = new uint64_t[data.size()];
+        copy(data.begin(), data.end(), data_array);
+        *out_size = data.size();
+        return data_array;
+    }
+
     string timePointToIsoString(const time_point &time);
     string timePointToIsoString(const time_point &time, const string &format);
     time_point timePointFromIsoString(const string &time);

@@ -7,12 +7,12 @@
 #    if (defined(_WIN32) || defined(_WIN64))
 #        if defined(ELECTIONGUARD_BUILD_SHARED) /* build dll */
 #            define EG_API __declspec(dllexport)
-#            if defined(DEBUG)
+#            if defined(EXPORT_INTERNALS)
 #                define EG_INTERNAL_API __declspec(dllexport)
 #            endif
 #        elif !defined(ELECTIONGUARD_BUILD_STATIC) /* use dll */
 #            define EG_API __declspec(dllimport)
-#            ifdef DEBUG
+#            ifdef EXPORT_INTERNALS
 #                define EG_INTERNAL_API __declspec(dllimport)
 #            endif
 #        else /* static library */
@@ -24,7 +24,7 @@
 #    else
 #        if __GNUC__ >= 4
 #            define EG_API __attribute__((visibility("default")))
-#            ifdef DEBUG
+#            ifdef EXPORT_INTERNALS
 #                define EG_INTERNAL_API __attribute__((visibility("default")))
 #            else
 #                define EG_INTERNAL_API __attribute__((visibility("hidden")))

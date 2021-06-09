@@ -29,12 +29,15 @@ endif()
 
 # ---- Options ----
 
-option(CMAKE_BUILD_TYPE         "Build with or without debug symbols"                       Release)
-option(BUILD_SHARED_LIBS         "Build SHARED libraries"                                   OFF)
-option(OPTION_ENABLE_TESTS      "Enable support for testing private headers"                OFF)
-option(CODE_COVERAGE            "Use code coverage"                                         OFF)
-option(OPTION_GENERATE_DOCS     "Generate documentation"                                    OFF)
-option(USE_DYNAMIC_ANALYSIS     "Enable Dynamic tools"                                      OFF)
+option(CMAKE_BUILD_TYPE          "Build with or without debug symbols"                       Release)
+option(BUILD_SHARED_LIBS         "Build SHARED libraries"                                    OFF)
+option(EXPORT_INTERNALS          "Export Internal Headers"                                   OFF)
+option(CAN_USE_VECTOR_INTRINSICS "Use vector intrinsics for math functions if available"     OFF)
+option(USE_32BIT_MATH            "Use the 32 bit optimized math impl"                        OFF)
+option(OPTION_ENABLE_TESTS       "Enable support for testing private headers"                OFF)
+option(CODE_COVERAGE             "Use code coverage"                                         OFF)
+option(OPTION_GENERATE_DOCS      "Generate documentation"                                    OFF)
+option(USE_DYNAMIC_ANALYSIS      "Enable Dynamic tools"                                      OFF)
 
 # ---- Modules ----
 
@@ -73,9 +76,16 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
     add_compile_definitions(JSON_DIAGNOSTICS=1)
 endif()
 
+if(EXPORT_INTERNALS)
+    message("++ Exporting Internal Headers")
+    add_compile_definitions(EXPORT_INTERNALS)
+endif()
+
+# HACL includes processor optimized vectors where possible
 if(CAN_USE_VECTOR_INTRINSICS)
-    add_compile_definitions(EVERCRYPT_CAN_COMPILE_VEC128)
-    add_compile_definitions(EVERCRYPT_CAN_COMPILE_VEC256)
+    message("++ Using Vector Intrinsics")
+    add_compile_definitions(HACL_CAN_COMPILE_VEC128)
+    add_compile_definitions(HACL_CAN_COMPILE_VEC256)
 endif()
 
 # HACK: Disable explicit bzero on android

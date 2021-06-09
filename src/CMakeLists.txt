@@ -61,8 +61,12 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum.h
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum256.c
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum256.h
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum256_32.c
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum256_32.h
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.c
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.h
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096_32.c
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096_32.h
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Hash.c
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Hash.h
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_HMAC_DRBG.c

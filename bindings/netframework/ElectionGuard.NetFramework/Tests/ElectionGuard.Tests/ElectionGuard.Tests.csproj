@@ -101,10 +101,10 @@
   </Target>
   <PropertyGroup>
     <PreBuildEvent>if $(PlatformName) == x86 copy "..\..\..\..\..\..\..\..\build\libs\msvc\Win32\src\$(ConfigurationName)\electionguard.dll" "$(TargetDir)electionguard.dll"
-    if $(PlatformName) == x64 copy "..\..\..\..\..\..\..\..\build\libs\msvc\$(PlatformName)\src\$(ConfigurationName)\electionguard.dll" "$(TargetDir)electionguard.dll"
+    if $(PlatformName) == x64 copy "..\..\..\..\..\..\..\..\build\libs\msvc\x64\src\$(ConfigurationName)\electionguard.dll" "$(TargetDir)electionguard.dll"
     if $(PlatformName) == x86 copy "..\..\..\..\..\..\..\..\build\libs\msvc\Win32\src\$(ConfigurationName)\electionguard.lib" "$(TargetDir)electionguard.lib"
-    if $(PlatformName) == x64 copy "..\..\..\..\..\..\..\..\build\libs\msvc\$(PlatformName)\src\$(ConfigurationName)\electionguard.lib" "$(TargetDir)electionguard.lib"
-    if $(PlatformName) == x86 copy "..\..\..\..\..\..\..\..\build\libs\msvc\Win32\src\$(ConfigurationName)\electionguard.pdb" "$(TargetDir)electionguard.pdb"
-    if $(PlatformName) == x64 copy "..\..\..\..\..\..\..\..\build\libs\msvc\$(PlatformName)\src\$(ConfigurationName)\electionguard.pdb" "$(TargetDir)electionguard.pdb"</PreBuildEvent>
+    if $(PlatformName) == x64 copy "..\..\..\..\..\..\..\..\build\libs\msvc\x64\src\$(ConfigurationName)\electionguard.lib" "$(TargetDir)electionguard.lib"
+    if $(PlatformName) == x86 if $(ConfigurationName) == Debug copy "..\..\..\..\..\..\..\..\build\libs\msvc\Win32\src\$(ConfigurationName)\electionguard.pdb" "$(TargetDir)electionguard.pdb"
+    if $(PlatformName) == x64 if $(ConfigurationName) == Debug copy "..\..\..\..\..\..\..\..\build\libs\msvc\x64\src\$(ConfigurationName)\electionguard.pdb" "$(TargetDir)electionguard.pdb"</PreBuildEvent>
   </PropertyGroup>
 </Project>

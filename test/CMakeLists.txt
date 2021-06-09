@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 
 # ---- Project ----
 
+set(CPP_BENCHMARK_TARGET      "ElectionGuardBenchmark")
+
 set(UTILS_PROJECT_TARGET      "ElectionGuardUtils")
 set(CPPTEST_PROJECT_TARGET    "ElectionGuardTests")
 set(CTEST_PROJECT_TARGET      "ElectionGuardCTests")
@@ -9,10 +11,6 @@ set(CTEST_PROJECT_TARGET      "ElectionGuardCTests")
 # --- Import tools ----
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
-
-# ---- Options ----
-
-set(CMAKE_BUILD_TYPE        Debug)
 
 # ---- Dependencies ----
 
@@ -24,12 +22,24 @@ CPMAddPackage(
     GIT_TAG 2.3.7
 )
 
+CPMAddPackage(
+  NAME benchmark
+  GITHUB_REPOSITORY google/benchmark
+  VERSION 1.5.2
+  OPTIONS "BENCHMARK_ENABLE_TESTING Off"
+)
+
+if(benchmark_ADDED)
+  # enable c++11 to avoid compilation errors
+  set_target_properties(benchmark PROPERTIES CXX_STANDARD 17)
+endif()
+
 # ---- Sources ----
 
 # Utils Library -----------------------------------------------
 
 add_library(${UTILS_PROJECT_TARGET} SHARED
-${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.h
@@ -58,6 +68,28 @@ if(MSVC)
     target_compile_options(${UTILS_PROJECT_TARGET} 
         PUBLIC /WX- /wd4067 /wd4100 /wd4266 /wd4365 /wd4464 /wd4505 /wd4554 /wd4668 /wd4820 /wd4996 /wd5045 /wd5059)
 endif()
+
+
+# C++ Benchmark -----------------------------------------------
+
+add_executable(${CPP_BENCHMARK_TARGET}
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_chaum_pedersen.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_elgamal.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_encrypt.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_group.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_hash.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_nonces.cpp
+)
+
+target_compile_features(${CPP_BENCHMARK_TARGET} PRIVATE cxx_std_17)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    target_compile_options(${CPP_BENCHMARK_TARGET} PUBLIC -Wno-switch-default)
+    target_compile_options(${CPP_BENCHMARK_TARGET} PUBLIC -Wno-unused-parameter)
+    target_compile_options(${CPP_BENCHMARK_TARGET} PUBLIC -Wno-overloaded-virtual)
+endif()
+
 
 # C++ Tests ---------------------------------------------------
 
@@ -110,14 +142,13 @@ target_compile_features(${CTEST_PROJECT_TARGET} PRIVATE c_std_99)
 
 target_link_libraries(${UTILS_PROJECT_TARGET} PUBLIC ${META_PROJECT_TARGET})
 
-if (MINGW)
-    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
+target_link_libraries(${CPP_BENCHMARK_TARGET} PRIVATE benchmark::benchmark ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
+target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
 
+if (MINGW)
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
     target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE -static-libstdc++)
-else()
-    target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
 endif()
 
 target_link_libraries(${CTEST_PROJECT_TARGET} PRIVATE ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})

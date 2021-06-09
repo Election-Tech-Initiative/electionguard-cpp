@@ -14,6 +14,8 @@ namespace hacl
 
         static uint64_t sub(uint64_t *a, uint64_t *b, uint64_t *res);
 
+        static void mul(uint64_t *a, uint64_t *b, uint64_t *res);
+
         static bool mod(uint64_t *n, uint64_t *a, uint64_t *res);
 
         static bool modExp(uint64_t *n, uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res);

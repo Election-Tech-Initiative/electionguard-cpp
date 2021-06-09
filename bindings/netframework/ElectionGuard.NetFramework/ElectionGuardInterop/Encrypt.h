@@ -54,7 +54,7 @@ namespace ElectionGuardInterop
           CiphertextBallot
           ^ Encrypt(PlaintextBallot ^ ballot, bool shouldVerifyProofs) {
                 auto ciphertext = this->_instance->encrypt(*ballot->_instance, shouldVerifyProofs);
-                return gcnew CiphertextBallot(move(ciphertext));
+                return gcnew CiphertextBallot(std::move(ciphertext));
             }
     };
 
