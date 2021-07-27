@@ -46,7 +46,7 @@ namespace electionguard
                                        const uint64_t launchCode, const string &location)
         : pimpl(new Impl(deviceUuid, sessionUuid, launchCode, location))
     {
-        Log::debug(": EncryptionDevice: Created: UUID: " + to_string(deviceUuid) +
+        Log::trace("EncryptionDevice: Created: UUID: " + to_string(deviceUuid) +
                    " at: " + location);
     }
     EncryptionDevice::~EncryptionDevice() = default;
@@ -103,7 +103,7 @@ namespace electionguard
     EncryptionMediator::encrypt(const PlaintextBallot &ballot,
                                 bool shouldVerifyProofs /* = true */) const
     {
-        Log::debug(" encrypt: objectId: " + ballot.getObjectId());
+        Log::trace("encrypt: objectId: " + ballot.getObjectId());
 
         // this implementation chains each ballot encrypted by the mediator
         // to every subsequent ballot creating a linked list data structure
@@ -112,15 +112,14 @@ namespace electionguard
         if (!pimpl->ballotCodeSeed) {
             auto deviceHash = pimpl->encryptionDevice.getHash();
             pimpl->ballotCodeSeed.swap(deviceHash);
-            Log::debugHex(": encrypt: instantiated ballotCodeSeed: ",
-                          pimpl->ballotCodeSeed->toHex());
+            Log::debug("encrypt: instantiated ballotCodeSeed", pimpl->ballotCodeSeed->toHex());
         }
 
         auto encryptedBallot =
           encryptBallot(ballot, pimpl->internalManifest, pimpl->context, *pimpl->ballotCodeSeed,
                         nullptr, pimpl->encryptionDevice.getTimestamp(), shouldVerifyProofs);
 
-        Log::debug(": encrypt: ballot encrypted");
+        Log::trace("encrypt: ballot encrypted");
         pimpl->ballotCodeSeed = make_unique<ElementModQ>(*encryptedBallot->getBallotCode());
         return encryptedBallot;
     }
@@ -129,7 +128,7 @@ namespace electionguard
     EncryptionMediator::compactEncrypt(const PlaintextBallot &ballot,
                                        bool shouldVerifyProofs /* = true */) const
     {
-        Log::debug(" encrypt: objectId: " + ballot.getObjectId());
+        Log::trace("encrypt: objectId:" + ballot.getObjectId());
 
         // this implementation chains each ballot encrypted by the mediator
         // to every subsequent ballot creating a linked list data structure
@@ -138,15 +137,14 @@ namespace electionguard
         if (!pimpl->ballotCodeSeed) {
             auto deviceHash = pimpl->encryptionDevice.getHash();
             pimpl->ballotCodeSeed.swap(deviceHash);
-            Log::debugHex(": encrypt: instantiated ballotCodeSeed: ",
-                          pimpl->ballotCodeSeed->toHex());
+            Log::debug("encrypt: instantiated ballotCodeSeed:", pimpl->ballotCodeSeed->toHex());
         }
 
         auto encryptedBallot = encryptCompactBallot(
           ballot, pimpl->internalManifest, pimpl->context, *pimpl->ballotCodeSeed, nullptr,
           pimpl->encryptionDevice.getTimestamp(), shouldVerifyProofs);
 
-        Log::debug(": encrypt: ballot encrypted");
+        Log::trace("encrypt: ballot encrypted");
         pimpl->ballotCodeSeed = make_unique<ElementModQ>(*encryptedBallot->getBallotCode());
         return encryptedBallot;
     }
@@ -243,8 +241,8 @@ namespace electionguard
         auto selectionNonce = nonceSequence->get(description.getSequenceOrder());
         auto proofNonce = nonceSequence->next();
 
-        Log::debugHex(": encryptSelection: for " + description.getObjectId() + " hash: ",
-                      descriptionHash->toHex());
+        Log::trace("encryptSelection: for " + description.getObjectId() + " hash: ",
+                   descriptionHash->toHex());
 
         // Generate the encryption
         auto ciphertext = elgamalEncrypt(selection.getVote(), *selectionNonce, elgamalPublicKey);
@@ -363,7 +361,7 @@ namespace electionguard
         // TODO: ISSUE #33: support other cases such as cumulative voting
         // (individual selections being an encryption of > 1)
         if (selectionCount < description.getVotesAllowed()) {
-            Log::debug(
+            Log::warn(
               "mismatching selection count: only n-of-m style elections are currently supported");
         }
 
@@ -446,9 +444,9 @@ namespace electionguard
         auto nonceSeed =
           CiphertextBallot::nonceSeed(*manifest.getManifestHash(), ballot.getObjectId(), *nonce);
 
-        Log::debugHex(": manifestHash   : ", manifest.getManifestHash()->toHex());
-        Log::debugHex(": encryptionSeed          :", encryptionSeed.toHex());
-        Log::debug(": timestamp         : " + to_string(timestamp));
+        Log::trace("manifestHash   : ", manifest.getManifestHash()->toHex());
+        Log::trace("encryptionSeed          :", encryptionSeed.toHex());
+        Log::trace("timestamp         : " + to_string(timestamp));
 
         // encrypt contests
         auto encryptedContests =

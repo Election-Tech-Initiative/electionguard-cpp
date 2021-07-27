@@ -73,7 +73,13 @@ set(IDE_FOLDER "")
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     message("++ Setting DEBUG during compile")
     add_compile_definitions(DEBUG)
+    add_compile_definitions(LOG_DEBUG)
     add_compile_definitions(JSON_DIAGNOSTICS=1)
+endif()
+
+if (LOG_LEVEL MATCHES debug)
+    message("++ Using DEBUG Logs")
+    add_compile_definitions(LOG_DEBUG)
 endif()
 
 if(EXPORT_INTERNALS)

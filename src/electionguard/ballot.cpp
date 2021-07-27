@@ -120,12 +120,12 @@ namespace electionguard
     bool PlaintextBallotSelection::isValid(const std::string &expectedObjectId) const
     {
         if (pimpl->object_id != expectedObjectId) {
-            Log::debug("invalid object_id: expected: " + expectedObjectId +
-                       " actual: " + pimpl->object_id);
+            Log::info("invalid object_id: expected: " + expectedObjectId +
+                      " actual: " + pimpl->object_id);
             return false;
         }
         if (pimpl->vote > 1) {
-            Log::debug("Currently only supporting choices of 0 or 1");
+            Log::warn("Currently only supporting choices of 0 or 1");
             return false;
         }
         return true;
@@ -286,22 +286,22 @@ namespace electionguard
                                                       const ElementModQ &cryptoExtendedBaseHash)
     {
         if ((const_cast<ElementModQ &>(encryptionSeed) != *pimpl->descriptionHash)) {
-            Log::debug(": CiphertextBallotSelection mismatching selection hash: ");
-            Log::debugHex(": expected: ", encryptionSeed.toHex());
-            Log::debugHex(": actual: ", pimpl->descriptionHash->toHex());
+            Log::info(": CiphertextBallotSelection mismatching selection hash: ");
+            Log::info(": expected: ", encryptionSeed.toHex());
+            Log::info(": actual: ", pimpl->descriptionHash->toHex());
             return false;
         }
 
         auto recalculatedCryptoHash = crypto_hash_with(encryptionSeed);
         if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
-            Log::debug(": CiphertextBallotSelection mismatching crypto hash: ");
-            Log::debugHex(": expected: ", recalculatedCryptoHash->toHex());
-            Log::debugHex(": actual: ", pimpl->cryptoHash->toHex());
+            Log::info(": CiphertextBallotSelection mismatching crypto hash: ");
+            Log::info(": expected: ", recalculatedCryptoHash->toHex());
+            Log::info(": actual: ", pimpl->cryptoHash->toHex());
             return false;
         }
 
         if (pimpl->proof == nullptr) {
-            Log::debug(": No proof exists for: " + pimpl->objectId);
+            Log::info(": No proof exists for: " + pimpl->objectId);
             return false;
         }
         return pimpl->proof->isValid(*pimpl->ciphertext, elgamalPublicKey, cryptoExtendedBaseHash);
@@ -392,12 +392,12 @@ namespace electionguard
                                          uint64_t votesAllowd /* = 0 */) const
     {
         if (pimpl->object_id != expectedObjectId) {
-            Log::debug(": invalid objectId");
+            Log::info(": invalid objectId");
             return false;
         }
 
         if (pimpl->selections.size() > expectedNumberSelections) {
-            Log::debug(": too many selections");
+            Log::info(": too many selections");
             return false;
         }
 
@@ -412,7 +412,7 @@ namespace electionguard
         }
 
         if (numberElected > expectedNumberElected) {
-            Log::debug(": too many elections");
+            Log::info(": too many elections");
             return false;
         }
 
@@ -421,7 +421,7 @@ namespace electionguard
         }
 
         if (votes > votesAllowd) {
-            Log::debug(": too many votes");
+            Log::info(": too many votes");
             return false;
         }
 
@@ -595,24 +595,24 @@ namespace electionguard
                                                     const ElementModQ &cryptoExtendedBaseHash)
     {
         if ((const_cast<ElementModQ &>(encryptionSeed) != *pimpl->descriptionHash)) {
-            Log::debug(": CiphertextBallotContest mismatching constest hash: ");
-            Log::debugHex(": expected: ", encryptionSeed.toHex());
-            Log::debugHex(": actual: ", pimpl->descriptionHash->toHex());
+            Log::info(": CiphertextBallotContest mismatching constest hash: ");
+            Log::info(": expected: ", encryptionSeed.toHex());
+            Log::info(": actual: ", pimpl->descriptionHash->toHex());
             return false;
         }
 
         auto recalculatedCryptoHash = crypto_hash_with(encryptionSeed);
         if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
-            Log::debug(": CiphertextBallotContest mismatching crypto hash: ");
-            Log::debugHex(": expected: ", recalculatedCryptoHash->toHex());
-            Log::debugHex(": actual: ", pimpl->cryptoHash->toHex());
+            Log::info(": CiphertextBallotContest mismatching crypto hash: ");
+            Log::info(": expected: ", recalculatedCryptoHash->toHex());
+            Log::info(": actual: ", pimpl->cryptoHash->toHex());
             return false;
         }
 
         // NOTE: this check does not verify the proofs of the individual selections by design.
 
         if (!pimpl->proof) {
-            Log::debug(": no proof exists for: " + pimpl->object_id);
+            Log::info(": no proof exists for: " + pimpl->object_id);
             return false;
         }
 
@@ -620,12 +620,11 @@ namespace electionguard
 
         // Verify that the contest ciphertext matches the elgamal accumulation of all selections
         if (*pimpl->ciphertextAccumulation != *computedAccumulation) {
-            Log::debug(": ciphertext does not equal elgamal accumulation for : " +
-                       pimpl->object_id);
-            Log::debugHex(": expected (pad): ", computedAccumulation->getPad()->toHex());
-            Log::debugHex(": expected (data): ", computedAccumulation->getData()->toHex());
-            Log::debugHex(": actual (pad): ", pimpl->ciphertextAccumulation->getPad()->toHex());
-            Log::debugHex(": actual (data): ", pimpl->ciphertextAccumulation->getData()->toHex());
+            Log::info(": ciphertext does not equal elgamal accumulation for : " + pimpl->object_id);
+            Log::info(": expected (pad): ", computedAccumulation->getPad()->toHex());
+            Log::info(": expected (data): ", computedAccumulation->getData()->toHex());
+            Log::info(": actual (pad): ", pimpl->ciphertextAccumulation->getPad()->toHex());
+            Log::info(": actual (data): ", pimpl->ciphertextAccumulation->getData()->toHex());
             return false;
         }
 
@@ -891,7 +890,7 @@ namespace electionguard
       unique_ptr<ElementModQ> ballotCode /* = nullptr */)
     {
         if (contests.empty()) {
-            Log::debug(":ballot must have at least some contests");
+            Log::error(":ballot must have at least some contests");
             throw invalid_argument("ballot must have at least some contests");
         }
 
@@ -934,17 +933,17 @@ namespace electionguard
                                              const ElementModQ &cryptoExtendedBaseHash)
     {
         if ((const_cast<ElementModQ &>(manifestHash) != *pimpl->manifestHash)) {
-            Log::debug(": CiphertextBallot mismatching manifestHash: ");
-            Log::debugHex(": expected: ", manifestHash.toHex());
-            Log::debugHex(": actual: ", pimpl->manifestHash->toHex());
+            Log::info(": CiphertextBallot mismatching manifestHash: ");
+            Log::info(": expected: ", manifestHash.toHex());
+            Log::info(": actual: ", pimpl->manifestHash->toHex());
             return false;
         }
 
         auto recalculatedCryptoHash = crypto_hash_with(manifestHash);
         if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
-            Log::debug(": CiphertextBallot mismatching crypto hash: ");
-            Log::debugHex(": expected: ", recalculatedCryptoHash->toHex());
-            Log::debugHex(": actual: ", pimpl->cryptoHash->toHex());
+            Log::info(": CiphertextBallot mismatching crypto hash: ");
+            Log::info(": expected: ", recalculatedCryptoHash->toHex());
+            Log::info(": actual: ", pimpl->cryptoHash->toHex());
             return false;
         }
 
@@ -964,7 +963,7 @@ namespace electionguard
         bool isValid = true;
         for (const auto &[key, value] : validProofs) {
             if (!value) {
-                Log::debug(": CiphertextBallot found invalid proof for: " + key);
+                Log::info(": CiphertextBallot found invalid proof for: " + key);
                 isValid = false;
             }
         }
@@ -1084,7 +1083,7 @@ namespace electionguard
       BallotBoxState state /* = BallotBoxState::unknown */)
     {
         if (contests.empty()) {
-            Log::debug(":ballot must have at least some contests");
+            Log::error(":ballot must have at least some contests");
             throw invalid_argument("ballot must have at least some contests");
         }
 

@@ -57,7 +57,7 @@ namespace electionguard
             auto item = findByValue(_election_type<ElectionType>::_map, value);
             return item;
         } catch (const std::exception &e) {
-            Log::error(": error", e);
+            Log::error(": error {}", e);
             return ElectionType::unknown;
         }
     }
@@ -113,7 +113,7 @@ namespace electionguard
             auto item = findByValue(_reporting_unit_type<ReportingUnitType>::_map, value);
             return item;
         } catch (const std::exception &e) {
-            Log::error(": error", e);
+            Log::error(": error {}", e);
             return ReportingUnitType::unknown;
         }
     }
@@ -152,7 +152,7 @@ namespace electionguard
             auto item = findByValue(_vote_variation_type<VoteVariationType>::_map, value);
             return item;
         } catch (const std::exception &e) {
-            Log::error(": error", e);
+            Log::error(": error {}", e);
             return VoteVariationType::unknown;
         }
     }
@@ -179,7 +179,7 @@ namespace electionguard
         [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
         {
             auto hash = hash_elems({annotation, value});
-            Log::debugHex(": AnnotatedString :", hash->toHex());
+            Log::trace("AnnotatedString", hash.get());
             return hash;
         }
     };
@@ -242,7 +242,7 @@ namespace electionguard
         [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
         {
             auto hash = hash_elems({value, language});
-            Log::debugHex(": Language :", hash->toHex());
+            Log::trace("Language", hash.get());
             return hash;
         }
     };
@@ -312,7 +312,7 @@ namespace electionguard
             }
 
             auto hash = hash_elems(refs);
-            Log::debugHex(": InternationalizedText :", hash->toHex());
+            Log::trace("InternationalizedText", hash.get());
             return hash;
         }
     };
@@ -425,7 +425,7 @@ namespace electionguard
                 phoneRefs.push_back(ref<CryptoHashable>(*i));
             }
             auto hash = hash_elems({name, addressLine, emailRefs, phoneRefs});
-            Log::debugHex(": ContactInformation :", hash->toHex());
+            Log::trace("ContactInformation", hash.get());
             return hash;
         }
     };
@@ -536,12 +536,12 @@ namespace electionguard
             if (contactInformation != nullptr) {
                 auto hash = hash_elems(
                   {object_id, name, getReportingUnitTypeString(type), contactInformation.get()});
-                Log::debugHex(": GeopoliticalUnit :", hash->toHex());
+                Log::trace("GeopoliticalUnit", hash.get());
                 return hash;
             }
 
             auto hash = hash_elems({object_id, name, getReportingUnitTypeString(type), nullptr});
-            Log::debugHex(": GeopoliticalUnit :", hash->toHex());
+            Log::trace("GeopoliticalUnit", hash.get());
             return hash;
         }
     };
@@ -632,7 +632,7 @@ namespace electionguard
         [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
         {
             auto hash = hash_elems({object_id, geopoliticalUnitIds, partyIds, imageUri});
-            Log::debugHex(": BallotStyle :", hash->toHex());
+            Log::trace("BallotStyle", hash.get());
             return hash;
         }
     };
@@ -721,11 +721,11 @@ namespace electionguard
         {
             if (name != nullptr) {
                 auto hash = hash_elems({object_id, name.get(), abbreviation, color, logoUri});
-                Log::debugHex(": Party :", hash->toHex());
+                Log::trace("Party", hash.get());
                 return hash;
             }
             auto hash = hash_elems({object_id, nullptr, abbreviation, color, logoUri});
-            Log::debugHex(": Party :", hash->toHex());
+            Log::trace("Party", hash.get());
             return hash;
         }
     };
@@ -838,11 +838,11 @@ namespace electionguard
         {
             if (name != nullptr) {
                 auto hash = hash_elems({object_id, name.get(), partyId, imageUri});
-                Log::debugHex(": Candidate :", hash->toHex());
+                Log::trace("Candidate", hash.get());
                 return hash;
             }
             auto hash = hash_elems({object_id, nullptr, partyId, imageUri});
-            Log::debugHex(": Candidate :", hash->toHex());
+            Log::trace("Candidate", hash.get());
             return hash;
         }
     };
@@ -924,7 +924,7 @@ namespace electionguard
         [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
         {
             auto hash = hash_elems({object_id, sequenceOrder, candidateId});
-            Log::debugHex(": SelectionDescription :", hash->toHex());
+            Log::trace("SelectionDescription", hash.get());
             return hash;
         }
     };
@@ -1078,13 +1078,13 @@ namespace electionguard
                                         ref<CryptoHashable>(*ballotTitle),
                                         ref<CryptoHashable>(*ballotSubtitle), name, numberElected,
                                         votesAllowed, selectionRefs});
-                Log::debugHex(": ContestDescription :", hash->toHex());
+                Log::trace("ContestDescription", hash.get());
                 return hash;
             }
             auto hash = hash_elems({object_id, sequenceOrder, electoralDistrictId,
                                     getVoteVariationTypeString(voteVariation), nullptr, nullptr,
                                     name, numberElected, votesAllowed, selectionRefs});
-            Log::debugHex(": ContestDescription :", hash->toHex());
+            Log::trace("ContestDescription", hash.get());
             return hash;
         }
     };
@@ -1232,7 +1232,6 @@ namespace electionguard
                        selections_have_valid_sequence_ids;
 
         if (!success) {
-            // TODO: better logging
             map<string, bool> printMap{
               {"contest_has_valid_number_elected", contest_has_valid_number_elected},
               {"contest_has_valid_votes_allowed", contest_has_valid_votes_allowed},
@@ -1240,7 +1239,7 @@ namespace electionguard
               {"selections_have_valid_selection_ids", selections_have_valid_selection_ids},
               {"selections_have_valid_sequence_ids", selections_have_valid_sequence_ids}};
 
-            Log::debug(printMap, ": Contest " + getObjectId() + " failed validation check: ");
+            Log::info("Contest " + getObjectId() + " failed validation check", printMap);
         }
 
         return success;
@@ -1479,7 +1478,7 @@ namespace electionguard
                   {electionScopeId, getElectionTypeString(type), timePointToIsoString(startDate),
                    timePointToIsoString(endDate), nullptr, geopoliticalUnitRefs, partyRefs,
                    contestRefs, ballotStyleRefs});
-                Log::debugHex(": Manifest : crypto_hash: NO NAME!: ", hash->toHex());
+                Log::trace("Manifest:: NO NAME!", hash->toHex());
                 return hash;
             }
 
@@ -1489,7 +1488,7 @@ namespace electionguard
                           ref<CryptoHashable>(*name), ref<CryptoHashable>(*contactInformation),
                           geopoliticalUnitRefs, partyRefs, contestRefs, ballotStyleRefs});
 
-            Log::debugHex(": Manifest : crypto_hash: ", hash->toHex());
+            Log::trace("Manifest", hash->toHex());
             return hash;
         }
     };
@@ -1731,7 +1730,7 @@ namespace electionguard
               {"candidate_contests_have_valid_party_ids", candidate_contests_have_valid_party_ids},
             };
 
-            Log::debug(printMap, ": Election failed Validation check: ");
+            Log::info("Election failed Validation check", printMap);
         }
 
         return success;

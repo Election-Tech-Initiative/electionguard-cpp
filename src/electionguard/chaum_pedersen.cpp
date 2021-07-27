@@ -146,7 +146,7 @@ namespace electionguard
             throw invalid_argument(
               "DisjunctiveChaumPedersenProof::make:: only supports plaintexts of 0 or 1");
         }
-        Log::debug(":DisjunctiveChaumPedersenProof: making proof.");
+        Log::trace("DisjunctiveChaumPedersenProof: making proof.");
         if (plaintext == 1) {
             return make_one(message, r, k, q, seed);
         }
@@ -158,7 +158,7 @@ namespace electionguard
     bool DisjunctiveChaumPedersenProof::isValid(const ElGamalCiphertext &message,
                                                 const ElementModP &k, const ElementModQ &q)
     {
-        Log::debug(":DisjunctiveChaumPedersenProof::isValid: ");
+        Log::trace("DisjunctiveChaumPedersenProof::isValid: ");
         auto *alpha = message.getPad();
         auto *beta = message.getData();
 
@@ -229,25 +229,25 @@ namespace electionguard
               {"consistent_gc1kv1", consistent_gc1kv1},
             };
 
-            Log::debug(printMap, ": found an invalid Disjunctive Chaum-Pedersen proof: ");
+            Log::info("found an invalid Disjunctive Chaum-Pedersen proof", printMap);
 
-            Log::debugHex(" k->get: ", k.toHex());
-            Log::debugHex(" q->get: ", q.toHex());
-            Log::debugHex(" alpha->get: ", alpha->toHex());
-            Log::debugHex(" beta->get: ", beta->toHex());
-            Log::debugHex(" a0->get: ", a0.toHex());
-            Log::debugHex(" b0->get: ", b0.toHex());
-            Log::debugHex(" a1->get: ", a1.toHex());
-            Log::debugHex(" b1->get: ", b1.toHex());
-            Log::debugHex(" c0->get: ", c0.toHex());
-            Log::debugHex(" c1->get: ", c1.toHex());
-            Log::debugHex(" c->get: ", c.toHex());
-            Log::debugHex(" v0->get: ", v0.toHex());
-            Log::debugHex(" v1->get: ", v1.toHex());
+            Log::debug("k->get", k.toHex());
+            Log::debug("q->get", q.toHex());
+            Log::debug("alpha->get", alpha->toHex());
+            Log::debug("beta->get", beta->toHex());
+            Log::debug("a0->get", a0.toHex());
+            Log::debug("b0->get", b0.toHex());
+            Log::debug("a1->get", a1.toHex());
+            Log::debug("b1->get", b1.toHex());
+            Log::debug("c0->get", c0.toHex());
+            Log::debug("c1->get", c1.toHex());
+            Log::debug("c->get", c.toHex());
+            Log::debug("v0->get", v0.toHex());
+            Log::debug("v1->get", v1.toHex());
 
             return false;
         }
-        Log::debug(":DisjunctiveChaumPedersenProof::isValid: TRUE!");
+        Log::trace("Proof is Valid!");
         return success;
     }
 
@@ -393,7 +393,7 @@ namespace electionguard
                                      const ElementModP &k, const ElementModQ &seed,
                                      const ElementModQ &hash_header, uint64_t constant)
     {
-        Log::debug(":ConstantChaumPedersenProof:: making proof");
+        Log::trace("ConstantChaumPedersenProof:: making proof");
         auto *alpha = message.getPad();
         auto *beta = message.getData();
 
@@ -419,7 +419,7 @@ namespace electionguard
     bool ConstantChaumPedersenProof::isValid(const ElGamalCiphertext &message, const ElementModP &k,
                                              const ElementModQ &q)
     {
-        Log::debug(":ConstantChaumPedersenProof::isValid: ");
+        Log::trace("ConstantChaumPedersenProof::isValid: ");
         auto *alpha = message.getPad();
         auto *beta = message.getData();
 
@@ -465,20 +465,20 @@ namespace electionguard
               {"consistent_kv", consistent_kv},
             };
 
-            Log::debug(printMap, ": found an invalid Constant Chaum-Pedersen proof: ");
+            Log::info("found an invalid Constant Chaum-Pedersen proof", printMap);
 
-            Log::debugHex(" k->get: ", k.toHex());
-            Log::debugHex(" q->get: ", q.toHex());
-            Log::debugHex(" alpha->get: ", alpha->toHex());
-            Log::debugHex(" beta->get: ", beta->toHex());
-            Log::debugHex(" a->get: ", a.toHex());
-            Log::debugHex(" b->get: ", b.toHex());
-            Log::debugHex(" c->get: ", c.toHex());
-            Log::debugHex(" v->get: ", v.toHex());
+            Log::debug("k->get", k.toHex());
+            Log::debug("q->get", q.toHex());
+            Log::debug("alpha->get", alpha->toHex());
+            Log::debug("beta->get", beta->toHex());
+            Log::debug("a->get", a.toHex());
+            Log::debug("b->get", b.toHex());
+            Log::debug("c->get", c.toHex());
+            Log::debug("v->get", v.toHex());
 
             return false;
         }
-        Log::debug(":ConstantChaumPedersenProof::isValid: TRUE!");
+        Log::trace("ConstantChaumPedersenProof::isValid: TRUE!");
         return success;
     }
 #pragma endregion
