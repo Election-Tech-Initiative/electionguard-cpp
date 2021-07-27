@@ -177,6 +177,10 @@ make build-msvc
 
 open `./bindings/netframework//ElectionGuard.NetFramework/ElectionGuard.NetFramework.XXX.sln` in VS 2019 and build.
 
+#### Running the .Net Framework Benchmark
+
+Open the NetFramework solution and run the `ElectionGuard.Bench` project
+
 ### Build for Xamarin
 
 Wraps the android and iOS build artifacts in a NuGet package to be consumed from a Xamarin application (classic or forms)
