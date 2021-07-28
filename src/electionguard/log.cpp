@@ -4,8 +4,11 @@
 #include "spdlog/sinks/stdout_sinks.h"
 #include "spdlog/spdlog.h"
 
+#include <iomanip>
 #include <sstream>
 
+using std::boolalpha;
+using std::endl;
 using std::get;
 using std::make_unique;
 using std::ostringstream;

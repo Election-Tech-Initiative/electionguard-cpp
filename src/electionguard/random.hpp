@@ -14,6 +14,7 @@
 #include <vector>
 
 using std::bad_alloc;
+using std::put_time;
 using std::stringstream;
 using std::vector;
 

@@ -4,6 +4,8 @@
 #include "electionguard/hash.hpp"
 #include "log.hpp"
 
+#include <stdexcept>
+
 using std::invalid_argument;
 using std::make_unique;
 using std::move;

@@ -7,6 +7,7 @@
 #include <cstring>
 #include <electionguard/hash.hpp>
 #include <map>
+#include <stdexcept>
 
 using std::invalid_argument;
 using std::make_unique;

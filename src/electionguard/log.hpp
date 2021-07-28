@@ -1,29 +1,16 @@
 #ifndef __ELECTIONGUARD_CPP_LOG_HPP_INCLUDED__
 #define __ELECTIONGUARD_CPP_LOG_HPP_INCLUDED__
 
-#include "electionguard/group.hpp"
-
-#include <ctime>
-#include <iomanip>
-#include <iostream>
+#include <electionguard/export.h>
+#include <electionguard/group.hpp>
 #include <map>
-#include <sstream>
 #include <string>
 #include <variant>
 #include <vector>
 
-using std::boolalpha;
-using std::cerr;
-using std::cout;
-using std::dec;
-using std::endl;
 using std::exception;
-using std::hex;
 using std::ios;
 using std::map;
-using std::put_time;
-using std::setfill;
-using std::setw;
 using std::shared_ptr;
 using std::string;
 using std::stringstream;
@@ -37,7 +24,7 @@ namespace electionguard
                    std::reference_wrapper<const ElementModP>,
                    std::reference_wrapper<const ElementModQ>, std::map<std::string, bool>>;
 
-    class Log
+    class EG_INTERNAL_API Log
     {
       public:
         Log(Log const &) = delete;
