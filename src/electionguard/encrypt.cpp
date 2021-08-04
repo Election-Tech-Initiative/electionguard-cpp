@@ -1,5 +1,6 @@
 #include "electionguard/encrypt.hpp"
 
+#include "async.hpp"
 #include "electionguard/ballot_code.hpp"
 #include "electionguard/elgamal.hpp"
 #include "electionguard/hash.hpp"
@@ -7,6 +8,8 @@
 #include "nonces.hpp"
 #include "utils.hpp"
 
+#include <algorithm>
+#include <future>
 #include <iostream>
 
 extern "C" {
@@ -133,7 +136,7 @@ namespace electionguard
         // this implementation chains each ballot encrypted by the mediator
         // to every subsequent ballot creating a linked list data structure
         // that can be used to prove there are no gaps in the election record
-        // but this is not required as part of the specification
+        // but this is not required as part of the specification.
         if (!pimpl->ballotCodeSeed) {
             auto deviceHash = pimpl->encryptionDevice.getHash();
             pimpl->ballotCodeSeed.swap(deviceHash);
@@ -295,7 +298,9 @@ namespace electionguard
           make_unique<Nonces>(*descriptionHash, &const_cast<ElementModQ &>(nonceSeed));
         auto contestNonce = nonceSequence->get(description.getSequenceOrder());
         auto chaumPedersenNonce = nonceSequence->next();
+        std::shared_ptr<ElementModQ> sharedNonce(move(contestNonce));
 
+        vector<future<unique_ptr<CiphertextBallotSelection>>> tasks;
         vector<unique_ptr<CiphertextBallotSelection>> encryptedSelections;
 
         // TODO: ISSUE #36: this code could be inefficient if we had a contest
@@ -303,31 +308,35 @@ namespace electionguard
         // compared to the huge cost of doing the cryptography.
         uint64_t selectionCount = 0;
 
+        // iterate over the actual selections for each contest description
+        // and apply the selected value if it exists.  If it does not, an explicit
+        // false is entered instead and the selection_count is not incremented
+        // this allows consumers to only pass in the relevant selections made by a voter
         auto normalizedContest = emplaceMissingValues(contest, description);
-
+        auto normalizedSelections = normalizedContest->getSelections();
         for (const auto &selectionDescription : description.getSelections()) {
-            bool hasSelection = false;
-            unique_ptr<CiphertextBallotSelection> encryptedSelection = nullptr;
+            auto description_id = selectionDescription.get().getObjectId();
+            if (auto selection =
+                  std::find_if(normalizedSelections.begin(), normalizedSelections.end(),
+                               [description_id](const PlaintextBallotSelection &item) {
+                                   return item.getObjectId() == description_id;
+                               });
+                selection != normalizedSelections.end()) {
 
-            // iterate over the actual selections for each contest description
-            // and apply the selected value if it exists.  If it does not, an explicit
-            // false is entered instead and the selection_count is not incremented
-            // this allows consumers to only pass in the relevant selections made by a voter
-            for (const auto &selection : normalizedContest->getSelections()) {
-                if (selection.get().getObjectId() == selectionDescription.get().getObjectId()) {
-                    // track the selection count so we can append the
-                    // appropriate number of true placeholder votes
-                    hasSelection = true;
-                    selectionCount += selection.get().getVote();
-                    encryptedSelections.push_back(encryptSelection(
-                      selection.get(), selectionDescription.get(), elgamalPublicKey,
-                      cryptoExtendedBaseHash, *contestNonce, false, shouldVerifyProofs));
-                    break;
-                }
-            }
+                // track the selection count so we can append the
+                // appropriate number of true placeholder votes
+                const auto &selectionRef = selection->get();
+                selectionCount += selection->get().getVote();
 
-            if (!hasSelection) {
-                // Should never happen since the contest is normalized by emplacing missing values
+                tasks.push_back(Scheduler::submit([=] {
+                    auto encrypted = encryptSelection(
+                      selection->get(), selectionDescription.get(), elgamalPublicKey,
+                      cryptoExtendedBaseHash, *sharedNonce.get(), false, shouldVerifyProofs);
+                    return encrypted;
+                }));
+
+            } else {
+                // Should never happen since the contest is normalized by emplaceMissingValues
                 throw runtime_error("encryptedContest:: Error constructing encrypted selection");
             }
         }
@@ -345,18 +354,17 @@ namespace electionguard
                 selectionCount += 1;
             }
 
-            auto placeholderSelection = selectionFrom(placeholder, true, selectPlaceholder);
-            auto encryptedSelection =
-              encryptSelection(*placeholderSelection, placeholder, elgamalPublicKey,
-                               cryptoExtendedBaseHash, *contestNonce, false, shouldVerifyProofs);
-
-            if (encryptedSelection == nullptr) {
-                throw runtime_error(
-                  "encryptedContest:: Error constructing encrypted placeholder selection");
-            }
-
-            encryptedSelections.push_back(move(encryptedSelection));
+            tasks.push_back(Scheduler::submit([=] {
+                auto placeholderSelection = selectionFrom(placeholder, true, selectPlaceholder);
+                auto encrypted = encryptSelection(*placeholderSelection, placeholder,
+                                                  elgamalPublicKey, cryptoExtendedBaseHash,
+                                                  *sharedNonce.get(), false, shouldVerifyProofs);
+                return encrypted;
+            }));
         }
+
+        // wait for all tasks to complete
+        encryptedSelections = wait_all(tasks);
 
         // TODO: ISSUE #33: support other cases such as cumulative voting
         // (individual selections being an encryption of > 1)
@@ -369,7 +377,7 @@ namespace electionguard
         auto encryptedContest = CiphertextBallotContest::make(
           contest.getObjectId(), *descriptionHash, move(encryptedSelections), elgamalPublicKey,
           cryptoExtendedBaseHash, *chaumPedersenNonce, description.getNumberElected(),
-          move(contestNonce));
+          sharedNonce->clone());
 
         if (encryptedContest == nullptr || encryptedContest->getProof() == nullptr) {
             throw runtime_error("encryptedContest:: Error constructing encrypted constest");

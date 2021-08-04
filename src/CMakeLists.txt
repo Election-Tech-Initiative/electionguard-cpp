@@ -27,6 +27,8 @@ CPMAddPackage(
   VERSION 1.8.2
 )
 
+find_package(Threads REQUIRED)
+
 # ---- Library Sources ----
 
 set(PROJECT_SOURCE_FILES
@@ -44,6 +46,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum4096.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/hash.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/manifest.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/async.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_code.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_compact.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
@@ -174,13 +177,13 @@ add_library(nlohmann_json INTERFACE IMPORTED)
 target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
 
 if (MINGW)
-    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json spdlog)
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json spdlog Threads::Threads)
 
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
     target_link_libraries(${META_PROJECT_TARGET} PRIVATE -static-libstdc++)
 else()
-    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json spdlog)
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json spdlog Threads::Threads)
 endif()
 
 # ---- Install ----
