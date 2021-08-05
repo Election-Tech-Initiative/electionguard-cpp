@@ -17,15 +17,26 @@ bool test_manifest(void);
 
 int main(void)
 {
-    assert(test_ballot_code() == true);
-    assert(test_ballot() == true);
-    assert(test_chaum_pedersen_proof() == true);
-    assert(test_election() == true);
-    assert(test_elgamal() == true);
-    assert(test_encrypt_compact() == true);
-    assert(test_encrypt() == true);
-    assert(test_hash() == true);
-    assert(test_manifest() == true);
+    printf("\n ---------- RUNNING C TESTS ------------ \n");
 
-    printf("\n C TEST STATUS SUCCESS! \n");
+    bool ballot_code = test_ballot_code();
+    bool ballot = test_ballot();
+    bool proofs = test_chaum_pedersen_proof();
+    bool election = test_election();
+    bool elgamal = test_elgamal();
+    bool encrypt_compact = test_encrypt_compact();
+    bool encrypt = test_encrypt();
+    bool hash = test_hash();
+    bool manifest = test_manifest();
+
+    bool success = ballot_code && ballot && proofs && election && elgamal && encrypt_compact &&
+                   encrypt && hash && manifest;
+
+    if (success == true) {
+        printf("\n ---------- C TEST STATUS SUCCESS! ---------- \n");
+        return 0;
+    } else {
+        printf("\n ---------- C TEST FAILED! ---------- \n");
+        return 1;
+    }
 }

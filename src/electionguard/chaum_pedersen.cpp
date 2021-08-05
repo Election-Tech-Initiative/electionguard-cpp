@@ -248,7 +248,7 @@ namespace electionguard
 
             return false;
         }
-        Log::trace("Proof is Valid!");
+        Log::trace("DisjunctiveChaumPedersenProof::isValid: TRUE!");
         return success;
     }
 

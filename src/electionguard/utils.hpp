@@ -53,7 +53,7 @@ namespace electionguard
         }
 
       private:
-        time_point<steady_clock> _startTime = steady_clock::now();
+        std::chrono::time_point<steady_clock> _startTime = steady_clock::now();
         duration<double> _elapsedTime = duration<double>::zero();
     };
 

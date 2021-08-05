@@ -256,9 +256,9 @@ namespace electionguard
         // TODO: ISSUE #134: encrypt/decrypt: encrypt the extended_data field
 
         auto encrypted = CiphertextBallotSelection::make(
-          selection.getObjectId(), *descriptionHash, move(ciphertext), elgamalPublicKey,
-          cryptoExtendedBaseHash, *proofNonce, selection.getVote(), isPlaceholder,
-          move(selectionNonce));
+          selection.getObjectId(), description.getSequenceOrder(), *descriptionHash,
+          move(ciphertext), elgamalPublicKey, cryptoExtendedBaseHash, *proofNonce,
+          selection.getVote(), isPlaceholder, move(selectionNonce));
 
         if (encrypted == nullptr || encrypted->getProof() == nullptr) {
             throw runtime_error("encryptSelection:: Error constructing encrypted selection");
@@ -375,9 +375,9 @@ namespace electionguard
 
         // Create the return object
         auto encryptedContest = CiphertextBallotContest::make(
-          contest.getObjectId(), *descriptionHash, move(encryptedSelections), elgamalPublicKey,
-          cryptoExtendedBaseHash, *chaumPedersenNonce, description.getNumberElected(),
-          sharedNonce->clone());
+          contest.getObjectId(), description.getSequenceOrder(), *descriptionHash,
+          move(encryptedSelections), elgamalPublicKey, cryptoExtendedBaseHash, *chaumPedersenNonce,
+          description.getNumberElected(), sharedNonce->clone());
 
         if (encryptedContest == nullptr || encryptedContest->getProof() == nullptr) {
             throw runtime_error("encryptedContest:: Error constructing encrypted constest");

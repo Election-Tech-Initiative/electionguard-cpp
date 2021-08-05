@@ -13,17 +13,16 @@
 using std::bad_cast;
 using std::begin;
 using std::end;
+using std::get_time;
+using std::gmtime;
 using std::hex;
+using std::mktime;
 using std::setfill;
 using std::setw;
 using std::string;
-using std::vector;
-using time_point = std::chrono::system_clock::time_point;
-using std::get_time;
-using std::gmtime;
-using std::mktime;
 using std::stringstream;
 using std::uppercase;
+using std::vector;
 using std::wstring;
 using std::chrono::system_clock;
 
@@ -192,10 +191,12 @@ namespace electionguard
         return data_array;
     }
 
-    string timePointToIsoString(const time_point &time);
-    string timePointToIsoString(const time_point &time, const string &format);
-    time_point timePointFromIsoString(const string &time);
-    time_point timePointFromIsoString(const string &time, const string &format);
+    string timePointToIsoString(const std::chrono::system_clock::time_point &time);
+    string timePointToIsoString(const std::chrono::system_clock::time_point &time,
+                                const string &format);
+    std::chrono::system_clock::time_point timePointFromIsoString(const string &time);
+    std::chrono::system_clock::time_point timePointFromIsoString(const string &time,
+                                                                 const string &format);
 
 } // namespace electionguard
 

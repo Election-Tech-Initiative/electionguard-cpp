@@ -5,6 +5,7 @@
 #include <electionguard/constants.h>
 #include <electionguard/group.hpp>
 #include <exception>
+#include <iostream>
 #include <string>
 
 using namespace electionguard;

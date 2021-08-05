@@ -1,7 +1,6 @@
-#include "../../src/electionguard/log.hpp"
-
 #include <doctest/doctest.h>
 #include <electionguard/nonces.hpp>
+#include <iostream>
 
 using namespace electionguard;
 using namespace std;

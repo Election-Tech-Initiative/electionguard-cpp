@@ -53,15 +53,15 @@ TEST_CASE("Encrypt simple selection malformed data fails")
 
     // tamper with the description_hash
     auto malformedDescriptionHash = make_unique<CiphertextBallotSelection>(
-      result->getObjectId(), TWO_MOD_Q(), result->getCiphertext()->clone(),
-      result->getIsPlaceholder(), result->getNonce()->clone(), result->getCryptoHash()->clone(),
-      result->getProof()->clone());
+      result->getObjectId(), metadata->getSequenceOrder(), TWO_MOD_Q(),
+      result->getCiphertext()->clone(), result->getIsPlaceholder(), result->getNonce()->clone(),
+      result->getCryptoHash()->clone(), result->getProof()->clone());
 
     // remove the proof
     auto missingProof = make_unique<CiphertextBallotSelection>(
-      result->getObjectId(), *result->getDescriptionHash(), result->getCiphertext()->clone(),
-      result->getIsPlaceholder(), result->getNonce()->clone(), result->getCryptoHash()->clone(),
-      nullptr);
+      result->getObjectId(), metadata->getSequenceOrder(), *result->getDescriptionHash(),
+      result->getCiphertext()->clone(), result->getIsPlaceholder(), result->getNonce()->clone(),
+      result->getCryptoHash()->clone(), nullptr);
 
     // Assert
     CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
@@ -88,7 +88,6 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert
-    // TODO: validate against manifest->getManifestHash()
     CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
 }
@@ -109,7 +108,6 @@ TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert
-    // TODO: validate against manifest->getManifestHash()
     CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
 }
@@ -129,7 +127,6 @@ TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds")
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert
-    // TODO: validate against metadata->getManifestHash()
     CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
 
