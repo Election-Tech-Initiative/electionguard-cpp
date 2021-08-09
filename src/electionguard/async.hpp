@@ -98,10 +98,10 @@ namespace electionguard
         AsyncQueue(const AsyncQueue &other) = delete;
         AsyncQueue &operator=(const AsyncQueue &other) = delete;
 
-        void empty()
+        bool empty()
         {
             std::lock_guard<std::mutex> lock(_head_mutex);
-            return (_head == _getTail());
+            return (_head.get() == _getTail());
         }
 
         std::shared_ptr<T> pop()
@@ -242,7 +242,14 @@ namespace electionguard
         ThreadPool(const ThreadPool &other) = delete;
         ThreadPool(const ThreadPool &&other) = delete;
 
-        ~ThreadPool() { _running = false; }
+        ~ThreadPool()
+        {
+            wait();
+            _running = false;
+            for (auto &thread : _threads) {
+                thread.join();
+            }
+        }
 
         ThreadPool &operator=(ThreadPool other) = delete;
         ThreadPool &operator=(ThreadPool &&other) = delete;
@@ -263,6 +270,16 @@ namespace electionguard
         AsyncQueue<CallableWrapper> _taskQueue;
         std::mutex queue_mutex = {};
         std::vector<std::thread> _threads;
+
+        void wait()
+        {
+            while (_running) {
+                if (_taskQueue.empty() == true) {
+                    break;
+                }
+                std::this_thread::yield();
+            }
+        }
 
         void worker()
         {
