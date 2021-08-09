@@ -111,9 +111,9 @@ namespace ElectionGuardInterop
     ref class CiphertextBallotSelection : ManagedInstance<electionguard::CiphertextBallotSelection>
     {
       public:
-        CiphertextBallotSelection(String ^ objectId, ElementModQ ^ descriptionHash,
-                                  ElGamalCiphertext ^ ciphertext, bool isPlaceholder,
-                                  ElementModQ ^ nonce, ElementModQ ^ cryptoHash,
+        CiphertextBallotSelection(String ^ objectId, uint64_t sequenceOrder,
+                                  ElementModQ ^ descriptionHash, ElGamalCiphertext ^ ciphertext,
+                                  bool isPlaceholder, ElementModQ ^ nonce, ElementModQ ^ cryptoHash,
                                   DisjunctiveChaumPedersenProof ^ proof,
                                   ElGamalCiphertext ^ extendedData)
         {
@@ -121,7 +121,7 @@ namespace ElectionGuardInterop
             Utilities::MarshalString(objectId, _objectId);
 
             this->_instance = new electionguard::CiphertextBallotSelection(
-              _objectId, *descriptionHash->_instance,
+              _objectId, sequenceOrder, *descriptionHash->_instance,
               std::make_unique<electionguard::ElGamalCiphertext>(*ciphertext->_instance),
               isPlaceholder, std::make_unique<electionguard::ElementModQ>(*nonce->_instance),
               std::make_unique<electionguard::ElementModQ>(*cryptoHash->_instance),
@@ -150,6 +150,9 @@ namespace ElectionGuardInterop
                   return gcnew String(unmanaged.c_str());
               }
           }
+
+          property uint64_t ^
+          SequenceOrder { uint64_t ^ get() { return this->_instance->getSequenceOrder(); } }
 
           property ElementModQ ^
           DescriptionHash {
@@ -286,7 +289,8 @@ namespace ElectionGuardInterop
     ref class CiphertextBallotContest : ManagedInstance<electionguard::CiphertextBallotContest>
     {
       public:
-        CiphertextBallotContest(String ^ objectId, ElementModQ ^ descriptionHash,
+        CiphertextBallotContest(String ^ objectId, uint64_t sequenceOrder,
+                                ElementModQ ^ descriptionHash,
                                 array<CiphertextBallotSelection ^> ^ selections,
                                 ElementModQ ^ nonce, ElGamalCiphertext ^ ciphertextAccumulation,
                                 ElementModQ ^ cryptoHash, ConstantChaumPedersenProof ^ proof)
@@ -302,7 +306,7 @@ namespace ElectionGuardInterop
             }
 
             this->_instance = new electionguard::CiphertextBallotContest(
-              _objectId, *descriptionHash->_instance, std::move(elements),
+              _objectId, sequenceOrder, *descriptionHash->_instance, std::move(elements),
               std::make_unique<electionguard::ElementModQ>(*nonce->_instance),
               std::make_unique<electionguard::ElGamalCiphertext>(
                 *ciphertextAccumulation->_instance),
@@ -331,6 +335,9 @@ namespace ElectionGuardInterop
                   return gcnew String(unmanaged.c_str());
               }
           }
+
+          property uint64_t ^
+          SequenceOrder { uint64_t ^ get() { return this->_instance->getSequenceOrder(); } }
 
           property ElementModQ ^
           DescriptionHash {
