@@ -2,7 +2,6 @@
 #define __ELECTIONGUARD_CPP_ASYNC_HPP_INCLUDED__
 
 #include "electionguard/export.h"
-//#include "thread_pool.hpp"
 #include "log.hpp"
 
 #include <atomic>
@@ -43,6 +42,12 @@ namespace electionguard
     {
       public:
         explicit AsyncSemaphore(size_t count) : _count(count) {}
+        AsyncSemaphore(const AsyncSemaphore &other) = delete;
+        AsyncSemaphore(const AsyncSemaphore &&other) = delete;
+
+        AsyncSemaphore &operator=(AsyncSemaphore other) = delete;
+        AsyncSemaphore &operator=(AsyncSemaphore &&other) = delete;
+
         size_t getCount() const { return _count; };
         void lock()
         {
@@ -96,7 +101,10 @@ namespace electionguard
       public:
         AsyncQueue() : _head(new Node), _tail(_head.get()) {}
         AsyncQueue(const AsyncQueue &other) = delete;
-        AsyncQueue &operator=(const AsyncQueue &other) = delete;
+        AsyncQueue(const AsyncQueue &&other) = delete;
+
+        AsyncQueue &operator=(AsyncQueue other) = delete;
+        AsyncQueue &operator=(AsyncQueue &&other) = delete;
 
         bool empty()
         {
@@ -185,17 +193,6 @@ namespace electionguard
     /// </summary>
     class EG_INTERNAL_API CallableWrapper
     {
-        struct Impl {
-            virtual void call() = 0;
-            virtual ~Impl() {}
-        };
-        std::unique_ptr<Impl> _pimpl;
-        template <typename F> struct TypedImpl : Impl {
-            F callable;
-            TypedImpl(F &&callable) : callable(std::move(callable)) {}
-            void call() { callable(); }
-        };
-
       public:
         CallableWrapper() {}
         template <typename F>
@@ -205,7 +202,9 @@ namespace electionguard
 
         CallableWrapper(CallableWrapper &&other) : _pimpl(std::move(other._pimpl)) {}
 
-        void operator()() { _pimpl->call(); }
+        CallableWrapper(const CallableWrapper &other) = delete;
+
+        CallableWrapper &operator=(const CallableWrapper &) = delete;
 
         CallableWrapper &operator=(CallableWrapper &&other)
         {
@@ -213,11 +212,22 @@ namespace electionguard
             return *this;
         }
 
-        CallableWrapper(const CallableWrapper &) = delete;
-        CallableWrapper(CallableWrapper &) = delete;
-        CallableWrapper &operator=(const CallableWrapper &) = delete;
+        void operator()() { _pimpl->call(); }
 
         void call() { _pimpl->call(); }
+
+      private:
+        struct Impl {
+            virtual void call() = 0;
+            virtual ~Impl() {}
+        };
+        std::unique_ptr<Impl> _pimpl;
+
+        template <typename F> struct TypedImpl : Impl {
+            F callable;
+            TypedImpl(F &&callable) : callable(std::move(callable)) {}
+            void call() { callable(); }
+        };
     };
 
     /// <summary>
