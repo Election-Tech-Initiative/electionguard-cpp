@@ -24,7 +24,8 @@ CPMAddPackage(
 CPMAddPackage(
   NAME spdlog
   GITHUB_REPOSITORY gabime/spdlog
-  VERSION 1.8.2
+  VERSION 1.9.1
+  OPTIONS "SPDLOG_INSTALL ON"
 )
 
 find_package(Threads REQUIRED)
@@ -177,13 +178,13 @@ add_library(nlohmann_json INTERFACE IMPORTED)
 target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
 
 if (MINGW)
-    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json spdlog Threads::Threads)
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json spdlog::spdlog_header_only Threads::Threads)
 
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
     target_link_libraries(${META_PROJECT_TARGET} PRIVATE -static-libstdc++)
 else()
-    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json spdlog Threads::Threads)
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json spdlog::spdlog_header_only Threads::Threads)
 endif()
 
 # ---- Install ----
@@ -201,6 +202,9 @@ install(
     TYPE INCLUDE
     FILES_MATCHING PATTERN "*.h*"
 )
+
+# export the spdlog config
+export(EXPORT spdlog FILE "${project_config_out}")
 
 # Generate the build-tree ElectionGuardConfig.cmake for use 
 # in other cmake projects without needing to install

@@ -82,6 +82,7 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
     add_compile_definitions(JSON_DIAGNOSTICS=1)
 endif()
 
+# Allow explicitly setting debug logs in release builds
 if (LOG_LEVEL MATCHES debug)
     message("++ Using DEBUG Logs")
     add_compile_definitions(LOG_DEBUG)
