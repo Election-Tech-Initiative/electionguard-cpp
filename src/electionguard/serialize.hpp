@@ -954,6 +954,7 @@ namespace electionguard
 
                         json selection_props = {
                           {"object_id", selection.get().getObjectId()},
+                          {"sequence_order", selection.get().getSequenceOrder()},
                           {"description_hash", selection.get().getDescriptionHash()->toHex()},
                           {"ciphertext", ciphertext},
                           {"is_placeholder_selection", selection.get().getIsPlaceholder()},
@@ -980,6 +981,7 @@ namespace electionguard
                     };
                     json contest_props = {
                       {"object_id", contest.get().getObjectId()},
+                      {"sequence_order", contest.get().getSequenceOrder()},
                       {"description_hash", contest.get().getDescriptionHash()->toHex()},
                       {"ballot_selections", selections},
                       {"ciphertext_accumulation", ciphertext},
@@ -1024,6 +1026,7 @@ namespace electionguard
                 ciphertextContests.reserve(contests.size());
                 for (auto &contest : contests) {
                     auto contest_object_id = contest["object_id"].get<string>();
+                    auto contest_sequence_order = contest["sequence_order"].get<uint64_t>();
                     auto contest_description_hash = contest["description_hash"].get<string>();
                     auto contest_nonce =
                       contest["nonce"].is_null() ? "" : contest["nonce"].get<string>();
@@ -1056,6 +1059,7 @@ namespace electionguard
                     ciphertextSelections.reserve(selections.size());
                     for (auto &selection : selections) {
                         auto selection_object_id = selection["object_id"].get<string>();
+                        auto selection_sequence_order = selection["sequence_order"].get<uint64_t>();
                         auto selection_description_hash =
                           selection["description_hash"].get<string>();
                         auto selection_is_placeholder_selection =
@@ -1109,7 +1113,8 @@ namespace electionguard
 
                         ciphertextSelections.push_back(
                           make_unique<electionguard::CiphertextBallotSelection>(
-                            selection_object_id, *ElementModQ::fromHex(selection_description_hash),
+                            selection_object_id, selection_sequence_order,
+                            *ElementModQ::fromHex(selection_description_hash),
                             move(deserializedCiphertext), selection_is_placeholder_selection,
                             move(nonce), ElementModQ::fromHex(selection_crypto_hash),
                             move(deserializedDisjunctive)));
@@ -1120,9 +1125,9 @@ namespace electionguard
 
                     ciphertextContests.push_back(
                       make_unique<electionguard::CiphertextBallotContest>(
-                        contest_object_id, *ElementModQ::fromHex(contest_description_hash),
-                        move(ciphertextSelections), move(nonce),
-                        move(deserialized_contest_ciphertext),
+                        contest_object_id, contest_sequence_order,
+                        *ElementModQ::fromHex(contest_description_hash), move(ciphertextSelections),
+                        move(nonce), move(deserialized_contest_ciphertext),
                         ElementModQ::fromHex(contest_crypto_hash), move(deserializedProof)));
                 }
 

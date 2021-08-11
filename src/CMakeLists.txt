@@ -21,6 +21,15 @@ CPMAddPackage(
     URL_HASH SHA256=6bea5877b1541d353bd77bdfbdb2696333ae5ed8f9e8cc22df657192218cad91
 )
 
+CPMAddPackage(
+  NAME spdlog
+  GITHUB_REPOSITORY gabime/spdlog
+  VERSION 1.9.1
+  OPTIONS "SPDLOG_INSTALL ON"
+)
+
+find_package(Threads REQUIRED)
+
 # ---- Library Sources ----
 
 set(PROJECT_SOURCE_FILES
@@ -38,6 +47,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum4096.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/hash.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/manifest.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/async.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_code.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_compact.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
@@ -49,6 +59,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/group.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/log.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/log.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/manifest.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp
@@ -167,13 +178,13 @@ add_library(nlohmann_json INTERFACE IMPORTED)
 target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
 
 if (MINGW)
-    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json)
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json spdlog::spdlog_header_only Threads::Threads)
 
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
     target_link_libraries(${META_PROJECT_TARGET} PRIVATE -static-libstdc++)
 else()
-    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json)
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json spdlog::spdlog_header_only Threads::Threads)
 endif()
 
 # ---- Install ----
@@ -191,6 +202,9 @@ install(
     TYPE INCLUDE
     FILES_MATCHING PATTERN "*.h*"
 )
+
+# export the spdlog config
+export(EXPORT spdlog FILE "${project_config_out}")
 
 # Generate the build-tree ElectionGuardConfig.cmake for use 
 # in other cmake projects without needing to install

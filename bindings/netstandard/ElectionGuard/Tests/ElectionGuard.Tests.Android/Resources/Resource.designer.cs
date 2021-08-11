@@ -25,6 +25,7 @@ namespace ElectionGuard.Tests.Android
 		
 		public static void UpdateIdValues()
 		{
+			global::Xamarin.Android.NUnitLite.Resource.Id.CreditsButton = global::ElectionGuard.Tests.Android.Resource.Id.CreditsButton;
 			global::Xamarin.Android.NUnitLite.Resource.Id.OptionHostName = global::ElectionGuard.Tests.Android.Resource.Id.OptionHostName;
 			global::Xamarin.Android.NUnitLite.Resource.Id.OptionPort = global::ElectionGuard.Tests.Android.Resource.Id.OptionPort;
 			global::Xamarin.Android.NUnitLite.Resource.Id.OptionRemoteServer = global::ElectionGuard.Tests.Android.Resource.Id.OptionRemoteServer;
@@ -41,10 +42,12 @@ namespace ElectionGuard.Tests.Android
 			global::Xamarin.Android.NUnitLite.Resource.Id.ResultsPassed = global::ElectionGuard.Tests.Android.Resource.Id.ResultsPassed;
 			global::Xamarin.Android.NUnitLite.Resource.Id.ResultsResult = global::ElectionGuard.Tests.Android.Resource.Id.ResultsResult;
 			global::Xamarin.Android.NUnitLite.Resource.Id.ResultStackTrace = global::ElectionGuard.Tests.Android.Resource.Id.ResultStackTrace;
+			global::Xamarin.Android.NUnitLite.Resource.Id.RunEverythingButton = global::ElectionGuard.Tests.Android.Resource.Id.RunEverythingButton;
 			global::Xamarin.Android.NUnitLite.Resource.Id.RunTestsButton = global::ElectionGuard.Tests.Android.Resource.Id.RunTestsButton;
 			global::Xamarin.Android.NUnitLite.Resource.Id.TestSuiteListView = global::ElectionGuard.Tests.Android.Resource.Id.TestSuiteListView;
 			global::Xamarin.Android.NUnitLite.Resource.Layout.options = global::ElectionGuard.Tests.Android.Resource.Layout.options;
 			global::Xamarin.Android.NUnitLite.Resource.Layout.results = global::ElectionGuard.Tests.Android.Resource.Layout.results;
+			global::Xamarin.Android.NUnitLite.Resource.Layout.Runner = global::ElectionGuard.Tests.Android.Resource.Layout.Runner;
 			global::Xamarin.Android.NUnitLite.Resource.Layout.test_result = global::ElectionGuard.Tests.Android.Resource.Layout.test_result;
 			global::Xamarin.Android.NUnitLite.Resource.Layout.test_suite = global::ElectionGuard.Tests.Android.Resource.Layout.test_suite;
 		}
@@ -91,58 +94,64 @@ namespace ElectionGuard.Tests.Android
 		{
 			
 			// aapt resource value: 0x7F020000
-			public const int OptionHostName = 2130837504;
+			public const int CreditsButton = 2130837504;
 			
 			// aapt resource value: 0x7F020001
-			public const int OptionPort = 2130837505;
+			public const int OptionHostName = 2130837505;
 			
 			// aapt resource value: 0x7F020002
-			public const int OptionRemoteServer = 2130837506;
+			public const int OptionPort = 2130837506;
 			
 			// aapt resource value: 0x7F020003
-			public const int OptionsButton = 2130837507;
+			public const int OptionRemoteServer = 2130837507;
 			
 			// aapt resource value: 0x7F020004
-			public const int ResultFullName = 2130837508;
+			public const int OptionsButton = 2130837508;
 			
 			// aapt resource value: 0x7F020005
-			public const int ResultMessage = 2130837509;
+			public const int ResultFullName = 2130837509;
 			
 			// aapt resource value: 0x7F020006
-			public const int ResultResultState = 2130837510;
+			public const int ResultMessage = 2130837510;
 			
 			// aapt resource value: 0x7F020007
-			public const int ResultRunSingleMethodTest = 2130837511;
-			
-			// aapt resource value: 0x7F020009
-			public const int ResultsFailed = 2130837513;
-			
-			// aapt resource value: 0x7F02000A
-			public const int ResultsId = 2130837514;
-			
-			// aapt resource value: 0x7F02000B
-			public const int ResultsIgnored = 2130837515;
-			
-			// aapt resource value: 0x7F02000C
-			public const int ResultsInconclusive = 2130837516;
-			
-			// aapt resource value: 0x7F02000D
-			public const int ResultsMessage = 2130837517;
-			
-			// aapt resource value: 0x7F02000E
-			public const int ResultsPassed = 2130837518;
-			
-			// aapt resource value: 0x7F02000F
-			public const int ResultsResult = 2130837519;
+			public const int ResultResultState = 2130837511;
 			
 			// aapt resource value: 0x7F020008
-			public const int ResultStackTrace = 2130837512;
+			public const int ResultRunSingleMethodTest = 2130837512;
+			
+			// aapt resource value: 0x7F02000A
+			public const int ResultsFailed = 2130837514;
+			
+			// aapt resource value: 0x7F02000B
+			public const int ResultsId = 2130837515;
+			
+			// aapt resource value: 0x7F02000C
+			public const int ResultsIgnored = 2130837516;
+			
+			// aapt resource value: 0x7F02000D
+			public const int ResultsInconclusive = 2130837517;
+			
+			// aapt resource value: 0x7F02000E
+			public const int ResultsMessage = 2130837518;
+			
+			// aapt resource value: 0x7F02000F
+			public const int ResultsPassed = 2130837519;
 			
 			// aapt resource value: 0x7F020010
-			public const int RunTestsButton = 2130837520;
+			public const int ResultsResult = 2130837520;
+			
+			// aapt resource value: 0x7F020009
+			public const int ResultStackTrace = 2130837513;
 			
 			// aapt resource value: 0x7F020011
-			public const int TestSuiteListView = 2130837521;
+			public const int RunEverythingButton = 2130837521;
+			
+			// aapt resource value: 0x7F020012
+			public const int RunTestsButton = 2130837522;
+			
+			// aapt resource value: 0x7F020013
+			public const int TestSuiteListView = 2130837523;
 			
 			static Id()
 			{
@@ -164,10 +173,13 @@ namespace ElectionGuard.Tests.Android
 			public const int results = 2130903041;
 			
 			// aapt resource value: 0x7F030002
-			public const int test_result = 2130903042;
+			public const int Runner = 2130903042;
 			
 			// aapt resource value: 0x7F030003
-			public const int test_suite = 2130903043;
+			public const int test_result = 2130903043;
+			
+			// aapt resource value: 0x7F030004
+			public const int test_suite = 2130903044;
 			
 			static Layout()
 			{

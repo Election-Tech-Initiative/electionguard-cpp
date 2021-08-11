@@ -120,12 +120,12 @@ namespace electionguard
     bool PlaintextBallotSelection::isValid(const std::string &expectedObjectId) const
     {
         if (pimpl->object_id != expectedObjectId) {
-            Log::debug("invalid object_id: expected: " + expectedObjectId +
-                       " actual: " + pimpl->object_id);
+            Log::info("invalid object_id: expected: " + expectedObjectId +
+                      " actual: " + pimpl->object_id);
             return false;
         }
         if (pimpl->vote > 1) {
-            Log::debug("Currently only supporting choices of 0 or 1");
+            Log::warn("Currently only supporting choices of 0 or 1");
             return false;
         }
         return true;
@@ -144,6 +144,7 @@ namespace electionguard
 
     struct CiphertextBallotSelection::Impl {
         string objectId;
+        uint64_t sequenceOrder;
         unique_ptr<ElementModQ> descriptionHash;
         unique_ptr<ElGamalCiphertext> ciphertext;
         bool isPlaceholder;
@@ -152,14 +153,15 @@ namespace electionguard
         unique_ptr<DisjunctiveChaumPedersenProof> proof;
         unique_ptr<ElGamalCiphertext> extendedData;
 
-        Impl(string objectId, unique_ptr<ElementModQ> descriptionHash,
+        Impl(string objectId, uint64_t sequenceOrder, unique_ptr<ElementModQ> descriptionHash,
              unique_ptr<ElGamalCiphertext> ciphertext, bool isPlaceholder,
              unique_ptr<ElementModQ> nonce, unique_ptr<ElementModQ> cryptoHash,
              unique_ptr<DisjunctiveChaumPedersenProof> proof,
              unique_ptr<ElGamalCiphertext> extendedData)
-            : objectId(move(objectId)), descriptionHash(move(descriptionHash)),
-              ciphertext(move(ciphertext)), nonce(move(nonce)), cryptoHash(move(cryptoHash)),
-              proof(move(proof)), extendedData(move(extendedData))
+            : objectId(move(objectId)), sequenceOrder(sequenceOrder),
+              descriptionHash(move(descriptionHash)), ciphertext(move(ciphertext)),
+              nonce(move(nonce)), cryptoHash(move(cryptoHash)), proof(move(proof)),
+              extendedData(move(extendedData))
         {
             this->isPlaceholder = isPlaceholder;
         }
@@ -175,8 +177,8 @@ namespace electionguard
               extendedData != nullptr ? make_unique<ElGamalCiphertext>(*extendedData) : nullptr;
 
             return make_unique<CiphertextBallotSelection::Impl>(
-              objectId, move(_descriptionHash), move(_ciphertext), isPlaceholder, move(_nonce),
-              move(_cryptoHash), move(_proof), move(_extendedData));
+              objectId, sequenceOrder, move(_descriptionHash), move(_ciphertext), isPlaceholder,
+              move(_nonce), move(_cryptoHash), move(_proof), move(_extendedData));
         }
 
         [[nodiscard]] unique_ptr<ElementModQ>
@@ -194,13 +196,13 @@ namespace electionguard
     }
 
     CiphertextBallotSelection::CiphertextBallotSelection(
-      const string &objectId, const ElementModQ &descriptionHash,
+      const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
       unique_ptr<ElGamalCiphertext> ciphertext, bool isPlaceholder, unique_ptr<ElementModQ> nonce,
       unique_ptr<ElementModQ> cryptoHash, unique_ptr<DisjunctiveChaumPedersenProof> proof,
       unique_ptr<ElGamalCiphertext> extendedData)
-        : pimpl(new Impl(objectId, make_unique<ElementModQ>(descriptionHash), move(ciphertext),
-                         isPlaceholder, move(nonce), move(cryptoHash), move(proof),
-                         move(extendedData)))
+        : pimpl(new Impl(objectId, sequenceOrder, make_unique<ElementModQ>(descriptionHash),
+                         move(ciphertext), isPlaceholder, move(nonce), move(cryptoHash),
+                         move(proof), move(extendedData)))
 
     {
     }
@@ -216,6 +218,8 @@ namespace electionguard
     // property Getters
 
     string CiphertextBallotSelection::getObjectId() const { return pimpl->objectId; }
+
+    uint64_t CiphertextBallotSelection::getSequenceOrder() const { return pimpl->sequenceOrder; }
 
     ElementModQ *CiphertextBallotSelection::getDescriptionHash() const
     {
@@ -252,7 +256,7 @@ namespace electionguard
     // public Static Members
 
     unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make(
-      const string &objectId, const ElementModQ &descriptionHash,
+      const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
       unique_ptr<ElGamalCiphertext> ciphertext, const ElementModP &elgamalPublicKey,
       const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &proofSeed, uint64_t plaintext,
       bool isPlaceholder /* = false */, unique_ptr<ElementModQ> nonce /* = nullptr */,
@@ -268,9 +272,9 @@ namespace electionguard
             proof = DisjunctiveChaumPedersenProof::make(
               *ciphertext, *nonce, elgamalPublicKey, cryptoExtendedBaseHash, proofSeed, plaintext);
         }
-        return make_unique<CiphertextBallotSelection>(objectId, descriptionHash, move(ciphertext),
-                                                      isPlaceholder, move(nonce), move(cryptoHash),
-                                                      move(proof), move(extendedData));
+        return make_unique<CiphertextBallotSelection>(
+          objectId, sequenceOrder, descriptionHash, move(ciphertext), isPlaceholder, move(nonce),
+          move(cryptoHash), move(proof), move(extendedData));
     }
 
     unique_ptr<ElementModQ>
@@ -286,22 +290,22 @@ namespace electionguard
                                                       const ElementModQ &cryptoExtendedBaseHash)
     {
         if ((const_cast<ElementModQ &>(encryptionSeed) != *pimpl->descriptionHash)) {
-            Log::debug(": CiphertextBallotSelection mismatching selection hash: ");
-            Log::debugHex(": expected: ", encryptionSeed.toHex());
-            Log::debugHex(": actual: ", pimpl->descriptionHash->toHex());
+            Log::info(": CiphertextBallotSelection mismatching selection hash: ");
+            Log::info(": expected: ", encryptionSeed.toHex());
+            Log::info(": actual: ", pimpl->descriptionHash->toHex());
             return false;
         }
 
         auto recalculatedCryptoHash = crypto_hash_with(encryptionSeed);
         if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
-            Log::debug(": CiphertextBallotSelection mismatching crypto hash: ");
-            Log::debugHex(": expected: ", recalculatedCryptoHash->toHex());
-            Log::debugHex(": actual: ", pimpl->cryptoHash->toHex());
+            Log::info(": CiphertextBallotSelection mismatching crypto hash: ");
+            Log::info(": expected: ", recalculatedCryptoHash->toHex());
+            Log::info(": actual: ", pimpl->cryptoHash->toHex());
             return false;
         }
 
         if (pimpl->proof == nullptr) {
-            Log::debug(": No proof exists for: " + pimpl->objectId);
+            Log::info(": No proof exists for: " + pimpl->objectId);
             return false;
         }
         return pimpl->proof->isValid(*pimpl->ciphertext, elgamalPublicKey, cryptoExtendedBaseHash);
@@ -392,12 +396,12 @@ namespace electionguard
                                          uint64_t votesAllowd /* = 0 */) const
     {
         if (pimpl->object_id != expectedObjectId) {
-            Log::debug(": invalid objectId");
+            Log::info(": invalid objectId");
             return false;
         }
 
         if (pimpl->selections.size() > expectedNumberSelections) {
-            Log::debug(": too many selections");
+            Log::info(": too many selections");
             return false;
         }
 
@@ -412,7 +416,7 @@ namespace electionguard
         }
 
         if (numberElected > expectedNumberElected) {
-            Log::debug(": too many elections");
+            Log::info(": too many elections");
             return false;
         }
 
@@ -421,7 +425,7 @@ namespace electionguard
         }
 
         if (votes > votesAllowd) {
-            Log::debug(": too many votes");
+            Log::info(": too many votes");
             return false;
         }
 
@@ -433,6 +437,7 @@ namespace electionguard
 #pragma region CiphertextBallotContest
 
     struct CiphertextBallotContest::Impl : ElectionObjectBase {
+        uint64_t sequenceOrder;
         unique_ptr<ElementModQ> descriptionHash;
         vector<unique_ptr<CiphertextBallotSelection>> selections;
         unique_ptr<ElementModQ> nonce;
@@ -440,13 +445,15 @@ namespace electionguard
         unique_ptr<ElementModQ> cryptoHash;
         unique_ptr<ConstantChaumPedersenProof> proof;
 
-        Impl(const string &objectId, unique_ptr<ElementModQ> descriptionHash,
+        Impl(const string &objectId, uint64_t sequenceOrder,
+             unique_ptr<ElementModQ> descriptionHash,
              vector<unique_ptr<CiphertextBallotSelection>> selections,
              unique_ptr<ElementModQ> nonce, unique_ptr<ElGamalCiphertext> ciphertextAccumulation,
              unique_ptr<ElementModQ> cryptoHash, unique_ptr<ConstantChaumPedersenProof> proof)
-            : descriptionHash(move(descriptionHash)), selections(move(selections)),
-              nonce(move(nonce)), ciphertextAccumulation(move(ciphertextAccumulation)),
-              cryptoHash(move(cryptoHash)), proof(move(proof))
+            : sequenceOrder(sequenceOrder), descriptionHash(move(descriptionHash)),
+              selections(move(selections)), nonce(move(nonce)),
+              ciphertextAccumulation(move(ciphertextAccumulation)), cryptoHash(move(cryptoHash)),
+              proof(move(proof))
         {
             this->object_id = objectId;
         }
@@ -466,7 +473,7 @@ namespace electionguard
             auto _proof = make_unique<ConstantChaumPedersenProof>(*proof);
 
             return make_unique<CiphertextBallotContest::Impl>(
-              object_id, move(_descriptionHash), move(_selections), move(_nonce),
+              object_id, sequenceOrder, move(_descriptionHash), move(_selections), move(_nonce),
               move(_accumulation), move(_cryptoHash), move(_proof));
         }
     };
@@ -479,12 +486,13 @@ namespace electionguard
     }
 
     CiphertextBallotContest::CiphertextBallotContest(
-      const string &objectId, const ElementModQ &descriptionHash,
+      const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
       vector<unique_ptr<CiphertextBallotSelection>> selections, unique_ptr<ElementModQ> nonce,
       unique_ptr<ElGamalCiphertext> ciphertextAccumulation, unique_ptr<ElementModQ> cryptoHash,
       unique_ptr<ConstantChaumPedersenProof> proof)
-        : pimpl(new Impl(objectId, make_unique<ElementModQ>(descriptionHash), move(selections),
-                         move(nonce), move(ciphertextAccumulation), move(cryptoHash), move(proof)))
+        : pimpl(new Impl(objectId, sequenceOrder, make_unique<ElementModQ>(descriptionHash),
+                         move(selections), move(nonce), move(ciphertextAccumulation),
+                         move(cryptoHash), move(proof)))
     {
     }
     CiphertextBallotContest::~CiphertextBallotContest() = default;
@@ -498,6 +506,8 @@ namespace electionguard
     // Property Getters
 
     string CiphertextBallotContest::getObjectId() const { return pimpl->object_id; }
+
+    uint64_t CiphertextBallotContest::getSequenceOrder() const { return pimpl->sequenceOrder; }
 
     ElementModQ *CiphertextBallotContest::getDescriptionHash() const
     {
@@ -513,12 +523,11 @@ namespace electionguard
             references.push_back(ref(*selection));
         }
 
-        // TODO: add sequence order to object
-        // sort(references.begin(), references.end(),
-        //      [](const reference_wrapper<CiphertextBallotSelection> left,
-        //         const reference_wrapper<CiphertextBallotSelection> right) {
-        //          return left.get().getSequenceOrder() < right.get().getSequenceOrder();
-        //      });
+        sort(references.begin(), references.end(),
+             [](const reference_wrapper<CiphertextBallotSelection> left,
+                const reference_wrapper<CiphertextBallotSelection> right) {
+                 return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+             });
         return references;
     }
 
@@ -547,7 +556,7 @@ namespace electionguard
     // Public Static Methods
 
     unique_ptr<CiphertextBallotContest> CiphertextBallotContest::make(
-      const string &objectId, const ElementModQ &descriptionHash,
+      const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
       vector<unique_ptr<CiphertextBallotSelection>> selections, const ElementModP &elgamalPublicKey,
       const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &proofSeed,
       uint64_t numberElected, unique_ptr<ElementModQ> nonce /* = nullptr */,
@@ -559,6 +568,12 @@ namespace electionguard
         for (const auto &selection : selections) {
             selectionReferences.push_back(ref(*selection));
         }
+
+        sort(selectionReferences.begin(), selectionReferences.end(),
+             [](const reference_wrapper<CiphertextBallotSelection> left,
+                const reference_wrapper<CiphertextBallotSelection> right) {
+                 return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+             });
 
         if (cryptoHash == nullptr) {
             auto crypto_hash = makeCryptoHash(objectId, selectionReferences, descriptionHash);
@@ -573,9 +588,9 @@ namespace electionguard
                                                proofSeed, cryptoExtendedBaseHash, numberElected);
             proof = move(owned_proof);
         }
-        return make_unique<CiphertextBallotContest>(objectId, descriptionHash, move(selections),
-                                                    move(nonce), move(accumulation),
-                                                    move(cryptoHash), move(proof));
+        return make_unique<CiphertextBallotContest>(
+          objectId, sequenceOrder, descriptionHash, move(selections), move(nonce),
+          move(accumulation), move(cryptoHash), move(proof));
     }
 
     // Public Methods
@@ -594,43 +609,60 @@ namespace electionguard
                                                     const ElementModP &elgamalPublicKey,
                                                     const ElementModQ &cryptoExtendedBaseHash)
     {
+        bool consistent_encryption_seed = true;
         if ((const_cast<ElementModQ &>(encryptionSeed) != *pimpl->descriptionHash)) {
-            Log::debug(": CiphertextBallotContest mismatching constest hash: ");
-            Log::debugHex(": expected: ", encryptionSeed.toHex());
-            Log::debugHex(": actual: ", pimpl->descriptionHash->toHex());
-            return false;
+            Log::debug("CiphertextBallotContest mismatching constest hash");
+            Log::debug("expected", encryptionSeed.toHex());
+            Log::debug("actual", pimpl->descriptionHash->toHex());
+            consistent_encryption_seed = false;
         }
 
+        bool consistent_crypto_hash = true;
         auto recalculatedCryptoHash = crypto_hash_with(encryptionSeed);
         if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
-            Log::debug(": CiphertextBallotContest mismatching crypto hash: ");
-            Log::debugHex(": expected: ", recalculatedCryptoHash->toHex());
-            Log::debugHex(": actual: ", pimpl->cryptoHash->toHex());
-            return false;
+            Log::debug("CiphertextBallotContest mismatching crypto hash");
+            Log::debug("expected", recalculatedCryptoHash->toHex());
+            Log::debug("actual", pimpl->cryptoHash->toHex());
+            consistent_crypto_hash = false;
         }
 
         // NOTE: this check does not verify the proofs of the individual selections by design.
 
+        bool proof_exists = true;
         if (!pimpl->proof) {
-            Log::debug(": no proof exists for: " + pimpl->object_id);
-            return false;
+            Log::debug("no proof exists for" + pimpl->object_id);
+            proof_exists = false;
         }
 
+        bool consistent_accumulation = true;
         auto computedAccumulation = this->elgamalAccumulate();
 
         // Verify that the contest ciphertext matches the elgamal accumulation of all selections
         if (*pimpl->ciphertextAccumulation != *computedAccumulation) {
-            Log::debug(": ciphertext does not equal elgamal accumulation for : " +
-                       pimpl->object_id);
-            Log::debugHex(": expected (pad): ", computedAccumulation->getPad()->toHex());
-            Log::debugHex(": expected (data): ", computedAccumulation->getData()->toHex());
-            Log::debugHex(": actual (pad): ", pimpl->ciphertextAccumulation->getPad()->toHex());
-            Log::debugHex(": actual (data): ", pimpl->ciphertextAccumulation->getData()->toHex());
-            return false;
+            Log::debug("ciphertext does not equal elgamal accumulation for" + pimpl->object_id);
+            Log::debug("expected (pad)", computedAccumulation->getPad()->toHex());
+            Log::debug("expected (data)", computedAccumulation->getData()->toHex());
+            Log::debug("actual (pad)", pimpl->ciphertextAccumulation->getPad()->toHex());
+            Log::debug("actual (data)", pimpl->ciphertextAccumulation->getData()->toHex());
+            consistent_accumulation = false;
         }
 
-        return pimpl->proof->isValid(*computedAccumulation, elgamalPublicKey,
-                                     cryptoExtendedBaseHash);
+        bool valid_proof =
+          pimpl->proof->isValid(*computedAccumulation, elgamalPublicKey, cryptoExtendedBaseHash);
+
+        bool success = consistent_encryption_seed && consistent_crypto_hash && proof_exists &&
+                       consistent_accumulation && valid_proof;
+
+        if (!success) {
+            map<string, bool> printMap{{"consistent_encryption_seed", consistent_encryption_seed},
+                                       {"consistent_crypto_hash", consistent_crypto_hash},
+                                       {"proof_exists", proof_exists},
+                                       {"consistent_accumulation", consistent_accumulation},
+                                       {"valid_proof", valid_proof}};
+
+            Log::info("CiphertextBallotContest::isValidEncryption failed!", printMap);
+        }
+        return success;
     }
 
     // Protected Members
@@ -856,12 +888,11 @@ namespace electionguard
             references.push_back(ref(*contest));
         }
 
-        // TODO: add sequence order to object
-        // sort(references.begin(), references.end(),
-        //      [](const reference_wrapper<CiphertextBallotContest> left,
-        //         const reference_wrapper<CiphertextBallotContest> right) {
-        //          return left.get().getSequenceOrder() < right.get().getSequenceOrder();
-        //      });
+        sort(references.begin(), references.end(),
+             [](const reference_wrapper<CiphertextBallotContest> left,
+                const reference_wrapper<CiphertextBallotContest> right) {
+                 return left.get().getSequenceOrder() < right.get().getSequenceOrder();
+             });
         return references;
     }
 
@@ -891,7 +922,7 @@ namespace electionguard
       unique_ptr<ElementModQ> ballotCode /* = nullptr */)
     {
         if (contests.empty()) {
-            Log::debug(":ballot must have at least some contests");
+            Log::error(":ballot must have at least some contests");
             throw invalid_argument("ballot must have at least some contests");
         }
 
@@ -934,17 +965,17 @@ namespace electionguard
                                              const ElementModQ &cryptoExtendedBaseHash)
     {
         if ((const_cast<ElementModQ &>(manifestHash) != *pimpl->manifestHash)) {
-            Log::debug(": CiphertextBallot mismatching manifestHash: ");
-            Log::debugHex(": expected: ", manifestHash.toHex());
-            Log::debugHex(": actual: ", pimpl->manifestHash->toHex());
+            Log::info(": CiphertextBallot mismatching manifestHash: ");
+            Log::info(": expected: ", manifestHash.toHex());
+            Log::info(": actual: ", pimpl->manifestHash->toHex());
             return false;
         }
 
         auto recalculatedCryptoHash = crypto_hash_with(manifestHash);
         if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
-            Log::debug(": CiphertextBallot mismatching crypto hash: ");
-            Log::debugHex(": expected: ", recalculatedCryptoHash->toHex());
-            Log::debugHex(": actual: ", pimpl->cryptoHash->toHex());
+            Log::info(": CiphertextBallot mismatching crypto hash: ");
+            Log::info(": expected: ", recalculatedCryptoHash->toHex());
+            Log::info(": actual: ", pimpl->cryptoHash->toHex());
             return false;
         }
 
@@ -964,7 +995,7 @@ namespace electionguard
         bool isValid = true;
         for (const auto &[key, value] : validProofs) {
             if (!value) {
-                Log::debug(": CiphertextBallot found invalid proof for: " + key);
+                Log::info(": CiphertextBallot found invalid proof for: " + key);
                 isValid = false;
             }
         }
@@ -1084,7 +1115,7 @@ namespace electionguard
       BallotBoxState state /* = BallotBoxState::unknown */)
     {
         if (contests.empty()) {
-            Log::debug(":ballot must have at least some contests");
+            Log::error(":ballot must have at least some contests");
             throw invalid_argument("ballot must have at least some contests");
         }
 

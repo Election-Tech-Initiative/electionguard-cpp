@@ -36,52 +36,51 @@ struct TestEncryptFixture {
     }
 };
 
-TEST_SUITE("Test Encrypt Compact Ballot")
+TEST_CASE("Can encrypt compact ballots")
 {
     auto fixture = make_unique<TestEncryptFixture>();
+    // Assert
+    CHECK(fixture->compactCiphertext->getObjectId() == fixture->plaintext->getObjectId());
+}
 
-    TEST_CASE("Can encrypt compact ballots")
-    {
-        // Assert
-        CHECK(fixture->compactCiphertext->getObjectId() == fixture->plaintext->getObjectId());
-    }
+TEST_CASE("Can Serialize CompactCiphertextBallot")
+{
+    auto fixture = make_unique<TestEncryptFixture>();
+    auto json = fixture->compactCiphertext->toJson();
+    Log::debug(json);
+    // Assert
+    auto msgpack = fixture->compactCiphertext->toMsgPack();
+    auto fromMsgpack = CompactCiphertextBallot::fromMsgPack(msgpack);
+    CHECK(fromMsgpack->getNonce()->toHex() == fixture->compactCiphertext->getNonce()->toHex());
+}
 
-    TEST_CASE("Can Serialize CompactCiphertextBallot")
-    {
-        auto json = fixture->compactCiphertext->toJson();
-        Log::debug(json);
-        // Assert
-        auto msgpack = fixture->compactCiphertext->toMsgPack();
-        auto fromMsgpack = CompactCiphertextBallot::fromMsgPack(msgpack);
-        CHECK(fromMsgpack->getNonce()->toHex() == fixture->compactCiphertext->getNonce()->toHex());
-    }
+TEST_CASE("Can Expand Plaintext")
+{
+    auto fixture = make_unique<TestEncryptFixture>();
+    auto expandedPlaintext =
+      expandCompactPlaintextBallot(*fixture->compactCiphertext->getPlaintext(), *fixture->manifest);
 
-    TEST_CASE("Can Expand Plaintext")
-    {
-        auto expandedPlaintext = expandCompactPlaintextBallot(
-          *fixture->compactCiphertext->getPlaintext(), *fixture->manifest);
+    // Assert
+    CHECK(expandedPlaintext->getObjectId() == fixture->compactCiphertext->getObjectId());
 
-        // Assert
-        CHECK(expandedPlaintext->getObjectId() == fixture->compactCiphertext->getObjectId());
+    auto msgpack = expandedPlaintext->toMsgPack();
+    auto fromMsgPack = PlaintextBallot::fromMsgPack(msgpack);
+    CHECK(fromMsgPack->getObjectId() == expandedPlaintext->getObjectId());
+}
 
-        auto msgpack = expandedPlaintext->toMsgPack();
-        auto fromMsgPack = PlaintextBallot::fromMsgPack(msgpack);
-        CHECK(fromMsgPack->getObjectId() == expandedPlaintext->getObjectId());
-    }
+TEST_CASE("Can Expand Ciphertext")
+{
+    auto fixture = make_unique<TestEncryptFixture>();
+    auto json = fixture->compactCiphertext->toJson();
+    Log::debug(json);
 
-    TEST_CASE("Can Expand Ciphertext")
-    {
-        auto json = fixture->compactCiphertext->toJson();
-        Log::debug(json);
+    auto expandedCiphertext = expandCompactCiphertextBallot(*fixture->compactCiphertext,
+                                                            *fixture->manifest, *fixture->context);
 
-        auto expandedCiphertext = expandCompactCiphertextBallot(
-          *fixture->compactCiphertext, *fixture->manifest, *fixture->context);
-
-        // Assert
-        CHECK(expandedCiphertext->getNonce()->toHex() ==
-              fixture->compactCiphertext->getNonce()->toHex());
-        CHECK(expandedCiphertext->isValidEncryption(
-                *fixture->context->getManifestHash(), *fixture->keypair->getPublicKey(),
-                *fixture->context->getCryptoExtendedBaseHash()) == true);
-    }
+    // Assert
+    CHECK(expandedCiphertext->getNonce()->toHex() ==
+          fixture->compactCiphertext->getNonce()->toHex());
+    CHECK(expandedCiphertext->isValidEncryption(
+            *fixture->context->getManifestHash(), *fixture->keypair->getPublicKey(),
+            *fixture->context->getCryptoExtendedBaseHash()) == true);
 }

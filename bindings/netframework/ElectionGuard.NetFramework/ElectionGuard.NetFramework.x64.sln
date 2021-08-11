@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "electionguard", "..\..\..\b
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ElectionGuardInterop", "ElectionGuardInterop\ElectionGuardInterop.vcxproj", "{84DFC423-E292-41C0-ACC4-7AEB3BC50853}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuard.Bench", "Tests\ElectionGuard.Bench\ElectionGuard.Bench.csproj", "{33441D29-4B12-4DA4-9C62-57012CED11E0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{84DFC423-E292-41C0-ACC4-7AEB3BC50853}.Release|x64.Build.0 = Release|x64
 		{84DFC423-E292-41C0-ACC4-7AEB3BC50853}.RelWithDebInfo|x64.ActiveCfg = Release|x64
 		{84DFC423-E292-41C0-ACC4-7AEB3BC50853}.RelWithDebInfo|x64.Build.0 = Release|x64
+		{33441D29-4B12-4DA4-9C62-57012CED11E0}.Debug|x64.ActiveCfg = Debug|x64
+		{33441D29-4B12-4DA4-9C62-57012CED11E0}.Debug|x64.Build.0 = Debug|x64
+		{33441D29-4B12-4DA4-9C62-57012CED11E0}.MinSizeRel|x64.ActiveCfg = Debug|x64
+		{33441D29-4B12-4DA4-9C62-57012CED11E0}.MinSizeRel|x64.Build.0 = Debug|x64
+		{33441D29-4B12-4DA4-9C62-57012CED11E0}.Release|x64.ActiveCfg = Release|x64
+		{33441D29-4B12-4DA4-9C62-57012CED11E0}.Release|x64.Build.0 = Release|x64
+		{33441D29-4B12-4DA4-9C62-57012CED11E0}.RelWithDebInfo|x64.ActiveCfg = Release|x64
+		{33441D29-4B12-4DA4-9C62-57012CED11E0}.RelWithDebInfo|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

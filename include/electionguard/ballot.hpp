@@ -166,7 +166,8 @@ namespace electionguard
       public:
         CiphertextBallotSelection(const CiphertextBallotSelection &other);
         CiphertextBallotSelection(const CiphertextBallotSelection &&other);
-        CiphertextBallotSelection(const std::string &objectId, const ElementModQ &descriptionHash,
+        CiphertextBallotSelection(const std::string &objectId, uint64_t sequenceOrder,
+                                  const ElementModQ &descriptionHash,
                                   std::unique_ptr<ElGamalCiphertext> ciphertext, bool isPlaceholder,
                                   std::unique_ptr<ElementModQ> nonce,
                                   std::unique_ptr<ElementModQ> cryptoHash,
@@ -182,6 +183,11 @@ namespace electionguard
         /// the selection in a specific contest described in the election manifest.
         /// </Summary>
         std::string getObjectId() const;
+
+        /// <Summary>
+        /// Get the sequence order of the selection
+        /// </Summary>
+        uint64_t getSequenceOrder() const;
 
         /// <summary>
         /// The hash of the string representation of the Selection Description from the election manifest
@@ -247,10 +253,10 @@ namespace electionguard
         /// the other fields.
         ///</summary>
         static std::unique_ptr<CiphertextBallotSelection>
-        make(const std::string &objectId, const ElementModQ &descriptionHash,
-             std::unique_ptr<ElGamalCiphertext> ciphertext, const ElementModP &elgamalPublicKey,
-             const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &proofSeed,
-             uint64_t plaintext, bool isPlaceholder = false,
+        make(const std::string &objectId, uint64_t sequenceOrder,
+             const ElementModQ &descriptionHash, std::unique_ptr<ElGamalCiphertext> ciphertext,
+             const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
+             const ElementModQ &proofSeed, uint64_t plaintext, bool isPlaceholder = false,
              std::unique_ptr<ElementModQ> nonce = nullptr,
              std::unique_ptr<ElementModQ> cryptoHash = nullptr,
              std::unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr,
@@ -359,7 +365,8 @@ namespace electionguard
       public:
         CiphertextBallotContest(const CiphertextBallotContest &other);
         CiphertextBallotContest(const CiphertextBallotContest &&other);
-        CiphertextBallotContest(const std::string &objectId, const ElementModQ &descriptionHash,
+        CiphertextBallotContest(const std::string &objectId, uint64_t sequenceOrder,
+                                const ElementModQ &descriptionHash,
                                 std::vector<std::unique_ptr<CiphertextBallotSelection>> selections,
                                 std::unique_ptr<ElementModQ> nonce,
                                 std::unique_ptr<ElGamalCiphertext> ciphertextAccumulation,
@@ -375,6 +382,11 @@ namespace electionguard
         /// the contest in a specific ballot style described in the election manifest.
         /// </Summary>
         std::string getObjectId() const;
+
+        /// <Summary>
+        /// Get the sequence order of the contest
+        /// </Summary>
+        uint64_t getSequenceOrder() const;
 
         /// <summary>
         /// The hash of the string representation of the Contest Description from the election manifest
@@ -427,7 +439,8 @@ namespace electionguard
         /// it will be derived from the other fields.
         /// </summary>
         static std::unique_ptr<CiphertextBallotContest>
-        make(const std::string &objectId, const ElementModQ &descriptionHash,
+        make(const std::string &objectId, uint64_t sequenceOrder,
+             const ElementModQ &descriptionHash,
              std::vector<std::unique_ptr<CiphertextBallotSelection>> selections,
              const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
              const ElementModQ &proofSeed, const uint64_t numberElected,

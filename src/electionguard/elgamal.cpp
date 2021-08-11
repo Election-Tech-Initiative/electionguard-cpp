@@ -4,6 +4,8 @@
 #include "electionguard/hash.hpp"
 #include "log.hpp"
 
+#include <stdexcept>
+
 using std::invalid_argument;
 using std::make_unique;
 using std::move;
@@ -155,7 +157,7 @@ namespace electionguard
           Hacl_Bignum4096_mod_exp_consttime(p.get(), this->getPad()->get(), MAX_P_SIZE,
                                             secret->get(), static_cast<uint64_t *>(divisor));
         if (!success) {
-            Log::debug(": could not calculate mod exp");
+            Log::warn("could not calculate mod exp");
             return 0;
         }
 
@@ -171,7 +173,7 @@ namespace electionguard
         success = Hacl_Bignum4096_mod(p.get(), static_cast<uint64_t *>(mulResult),
                                       static_cast<uint64_t *>(result));
         if (!success) {
-            Log::debug(": could not calculate mod");
+            Log::warn("could not calculate mod");
             return 0;
         }
 
@@ -211,10 +213,10 @@ namespace electionguard
         auto pubkey_pow_n = pow_mod_p(publicKey, *nonce4096);
         auto data = mul_mod_p(*gpowp_m, *pubkey_pow_n);
 
-        Log::debug(": Generated Encryption");
-        Log::debugHex(": publicKey: ", publicKey.toHex());
-        Log::debugHex(": pad: ", pad->toHex());
-        Log::debugHex(": data: ", data->toHex());
+        Log::trace("Generated Encryption");
+        Log::trace("publicKey", publicKey.toHex());
+        Log::trace("pad", pad->toHex());
+        Log::trace("data", data->toHex());
 
         return make_unique<ElGamalCiphertext>(move(pad), move(data));
     }

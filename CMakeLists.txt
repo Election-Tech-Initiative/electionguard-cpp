@@ -65,6 +65,11 @@ include(cmake/tools.cmake)
 set(CMAKE_CXX_STANDARD_REQUIRED     ON)
 set(CMAKE_CXX_EXTENSIONS            OFF)
 
+set(CMAKE_THREAD_PREFER_PTHREAD     TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG     TRUE)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # IDE's usually prefer folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(IDE_FOLDER "")
@@ -73,7 +78,14 @@ set(IDE_FOLDER "")
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     message("++ Setting DEBUG during compile")
     add_compile_definitions(DEBUG)
+    add_compile_definitions(LOG_DEBUG)
     add_compile_definitions(JSON_DIAGNOSTICS=1)
+endif()
+
+# Allow explicitly setting debug logs in release builds
+if (LOG_LEVEL MATCHES debug)
+    message("++ Using DEBUG Logs")
+    add_compile_definitions(LOG_DEBUG)
 endif()
 
 if(EXPORT_INTERNALS)
