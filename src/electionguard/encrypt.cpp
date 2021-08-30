@@ -290,7 +290,7 @@ namespace electionguard
             throw invalid_argument("the plaintext contest was invalid");
         }
 
-        // TODO: validate the description inpout
+        // TODO: validate the description input
 
         // account for sequence id
         auto descriptionHash = description.crypto_hash();
@@ -435,6 +435,7 @@ namespace electionguard
                   unique_ptr<ElementModQ> nonce /* = nullptr */, uint64_t timestamp /* = 0 */,
                   bool shouldVerifyProofs /* = true */)
     {
+        Log::trace("encryptBallot:: encrypting");
         auto *style = manifest.getBallotStyle(ballot.getStyleId());
 
         // Validate Input
@@ -452,9 +453,9 @@ namespace electionguard
         auto nonceSeed =
           CiphertextBallot::nonceSeed(*manifest.getManifestHash(), ballot.getObjectId(), *nonce);
 
-        Log::trace("manifestHash   : ", manifest.getManifestHash()->toHex());
-        Log::trace("encryptionSeed          :", encryptionSeed.toHex());
-        Log::trace("timestamp         : " + to_string(timestamp));
+        Log::trace("manifestHash   :", manifest.getManifestHash()->toHex());
+        Log::trace("encryptionSeed :", encryptionSeed.toHex());
+        Log::trace("timestamp      :", to_string(timestamp));
 
         // encrypt contests
         auto encryptedContests =
@@ -476,6 +477,7 @@ namespace electionguard
         }
 
         if (!shouldVerifyProofs) {
+            Log::trace("encryptBallot:: bypass proof verification");
             return encryptedBallot;
         }
 
@@ -483,10 +485,11 @@ namespace electionguard
         if (encryptedBallot->isValidEncryption(*manifest.getManifestHash(),
                                                *context.getElGamalPublicKey(),
                                                *context.getCryptoExtendedBaseHash())) {
+            Log::trace("encryptBallot:: proof verification success");
             return encryptedBallot;
         }
 
-        throw runtime_error("encryptedBallot: failed validity check");
+        throw runtime_error("encryptBallot: failed validity check");
     }
 
     unique_ptr<CompactCiphertextBallot>

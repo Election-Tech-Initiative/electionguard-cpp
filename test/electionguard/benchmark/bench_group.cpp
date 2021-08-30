@@ -12,12 +12,12 @@ class GroupElementFixture : public benchmark::Fixture
   public:
     void SetUp(const ::benchmark::State &state)
     {
-        p1 = make_unique<ElementModP>(LARGE_P_ARRAY_1);
-        p2 = make_unique<ElementModP>(LARGE_P_ARRAY_2);
-        two = ElementModP::fromUint64(2);
+        p1 = make_unique<ElementModP>(LARGE_P_ARRAY_1, true);
+        p2 = make_unique<ElementModP>(LARGE_P_ARRAY_2, true);
+        two = ElementModP::fromUint64(2UL);
 
-        q1 = make_unique<ElementModQ>(LARGE_Q_ARRAY_1);
-        q2 = make_unique<ElementModQ>(LARGE_Q_ARRAY_2);
+        q1 = make_unique<ElementModQ>(LARGE_Q_ARRAY_1, true);
+        q2 = make_unique<ElementModQ>(LARGE_Q_ARRAY_2, true);
 
         auto array_size = sizeof(LARGE_P_ARRAY_1) / sizeof(uint64_t);
         p1_vector.assign(&LARGE_P_ARRAY_1[0], &LARGE_P_ARRAY_1[array_size]);
@@ -36,7 +36,7 @@ class GroupElementFixture : public benchmark::Fixture
 BENCHMARK_DEFINE_F(GroupElementFixture, ElementModP_fromArray)(benchmark::State &state)
 {
     for (auto _ : state) {
-        auto p = make_unique<ElementModP>(LARGE_P_ARRAY_1);
+        auto p = make_unique<ElementModP>(LARGE_P_ARRAY_1, true);
     }
 }
 
@@ -45,7 +45,7 @@ BENCHMARK_REGISTER_F(GroupElementFixture, ElementModP_fromArray)->Unit(benchmark
 BENCHMARK_DEFINE_F(GroupElementFixture, ElementModP_fromVector)(benchmark::State &state)
 {
     for (auto _ : state) {
-        auto p = make_unique<ElementModP>(p1_vector);
+        auto p = make_unique<ElementModP>(p1_vector, true);
     }
 }
 
@@ -54,7 +54,7 @@ BENCHMARK_REGISTER_F(GroupElementFixture, ElementModP_fromVector)->Unit(benchmar
 BENCHMARK_DEFINE_F(GroupElementFixture, ElementModP_fromUint)(benchmark::State &state)
 {
     for (auto _ : state) {
-        auto one1 = ElementModP::fromUint64(1234567UL);
+        auto one1 = ElementModP::fromUint64(1234567UL, true);
     }
 }
 
@@ -75,7 +75,8 @@ BENCHMARK_DEFINE_F(GroupElementFixture, ElementModP_fromHex)(benchmark::State &s
           "007792660B42C6CE9DCE1C6286609F422F2CAF3CA84AB7EBEE67A408E8930A0EB10D1D0A81ABA2E12C4DE802"
           "188DB57652A5C8CD4AD08DCDB375BBD5212E08F8A88F23EEF964DDBB975001F1DF6648F21DF5CB96BA3FA7CC"
           "B887F3626B539FE518DE6B8C5931C1695C738B25F444A1040FD2484D62CB55C0078477CCB648198FFB490128"
-          "6D7EFC54B53381285FF6449656A455C15D5B9848A232729EACCD9752");
+          "6D7EFC54B53381285FF6449656A455C15D5B9848A232729EACCD9752",
+          true);
     }
 }
 
@@ -108,6 +109,12 @@ BENCHMARK_DEFINE_F(GroupElementFixture, mul_mod_p)(benchmark::State &state)
 
 BENCHMARK_REGISTER_F(GroupElementFixture, mul_mod_p)->Unit(benchmark::kMillisecond);
 
+#ifdef USE_STANDARD_PRIMES
+
+// only run when using standard prime
+// as the large array operation violates
+// the exponentiation constraints
+
 BENCHMARK_DEFINE_F(GroupElementFixture, pow_mod_p)(benchmark::State &state)
 {
     for (auto _ : state) {
@@ -116,6 +123,8 @@ BENCHMARK_DEFINE_F(GroupElementFixture, pow_mod_p)(benchmark::State &state)
 }
 
 BENCHMARK_REGISTER_F(GroupElementFixture, pow_mod_p)->Unit(benchmark::kMillisecond);
+
+#endif
 
 BENCHMARK_DEFINE_F(GroupElementFixture, g_pow_p)(benchmark::State &state)
 {
@@ -149,7 +158,7 @@ BENCHMARK_DEFINE_F(GroupElementFixture, add_mod_q_overflow)(benchmark::State &st
     auto overflow = 188UL;
     for (auto _ : state) {
         overflow += 1;
-        auto residue = ElementModQ::fromUint64(overflow);
+        auto residue = ElementModQ::fromUint64(overflow, true);
         auto sum1 = add_mod_q(Q(), *residue);
     }
 }

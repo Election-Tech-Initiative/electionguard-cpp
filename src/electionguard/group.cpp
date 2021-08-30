@@ -33,82 +33,6 @@ using std::unique_ptr;
 
 #pragma region UtilityHelpers
 
-/// <summary>
-/// Converts the binary value stored as a byte array
-/// to its big num representation stored as ElementModP
-/// </summary>
-unique_ptr<electionguard::ElementModP> bytes_to_p(const uint8_t *bytes, size_t size)
-{
-    if (bytes == nullptr || size > MAX_P_SIZE) {
-        throw out_of_range("Cannot convert ElementModP with size: " + to_string(size));
-    }
-
-    auto *bigNum = Bignum4096::fromBytes(size, const_cast<uint8_t *>(bytes));
-    if (bigNum == nullptr) {
-        throw bad_alloc();
-    }
-
-    // The ElementModP constructor expects the bignum
-    // to be a certain size, but there's no guarantee
-    // that constraint is satisfied by new_bn_from_bytes_be
-    // so copy it into a new element that is the correct size
-    // and free the allocated resources
-    uint64_t element[MAX_P_LEN] = {};
-    memcpy(static_cast<uint64_t *>(element), bigNum, size);
-    free(bigNum);
-    return make_unique<electionguard::ElementModP>(element);
-}
-
-/// <summary>
-/// Converts the binary value stored as a byte array
-/// to its big num representation stored as ElementModP
-/// </summary>
-unique_ptr<electionguard::ElementModP> bytes_to_p(vector<uint8_t> bytes)
-{
-    auto *array = new uint8_t[bytes.size()];
-    copy(bytes.begin(), bytes.end(), array);
-
-    auto element = bytes_to_p(array, bytes.size());
-    delete[] array;
-    return element;
-}
-
-/// <summary>
-/// Converts the binary value stored as a big-endian byte array
-/// to its big num representation stored as ElementModQ
-/// </summary>
-unique_ptr<electionguard::ElementModQ> bytes_to_q(const uint8_t *bytes, size_t size)
-{
-    if (bytes == nullptr || size > MAX_Q_SIZE) {
-        throw out_of_range("Cannot convert ElementModQ with size: " + to_string(size));
-    }
-
-    auto *bigNum = Bignum256::fromBytes(size, const_cast<uint8_t *>(bytes));
-    if (bigNum == nullptr) {
-        throw bad_alloc();
-    }
-
-    // The ElementModQ constructor expects the bignum
-    // to be a certain size, but there's no guarantee
-    // that constraint is satisfied by new_bn_from_bytes_be
-    // so copy it into a new element that is the correct size
-    // and free the allocated resources
-    uint64_t element[MAX_Q_LEN] = {};
-    memcpy(static_cast<uint64_t *>(element), bigNum, size);
-    free(bigNum);
-    return make_unique<electionguard::ElementModQ>(element);
-}
-
-unique_ptr<electionguard::ElementModQ> bytes_to_q(vector<uint8_t> bytes)
-{
-    auto *array = new uint8_t[bytes.size()];
-    copy(bytes.begin(), bytes.end(), array);
-
-    auto element = bytes_to_q(array, bytes.size());
-    delete[] array;
-    return element;
-}
-
 bool isMax(const uint64_t (&array)[MAX_Q_LEN_DOUBLE])
 {
     const uint64_t max = 0xffffffffffffffff;
@@ -137,6 +61,12 @@ namespace electionguard
 {
 
 #pragma region Constants
+
+    const ElementModP &R()
+    {
+        static ElementModP instance{R_ARRAY_REVERSE, true};
+        return instance;
+    }
 
     const ElementModP &G()
     {
@@ -205,7 +135,7 @@ namespace electionguard
         {
             uint64_t array[MAX_P_LEN] = {};
             copy(elem.begin(), elem.end(), static_cast<uint64_t *>(array));
-            if (!unchecked && Bignum4096::lessThan(const_cast<uint64_t *>(P_ARRAY_REVERSE),
+            if (!unchecked && Bignum4096::lessThan(const_cast<uint64_t *>(P().get()),
                                                    static_cast<uint64_t *>(array)) > 0) {
                 throw out_of_range("Value for ElementModP is greater than allowed");
             }
@@ -214,7 +144,7 @@ namespace electionguard
 
         Impl(const uint64_t (&elem)[MAX_P_LEN], bool unchecked)
         {
-            if (!unchecked && Bignum4096::lessThan(const_cast<uint64_t *>(P_ARRAY_REVERSE),
+            if (!unchecked && Bignum4096::lessThan(const_cast<uint64_t *>(P().get()),
                                                    const_cast<uint64_t *>(elem)) > 0) {
                 throw out_of_range("Value for ElementModP is greater than allowed");
             }
@@ -230,8 +160,6 @@ namespace electionguard
 
         bool operator==(const Impl &other)
         {
-            // TODO: ISSUE #137: safety, specifically when the object underflows its max size
-            // e.g. if ((l == (uint64_t)0U) && (r == (uint64_t)0U))
             for (uint8_t i = 0; i < MAX_P_LEN; i++) {
                 auto l = data[i];
                 auto r = other.data[i];
@@ -321,20 +249,22 @@ namespace electionguard
 
     // Static Methods
 
-    unique_ptr<ElementModP> ElementModP::fromHex(const string &representation)
+    unique_ptr<ElementModP> ElementModP::fromHex(const string &representation,
+                                                 bool unchecked /* = false */)
     {
         auto sanitized = sanitize_hex_string(representation);
         auto bytes = hex_to_bytes(sanitized);
-        auto element = bytes_to_p(bytes);
+        auto element = bytes_to_p(bytes, unchecked);
         release(bytes);
         return element;
     }
 
-    unique_ptr<ElementModP> ElementModP::fromUint64(uint64_t representation)
+    unique_ptr<ElementModP> ElementModP::fromUint64(uint64_t representation,
+                                                    bool unchecked /* = false */)
     {
         const size_t bitWidth = 8U;
         uint64_t bigEndian = htobe64(representation);
-        return bytes_to_p(reinterpret_cast<uint8_t *>(&bigEndian), bitWidth);
+        return bytes_to_p(reinterpret_cast<uint8_t *>(&bigEndian), bitWidth, unchecked);
     }
 
 #pragma endregion
@@ -349,7 +279,7 @@ namespace electionguard
         {
             uint64_t array[MAX_Q_LEN] = {};
             copy(elem.begin(), elem.end(), static_cast<uint64_t *>(array));
-            if (!unchecked && Bignum256::lessThan(const_cast<uint64_t *>(Q_ARRAY_REVERSE),
+            if (!unchecked && Bignum256::lessThan(const_cast<uint64_t *>(Q().get()),
                                                   static_cast<uint64_t *>(array)) > 0) {
                 throw out_of_range("Value for ElementModQ is greater than allowed");
             }
@@ -358,7 +288,7 @@ namespace electionguard
 
         Impl(const uint64_t (&elem)[MAX_Q_LEN], bool unchecked)
         {
-            if (!unchecked && Bignum256::lessThan(const_cast<uint64_t *>(Q_ARRAY_REVERSE),
+            if (!unchecked && Bignum256::lessThan(const_cast<uint64_t *>(Q().get()),
                                                   const_cast<uint64_t *>(elem)) > 0) {
                 throw out_of_range("Value for ElementModQ is greater than allowed");
             }
@@ -374,8 +304,6 @@ namespace electionguard
 
         bool operator==(const Impl &other)
         {
-            // TODO: ISSUE #137: safety, specifically when the object underflows its max size
-            // e.g. if ((l == (uint64_t)0U) && (r == (uint64_t)0U))
             for (uint8_t i = 0; i < MAX_Q_LEN; i++) {
                 auto l = data[i];
                 auto r = other.data[i];
@@ -454,20 +382,22 @@ namespace electionguard
 
     // Static Methods
 
-    unique_ptr<ElementModQ> ElementModQ::fromHex(const string &representation)
+    unique_ptr<ElementModQ> ElementModQ::fromHex(const string &representation,
+                                                 bool unchecked /* = false */)
     {
         auto sanitized = sanitize_hex_string(representation);
         auto bytes = hex_to_bytes(sanitized);
-        auto element = bytes_to_q(bytes);
+        auto element = bytes_to_q(bytes, unchecked);
         release(bytes);
         return element;
     }
 
-    unique_ptr<ElementModQ> ElementModQ::fromUint64(uint64_t representation)
+    unique_ptr<ElementModQ> ElementModQ::fromUint64(uint64_t representation,
+                                                    bool unchecked /* = false */)
     {
         const size_t bitWidth = 8U;
         uint64_t bigEndian = htobe64(representation);
-        return bytes_to_q(reinterpret_cast<uint8_t *>(&bigEndian), bitWidth);
+        return bytes_to_q(reinterpret_cast<uint8_t *>(&bigEndian), bitWidth, unchecked);
     }
 
     // Public Methods
@@ -486,25 +416,142 @@ namespace electionguard
 
 #pragma endregion
 
+#pragma region Utility Helpers
+
+    /// <summary>
+    /// Converts the binary value stored as a byte array
+    /// to its big num representation stored as ElementModP
+    /// </summary>
+    unique_ptr<electionguard::ElementModP> bytes_to_p(const uint8_t *bytes, size_t size,
+                                                      bool unchecked /* = false */)
+    {
+        if (bytes == nullptr || size > MAX_P_SIZE) {
+            throw out_of_range("Cannot convert ElementModP with size: " + to_string(size));
+        }
+
+        auto *bigNum = Bignum4096::fromBytes(size, const_cast<uint8_t *>(bytes));
+        if (bigNum == nullptr) {
+            throw bad_alloc();
+        }
+
+        // The ElementModP constructor expects the bignum
+        // to be a certain size, but there's no guarantee
+        // that constraint is satisfied by new_bn_from_bytes_be
+        // so copy it into a new element that is the correct size
+        // and free the allocated resources
+        uint64_t element[MAX_P_LEN] = {};
+        memcpy(static_cast<uint64_t *>(element), bigNum, size);
+        free(bigNum);
+        return make_unique<electionguard::ElementModP>(element, unchecked);
+    }
+
+    /// <summary>
+    /// Converts the binary value stored as a byte array
+    /// to its big num representation stored as ElementModP
+    /// </summary>
+    unique_ptr<electionguard::ElementModP> bytes_to_p(vector<uint8_t> bytes,
+                                                      bool unchecked /* = false */)
+    {
+        auto *array = new uint8_t[bytes.size()];
+        copy(bytes.begin(), bytes.end(), array);
+
+        auto element = bytes_to_p(array, bytes.size(), unchecked);
+        delete[] array;
+        return element;
+    }
+
+    /// <summary>
+    /// Converts the binary value stored as a big-endian byte array
+    /// to its big num representation stored as ElementModQ
+    /// </summary>
+    unique_ptr<electionguard::ElementModQ> bytes_to_q(const uint8_t *bytes, size_t size,
+                                                      bool unchecked /* = false */)
+    {
+        if (bytes == nullptr || size > MAX_Q_SIZE) {
+            throw out_of_range("Cannot convert ElementModQ with size: " + to_string(size));
+        }
+
+        auto *bigNum = Bignum256::fromBytes(size, const_cast<uint8_t *>(bytes));
+        if (bigNum == nullptr) {
+            throw bad_alloc();
+        }
+
+        // The ElementModQ constructor expects the bignum
+        // to be a certain size, but there's no guarantee
+        // that constraint is satisfied by new_bn_from_bytes_be
+        // so copy it into a new element that is the correct size
+        // and free the allocated resources
+        uint64_t element[MAX_Q_LEN] = {};
+        memcpy(static_cast<uint64_t *>(element), bigNum, size);
+        free(bigNum);
+        return make_unique<electionguard::ElementModQ>(element, unchecked);
+    }
+
+    unique_ptr<electionguard::ElementModQ> bytes_to_q(vector<uint8_t> bytes,
+                                                      bool unchecked /* = false */)
+    {
+        auto *array = new uint8_t[bytes.size()];
+        copy(bytes.begin(), bytes.end(), array);
+
+        auto element = bytes_to_q(array, bytes.size(), unchecked);
+        delete[] array;
+        return element;
+    }
+
+#pragma endregion
+
 #pragma region ElementModP Global Functions
 
     unique_ptr<ElementModP> add_mod_p(const ElementModP &lhs, const ElementModP &rhs)
     {
         const auto &p = P();
-        uint64_t result[MAX_P_LEN_DOUBLE] = {};
+        uint64_t addResult[MAX_P_LEN_DOUBLE] = {};
         uint64_t carry =
           Bignum4096::add(const_cast<ElementModP &>(lhs).get(),
-                          const_cast<ElementModP &>(rhs).get(), static_cast<uint64_t *>(result));
+                          const_cast<ElementModP &>(rhs).get(), static_cast<uint64_t *>(addResult));
 
         // handle the specific case where the the sum == MAX_4096
         // but the carry value is not set.  We still need to offset.
-        if (carry > 0 || isMax(result)) {
+        if (carry > 0 || isMax(addResult)) {
 
-            // TODO: ISSUE #137: handle carry like in ElementModQ
+            auto big_a = (const_cast<ElementModP &>(p) < lhs);
+            auto big_b = (const_cast<ElementModP &>(p) < rhs);
+
+            if (big_a || big_b) {
+
+                uint64_t offset[MAX_P_LEN] = {};
+                if (big_a) {
+                    // TODO: move the casts into the interface
+                    Bignum4096::add(static_cast<uint64_t *>(offset),
+                                    const_cast<uint64_t *>(P_ARRAY_INVERSE_OFFSET),
+                                    static_cast<uint64_t *>(offset));
+                    Bignum4096::add(static_cast<uint64_t *>(offset),
+                                    const_cast<uint64_t *>(ONE_MOD_P_ARRAY),
+                                    static_cast<uint64_t *>(offset));
+                }
+
+                if (big_b) {
+                    Bignum4096::add(static_cast<uint64_t *>(offset),
+                                    const_cast<uint64_t *>(P_ARRAY_INVERSE_OFFSET),
+                                    static_cast<uint64_t *>(offset));
+                    Bignum4096::add(static_cast<uint64_t *>(offset),
+                                    const_cast<uint64_t *>(ONE_MOD_P_ARRAY),
+                                    static_cast<uint64_t *>(offset));
+                }
+
+                // adjust
+                Bignum4096::add(static_cast<uint64_t *>(addResult), static_cast<uint64_t *>(offset),
+                                static_cast<uint64_t *>(addResult));
+
+            } else {
+                Bignum4096::add(static_cast<uint64_t *>(addResult),
+                                const_cast<uint64_t *>(Q_ARRAY_INVERSE_OFFSET),
+                                static_cast<uint64_t *>(addResult));
+            }
         }
 
         uint64_t modResult[MAX_P_LEN] = {};
-        bool success = Bignum4096::mod(p.get(), static_cast<uint64_t *>(result),
+        bool success = Bignum4096::mod(p.get(), static_cast<uint64_t *>(addResult),
                                        static_cast<uint64_t *>(modResult));
         if (!success) {
             throw runtime_error(" add_mod_p mod operation failed");
@@ -552,14 +599,14 @@ namespace electionguard
 
         // HACL's input constraints require the exponent to be greater than zero
         if (const_cast<ElementModP &>(exponent) == ZERO_MOD_P()) {
-            return ElementModP::fromUint64(1);
+            return ElementModP::fromUint64(1UL);
         }
 
         uint64_t result[MAX_P_LEN] = {};
         bool success = Bignum4096::modExp(p.get(), base.get(), MAX_P_SIZE, exponent.get(),
                                           static_cast<uint64_t *>(result));
         if (!success) {
-            throw runtime_error(" pow_mod_p mod operation failed");
+            throw runtime_error("pow_mod_p: mod operation failed");
         }
         return make_unique<ElementModP>(result, true);
     }
@@ -601,10 +648,10 @@ namespace electionguard
             if (big_a || big_b) {
 
                 uint64_t offset[MAX_Q_LEN] = {};
-                // TODO: ISSUE #135: precompute?
                 if (big_a) {
+                    // TODO: move the casts into the interface
                     Bignum256::add(static_cast<uint64_t *>(offset),
-                                   const_cast<uint64_t *>(Q_ARRAY_INVERSE_REVERSE),
+                                   const_cast<uint64_t *>(Q_ARRAY_INVERSE_OFFSET),
                                    static_cast<uint64_t *>(offset));
                     Bignum256::add(static_cast<uint64_t *>(offset),
                                    const_cast<uint64_t *>(ONE_MOD_Q_ARRAY),
@@ -613,7 +660,7 @@ namespace electionguard
 
                 if (big_b) {
                     Bignum256::add(static_cast<uint64_t *>(offset),
-                                   const_cast<uint64_t *>(Q_ARRAY_INVERSE_REVERSE),
+                                   const_cast<uint64_t *>(Q_ARRAY_INVERSE_OFFSET),
                                    static_cast<uint64_t *>(offset));
                     Bignum256::add(static_cast<uint64_t *>(offset),
                                    const_cast<uint64_t *>(ONE_MOD_Q_ARRAY),
@@ -625,8 +672,8 @@ namespace electionguard
                                static_cast<uint64_t *>(addResult));
 
             } else {
-                const uint64_t offset[MAX_Q_LEN] = {0x00000000000000bd};
-                Bignum256::add(static_cast<uint64_t *>(addResult), const_cast<uint64_t *>(offset),
+                Bignum256::add(static_cast<uint64_t *>(addResult),
+                               const_cast<uint64_t *>(Q_ARRAY_INVERSE_OFFSET),
                                static_cast<uint64_t *>(addResult));
             }
         }
@@ -674,7 +721,7 @@ namespace electionguard
                 uint64_t offset[MAX_Q_LEN] = {};
 
                 Bignum256::add(static_cast<uint64_t *>(offset),
-                               const_cast<uint64_t *>(Q_ARRAY_INVERSE_REVERSE),
+                               const_cast<uint64_t *>(Q_ARRAY_INVERSE_OFFSET),
                                static_cast<uint64_t *>(offset));
                 Bignum256::add(static_cast<uint64_t *>(offset),
                                const_cast<uint64_t *>(ONE_MOD_Q_ARRAY),
@@ -685,8 +732,9 @@ namespace electionguard
                                static_cast<uint64_t *>(subResult));
 
             } else {
-                const uint64_t offset[MAX_Q_LEN] = {0x00000000000000bd};
-                Bignum256::sub(static_cast<uint64_t *>(subResult), const_cast<uint64_t *>(offset),
+                // if there is no carry then offset by the inverse
+                Bignum256::sub(static_cast<uint64_t *>(subResult),
+                               const_cast<uint64_t *>(Q_ARRAY_INVERSE_OFFSET),
                                static_cast<uint64_t *>(subResult));
             }
         }
@@ -710,7 +758,7 @@ namespace electionguard
         Bignum256::mul(const_cast<ElementModQ &>(b).get(), const_cast<ElementModQ &>(c).get(),
                        static_cast<uint64_t *>(resultBC));
 
-        auto bc_as_p = make_unique<ElementModP>(resultBC);
+        auto bc_as_p = make_unique<ElementModP>(resultBC, true);
         auto a_as_p = a.toElementModP();
 
         uint64_t a_plus_bc_result[MAX_P_LEN_DOUBLE] = {};
@@ -763,7 +811,8 @@ namespace electionguard
         memcpy(static_cast<uint64_t *>(element), bigNum, MAX_Q_SIZE);
         free(bigNum);
 
-        return make_unique<ElementModQ>(element);
+        auto random_q = make_unique<ElementModQ>(element, true);
+        return add_mod_q(*random_q, ZERO_MOD_Q());
     }
 
 #pragma endregion

@@ -1,7 +1,11 @@
 #ifndef __ELECTIONGUARD_CPP_CONVERT_HPP_INCLUDED__
 #define __ELECTIONGUARD_CPP_CONVERT_HPP_INCLUDED__
 
+#include "facades/Hacl_Bignum4096.hpp"
+#include "log.hpp"
+
 #include <chrono>
+#include <cmath>
 #include <codecvt>
 #include <iomanip>
 #include <iostream>
@@ -26,8 +30,12 @@ using std::vector;
 using std::wstring;
 using std::chrono::system_clock;
 
+using electionguard::Log;
+
 namespace electionguard
 {
+    const string LEADING_CHARS = "0 \n\r\t\f\v";
+
     template <typename T> auto release(std::vector<T> &container)
     {
         container.clear();
@@ -55,17 +63,6 @@ namespace electionguard
         }
     }
 
-    inline void hex_to_bytes_be(const string &hex, uint8_t *bytesOut)
-    {
-        const size_t baseHex = 16;
-        for (size_t i(0); i < hex.size(); i += 2) {
-            string byteString = hex.substr(i, 2);
-            uint16_t as_int = static_cast<uint16_t>(stoi(byteString, nullptr, baseHex));
-            uint16_t bigEndian = htobe16(as_int);
-            bytesOut[i / 2] = static_cast<uint8_t>(bigEndian);
-        }
-    }
-
     inline vector<uint8_t> hex_to_bytes(const string &hexString)
     {
         vector<uint8_t> bytes;
@@ -81,20 +78,97 @@ namespace electionguard
         return bytes;
     }
 
-    inline vector<uint8_t> hex_to_bytes_be(const string &hexString)
+    inline string uint64_to_hex_string(uint64_t number)
     {
-        vector<uint8_t> bytes;
-        const size_t baseHex = 16;
-        for (size_t i = 0; i < hexString.size(); i += 2) {
-            auto byteString = hexString.substr(i, 2);
-            uint16_t as_int = static_cast<uint16_t>(stoi(byteString, nullptr, baseHex));
-            uint8_t array[sizeof(uint16_t)];
-            uint16_t bigEndian = htobe16(as_int);
-            memmove(&array, &bigEndian, sizeof(bigEndian));
-            bytes.push_back(array[0]);
+        bool detectedFirstNonZeroBytes = false;
+        stringstream stream;
+        stream << hex << uppercase;
+        stream << setw(16) << setfill('0') << std::hex << number;
+
+        return stream.str();
+    }
+
+    inline vector<uint8_t> bignum_to_bytes(const vector<uint64_t> &bignum)
+    {
+        size_t offset = sizeof(uint64_t) / sizeof(uint8_t);
+        std::vector<uint8_t> bytes;
+        bytes.reserve((bignum.size() * offset));
+        for (auto number : bignum) {
+            uint64_t buffer = htobe64(number);
+            for (size_t i = 0; i < sizeof(buffer); i++) {
+                bytes.push_back(buffer & 0xFF);
+                buffer >>= 8;
+            }
+        }
+        return bytes;
+    }
+
+    inline vector<uint8_t> bignum_to_bytes(uint64_t *data, size_t size)
+    {
+        vector<uint64_t> vec(data, data + size);
+        auto result = bignum_to_bytes(vec);
+        release(vec);
+        return result;
+    }
+
+    inline vector<uint64_t> copy_bytes_to_bignum_64(const vector<uint8_t> &bytes, size_t outputMask)
+    {
+        vector<uint64_t> bignum;
+        bignum.reserve(outputMask);
+        size_t offset = sizeof(uint64_t) / sizeof(uint8_t);
+        auto residue = bytes.size() % offset;
+
+        auto limbs = std::ceil((bytes.size() / offset));
+        limbs += residue > 0 ? 1 : 0;
+
+        size_t prepend = outputMask > limbs ? outputMask - limbs : 0;
+
+        Log::trace("bytes.size(): " + std::to_string(bytes.size()));
+        Log::trace("offset: " + std::to_string(offset));
+        Log::trace("residue: " + std::to_string(residue));
+        Log::trace("limbs: " + std::to_string(limbs));
+        Log::trace("prepend: " + std::to_string(prepend));
+
+        // prepend zeroes
+        for (size_t i = 0; i < prepend; i += 1) {
+            bignum.push_back(0UL);
         }
 
-        return bytes;
+        // iterate over a window
+        for (size_t i = 0; i < bytes.size(); i += offset) {
+
+            uint64_t as_int;
+            auto remaining = bytes.size() - i;
+
+            if (remaining > offset) {
+                for (size_t j = i; j < i + 8; j++) {
+                    as_int = (as_int << 8) + (bytes[j] & 0xFF);
+                }
+            } else {
+                // assign the rest of the values
+                for (size_t j = i; j < i + remaining; j++) {
+                    as_int = (as_int << 8) + (bytes[j] & 0xFF);
+                }
+            }
+
+            // Log::debug("as_hex: " + uint64_to_hex_string(as_int));
+            bignum.push_back(as_int);
+        }
+
+        return bignum;
+    }
+
+    inline string sanitize_hex_string(const string &hexString)
+    {
+        string sanitized;
+        string leftTrimmed = hexString.substr(hexString.find_first_not_of(LEADING_CHARS));
+        bool isOdd = (leftTrimmed.size() % 2) != 0U;
+        if (isOdd) {
+            Log::trace("sanitize_hex_string: is odd");
+            sanitized.insert(0, 1, '0');
+        }
+        sanitized.append(leftTrimmed);
+        return sanitized;
     }
 
     inline string bytes_to_hex(const vector<uint8_t> &bytes)
@@ -124,18 +198,26 @@ namespace electionguard
         return result;
     }
 
-    const string LEADING_CHARS = "0 \n\r\t\f\v";
-
-    inline string sanitize_hex_string(const string &hexString)
+    template <typename T> string bytes_to_hex(T *data, size_t size)
     {
-        string sanitized;
-        string leftTrimmed = hexString.substr(hexString.find_first_not_of(LEADING_CHARS));
-        bool isOdd = (leftTrimmed.size() % 2) != 0U;
-        if (isOdd) {
-            sanitized.insert(0, 1, '0');
-        }
-        sanitized.append(leftTrimmed);
-        return sanitized;
+        vector<T> vec(begin(data), data + size);
+        auto result = bytes_to_hex(vec);
+        release(vec);
+        return result;
+    }
+
+    inline string bignum_to_hex_string(const vector<uint64_t> &bignum)
+    {
+        auto bytes = bignum_to_bytes(bignum);
+        return bytes_to_hex(bytes);
+    }
+
+    inline string bignum_to_hex_string(uint64_t *data, size_t size)
+    {
+        vector<uint64_t> vec(data, data + size);
+        auto result = bignum_to_hex_string(vec);
+        release(vec);
+        return result;
     }
 
     inline wstring stringToWideString(const std::string &str)
@@ -177,6 +259,15 @@ namespace electionguard
     inline uint8_t *dynamicCopy(vector<uint8_t> &data, size_t *out_size)
     {
         auto *data_array = new uint8_t[data.size()];
+        copy(data.begin(), data.end(), data_array);
+        *out_size = data.size();
+        return data_array;
+    }
+
+    /// Copy the vector byte array to a heap-allocated byte array
+    inline uint32_t *dynamicCopy(vector<uint32_t> &data, size_t *out_size)
+    {
+        auto *data_array = new uint32_t[data.size()];
         copy(data.begin(), data.end(), data_array);
         *out_size = data.size();
         return data_array;

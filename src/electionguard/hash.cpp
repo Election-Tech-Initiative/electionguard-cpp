@@ -101,14 +101,16 @@ namespace electionguard
         // that constraint is satisfied by new_bn_from_bytes_be
         // so copy it into a new element that is the correct size
         // and free the allocated resources
-        uint64_t element[MAX_Q_LEN] = {};
-        memcpy(static_cast<uint64_t *>(element), bigNum, sizeof(output));
+        uint64_t normalized[MAX_Q_LEN] = {};
+        memcpy(static_cast<uint64_t *>(normalized), bigNum, sizeof(output));
         Hacl_Streaming_SHA2_free_256(p);
         free(bigNum);
 
+        auto element = make_unique<ElementModQ>(normalized, true);
+
         // TODO: take the result mod Q - 1
         // to produce a result that is [0,q-1]
-        return make_unique<ElementModQ>(element);
+        return add_mod_q(*element, ZERO_MOD_Q());
     }
 
     template <typename T> string hash_inner_vector(vector<T> inner_vector)

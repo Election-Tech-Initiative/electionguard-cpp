@@ -12,7 +12,6 @@
 
 namespace electionguard
 {
-
     /// <summary>
     /// An element of the larger `mod p` space, i.e., in [0, P), where P is a 4096-bit prime.
     /// </summary>
@@ -36,7 +35,8 @@ namespace electionguard
 
         /// <Summary>
         /// Get the integer representation of the element
-        /// <returns> a pointer to the first limb</returns>
+        /// Note the Element is stored in HACL format
+        /// <returns> a pointer to the first limb. </returns>
         /// </Summary>
         uint64_t *get() const;
 
@@ -69,14 +69,16 @@ namespace electionguard
         /// Converts the binary value stored by the hex string in Big Endian format
         /// to its big num representation stored as ElementModP
         /// </summary>
-        static std::unique_ptr<ElementModP> fromHex(const std::string &representation);
+        static std::unique_ptr<ElementModP> fromHex(const std::string &representation,
+                                                    bool unchecked = false);
 
         /// <summary>
         /// Converts an unsigned long integer value
         /// (that is no larger than an unsigned long int)
         /// to its big num representation stored as ElementModP
         /// </summary>
-        static std::unique_ptr<ElementModP> fromUint64(uint64_t representation);
+        static std::unique_ptr<ElementModP> fromUint64(uint64_t representation,
+                                                       bool unchecked = false);
 
       private:
         class Impl;
@@ -107,6 +109,7 @@ namespace electionguard
 
         /// <Summary>
         /// Get the integer representation of the element
+        /// Note the Element is stored in HACL format
         /// <returns> a pointer to the first limb</returns>
         /// </Summary>
         uint64_t *get() const;
@@ -135,14 +138,16 @@ namespace electionguard
         /// Converts the binary value stored by the hex string
         /// to its big num representation stored as ElementModQ
         /// </summary>
-        static std::unique_ptr<ElementModQ> fromHex(const std::string &representation);
+        static std::unique_ptr<ElementModQ> fromHex(const std::string &representation,
+                                                    bool unchecked = false);
 
         /// <summary>
         /// Converts an unsigned long integer value
         /// (that is no larger than an unsigned long int)
         /// to its big num representation stored as ElementModQ
         /// </summary>
-        static std::unique_ptr<ElementModQ> fromUint64(uint64_t representation);
+        static std::unique_ptr<ElementModQ> fromUint64(uint64_t representation,
+                                                       bool unchecked = false);
 
         /// <Summary>
         /// create a copy of the Element in ElementModP space
@@ -157,6 +162,7 @@ namespace electionguard
 
     // Common constants
 
+    EG_API const ElementModP &R();
     EG_API const ElementModP &G();
     EG_API const ElementModP &P();
     EG_API const ElementModP &ZERO_MOD_P();
@@ -166,6 +172,20 @@ namespace electionguard
     EG_API const ElementModQ &ZERO_MOD_Q();
     EG_API const ElementModQ &ONE_MOD_Q();
     EG_API const ElementModQ &TWO_MOD_Q();
+
+    // utility helpers
+
+    EG_API std::unique_ptr<electionguard::ElementModP> bytes_to_p(const uint8_t *bytes, size_t size,
+                                                                  bool unchecked = false);
+
+    EG_API std::unique_ptr<electionguard::ElementModP> bytes_to_p(std::vector<uint8_t> bytes,
+                                                                  bool unchecked = false);
+
+    EG_API std::unique_ptr<electionguard::ElementModQ> bytes_to_q(const uint8_t *bytes, size_t size,
+                                                                  bool unchecked = false);
+
+    EG_API std::unique_ptr<electionguard::ElementModQ> bytes_to_q(std::vector<uint8_t> bytes,
+                                                                  bool unchecked = false);
 
     /// <summary>
     /// Adds together the left hand side and right hand side and returns the sum mod P

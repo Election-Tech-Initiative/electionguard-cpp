@@ -420,7 +420,7 @@ namespace electionguard
     bool ConstantChaumPedersenProof::isValid(const ElGamalCiphertext &message, const ElementModP &k,
                                              const ElementModQ &q)
     {
-        Log::trace("ConstantChaumPedersenProof::isValid: ");
+        Log::trace("ConstantChaumPedersenProof::isValid: checking validity");
         auto *alpha = message.getPad();
         auto *beta = message.getData();
 

@@ -17,6 +17,12 @@ using std::chrono::time_point;
 
 namespace electionguard
 {
+    inline bool is_little_endian()
+    {
+        const unsigned one = 1U;
+        return reinterpret_cast<const char *>(&one) + sizeof(unsigned) - 1;
+    }
+
     template <typename K, typename V>
     K findByValue(const map<K, const V> &collection, const V &value)
     {

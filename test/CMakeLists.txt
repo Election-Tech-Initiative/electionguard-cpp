@@ -48,6 +48,7 @@ add_library(${UTILS_PROJECT_TARGET} SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/manifest.h
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/manifest.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/manifest.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/byte_logger.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/constants.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h
 )
@@ -99,6 +100,7 @@ add_executable(${CPPTEST_PROJECT_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot_compact.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_constants.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_election.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.cpp

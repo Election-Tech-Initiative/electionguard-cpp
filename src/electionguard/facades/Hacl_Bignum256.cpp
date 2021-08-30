@@ -2,6 +2,10 @@
 
 #include "../../kremlin/Hacl_Bignum256.h"
 
+#include <electionguard/constants.h>
+
+using std::vector;
+
 namespace hacl
 {
     uint64_t Bignum256::add(uint64_t *a, uint64_t *b, uint64_t *res)
@@ -32,6 +36,14 @@ namespace hacl
     uint64_t *Bignum256::fromBytes(uint32_t len, uint8_t *bytes)
     {
         return Hacl_Bignum256_new_bn_from_bytes_be(len, bytes);
+    }
+
+    vector<uint8_t> Bignum256::toBytes(uint64_t *bytes)
+    {
+        uint8_t byteResult[MAX_Q_SIZE] = {};
+        Bignum256::toBytes(bytes, byteResult);
+        vector<uint8_t> result(std::begin(byteResult), std::end(byteResult));
+        return result;
     }
 
     void Bignum256::toBytes(uint64_t *bytes, uint8_t *res)

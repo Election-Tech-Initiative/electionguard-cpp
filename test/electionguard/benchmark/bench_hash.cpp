@@ -13,9 +13,9 @@ class HashFixture : public benchmark::Fixture
   public:
     void SetUp(const ::benchmark::State &state)
     {
-        p1 = make_unique<ElementModP>(LARGE_P_ARRAY_1);
-        p2 = make_unique<ElementModP>(LARGE_P_ARRAY_2);
-        two = ElementModP::fromUint64(2);
+        p1 = make_unique<ElementModP>(LARGE_P_ARRAY_1, true);
+        p2 = make_unique<ElementModP>(LARGE_P_ARRAY_2, true);
+        two = ElementModP::fromUint64(2UL);
 
         auto array_size = sizeof(LARGE_P_ARRAY_1) / sizeof(uint64_t);
         p1_vector.assign(&LARGE_P_ARRAY_1[0], &LARGE_P_ARRAY_1[array_size]);
