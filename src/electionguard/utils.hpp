@@ -38,7 +38,10 @@ namespace electionguard
     {
         auto now = system_clock::now();
         auto ticks = now.time_since_epoch();
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
         return ticks.count() * system_clock::period::num / system_clock::period::den;
+#pragma GCC diagnostic pop
     }
 
     /// <Summary>
