@@ -118,7 +118,7 @@ namespace electionguard
         size_t offset = sizeof(uint64_t) / sizeof(uint8_t);
         auto residue = bytes.size() % offset;
 
-        auto limbs = std::ceil((bytes.size() / offset));
+        auto limbs = static_cast<size_t>(std::ceil((bytes.size() / offset)));
         limbs += residue > 0 ? 1 : 0;
 
         size_t prepend = outputMask > limbs ? static_cast<size_t>((outputMask - limbs)) : 0;
