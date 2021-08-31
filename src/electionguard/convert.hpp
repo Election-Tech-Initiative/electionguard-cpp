@@ -121,7 +121,7 @@ namespace electionguard
         auto limbs = std::ceil((bytes.size() / offset));
         limbs += residue > 0 ? 1 : 0;
 
-        size_t prepend = outputMask > limbs ? outputMask - limbs : 0;
+        size_t prepend = outputMask > limbs ? static_cast<size_t>((outputMask - limbs)) : 0;
 
         Log::trace("bytes.size(): " + std::to_string(bytes.size()));
         Log::trace("offset: " + std::to_string(offset));
