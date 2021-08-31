@@ -1,6 +1,9 @@
 #include "Hacl_Bignum4096.hpp"
 
 #include "../../kremlin/Hacl_Bignum4096.h"
+#include "../log.hpp"
+
+using electionguard::Log;
 
 namespace hacl
 {
@@ -27,6 +30,7 @@ namespace hacl
     bool Bignum4096::modExp(uint64_t *n, uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res)
     {
         if (bBits <= 0) {
+            Log::trace("Bignum4096::modExp:: bbits <= 0");
             return false;
         }
         return Hacl_Bignum4096_mod_exp_consttime(n, a, bBits, b, res);

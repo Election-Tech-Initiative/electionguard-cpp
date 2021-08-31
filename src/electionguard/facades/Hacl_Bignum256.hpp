@@ -4,6 +4,7 @@
 #include "electionguard/export.h"
 
 #include <cstdint>
+#include <vector>
 
 namespace hacl
 {
@@ -22,6 +23,7 @@ namespace hacl
 
         static uint64_t *fromBytes(uint32_t len, uint8_t *bytes);
 
+        static std::vector<uint8_t> toBytes(uint64_t *bytes);
         static void toBytes(uint64_t *bytes, uint8_t *res);
 
         static uint64_t lessThan(uint64_t *a, uint64_t *b);

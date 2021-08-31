@@ -14,9 +14,9 @@ TEST_CASE("Get rotating ballot code rotates")
     // Arrange
     auto deviceHash =
       BallotCode::getHashForDevice(12345UL, 23456UL, 34567UL, "some-location-string");
-    uint64_t firstHash[MAX_Q_LEN] = {1, 2, 3, 4};
+    uint64_t firstHash[MAX_Q_LEN] = {1};
     auto firstBallotHash = make_unique<ElementModQ>(firstHash);
-    uint64_t secondHash[MAX_Q_LEN] = {2, 3, 4, 5};
+    uint64_t secondHash[MAX_Q_LEN] = {2};
     auto secondBallotHash = make_unique<ElementModQ>(secondHash);
 
     // Act

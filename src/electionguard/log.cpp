@@ -94,6 +94,8 @@ namespace electionguard
             auto console = spdlog::stdout_logger_mt("console");
 #if LOG_DEBUG
             console->set_level(spdlog::level::debug);
+#elif LOG_TRACE
+            console->set_level(spdlog::level::trace);
 #else
             console->set_level(spdlog::level::info);
 #endif

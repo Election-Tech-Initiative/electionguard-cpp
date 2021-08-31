@@ -17,6 +17,12 @@ using std::chrono::time_point;
 
 namespace electionguard
 {
+    inline bool is_little_endian()
+    {
+        const unsigned one = 1U;
+        return reinterpret_cast<const char *>(&one) + sizeof(unsigned) - 1;
+    }
+
     template <typename K, typename V>
     K findByValue(const map<K, const V> &collection, const V &value)
     {
@@ -32,7 +38,10 @@ namespace electionguard
     {
         auto now = system_clock::now();
         auto ticks = now.time_since_epoch();
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
         return ticks.count() * system_clock::period::num / system_clock::period::den;
+#pragma GCC diagnostic pop
     }
 
     /// <Summary>
