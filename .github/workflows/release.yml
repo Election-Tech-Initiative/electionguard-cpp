@@ -1,0 +1,134 @@
+name: Release
+
+on:
+  milestone:
+    types: [closed]
+
+env:
+  TARGET: Release
+
+jobs:
+  windows_build:
+    name: Windows Build
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Setup Environment
+        run: make environment
+      - name: Build
+        run: make build-msvc
+      - name: Upload Library (x86)
+        uses: actions/upload-artifact@v2
+        with:
+          name: win-x86
+          path: build/libs/msvc/Win32/src/Release/*.dll*
+      - name: Upload Library (x64)
+        uses: actions/upload-artifact@v2
+        with:
+          name: win-x64
+          path: build/libs/msvc/x64/src/Release/*.dll*
+
+  linux_build:
+    name: Linux Build
+    runs-on: ubuntu-latest
+    env:
+      compiler: clang
+      compiler_version: 10
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Update Environment
+        run: |
+          sudo apt-get update
+
+          if [ "${{ env.compiler }}" = "gcc" ]; then
+            echo "CC=gcc-${{ env.compiler_version }}" >> $GITHUB_ENV
+            echo "CXX=g++-${{ env.compiler_version }}" >> $GITHUB_ENV
+          else
+            sudo apt-get install -y clang-${{ env.compiler_version }} g++-multilib
+            echo "CC=clang-${{ env.compiler_version }}" >> $GITHUB_ENV
+            echo "CXX=clang++-${{ env.compiler_version }}" >> $GITHUB_ENV
+          fi
+      - name: Configure Environment
+        run: make environment
+      - name: Build
+        run: make build
+      - name: Upload Library
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-x64
+          path: build/libs/x86_64/Release/src/*.so
+
+  macos_build:
+    name: MacOS Build
+    runs-on: macos-latest
+    env:
+      compiler_version: 12
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Setup Compiler
+        run: sudo xcode-select -switch /Applications/Xcode_${{ env.compiler_version }}.app
+      - name: Configure Environment
+        run: make environment
+      - name: Build
+        run: make build
+      - name: Upload Library
+        uses: actions/upload-artifact@v2
+        with:
+          name: osx-x64
+          path: build/libs/x86_64/Release/src/*.dylib
+
+  package:
+    name: Upload Package
+    needs: [linux_build, windows_build, macos_build]
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Get Windows x86 Build
+        uses: actions/download-artifact@v2
+        with:
+          name: win-x86
+          path: build/libs/msvc/Win32/src/Release
+      - name: Get Windows x64 Build
+        uses: actions/download-artifact@v2
+        with:
+          name: win-x64
+          path: build/libs/msvc/x64/src/Release
+      - name: Get Linux Build
+        uses: actions/download-artifact@v2
+        with:
+          name: linux-x64
+          path: build/libs/x86_64/Release/src
+      - name: Get MacOS Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: osx-x64
+          path: build/libs/x86_64/Release/src
+      - name: Get Shortened Sha
+        id: sha
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+      - name: Build and Package
+        working-directory: bindings/netstandard/ElectionGuard/ElectionGuard.Encryption
+        run: |
+          dotnet build -c Release
+          dotnet pack -c Release --version-suffix "v${{ steps.sha.outputs.sha_short }}"
+      - name: Get Release Version
+        id: get_version
+        uses: greenygh0st/net-proj-release-version@v2
+        with:
+          PROJ_FILE: ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption/ElectionGuard.Encryption.csproj
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.get_version.outputs.RELEASE_VERSION }}
+          tag_name: ${{ steps.get_version.outputs.RELEASE_VERSION }}
+          draft: false
+          prerelease: false
+          files: |
+            ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption/bin/Release/*.nupkg
+      - name: Push to Nuget.org
+        working-directory: bindings/netstandard/ElectionGuard/ElectionGuard.Encryption
+        run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
