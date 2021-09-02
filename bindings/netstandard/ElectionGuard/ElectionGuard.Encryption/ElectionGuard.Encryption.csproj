@@ -1,0 +1,90 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Platforms>x64;x86</Platforms>
+
+    <!-- Project -->
+    <RootNamespace>ElectionGuard.Encryption</RootNamespace>
+    <AssemblyName>ElectionGuard.Encryption</AssemblyName>
+    <Version>0.1.1</Version>
+    <AssemblyVersion>0.1.1.0</AssemblyVersion>
+    <AssemblyFileVersion>0.1.1.0</AssemblyFileVersion>
+    
+
+    <!-- Package -->
+    <PackageId>ElectionGuard.Encryption</PackageId>
+    <Title>ElectionGuard Encryption</Title>
+    <Description>Open source implementation of ElectionGuard's ballot encryption.</Description>
+    <Authors>Microsoft</Authors>
+    <PackageVersion>0.1.1</PackageVersion>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/microsoft/electionguard-cpp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/microsoft/electionguard-cpp</RepositoryUrl>
+    <PackageTags>Microsoft; Electionguard;Encryption;Windows;MacOS;Linux</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <!-- <PackageReleaseNotes>Changelog</PackageReleaseNotes> -->
+  </PropertyGroup>
+
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>ElectionGuard</Import_RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Debug" Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Release" Condition=" '$(Configuration)' == 'Release' ">
+    <DebugType>pdbonly</DebugType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Library Paths">
+    <ElectionGuardLibs>..\..\..\..\build\libs</ElectionGuardLibs>
+  </PropertyGroup>
+  <ItemGroup Label="C++ Built Libraries">
+    <None Name="Windows x86"
+          Visible="false"
+          Include="$(ElectionGuardLibs)\msvc\Win32\src\Release\*.dll*"
+          Pack="true"
+          PackagePath="runtimes\win-x86\native">
+      <CopyToOutputDirectory Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
+    </None>
+    <None Name="Windows x64"
+          Visible="false"
+          Include="$(ElectionGuardLibs)\msvc\x64\src\Release\*.dll*"
+          Pack="true"
+          PackagePath="runtimes\win-x64\native">
+      <CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
+    </None>
+    <None Name="Non Windows x64"
+          Visible="false"
+          Include="$(ElectionGuardLibs)\x86_64\Release\src\*.dll*"
+          Pack="true"
+          PackagePath="runtimes\win-x64\native">
+      <CopyToOutputDirectory Condition="'$(OS)' != 'Windows_NT'">Always</CopyToOutputDirectory>
+    </None>
+    <None Name="MacOS"
+          Visible="false"
+          Include="$(ElectionGuardLibs)\x86_64\Release\src\*.dylib"
+          CopyToOutputDirectory="Always"
+          Pack="true"
+          PackagePath="runtimes\osx-x64\native" />
+    <None Name="Linux"
+          Visible="false"
+          Include="$(ElectionGuardLibs)\x86_64\Release\src\*.so"
+          CopyToOutputDirectory="Always"
+          Pack="true"
+          PackagePath="runtimes\linux-x64\native" />
+  </ItemGroup>
+
+  <ItemGroup Label="Additional Package Files">
+    <None Name="ReadMe" Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Name="Icon" Include="..\icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

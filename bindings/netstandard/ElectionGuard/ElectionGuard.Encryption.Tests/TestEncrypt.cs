@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 
-namespace ElectionGuard.Tests
+namespace ElectionGuard.Encrypt.Tests
 {
     [TestFixture]
     public class TestEncrypt
@@ -11,6 +11,7 @@ namespace ElectionGuard.Tests
         [Test]
         public void Test_Compact_Encrypt_Ballot_Simple_Succeeds()
         {
+            // Arrange
             var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
             var description = new Manifest(jsonManifest);
             var manifest = new InternalManifest(description);
@@ -27,9 +28,11 @@ namespace ElectionGuard.Tests
             // Assert
             Assert.That(compact.ObjectId == ballot.ObjectId);
 
+            // Act
             var msgpack = compact.ToMsgPack();
             var fromMsgpack = new CompactCiphertextBallot(msgpack);
 
+            // Assert
             Assert.That(compact.ObjectId == fromMsgpack.ObjectId);
 
         }

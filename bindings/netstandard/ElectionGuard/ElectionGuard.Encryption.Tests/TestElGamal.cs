@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 
-namespace ElectionGuard.Tests
+namespace ElectionGuard.Encrypt.Tests
 {
     [TestFixture]
     public class TestElGamal
@@ -14,7 +14,7 @@ namespace ElectionGuard.Tests
             var secret = Constants.TWO_MOD_Q;
             var keyPair = ElGamalKeyPair.FromSecret(secret);
             var publicKey = keyPair.PublicKey;
-            var vote = 1UL;
+            const ulong vote = 1UL;
 
             // Act
             var ciphertext = Elgamal.Encrypt(vote, nonce, publicKey);

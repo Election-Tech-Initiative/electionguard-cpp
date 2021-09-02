@@ -21,12 +21,8 @@ namespace ElectionGuard
     }
 
     internal static unsafe class NativeInterface
-    {
-#if Android
-        const string DllName = "libelectionguard.so";
-#else
-        const string DllName = "__Internal";
-#endif
+    { 
+        const string DllName = "electionguard";
 
         internal unsafe struct CharPtr { };
 

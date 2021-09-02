@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using NUnit.Framework;
 
-namespace ElectionGuard.Tests
+namespace ElectionGuard.Encrypt.Tests
 {
     [TestFixture]
     public class TestBallot
@@ -11,7 +11,7 @@ namespace ElectionGuard.Tests
         public void Test_Ballot_Property_Getters()
         {
             // Arrange
-            string data = @"{""style_id"":""ballot-style-1"",""contests"":[{""ballot_selections"":[{""object_id"":""contest-1-selection-1-id"",""vote"":1},{""object_id"":""contest-1-selection-2-id"",""vote"":0},{""object_id"":""contest-1-selection-3-id"",""vote"":0}],""object_id"":""contest-1-id""},{""ballot_selections"":[{""object_id"":""contest-2-selection-1-id"",""vote"":1},{""object_id"":""contest-2-selection-2-id"",""vote"":0}],""object_id"":""contest-2-id""}],""object_id"":""ballot-id-123""}";
+            const string data = @"{""style_id"":""ballot-style-1"",""contests"":[{""ballot_selections"":[{""object_id"":""contest-1-selection-1-id"",""vote"":1},{""object_id"":""contest-1-selection-2-id"",""vote"":0},{""object_id"":""contest-1-selection-3-id"",""vote"":0}],""object_id"":""contest-1-id""},{""ballot_selections"":[{""object_id"":""contest-2-selection-1-id"",""vote"":1},{""object_id"":""contest-2-selection-2-id"",""vote"":0}],""object_id"":""contest-2-id""}],""object_id"":""ballot-id-123""}";
 
             // Act
             var ballot = new PlaintextBallot(data);
@@ -38,7 +38,7 @@ namespace ElectionGuard.Tests
 
                     // verify the selection property accessors
                     var selectionId = selection.ObjectId;
-                    Assert.That(selectionId == $"contest-{i + 1}-selection-{j+1}-id");
+                    Assert.That(selectionId == $"contest-{i + 1}-selection-{j + 1}-id");
                 }
             }
         }
@@ -46,30 +46,39 @@ namespace ElectionGuard.Tests
         [Test]
         public void Test_Plaintext_Ballot_Selection_Is_Valid()
         {
-            var objectId = "some-object-id";
+            // Arrange
+            const string objectId = "some-object-id";
 
+            // Act
             var subject = new PlaintextBallotSelection(objectId, 1);
 
+            // Assert
             Assert.That(subject.IsValid(objectId) == true);
         }
 
         [Test]
         public void Test_Plaintext_Ballot_Selection_Is_InValid_With_Different_objectIds()
         {
-            var objectId = "some-object-id";
+            // Arrange
+            const string objectId = "some-object-id";
 
+            // Act
             var subject = new PlaintextBallotSelection(objectId, 1);
 
+            // Assert
             Assert.That(subject.IsValid("some-other-object-id") == false);
         }
 
         [Test]
         public void Test_Plaintext_Ballot_Selection_Is_InValid_With_overvote()
         {
-            var objectId = "some-object-id";
+            // Arrange
+            const string objectId = "some-object-id";
 
+            // Act
             var subject = new PlaintextBallotSelection(objectId, 2);
 
+            // Assert
             Assert.That(subject.IsValid(objectId) == false);
         }
     }

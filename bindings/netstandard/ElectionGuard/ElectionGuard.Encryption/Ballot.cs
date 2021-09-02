@@ -15,7 +15,7 @@ namespace ElectionGuard
     using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotHandle;
     using NativeCompactCiphertextBallot = NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle;
 
-    #region PlaintextBallotSelction
+    #region PlaintextBallotSelection
 
     /// <summary>
     /// A BallotSelection represents an individual selection on a ballot.
