@@ -159,14 +159,15 @@ else
 	echo "Net Framework builds are only supported on Windows"
 endif
 
-build-netstandard: build-android build-ios
-	@echo 🖥️ BUILD NETSTANDARD
-ifeq ($(OPERATING_SYSTEM),Darwin)
-	msbuild ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /t:Build /p:Configuration=$(TARGET)
-	cp ./bindings/netstandard/ElectionGuard/ElectionGuard.NuGet/bin/$(TARGET)/* $(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/$(TARGET)/
+build-netstandard:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	make build-msvc
 else
-	echo "NetStandard builds are only supported on MacOS"
+	make build
 endif
+
+	@echo 🖥️ BUILD NETSTANDARD
+	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
 
 build-all: build build-netstandard
 
