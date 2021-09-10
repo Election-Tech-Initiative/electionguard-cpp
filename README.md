@@ -108,8 +108,10 @@ When compiling with shared libraries, you may encounter an error running the uni
 
 A .NET Standard binding library is provided so that this package can be consumed from C# applications. At this time, MacOS, Linux and Windows are supported.
 
+- [Latest DotNet SDK](https://dotnet.microsoft.com/download)
 - [Visual Studio](https://visualstudio.microsoft.com)
 - [NuGet Command Line (CLI)](https://docs.microsoft.com/en-us/nuget/reference/nuget-exe-cli-reference#macoslinux)
+- On Linux, you need [Mono](https://www.mono-project.com/download/stable/)
 
 ## Build C++
 
@@ -208,14 +210,22 @@ make test-msvc
 
 ### Running the netstandard tests
 
-You can run the .Net Standard tests using the Xamarin Test runner on the iOS simulator.
+To run the tests when building for the current host (Linux, Mac, windows:)
 
 ```sh
-# ensure the iOS and Android binaries are built
+make build-netstandard
+make test-netstandard
+```
+
+To run the tests when building for a mobile device, you can run the .Net Standard tests using the Xamarin Test runner on the Android Emulator or the iOS simulator:
+
+**NOTE: Xamarin build support is temporarily disabled while the project migrates to the new SDK style project format.**  Please refer to ISSUE #195 for more information.
+
+```sh
 make build-netstandard
 ```
 
-Then, open Visual studio for Mac and run the `ElectionGuard.Tests.iOS` project.
+Then, open Visual studio for Mac and run the `ElectionGuard.Tests.Android` or `ElectionGuard.Tests.iOS` project.
 
 ## 📄 Documentation
 
