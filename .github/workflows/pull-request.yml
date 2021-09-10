@@ -110,7 +110,7 @@ jobs:
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc')
         run: make test-msvc
       - name: Run .Net Standard Tests
-        if: runner.os != 'Linux'
+        if: runner.os == 'macOS'
         run: make test-netstandard
       - name: Run Sanitizer
         if: (runner.os == 'Linux' && matrix.os == 'ubuntu-20.04')
