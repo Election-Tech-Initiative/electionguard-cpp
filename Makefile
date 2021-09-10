@@ -1,4 +1,4 @@
-.PHONY: all build build-msvc build-debug-all build-android build-ios clean environment format memcheck sanitize sanitize-asan sanitize-tsan test
+.PHONY: all build build-msvc build-debug-all build-android build-ios clean environment format memcheck sanitize sanitize-asan sanitize-tsan test test-msvc test-netstandard
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_BUILD_DIR=$(realpath .)/build
@@ -16,7 +16,7 @@ else
 endif
 
 # Debug or Release (capitalized)
-TARGET?=Release
+TARGET?=Debug
 
 ifeq ($(OPERATING_SYSTEM),Darwin)
 NDK_PATH?=/Users/$$USER/Library/Android/sdk/ndk/21.3.6528147
@@ -333,6 +333,10 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64/test/$(TARGET)/ElectionGuardTests
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64/test/$(TARGET)/ElectionGuardCTests
 endif
+
+test-netstandard:
+	@echo 🧪 TEST NETSTANDARD
+	dotnet test ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
 
 coverage:
 	@echo ✅ CHECK COVERAGE

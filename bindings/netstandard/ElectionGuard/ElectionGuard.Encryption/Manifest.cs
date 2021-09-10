@@ -121,9 +121,9 @@ namespace ElectionGuard
 
         internal unsafe NativeInternalManifest Handle;
 
-        public unsafe InternalManifest(Manifest election)
+        public unsafe InternalManifest(Manifest manifest)
         {
-            var status = NativeInterface.InternalManifest.New(election.Handle, out Handle);
+            var status = NativeInterface.InternalManifest.New(manifest.Handle, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"InternalManifest Error Status: {status}");
