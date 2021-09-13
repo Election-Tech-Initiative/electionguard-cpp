@@ -1,10 +1,12 @@
-![Microsoft Defending Democracy Program: ElectionGuard Python][Banner Image]
+![Microsoft Defending Democracy Program: ElectionGuard Python][banner image]
 
 # 🗳 ElectionGuard C++
 
-This repository is a "reference implementation" of an ElectionGuard ballot encryption library written in c++ and includes a C-compatible API for referencing the library from pure-c application.  This core SDK performs ballot encryption and verification functions and is suitable for execution on voting system hardware and low powered devices.  It is designed to be integrated into existing (or new) voting system software.  
+![Github Package Action](https://github.com/microsoft/electionguard-cpp/workflows/Release/badge.svg) [![license](https://img.shields.io/github/license/microsoft/electionguard-cpp)](https://github.com/microsoft/electionguard-cpp/blob/main/LICENSE) [![license](https://img.shields.io/nuget/v/Electionguard.Encryption)](https://www.nuget.org/packages/ElectionGuard.Encryption/)
 
-This repository is `pre-release` software to showcase the ElectionGuard API implemented in a native language.  It is not feature complete and should not be used for production applications.
+This repository is a "reference implementation" of an ElectionGuard ballot encryption library written in c++ and includes a C-compatible API for referencing the library from pure-c application. This core SDK performs ballot encryption and verification functions and is suitable for execution on voting system hardware and low powered devices. It is designed to be integrated into existing (or new) voting system software.
+
+This repository is `pre-release` software to showcase the ElectionGuard API implemented in a native language. It is not feature complete and should not be used for production applications.
 
 ## 📁 In This Repository
 
@@ -33,21 +35,21 @@ Learn More in the [ElectionGuard Repository](https://github.com/microsoft/electi
 
 ## 🦸 How Can I use ElectionGuard?
 
-ElectionGuard supports a variety of use cases.  The Primary use case is to generate verifiable end-to-end (E2E) encrypted elections.  The ElectionGuard process can also be used for other use cases such as privacy enhanced risk-limiting audits (RLAs).  This implementation only includes encryption functions and cannot be used to generate election keys and it cannot decrypt tally results.
+ElectionGuard supports a variety of use cases. The Primary use case is to generate verifiable end-to-end (E2E) encrypted elections. The ElectionGuard process can also be used for other use cases such as privacy enhanced risk-limiting audits (RLAs). This implementation only includes encryption functions and cannot be used to generate election keys and it cannot decrypt tally results.
 
-This c++ implementation also includes a C API that can be consumed from anywhere that can call C code directly.  A .Net Standard package is also provided.
+This c++ implementation also includes a C API that can be consumed from anywhere that can call C code directly. A .Net Standard package is also provided.
 
 ## 💻 Requirements
 
 ### All Platforms
 
-- A [C++17](https://isocpp.org/get-started) standard compliant compiler is required to build the core library.  While any modern compiler should work, the library is tested on a subset.  Check out the [GitHub actions](#) to see what is officially supported.
+- A [C++17](https://isocpp.org/get-started) standard compliant compiler is required to build the core library. While any modern compiler should work, the library is tested on a subset. Check out the [GitHub actions](#) to see what is officially supported.
 - [GNU Make](https://www.gnu.org/software/make/manual/make.html) is used to simplify the commands and GitHub Actions. This approach is recommended to simplify the command line experience. This is built in for MacOS and Linux. For Windows, setup is simpler with [Chocolatey](https://chocolatey.org/install) and installing the provided [make package](https://chocolatey.org/packages/make). The other Windows option is [manually installing make](http://gnuwin32.sourceforge.net/packages/make.htm).
 - [CMake](https://cmake.org/) is used to simplify the build experience.
 
 ### 🤖 Android
 
-To build for android, you need the Android SDK and platforms 21 and 26.  The easiest way is to download android studio.  Alternatively, you can use the SDK installation that ships with the Xamarin Tooling in Visual Studio.  WE also require the use of the Android NDK.  Android builds can be compiled on Linux, Mac, or Windows
+To build for android, you need the Android SDK and platforms 21 and 26. The easiest way is to download android studio. Alternatively, you can use the SDK installation that ships with the Xamarin Tooling in Visual Studio. WE also require the use of the Android NDK. Android builds can be compiled on Linux, Mac, or Windows
 
 - [Android SDK](https://developer.android.com/studio/#downloads)
 - [SDK 21](https://developer.android.com/studio/releases/platforms#5.0)
@@ -59,11 +61,11 @@ To build for android, you need the Android SDK and platforms 21 and 26.  The eas
 To build for iOS you need XCode installed
 
 - [XCode](https://developer.apple.com/xcode/resources/) and the [Command Line Tools for XCode](#)
-- [CMake 3.19](https://cmake.org/) may be necessary, along with changes to the Makefile.  [See ISSUE #138](https://github.com/microsoft/electionguard-cpp/issues/138)
+- [CMake 3.19](https://cmake.org/) may be necessary, along with changes to the Makefile. [See ISSUE #138](https://github.com/microsoft/electionguard-cpp/issues/138)
 
 ### Linux
 
-The automated install of dependencies is currently only supported on debian-based systems.  See the makefile for more information.
+The automated install of dependencies is currently only supported on debian-based systems. See the makefile for more information.
 
 ### 🖥️ Windows (using MSVC)
 
@@ -73,10 +75,10 @@ Building on windows is supported using the `MSVC` toolchain.
 - Install [Powershell Core](https://github.com/powershell/powershell)
 - Install [VS 2019](https://visualstudio.microsoft.com/vs/)
 - Open the Visual Studio Installer and install
--- MSVC v142 - VS 2019 C++ x64/x86 build tools
--- Windows 10 SDK (latest)
--- C++ CMake tools for Windows
--- C++/CLI support for v142 build tools
+  -- MSVC v142 - VS 2019 C++ x64/x86 build tools
+  -- Windows 10 SDK (latest)
+  -- C++ CMake tools for Windows
+  -- C++/CLI support for v142 build tools
 
 ### 🖥️ Windows (using MSYS2)
 
@@ -88,33 +90,34 @@ Building on windows is supported using the `MSYS2` toolchain. MSYS is the defaul
 - Open the MSYS2 prompt by running the newly-created "MSYS2 MSYS" shortcut in your start menu.
 - Inside the prompt, run `pacman -Syu`, then close the window when it prompts you to.
 - Reopen the MSYS2 prompt and run:
-    ```
-    pacman -Syu
-    pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake make
-    ```
+  ```
+  pacman -Syu
+  pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake make
+  ```
 - Modify your `%Path%` to include the newly-installed software. You should include these two paths:
-    ```
-    C:\msys64\mingw64\bin
-    C:\msys64\usr\bin
-    ```
+  ```
+  C:\msys64\mingw64\bin
+  C:\msys64\usr\bin
+  ```
 
 #### 🚧 The Procedure Entry Point Could not be Located
 
-When compiling with shared libraries, you may encounter an error running the unit tests project.  This is likely due to windows resolving the incorrect implementation of `libstdc++-6.dll`.  Solving this depends on your use case, but you can either ensure that the path modifications made above appear before any other paths which include this library (e.g. c\Windows\System32\), or you can include a copy of the correct DLL in the output folder.  [See this StackOverflow post for more information](https://stackoverflow.com/questions/18668003/the-procedure-entry-point-gxx-personality-v0-could-not-be-located)
+When compiling with shared libraries, you may encounter an error running the unit tests project. This is likely due to windows resolving the incorrect implementation of `libstdc++-6.dll`. Solving this depends on your use case, but you can either ensure that the path modifications made above appear before any other paths which include this library (e.g. c\Windows\System32\), or you can include a copy of the correct DLL in the output folder. [See this StackOverflow post for more information](https://stackoverflow.com/questions/18668003/the-procedure-entry-point-gxx-personality-v0-could-not-be-located)
 
 ### 🌐 .NET Standard
 
-A .NET Standard binding library is provided so that this package can be consumed from C# applications.  At this time, only Android and iOS binaries are included and they can be consumed from a Xamarin application.  Building for Xamarin currently requires a Mac.
+A .NET Standard binding library is provided so that this package can be consumed from C# applications. At this time, MacOS, Linux and Windows are supported.
 
-- Other dependencies for Android and iOS
-- [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/)
+- [Latest DotNet SDK](https://dotnet.microsoft.com/download)
+- [Visual Studio](https://visualstudio.microsoft.com)
 - [NuGet Command Line (CLI)](https://docs.microsoft.com/en-us/nuget/reference/nuget-exe-cli-reference#macoslinux)
+- On Linux, you need [Mono](https://www.mono-project.com/download/stable/)
 
-## Build
+## Build C++
 
 Using **make**,
 
-### To Download Dependencies
+### Download Dependencies
 
 ```sh
 make environment
@@ -132,7 +135,7 @@ make build
 export TARGET=Debug && make build
 ```
 
-### Build for android
+### Android
 
 The Android Build currently Targets API Level 26 but can be configured by modifying the Makefile
 
@@ -142,7 +145,7 @@ Set the path to the NDK, replacing the version with your own
 export NDK_PATH=/Users/$USER/Library/Android/sdk/ndk/21.3.6528147 && make build-android
 ```
 
-### Build for iOS
+### iOS
 
 The iOS build currently targets iPhone OS 12 but can be configured by modifying the Makefile
 
@@ -152,7 +155,7 @@ Creates a fat binary for the simulator and targets a recent version of iOS
 make build-ios
 ```
 
-### Build for Windows
+### Windows
 
 Using the default MSYS2 toolchain:
 
@@ -166,9 +169,19 @@ Using the MSVC toolchain:
 make build-msvc
 ```
 
-### Build for .Net Framework v4.8
+## Build Wrappers
 
-Wraps the MSVC build artifacts in a C++/CLI wrapper to be consumed from a .Net Framework 4.8 application (windows desktop only).  Only works on Windows.
+### .Net Standard 2.0
+
+Wraps the build artifacts in a C# wrapper conforming to .Net Standard 2.0.
+
+```sh
+make build-netstandard
+```
+
+### .Net Framework v4.8
+
+Wraps the MSVC build artifacts in a C++/CLI wrapper to be consumed from a .Net Framework 4.8 application (windows desktop only). Only works on Windows.
 
 ```pwsh
 // ensure the windows msvc binaries are built
@@ -180,16 +193,6 @@ open `./bindings/netframework//ElectionGuard.NetFramework/ElectionGuard.NetFrame
 #### Running the .Net Framework Benchmark
 
 Open the NetFramework solution and run the `ElectionGuard.Bench` project
-
-### Build for Xamarin
-
-Wraps the android and iOS build artifacts in a NuGet package to be consumed from a Xamarin application (classic or forms)
-
-Must be executed on OS X to successfully built the iOS project.
-
-```sh
-make build-netstandard
-```
 
 ## Test
 
@@ -207,20 +210,28 @@ make test-msvc
 
 ### Running the netstandard tests
 
-You can run the .Net Standard tests using the Xamarin Test runner on the iOS simulator.
+To run the tests when building for the current host (Linux, Mac, windows:)
 
 ```sh
-# ensure the iOS and Android binaries are built
+make build-netstandard
+make test-netstandard
+```
+
+To run the tests when building for a mobile device, you can run the .Net Standard tests using the Xamarin Test runner on the Android Emulator or the iOS simulator:
+
+**NOTE: Xamarin build support is temporarily disabled while the project migrates to the new SDK style project format.**  Please refer to ISSUE #195 for more information.
+
+```sh
 make build-netstandard
 ```
 
-Then, open Visual studio for Mac and run the `ElectionGuard.Tests.iOS` project.
+Then, open Visual studio for Mac and run the `ElectionGuard.Tests.Android` or `ElectionGuard.Tests.iOS` project.
 
 ## 📄 Documentation
 
 ## Contributing
 
-This project encourages community contributions for development, testing, documentation, code review, and performance analysis, etc.  For more information on how to contribute, see [the contribution guidelines][Contributing]
+This project encourages community contributions for development, testing, documentation, code review, and performance analysis, etc. For more information on how to contribute, see [the contribution guidelines][contributing]
 
 ### Code of Conduct
 
@@ -228,7 +239,7 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 ### Reporting Issues
 
-Please report any bugs, feature requests, or enhancements using the [GitHub Issue Tracker](https://github.com/microsoft/electionguard-python/issues).  Please do not report any security vulnerabilities using the Issue Tracker.  Instead, please report them to the Microsoft Security Response Center (MSRC) at [https://msrc.microsoft.com/create-report](https://msrc.microsoft.com/create-report).  See the [Security Documentation][Security] for more information.
+Please report any bugs, feature requests, or enhancements using the [GitHub Issue Tracker](https://github.com/microsoft/electionguard-python/issues). Please do not report any security vulnerabilities using the Issue Tracker. Instead, please report them to the Microsoft Security Response Center (MSRC) at [https://msrc.microsoft.com/create-report](https://msrc.microsoft.com/create-report). See the [Security Documentation][security] for more information.
 
 ### Have Questions?
 
@@ -244,7 +255,7 @@ A huge thank you to those who helped to contribute to this project so far, inclu
 
 **[Josh Benaloh _(Microsoft)_](https://www.microsoft.com/en-us/research/people/benaloh/)**
 
-<a href="https://www.microsoft.com/en-us/research/people/benaloh/"><img src="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/09/avatar_user__1473484671-180x180.jpg" title="Josh Benaloh" width="80" height="80"></a> 
+<a href="https://www.microsoft.com/en-us/research/people/benaloh/"><img src="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/09/avatar_user__1473484671-180x180.jpg" title="Josh Benaloh" width="80" height="80"></a>
 
 **[Keith Fung](https://github.com/keithrfung) [_(InfernoRed Technology)_](https://infernored.com/)**
 
@@ -270,14 +281,10 @@ A huge thank you to those who helped to contribute to this project so far, inclu
 
 <a href="https://jonathan.protzenko.fr/"><img src="https://jonathan.protzenko.fr/assets/protzenko.jpg" title="protzenko" width="80" height="80"></a>
 
-
 <!-- Links -->
-[Banner Image]: https://raw.githubusercontent.com/microsoft/electionguard-python/main/images/electionguard-banner.svg
 
-[Pull Request Workflow]: https://github.com/microsoft/electionguard-ccpp/blob/main/.github/workflows/pull_request.yml
-
-[Contributing]: https://github.com/microsoft/electionguard-cpp/blob/main/CONTRIBUTING.md
-
-[Security]:https://github.com/microsoft/electionguard-cpp/blob/main/SECURITY.md
-
-[MIT License]: https://github.com/microsoft/electionguard-cpp/blob/main/LICENSE
+[banner image]: https://raw.githubusercontent.com/microsoft/electionguard-python/main/images/electionguard-banner.svg
+[pull request workflow]: https://github.com/microsoft/electionguard-ccpp/blob/main/.github/workflows/pull_request.yml
+[contributing]: https://github.com/microsoft/electionguard-cpp/blob/main/CONTRIBUTING.md
+[security]: https://github.com/microsoft/electionguard-cpp/blob/main/SECURITY.md
+[mit license]: https://github.com/microsoft/electionguard-cpp/blob/main/LICENSE

@@ -1,4 +1,4 @@
-.PHONY: all build build-msvc build-debug-all build-android build-ios clean environment format memcheck sanitize sanitize-asan sanitize-tsan test
+.PHONY: all build build-msvc build-android build-ios clean environment format memcheck sanitize sanitize-asan sanitize-tsan test test-msvc test-netstandard
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_BUILD_DIR=$(realpath .)/build
@@ -159,16 +159,15 @@ else
 	echo "Net Framework builds are only supported on Windows"
 endif
 
-build-netstandard: build-android build-ios
-	@echo 🖥️ BUILD NETSTANDARD
-ifeq ($(OPERATING_SYSTEM),Darwin)
-	msbuild ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /t:Build /p:Configuration=$(TARGET)
-	cp ./bindings/netstandard/ElectionGuard/ElectionGuard.NuGet/bin/$(TARGET)/* $(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/$(TARGET)/
+build-netstandard:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	make build-msvc
 else
-	echo "NetStandard builds are only supported on MacOS"
+	make build
 endif
 
-build-all: build build-netstandard
+	@echo 🖥️ BUILD NETSTANDARD
+	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
 
 clean:
 	@echo 🗑️ Cleaning Output Directory
@@ -332,6 +331,10 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64/test/$(TARGET)/ElectionGuardTests
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64/test/$(TARGET)/ElectionGuardCTests
 endif
+
+test-netstandard: build-netstandard
+	@echo 🧪 TEST NETSTANDARD
+	dotnet test ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
 
 coverage:
 	@echo ✅ CHECK COVERAGE
