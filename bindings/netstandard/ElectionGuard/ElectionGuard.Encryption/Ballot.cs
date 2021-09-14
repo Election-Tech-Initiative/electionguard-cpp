@@ -6,6 +6,8 @@ namespace ElectionGuard
     // Declare native types for convenience
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
     using NativeElGamalCiphertext = NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
+    using NativeDisjunctiveChaumPedersenProof = NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle;
+    using NativeConstantChaumPedersenProof = NativeInterface.ConstantChaumPedersenProof.ConstantChaumPedersenProofHandle;
     using NativePlaintextBallotSelection = NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle;
     using NativeCiphertextBallotSelection = NativeInterface.CiphertextBallotSelection.CiphertextBallotSelectionHandle;
     using NativePlaintextBallotContest = NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle;
@@ -246,6 +248,25 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// The proof that demonstrates the selection is an encryption of 0 or 1,
+        /// and was encrypted using the `nonce`
+        /// </summary>
+        public unsafe DisjunctiveChaumPedersenProof Proof
+        {
+            get
+            {
+                var status = NativeInterface.CiphertextBallotSelection.GetProof(
+                    Handle, out NativeDisjunctiveChaumPedersenProof value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"CiphertextBallotSelection Error Proof: {status}");
+                    return null;
+                }
+                return new DisjunctiveChaumPedersenProof(value);
+            }
+        }
+
         internal unsafe NativeCiphertextBallotSelection Handle;
 
         unsafe internal CiphertextBallotSelection(NativeCiphertextBallotSelection handle)
@@ -449,6 +470,25 @@ namespace ElectionGuard
                     return null;
                 }
                 return new ElementModQ(value);
+            }
+        }
+
+        /// <summary>
+        /// The proof demonstrates the sum of the selections does not exceed the maximum
+        /// available selections for the contest, and that the proof was generated with the nonce
+        /// </summary>
+        public unsafe ConstantChaumPedersenProof Proof
+        {
+            get
+            {
+                var status = NativeInterface.CiphertextBallotContest.GetProof(
+                    Handle, out NativeConstantChaumPedersenProof value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"CiphertextBallotContest Error Proof: {status}");
+                    return null;
+                }
+                return new ConstantChaumPedersenProof(value);
             }
         }
 

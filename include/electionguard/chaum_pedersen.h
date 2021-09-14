@@ -207,8 +207,6 @@ EG_API eg_electionguard_status_t eg_constant_chaum_pedersen_proof_get_response(
  * @param[in] in_message The ciphertext message
  * @param[in] in_r The nonce used creating the ElGamal ciphertext
  * @param[in] in_k The public key of the election
- * @param[in] in_q A value used when generating the challenge,
- *                 usually the election extended base hash (𝑄')
  * @param[in] in_seed Used to generate other random values here
  * @param[in] in_hash_header Zero or one
  * @param[in] in_constant the value to prove
