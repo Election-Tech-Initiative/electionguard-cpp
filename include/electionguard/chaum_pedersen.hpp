@@ -86,6 +86,14 @@ namespace electionguard
 
         /// <Summary>
         /// make function for a `DisjunctiveChaumPedersenProof`
+        ///
+        /// <param name="message"> The ciphertext message</param>
+        /// <param name="r"> The nonce used creating the ElGamal ciphertext</param>
+        /// <param name="k"> The public key of the election</param>
+        /// <param name="q"> A value used when generating the challenge,
+        ///          usually the election extended base hash (𝑄')</param>
+        /// <param name="seed">Used to generate other random values here</param>
+        /// <returns>A unique pointer</returns>
         /// </Summary>
         static std::unique_ptr<DisjunctiveChaumPedersenProof>
         make(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
