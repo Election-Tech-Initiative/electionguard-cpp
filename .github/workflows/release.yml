@@ -115,6 +115,7 @@ jobs:
         run: |
           dotnet build -c Release
           dotnet pack -c Release --version-suffix "v${{ steps.sha.outputs.sha_short }}"
+          rename build/libs/msvc/Win32/src/Release/electionguard.dll electionguard_x86.dll
       - name: Get Release Version
         id: get_version
         uses: greenygh0st/net-proj-release-version@v2
