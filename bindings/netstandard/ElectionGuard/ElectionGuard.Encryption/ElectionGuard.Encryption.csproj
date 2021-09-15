@@ -7,9 +7,9 @@
     <!-- Project -->
     <RootNamespace>ElectionGuard.Encryption</RootNamespace>
     <AssemblyName>ElectionGuard.Encryption</AssemblyName>
-    <Version>0.1.1</Version>
-    <AssemblyVersion>0.1.1.0</AssemblyVersion>
-    <AssemblyFileVersion>0.1.1.0</AssemblyFileVersion>
+    <Version>0.1.2</Version>
+    <AssemblyVersion>0.1.2.0</AssemblyVersion>
+    <AssemblyFileVersion>0.1.2.0</AssemblyFileVersion>
     
 
     <!-- Package -->
