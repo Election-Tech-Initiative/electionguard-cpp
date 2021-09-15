@@ -17,7 +17,7 @@
     <Title>ElectionGuard Encryption</Title>
     <Description>Open source implementation of ElectionGuard's ballot encryption.</Description>
     <Authors>Microsoft</Authors>
-    <PackageVersion>0.1.1</PackageVersion>
+    <PackageVersion>0.1.2</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/microsoft/electionguard-cpp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/microsoft/electionguard-cpp</RepositoryUrl>
