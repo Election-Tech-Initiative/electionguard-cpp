@@ -288,6 +288,14 @@ endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardBenchmark
 
+bench-netstandard: build-netstandard
+	@echo 🧪 BENCHMARK
+ifeq ($(OPERATING_SYSTEM),Windows)
+
+else
+	dotnet ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net5.0/ElectionGuard.Encryption.Bench.dll
+endif
+
 test:
 	@echo 🧪 TEST
 ifeq ($(OPERATING_SYSTEM),Windows)
@@ -334,7 +342,7 @@ endif
 
 test-netstandard: build-netstandard
 	@echo 🧪 TEST NETSTANDARD
-	dotnet test ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	dotnet test --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
 
 coverage:
 	@echo ✅ CHECK COVERAGE

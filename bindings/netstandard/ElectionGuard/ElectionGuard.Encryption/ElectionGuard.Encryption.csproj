@@ -7,9 +7,9 @@
     <!-- Project -->
     <RootNamespace>ElectionGuard.Encryption</RootNamespace>
     <AssemblyName>ElectionGuard.Encryption</AssemblyName>
-    <Version>0.1.1</Version>
-    <AssemblyVersion>0.1.1.0</AssemblyVersion>
-    <AssemblyFileVersion>0.1.1.0</AssemblyFileVersion>
+    <Version>0.1.2</Version>
+    <AssemblyVersion>0.1.2.0</AssemblyVersion>
+    <AssemblyFileVersion>0.1.2.0</AssemblyFileVersion>
     
 
     <!-- Package -->
@@ -48,32 +48,14 @@
     <ElectionGuardLibs>..\..\..\..\build\libs</ElectionGuardLibs>
   </PropertyGroup>
   <ItemGroup Label="C++ Built Libraries">
-    <None Name="Windows MSVC x86"
-          Visible="false"
-          Include="$(ElectionGuardLibs)\msvc\Win32\src\$(Configuration)\*.dll*"
-          Pack="true"
-          PackagePath="runtimes\win-x86\native">
+    <None Name="Windows MSVC x86" Visible="false" Include="$(ElectionGuardLibs)\msvc\Win32\src\$(Configuration)\*.dll*" Pack="true" PackagePath="runtimes\win-x86\native">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
     </None>
-    <None Name="Windows MSVC x64"
-          Visible="false"
-          Include="$(ElectionGuardLibs)\msvc\x64\src\$(Configuration)\*.dll*"
-          Pack="true"
-          PackagePath="runtimes\win-x64\native">
+    <None Name="Windows MSVC x64" Visible="false" Include="$(ElectionGuardLibs)\msvc\x64\src\$(Configuration)\*.dll*" Pack="true" PackagePath="runtimes\win-x64\native">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
     </None>
-    <None Name="MacOS"
-          Visible="false"
-          Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.dylib"
-          CopyToOutputDirectory="Always"
-          Pack="true"
-          PackagePath="runtimes\osx-x64\native" />
-    <None Name="Linux"
-          Visible="false"
-          Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.so"
-          CopyToOutputDirectory="Always"
-          Pack="true"
-          PackagePath="runtimes\linux-x64\native" />
+    <None Name="MacOS" Visible="false" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.dylib" CopyToOutputDirectory="Always" Pack="true" PackagePath="runtimes\osx-x64\native" />
+    <None Name="Linux" Visible="false" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.so" CopyToOutputDirectory="Always" Pack="true" PackagePath="runtimes\linux-x64\native" />
   </ItemGroup>
 
   <ItemGroup Label="Additional Package Files">

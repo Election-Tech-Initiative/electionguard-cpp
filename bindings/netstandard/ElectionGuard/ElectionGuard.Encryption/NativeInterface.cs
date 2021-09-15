@@ -21,7 +21,7 @@ namespace ElectionGuard
     }
 
     internal static unsafe class NativeInterface
-    { 
+    {
         const string DllName = "electionguard";
 
         internal unsafe struct CharPtr { };
@@ -244,6 +244,162 @@ namespace ElectionGuard
                 ElementModP.ElementModPHandle public_key,
                 out ElGamalCiphertext.ElGamalCiphertextHandle handle);
         }
+
+        #endregion
+
+        #region ChaumPedersen
+
+        internal static unsafe class DisjunctiveChaumPedersenProof
+        {
+            internal unsafe struct DisjunctiveChaumPedersenProofType { };
+
+            internal class DisjunctiveChaumPedersenProofHandle
+                : ElectionguardSafeHandle<DisjunctiveChaumPedersenProofType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = DisjunctiveChaumPedersenProof.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"DisjunctiveChaumPedersenProof Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_disjunctive_chaum_pedersen_proof_free")]
+            internal static extern Status Free(DisjunctiveChaumPedersenProofHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_disjunctive_chaum_pedersen_proof_get_zero_pad")]
+            internal static extern Status GetZeroPad(
+                DisjunctiveChaumPedersenProofHandle handle,
+                out ElementModP.ElementModPHandle element);
+
+            [DllImport(DllName, EntryPoint = "eg_disjunctive_chaum_pedersen_proof_get_zero_data")]
+            internal static extern Status GetZeroData(
+                DisjunctiveChaumPedersenProofHandle handle,
+                out ElementModP.ElementModPHandle element);
+
+            [DllImport(DllName, EntryPoint = "eg_disjunctive_chaum_pedersen_proof_get_one_pad")]
+            internal static extern Status GetOnePad(
+                DisjunctiveChaumPedersenProofHandle handle,
+                out ElementModP.ElementModPHandle element);
+
+            [DllImport(DllName, EntryPoint = "eg_disjunctive_chaum_pedersen_proof_get_one_data")]
+            internal static extern Status GetOneData(
+                DisjunctiveChaumPedersenProofHandle handle,
+                out ElementModP.ElementModPHandle element);
+
+            [DllImport(DllName, EntryPoint = "eg_disjunctive_chaum_pedersen_proof_get_zero_challenge")]
+            internal static extern Status GetZeroChallenge(
+                DisjunctiveChaumPedersenProofHandle handle,
+                out ElementModQ.ElementModQHandle element);
+
+            [DllImport(DllName, EntryPoint = "eg_disjunctive_chaum_pedersen_proof_get_one_challenge")]
+            internal static extern Status GetOneChallenge(
+                DisjunctiveChaumPedersenProofHandle handle,
+                out ElementModQ.ElementModQHandle element);
+
+            [DllImport(DllName, EntryPoint = "eg_disjunctive_chaum_pedersen_proof_get_challenge")]
+            internal static extern Status GetChallenge(
+                DisjunctiveChaumPedersenProofHandle handle,
+                out ElementModQ.ElementModQHandle element);
+
+            [DllImport(DllName, EntryPoint = "eg_disjunctive_chaum_pedersen_proof_get_zero_response")]
+            internal static extern Status GetZeroResponse(
+                DisjunctiveChaumPedersenProofHandle handle,
+                out ElementModQ.ElementModQHandle element);
+
+            [DllImport(DllName, EntryPoint = "eg_disjunctive_chaum_pedersen_proof_get_one_response")]
+            internal static extern Status GetOneResponse(
+                DisjunctiveChaumPedersenProofHandle handle,
+                out ElementModQ.ElementModQHandle element);
+
+            [DllImport(DllName, EntryPoint = "eg_disjunctive_chaum_pedersen_proof_make")]
+            internal static extern Status Make(
+                ElGamalCiphertext.ElGamalCiphertextHandle message,
+                ElementModQ.ElementModQHandle r,
+                ElementModP.ElementModPHandle k,
+                ElementModQ.ElementModQHandle q,
+                ElementModQ.ElementModQHandle seed,
+                ulong plaintext,
+                out DisjunctiveChaumPedersenProofHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_disjunctive_chaum_pedersen_proof_is_valid")]
+            internal static extern bool IsValid(
+                DisjunctiveChaumPedersenProofHandle handle,
+                ElGamalCiphertext.ElGamalCiphertextHandle message,
+                ElementModP.ElementModPHandle k,
+                ElementModQ.ElementModQHandle q);
+
+        }
+
+        internal static unsafe class ConstantChaumPedersenProof
+        {
+            internal unsafe struct ConstantChaumPedersenProofType { };
+
+            internal class ConstantChaumPedersenProofHandle
+                : ElectionguardSafeHandle<ConstantChaumPedersenProofType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = ConstantChaumPedersenProof.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"ConstantChaumPedersenProof Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_constant_chaum_pedersen_proof_free")]
+            internal static extern Status Free(ConstantChaumPedersenProofHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_constant_chaum_pedersen_proof_get_pad")]
+            internal static extern Status GetPad(
+                ConstantChaumPedersenProofHandle handle,
+                out ElementModP.ElementModPHandle element);
+
+            [DllImport(DllName, EntryPoint = "eg_constant_chaum_pedersen_proof_get_data")]
+            internal static extern Status GetData(
+                ConstantChaumPedersenProofHandle handle,
+                out ElementModP.ElementModPHandle element);
+
+            [DllImport(DllName, EntryPoint = "eg_constant_chaum_pedersen_proof_get_challenge")]
+            internal static extern Status GetChallenge(
+                ConstantChaumPedersenProofHandle handle,
+                out ElementModQ.ElementModQHandle element);
+
+            [DllImport(DllName, EntryPoint = "eg_constant_chaum_pedersen_proof_get_response")]
+            internal static extern Status GetResponse(
+                ConstantChaumPedersenProofHandle handle,
+                out ElementModQ.ElementModQHandle element);
+
+            [DllImport(DllName, EntryPoint = "eg_constant_chaum_pedersen_proof_make")]
+            internal static extern Status Make(
+                ElGamalCiphertext.ElGamalCiphertextHandle message,
+                ElementModQ.ElementModQHandle r,
+                ElementModP.ElementModPHandle k,
+                ElementModQ.ElementModQHandle seed,
+                ElementModQ.ElementModQHandle hash_header,
+                ulong constant,
+                out ConstantChaumPedersenProofHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_constant_chaum_pedersen_proof_is_valid")]
+            internal static extern bool IsValid(
+                ConstantChaumPedersenProofHandle handle,
+                ElGamalCiphertext.ElGamalCiphertextHandle message,
+                ElementModP.ElementModPHandle k,
+                ElementModQ.ElementModQHandle q);
+
+        }
+
 
         #endregion
 
@@ -555,7 +711,10 @@ namespace ElectionGuard
                 CiphertextBallotSelectionHandle handle,
                 out ElementModQ.ElementModQHandle nonce);
 
-            // TODO: ISSUE #129: get proof
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_get_proof")]
+            internal static extern Status GetProof(
+                CiphertextBallotSelectionHandle handle,
+                out DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle nonce);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_is_valid_encryption")]
             internal static extern bool IsValidEncryption(
@@ -665,7 +824,10 @@ namespace ElectionGuard
                 CiphertextBallotContestHandle handle,
                 out ElementModQ.ElementModQHandle cryptoHash);
 
-            // TODO: ISSUE #129: get proof
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_get_proof")]
+            internal static extern Status GetProof(
+                CiphertextBallotContestHandle handle,
+                out ConstantChaumPedersenProof.ConstantChaumPedersenProofHandle nonce);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_is_valid_encryption")]
             internal static extern bool IsValidEncryption(
@@ -767,7 +929,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_compact_plaintext_ballot_to_msgpack")]
             internal static extern Status ToMsgPack(
                 CompactPlaintextBallotHandle handle, out IntPtr data, out UIntPtr size);
-            
+
             [DllImport(DllName, EntryPoint = "eg_compact_plaintext_ballot_msgpack_free")]
             internal static extern Status MsgPackFree(IntPtr data);
         }
@@ -910,7 +1072,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_compact_ciphertext_ballot_to_msgpack")]
             internal static extern Status ToMsgPack(
                 CompactCiphertextBallotHandle handle, out IntPtr data, out UIntPtr size);
-            
+
             [DllImport(DllName, EntryPoint = "eg_compact_ciphertext_ballot_msgpack_free")]
             internal static extern Status MsgPackFree(IntPtr data);
 
