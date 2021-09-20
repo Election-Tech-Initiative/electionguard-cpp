@@ -2,7 +2,7 @@
 
 # 🗳 ElectionGuard C++
 
-![Github Package Action](https://github.com/microsoft/electionguard-cpp/workflows/Release/badge.svg) [![license](https://img.shields.io/github/license/microsoft/electionguard-cpp)](https://github.com/microsoft/electionguard-cpp/blob/main/LICENSE) [![license](https://img.shields.io/nuget/v/Electionguard.Encryption)](https://www.nuget.org/packages/ElectionGuard.Encryption/)
+[![ElectionGuard Specification 0.95.0](https://img.shields.io/badge/🗳%20ElectionGuard%20Specification-0.95.0-green)](https://www.electionguard.vote) ![Github Package Action](https://github.com/microsoft/electionguard-cpp/workflows/Release/badge.svg) [![license](https://img.shields.io/github/license/microsoft/electionguard-cpp)](https://github.com/microsoft/electionguard-cpp/blob/main/LICENSE) [![license](https://img.shields.io/nuget/v/Electionguard.Encryption)](https://www.nuget.org/packages/ElectionGuard.Encryption/)
 
 This repository is a "reference implementation" of an ElectionGuard ballot encryption library written in c++ and includes a C-compatible API for referencing the library from pure-c application. This core SDK performs ballot encryption and verification functions and is suitable for execution on voting system hardware and low powered devices. It is designed to be integrated into existing (or new) voting system software.
 
