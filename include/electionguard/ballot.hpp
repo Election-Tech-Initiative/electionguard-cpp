@@ -46,7 +46,7 @@ namespace electionguard
     /// <summary>
     /// ExtendedData represents any arbitrary data expressible as a string with a length.
     ///
-    ///  This class is used primarily as a field on a selection to indicate a write-in candidate text value
+    /// This class is used primarily as a field on a selection to indicate a write-in candidate text value
     /// </summary>
     struct ExtendedData {
       public:
@@ -632,13 +632,14 @@ namespace electionguard
         /// <summary>
         /// The timestamp indicating when the ballot was encrypted
         /// as measured by the encryption device.  This value does not
-        /// provide units as it is up to the consuming system to indicate the scale.
-        /// Typically a consumer may use seconds since epoch or ticks since epoch
+        /// provide units as it is up to the host system to indicate the scale.
+        /// Typically a host may use seconds since epoch or ticks since epoch
         /// </summary>
         uint64_t getTimestamp() const;
 
         /// <summary>
-        /// The nonce value used to encrypt all values in the ballot
+        /// The nonce value used to encrypt all values in the ballot.
+        /// Sensitive & should be treated as a secret
         /// </summary>
         ElementModQ *getNonce() const;
 
@@ -776,7 +777,7 @@ namespace electionguard
         SubmittedBallot &operator=(SubmittedBallot &&other);
 
         /// <summary>
-        /// The unique ballot id that is meaningful to the consuming application.
+        /// The state of the ballot (cast, spoiled, or unknown)
         /// </summary>
         BallotBoxState getState() const;
 

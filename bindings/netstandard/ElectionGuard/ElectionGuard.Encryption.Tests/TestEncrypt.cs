@@ -37,15 +37,18 @@ namespace ElectionGuard.Encrypt.Tests
             var fromJson = new CiphertextBallot(json);
             Assert.That(ciphertext.ObjectId == fromJson.ObjectId);
 
-            // TODO:
             // binary serialization
-            // var bson = ciphertext.Bson;
-            // var fromBson = CiphertextBallot.FromBson(bson);
-            // Assert.That(ciphertext.ObjectId == fromBson.ObjectId);
+            var bson = ciphertext.ToBson();
+            var fromBson = new CiphertextBallot(bson, BinarySerializationEncoding.BSON);
+            Assert.That(ciphertext.ObjectId == fromBson.ObjectId);
 
-            // TODO: submitted ballot
-            // var submitted = SubmittedBallot.From(ciphertext, BallotBoxState.cast);
-            // Assert.That(ciphertext.ObjectId == submitted.ObjectId);
+            var msgPack = ciphertext.ToMsgPack();
+            var fromMsgPack = new CiphertextBallot(msgPack, BinarySerializationEncoding.MsgPack);
+            Assert.That(ciphertext.ObjectId == fromMsgPack.ObjectId);
+
+            // submitted ballot
+            var submitted = new SubmittedBallot(ciphertext, BallotBoxState.Cast);
+            Assert.That(ciphertext.ObjectId == submitted.ObjectId);
         }
 
         [Test]

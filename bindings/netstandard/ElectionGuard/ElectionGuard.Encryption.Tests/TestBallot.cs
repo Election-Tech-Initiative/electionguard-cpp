@@ -41,6 +41,10 @@ namespace ElectionGuard.Encrypt.Tests
                     Assert.That(selectionId == $"contest-{i + 1}-selection-{j + 1}-id");
                 }
             }
+
+            var bson = ballot.ToBson();
+            var fromBson = new PlaintextBallot(bson, BinarySerializationEncoding.BSON);
+            Assert.That(ballot.ObjectId == fromBson.ObjectId);
         }
 
         [Test]

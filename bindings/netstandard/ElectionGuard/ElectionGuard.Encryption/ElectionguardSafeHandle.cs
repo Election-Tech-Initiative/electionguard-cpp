@@ -19,6 +19,13 @@ namespace ElectionGuard
         // Objects constructed from a structure pointer
         // do not own the context
         public unsafe ElectionguardSafeHandle(
+            IntPtr handle)
+            : base(ownsHandle: false)
+        {
+            SetHandle(handle);
+        }
+
+        public unsafe ElectionguardSafeHandle(
             T* handle)
             : base(ownsHandle: false)
         {
@@ -42,7 +49,7 @@ namespace ElectionGuard
             {
                 return Free();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"{nameof(T)} ERROR ReleaseHandle: {ex.Message}");
                 return false;
