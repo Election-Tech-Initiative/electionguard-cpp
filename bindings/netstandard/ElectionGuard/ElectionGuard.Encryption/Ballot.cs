@@ -8,6 +8,7 @@ namespace ElectionGuard
     using NativeElGamalCiphertext = NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
     using NativeDisjunctiveChaumPedersenProof = NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle;
     using NativeConstantChaumPedersenProof = NativeInterface.ConstantChaumPedersenProof.ConstantChaumPedersenProofHandle;
+    using NativeExtendedData = NativeInterface.ExtendedData.ExtendedDataHandle;
     using NativePlaintextBallotSelection = NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle;
     using NativeCiphertextBallotSelection = NativeInterface.CiphertextBallotSelection.CiphertextBallotSelectionHandle;
     using NativePlaintextBallotContest = NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle;
@@ -16,6 +17,81 @@ namespace ElectionGuard
     using NativeCompactPlaintextBallot = NativeInterface.CompactPlaintextBallot.CompactPlaintextBallotHandle;
     using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotHandle;
     using NativeCompactCiphertextBallot = NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle;
+    using NativeSubmittedBallot = NativeInterface.SubmittedBallot.SubmittedBallotHandle;
+
+    public enum BinarySerializationEncoding
+    {
+        BSON,
+        MsgPack
+    }
+
+    #region ExtendedData
+
+    /// <summary>
+    /// ExtendedData represents any arbitrary data expressible as a string with a length.
+    ///
+    /// This class is used primarily as a field on a selection to indicate a write-in candidate text value
+    /// </summary>
+    public class ExtendedData : DisposableBase
+    {
+        /// <Summary>
+        /// The string value
+        /// </Summary>
+        public unsafe string Value
+        {
+            get
+            {
+                var status = NativeInterface.ExtendedData.GetValue(
+                    Handle, out IntPtr value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"ExtendedData Error Value: {status}");
+                    return null;
+                }
+                return Marshal.PtrToStringAnsi(value);
+            }
+        }
+
+        /// <Summary>
+        /// The length of the string value
+        /// </Summary>
+        public unsafe long Length
+        {
+            get
+            {
+                return NativeInterface.ExtendedData.GetLength(Handle);
+            }
+        }
+
+        internal unsafe NativeExtendedData Handle;
+
+        unsafe internal ExtendedData(NativeExtendedData handle)
+        {
+            Handle = handle;
+        }
+
+        public unsafe ExtendedData(string value, long length)
+        {
+            var status = NativeInterface.ExtendedData.New(
+                value, length, out Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"ExtendedData Error Status: {status}");
+            }
+        }
+
+        protected override unsafe void DisposeUnmanaged()
+        {
+            base.DisposeUnmanaged();
+
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
+            Handle = null;
+        }
+
+    }
+
+    #endregion
 
     #region PlaintextBallotSelection
 
@@ -56,6 +132,17 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Get the plaintext vote
+        /// </Summary>
+        public unsafe long Vote
+        {
+            get
+            {
+                return NativeInterface.PlaintextBallotSelection.GetVote(Handle);
+            }
+        }
+
         /// <summary>
         /// Determines if this is a placeholder selection
         /// </summary>
@@ -64,6 +151,24 @@ namespace ElectionGuard
             get
             {
                 return NativeInterface.PlaintextBallotSelection.GetIsPlaceholder(Handle);
+            }
+        }
+
+        /// <summary>
+        /// an optional field of arbitrary data, such as the value of a write-in candidate
+        /// </summary>
+        public unsafe ExtendedData ExtendedData
+        {
+            get
+            {
+                var status = NativeInterface.PlaintextBallotSelection.GetExtendedData(
+                    Handle, out NativeExtendedData value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"PlaintextBallotSelection Error ExtendedData: {status}");
+                    return null;
+                }
+                return new ExtendedData(value);
             }
         }
 
@@ -162,6 +267,17 @@ namespace ElectionGuard
                     return null;
                 }
                 return Marshal.PtrToStringAnsi(value);
+            }
+        }
+
+        /// <Summary>
+        /// Get the sequence order of the selection
+        /// </Summary>
+        public unsafe long SequenceOrder
+        {
+            get
+            {
+                return NativeInterface.CiphertextBallotSelection.GetSequenceOrder(Handle);
             }
         }
 
@@ -274,6 +390,28 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Given an encrypted BallotSelection, generates a hash, suitable for rolling up
+        /// into a hash / tracking code for an entire ballot. Of note, this particular hash examines
+        /// the `encryptionSeed` and `message`, but not the proof.
+        /// This is deliberate, allowing for the possibility of ElectionGuard variants running on
+        /// much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed
+        /// later on.
+        ///
+        /// In most cases the encryption_seed should match the `description_hash`
+        /// </summary>
+        public unsafe ElementModQ CryptoHashWith(ElementModQ encryptionSeed)
+        {
+            var status = NativeInterface.CiphertextBallotSelection.CryptoHashWith(
+                    Handle, encryptionSeed.Handle, out NativeElementModQ cryptoHash);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"CiphertextBallotSelection Error CryptoHashWith: {status}");
+                return null;
+            }
+            return new ElementModQ(cryptoHash);
+        }
+
         /// <sumary>
         /// Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key.
         /// Calling this function expects that the object is in a well-formed encrypted state
@@ -331,6 +469,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Get the Size of the selections collection
+        /// </Summary>
         public unsafe ulong SelectionsSize
         {
             get
@@ -349,6 +490,9 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <Summary>
+        /// Get a selection at a specific index.
+        /// </Summary>
         public unsafe PlaintextBallotSelection GetSelectionAt(ulong index)
         {
             var status = NativeInterface.PlaintextBallotContest.GetSelectionAtIndex(
@@ -359,6 +503,25 @@ namespace ElectionGuard
                 return null;
             }
             return new PlaintextBallotSelection(value);
+        }
+
+        /// <Summary>
+        /// Given a PlaintextBallotContest returns true if the state is representative of the expected values.
+        ///
+        /// Note: because this class supports partial representations, undervotes are considered a valid state.
+        /// </Summary>
+        public unsafe bool IsValid(
+            string expectedObjectId,
+            long expectedNumSelections,
+            long expectedNumElected,
+            long votesAllowed = 0)
+        {
+            return NativeInterface.PlaintextBallotContest.IsValid(
+                Handle,
+                expectedObjectId,
+                expectedNumSelections,
+                expectedNumElected,
+                votesAllowed);
         }
 
         protected override unsafe void DisposeUnmanaged()
@@ -410,6 +573,17 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Get the sequence order of the contest
+        /// </Summary>
+        public unsafe long SequenceOrder
+        {
+            get
+            {
+                return NativeInterface.CiphertextBallotContest.GetSequenceOrder(Handle);
+            }
+        }
+
         /// <summary>
         /// The hash of the string representation of the Contest Description from the election manifest
         /// </summary>
@@ -428,6 +602,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Get the Size of the selections collection
+        /// </summary>
         public unsafe ulong SelectionsSize
         {
             get
@@ -499,6 +676,9 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Get a selection at a specific index.
+        /// </summary>
         public unsafe CiphertextBallotSelection GetSelectionAt(ulong index)
         {
             var status = NativeInterface.CiphertextBallotContest.GetSelectionAtIndex(
@@ -509,6 +689,60 @@ namespace ElectionGuard
                 return null;
             }
             return new CiphertextBallotSelection(value);
+        }
+
+        /// <summary>
+        /// Given an encrypted BallotContest, generates a hash, suitable for rolling up
+        /// into a hash / tracking code for an entire ballot. Of note, this particular hash examines
+        /// the `encryptionSeed` and `message`, but not the proof.
+        /// This is deliberate, allowing for the possibility of ElectionGuard variants running on
+        /// much more limited hardware, wherein the Constant Chaum-Pedersen proofs might be computed
+        /// later on.
+        ///
+        /// In most cases the encryption_seed should match the `description_hash`
+        /// </summary>
+        public unsafe ElementModQ CryptoHashWith(ElementModQ encryptionSeed)
+        {
+            var status = NativeInterface.CiphertextBallotContest.CryptoHashWith(
+                    Handle, encryptionSeed.Handle, out NativeElementModQ value);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"CiphertextBallotContest Error CryptoHashWith: {status}");
+                return null;
+            }
+            return new ElementModQ(value);
+        }
+
+        /// <summary>
+        /// An aggregate nonce for the contest composed of the nonces of the selections.
+        /// Used when constructing the proof of selection limit
+        /// </summary>
+        public unsafe ElementModQ AggregateNonce()
+        {
+            var status = NativeInterface.CiphertextBallotContest.AggregateNonce(
+                    Handle, out NativeElementModQ value);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"CiphertextBallotContest Error AggregateNonce: {status}");
+                return null;
+            }
+            return new ElementModQ(value);
+        }
+
+        /// <summary>
+        /// Add the individual ballot_selections `message` fields together, suitable for use
+        /// when constructing the proof of selection limit.
+        /// </summary>
+        public unsafe ElGamalCiphertext ElGamalAccumulate()
+        {
+            var status = NativeInterface.CiphertextBallotContest.ElGamalAccumulate(
+                    Handle, out NativeElGamalCiphertext value);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"CiphertextBallotContest Error ElGamalAccumulate: {status}");
+                return null;
+            }
+            return new ElGamalCiphertext(value);
         }
 
         /// <summary>
@@ -618,6 +852,20 @@ namespace ElectionGuard
             }
         }
 
+        public unsafe PlaintextBallot(byte[] data, BinarySerializationEncoding encoding)
+        {
+            fixed (byte* pointer = data)
+            {
+                var status = encoding == BinarySerializationEncoding.BSON
+                    ? NativeInterface.PlaintextBallot.FromBson(pointer, (ulong)data.Length, out Handle)
+                    : NativeInterface.PlaintextBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"PlaintextBallot Error Binary Ctor: {status}");
+                }
+            }
+        }
+
         public unsafe PlaintextBallotContest GetContestAt(ulong index)
         {
             var status = NativeInterface.PlaintextBallot.GetContestAtIndex(
@@ -654,6 +902,49 @@ namespace ElectionGuard
             var json = Marshal.PtrToStringAnsi(pointer);
             return json;
         }
+
+        /// <Summary>
+        /// Export the ballot representation as BSON
+        /// </Summary>
+        public unsafe byte[] ToBson()
+        {
+
+            var status = NativeInterface.PlaintextBallot.ToBson(
+                Handle, out IntPtr data, out UIntPtr size);
+
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"PlaintextBallot Error ToBson: {status}");
+                return null;
+            }
+
+            var byteArray = new byte[(int)size];
+            Marshal.Copy(data, byteArray, 0, (int)size);
+            NativeInterface.CompactCiphertextBallot.MsgPackFree(data);
+            return byteArray;
+        }
+
+        /// <Summary>
+        /// Export the ballot representation as MsgPack
+        /// </Summary>
+        public unsafe byte[] ToMsgPack()
+        {
+
+            var status = NativeInterface.PlaintextBallot.ToMsgPack(
+                Handle, out IntPtr data, out UIntPtr size);
+
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"PlaintextBallot Error ToMsgPack: {status}");
+                return null;
+            }
+
+            var byteArray = new byte[(int)size];
+            Marshal.Copy(data, byteArray, 0, (int)size);
+            NativeInterface.CompactCiphertextBallot.MsgPackFree(data);
+            return byteArray;
+        }
+
     }
 
     #endregion
@@ -819,6 +1110,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Get the size of the contests collection
+        /// </summary>
         public unsafe ulong ContestsSize
         {
             get
@@ -848,6 +1142,27 @@ namespace ElectionGuard
         }
 
         /// <summary>
+        /// The timestamp indicating when the ballot was encrypted
+        /// as measured by the encryption device.  This value does not
+        /// provide units as it is up to the host system to indicate the scale.
+        /// Typically a host may use seconds since epoch or ticks since epoch
+        /// </summary>
+        public unsafe long Timestamp
+        {
+            get
+            {
+                var status = NativeInterface.CiphertextBallot.GetTimestamp(
+                    Handle, out long value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"CiphertextBallot Error Timestamp: {status}");
+                    return 0;
+                }
+                return value;
+            }
+        }
+
+        /// <summary>
         /// The nonce value used to encrypt all values in the ballot
         /// </summary>
         public unsafe ElementModQ Nonce
@@ -870,7 +1185,21 @@ namespace ElectionGuard
             var status = NativeInterface.CiphertextBallot.FromJson(json, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallot Error Ctor: {status}");
+                Console.WriteLine($"CiphertextBallot Error JSON Ctor: {status}");
+            }
+        }
+
+        public unsafe CiphertextBallot(byte[] data, BinarySerializationEncoding encoding)
+        {
+            fixed (byte* pointer = data)
+            {
+                var status = encoding == BinarySerializationEncoding.BSON
+                    ? NativeInterface.CiphertextBallot.FromBson(pointer, (ulong)data.Length, out Handle)
+                    : NativeInterface.CiphertextBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"CiphertextBallot Error Binary Ctor: {status}");
+                }
             }
         }
 
@@ -879,6 +1208,9 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Get a contest at a specific index
+        /// </summary>
         public unsafe CiphertextBallotContest GetContestAt(ulong index)
         {
             var status = NativeInterface.CiphertextBallot.GetContestAtIndex(
@@ -908,8 +1240,6 @@ namespace ElectionGuard
                 Handle, manifestHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
         }
 
-        // TODO: ISSUE #129: To bson
-
         /// <Summary>
         /// Export the ballot representation as JSON
         /// </Summary>
@@ -929,6 +1259,54 @@ namespace ElectionGuard
             var json = Marshal.PtrToStringAnsi(pointer, (int)size);
             Marshal.FreeHGlobal(pointer);
             return json;
+        }
+
+        /// <Summary>
+        /// Export the ballot representation as BSON
+        /// </Summary>
+        public unsafe byte[] ToBson(bool withNonces = false)
+        {
+
+            var status = withNonces
+                ? NativeInterface.CiphertextBallot.ToBsonWithNonces(
+                Handle, out IntPtr data, out UIntPtr size)
+                : NativeInterface.CiphertextBallot.ToBson(
+                Handle, out data, out size);
+
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"CiphertextBallot Error ToBson: {status}");
+                return null;
+            }
+
+            var byteArray = new byte[(int)size];
+            Marshal.Copy(data, byteArray, 0, (int)size);
+            NativeInterface.CompactCiphertextBallot.MsgPackFree(data);
+            return byteArray;
+        }
+
+        /// <Summary>
+        /// Export the ballot representation as MsgPack
+        /// </Summary>
+        public unsafe byte[] ToMsgPack(bool withNonces = false)
+        {
+
+            var status = withNonces
+                ? NativeInterface.CiphertextBallot.ToMsgPack(
+                Handle, out IntPtr data, out UIntPtr size)
+                : NativeInterface.CiphertextBallot.ToMsgPack(
+                Handle, out data, out size);
+
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"CiphertextBallot Error ToMsgPack: {status}");
+                return null;
+            }
+
+            var byteArray = new byte[(int)size];
+            Marshal.Copy(data, byteArray, 0, (int)size);
+            NativeInterface.CompactCiphertextBallot.MsgPackFree(data);
+            return byteArray;
         }
 
         protected override unsafe void DisposeUnmanaged()
@@ -1009,7 +1387,7 @@ namespace ElectionGuard
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CompactCiphertextBallot Error ToJson: {status}");
+                Console.WriteLine($"CompactCiphertextBallot Error ToMsgPack: {status}");
                 return null;
             }
 
@@ -1034,4 +1412,296 @@ namespace ElectionGuard
     }
 
     #endregion
+
+    #region SubmittedBallot
+
+    /// <summary>
+    /// A `SubmittedBallot` represents a ballot that is submitted for inclusion in election results.
+    /// A submitted ballot is or is about to be either cast or spoiled.
+    /// The state supports the `BallotBoxState.UNKNOWN` enumeration to indicate that this object is mutable
+    /// and has not yet been explicitly assigned a specific state.
+    ///
+    /// Note, additionally, this ballot includes all proofs but no nonces.
+    ///
+    /// Do not make this class directly. Use `make_ciphertext_submitted_ballot` or `from_ciphertext_ballot` instead.
+    /// </summary>
+    public class SubmittedBallot : DisposableBase
+    {
+
+        public unsafe BallotBoxState State
+        {
+            get
+            {
+                return NativeInterface.SubmittedBallot.GetState(Handle);
+            }
+        }
+
+        public unsafe string ObjectId
+        {
+            get
+            {
+                var status = NativeInterface.SubmittedBallot.GetObjectId(
+                    Handle, out IntPtr value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"SubmittedBallot Error ObjectId: {status}");
+                    return null;
+                }
+                return Marshal.PtrToStringAnsi(value);
+            }
+        }
+
+        /// <Summary>
+        /// The Object Id of the ballot style in the election manifest.  This value is used
+        /// to determine which contests to expect on the ballot, to fill in missing values,
+        /// and to validate that the ballot is well-formed
+        /// </Summary>
+        public unsafe string StyleId
+        {
+            get
+            {
+                var status = NativeInterface.SubmittedBallot.GetStyleId(
+                    Handle, out IntPtr value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"SubmittedBallot Error StyleId: {status}");
+                    return null;
+                }
+                return Marshal.PtrToStringAnsi(value);
+            }
+        }
+
+        /// <summary>
+        /// Hash of the complete Election Manifest to which this ballot belongs
+        /// </summary>
+        public unsafe ElementModQ ManifestHash
+        {
+            get
+            {
+                var status = NativeInterface.SubmittedBallot.GetManifestHash(
+                    Handle, out NativeElementModQ value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"SubmittedBallot Error ManifestHash: {status}");
+                    return null;
+                }
+                return new ElementModQ(value);
+            }
+        }
+
+        /// <summary>
+        /// The seed hash for the ballot.  It may be the encryption device hash,
+        /// the hash of a previous ballot or the hash of some other value
+        /// that is meaningful to the consuming application.
+        /// </summary>
+        public unsafe ElementModQ BallotCodeSeed
+        {
+            get
+            {
+                var status = NativeInterface.SubmittedBallot.GetBallotCodeSeed(
+                    Handle, out NativeElementModQ value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"SubmittedBallot Error BallotCodeSeed: {status}");
+                    return null;
+                }
+                return new ElementModQ(value);
+            }
+        }
+
+        /// <summary>
+        /// Get the size of the contests collection
+        /// </summary>
+        public unsafe ulong ContestsSize
+        {
+            get
+            {
+                var size = NativeInterface.SubmittedBallot.GetContestsSize(Handle);
+                return size;
+            }
+        }
+
+        /// <summary>
+        /// The unique ballot code for this ballot that is derived from
+        /// the ballot seed, the timestamp, and the hash of the encrypted values
+        /// </summary>
+        public unsafe ElementModQ BallotCode
+        {
+            get
+            {
+                var status = NativeInterface.SubmittedBallot.GetBallotCode(
+                    Handle, out NativeElementModQ value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"SubmittedBallot Error BallotCode: {status}");
+                    return null;
+                }
+                return new ElementModQ(value);
+            }
+        }
+
+        /// <summary>
+        /// The timestamp indicating when the ballot was encrypted
+        /// as measured by the encryption device.  This value does not
+        /// provide units as it is up to the host system to indicate the scale.
+        /// Typically a host may use seconds since epoch or ticks since epoch
+        /// </summary>
+        public unsafe long Timestamp
+        {
+            get
+            {
+                var status = NativeInterface.SubmittedBallot.GetTimestamp(
+                    Handle, out long value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"SubmittedBallot Error Timestamp: {status}");
+                    return 0;
+                }
+                return value;
+            }
+        }
+
+        internal unsafe NativeSubmittedBallot Handle;
+
+        unsafe internal SubmittedBallot(NativeSubmittedBallot handle)
+        {
+            Handle = handle;
+        }
+
+        public unsafe SubmittedBallot(CiphertextBallot ciphertext, BallotBoxState state)
+        {
+            var status = NativeInterface.SubmittedBallot.From(
+                ciphertext.Handle, state, out Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"SubmittedBallot Error Status: {status}");
+            }
+        }
+
+        public unsafe SubmittedBallot(string json)
+        {
+            var status = NativeInterface.SubmittedBallot.FromJson(json, out Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"SubmittedBallot Error JSON Ctor: {status}");
+            }
+        }
+
+        public unsafe SubmittedBallot(byte[] data, BinarySerializationEncoding encoding)
+        {
+            fixed (byte* pointer = data)
+            {
+                var status = encoding == BinarySerializationEncoding.BSON
+                    ? NativeInterface.SubmittedBallot.FromBson(pointer, (ulong)data.Length, out Handle)
+                    : NativeInterface.SubmittedBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"SubmittedBallot Error Binary Ctor: {status}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get a contest at a specific index
+        /// </summary>
+        public unsafe CiphertextBallotContest GetContestAt(ulong index)
+        {
+            var status = NativeInterface.SubmittedBallot.GetContestAtIndex(
+                Handle, index, out NativeCiphertextBallotContest value);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"SubmittedBallot Error GetContestAt: {status}");
+                return null;
+            }
+            return new CiphertextBallotContest(value);
+        }
+
+        /// <summary>
+        /// Given an encrypted Ballot, validates the encryption state
+        /// against a specific ballot seed and public key
+        /// by verifying the states of this ballot's members (BallotContest's and BallotSelection's).
+        /// Calling this function expects that the object is in a well-formed encrypted state
+        /// with the `contests` populated with valid encrypted ballot selections,
+        /// and the ElementModQ `manifest_hash` also populated.
+        /// Specifically, the seed in this context is the hash of the Election Manifest,
+        /// or whatever `ElementModQ` was used to populate the `manifest_hash` field.
+        /// </summary>
+        public unsafe bool IsValidEncryption(
+            ElementModQ manifestHash, ElementModP elGamalPublicKey, ElementModQ cryptoExtendedBaseHash)
+        {
+            return NativeInterface.SubmittedBallot.IsValidEncryption(
+                Handle, manifestHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
+        }
+
+        /// <Summary>
+        /// Export the ballot representation as JSON
+        /// </Summary>
+        public unsafe string ToJson()
+        {
+            var status = NativeInterface.SubmittedBallot.ToJson(
+                Handle, out IntPtr pointer, out UIntPtr size);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"SubmittedBallot Error ToJson: {status}");
+                return null;
+            }
+            var json = Marshal.PtrToStringAnsi(pointer);
+            return json;
+        }
+
+        /// <Summary>
+        /// Export the ballot representation as MsgPack
+        /// </Summary>
+        public unsafe byte[] ToBson()
+        {
+
+            var status = NativeInterface.SubmittedBallot.ToBson(
+                Handle, out IntPtr data, out UIntPtr size);
+
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"SubmittedBallot Error ToBson: {status}");
+                return null;
+            }
+
+            var byteArray = new byte[(int)size];
+            Marshal.Copy(data, byteArray, 0, (int)size);
+            NativeInterface.CompactCiphertextBallot.MsgPackFree(data);
+            return byteArray;
+        }
+
+        /// <Summary>
+        /// Export the ballot representation as MsgPack
+        /// </Summary>
+        public unsafe byte[] ToMsgPack()
+        {
+
+            var status = NativeInterface.SubmittedBallot.ToMsgPack(
+                Handle, out IntPtr data, out UIntPtr size);
+
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"SubmittedBallot Error ToMsgPack: {status}");
+                return null;
+            }
+
+            var byteArray = new byte[(int)size];
+            Marshal.Copy(data, byteArray, 0, (int)size);
+            NativeInterface.CompactCiphertextBallot.MsgPackFree(data);
+            return byteArray;
+        }
+
+        protected override unsafe void DisposeUnmanaged()
+        {
+            base.DisposeUnmanaged();
+
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
+            Handle = null;
+        }
+
+    }
+
+    #endregion
+
 }
