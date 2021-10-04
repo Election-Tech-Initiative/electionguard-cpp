@@ -188,6 +188,8 @@ namespace electionguard
 
     AnnotatedString::AnnotatedString(const AnnotatedString &other) : pimpl(other.pimpl->clone()) {}
 
+    AnnotatedString::AnnotatedString(AnnotatedString &&other) : pimpl(move(other.pimpl)) {}
+
     AnnotatedString::AnnotatedString(string annotation, string value)
         : pimpl(new Impl(move(annotation), move(value)))
     {
@@ -326,6 +328,11 @@ namespace electionguard
     {
     }
 
+    InternationalizedText::InternationalizedText(InternationalizedText &&other)
+        : pimpl(move(other.pimpl))
+    {
+    }
+
     InternationalizedText::InternationalizedText(vector<unique_ptr<Language>> text)
         : pimpl(new Impl(move(text)))
     {
@@ -438,6 +445,8 @@ namespace electionguard
         : pimpl(other.pimpl->clone())
     {
     }
+
+    ContactInformation::ContactInformation(ContactInformation &&other) : pimpl(move(other.pimpl)) {}
 
     ContactInformation::ContactInformation(string name) : pimpl(new Impl(move(name))) {}
 

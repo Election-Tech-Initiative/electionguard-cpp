@@ -126,7 +126,7 @@ namespace electionguard
     {
       public:
         AnnotatedString(const AnnotatedString &other);
-        AnnotatedString(const AnnotatedString &&other);
+        AnnotatedString(AnnotatedString &&other);
         explicit AnnotatedString(std::string annotation, std::string value);
         ~AnnotatedString();
 
@@ -209,7 +209,7 @@ namespace electionguard
     {
       public:
         InternationalizedText(const InternationalizedText &other);
-        InternationalizedText(const InternationalizedText &&other);
+        InternationalizedText(InternationalizedText &&other);
         explicit InternationalizedText(std::vector<std::unique_ptr<Language>> text);
         ~InternationalizedText();
 
@@ -249,7 +249,7 @@ namespace electionguard
     {
       public:
         ContactInformation(const ContactInformation &other);
-        ContactInformation(const ContactInformation &&other);
+        ContactInformation(ContactInformation &&other);
         explicit ContactInformation(std::string name);
         explicit ContactInformation(std::vector<std::string> addressLine,
                                     std::string name = nullptr);

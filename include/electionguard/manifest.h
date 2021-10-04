@@ -207,21 +207,295 @@ eg_intertnationalized_text_crypto_hash(eg_language_t *handle, eg_element_mod_q_t
 
 #ifndef ContactInformation
 
+struct eg_contact_information_s;
+
+/**
+* For defining contact information about objects such as persons, boards of authorities, and organizations.
+*
+* Contact Information values are not used internally by ElectionGuard when encrypting ballots
+* but are included for checking the validity of a supplied manifest.
+*
+* See: https://developers.google.com/elections-data/reference/contact-information
+*/
+typedef struct eg_contact_information_s eg_contact_information_t;
+
+EG_API eg_electionguard_status_t eg_contact_information_new(char *in_name,
+                                                            eg_contact_information_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_contact_information_new_with_collections(
+  char *in_name, char *in_address_line[], const size_t in_address_line_size,
+  eg_annotated_string_t *in_email_line[], const size_t in_email_line_size,
+  eg_annotated_string_t *in_phone_line[], const size_t in_phone_line_size,
+  eg_contact_information_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_contact_information_free(eg_contact_information_t *handle);
+
+/**
+ * Get the Size of the address collection
+ */
+EG_API size_t eg_contact_information_get_address_line_size(eg_contact_information_t *handle);
+
+/**
+ * Get an address line at a specific index.
+ * 
+ *  Associates an address with the contact.
+ * AddressLine needs to contain the lines that someone would
+ * enter into a web mapping service to find the address on a map.
+ * That is, the value of the field needs to geocode the contact location.
+ * 
+ * @param[in] in_index The index of the text
+ * @param[out] out_text_ref An opaque pointer to the text.  
+ *                          The value is a reference and is not owned by the caller
+ */
+EG_API eg_electionguard_status_t eg_contact_information_get_address_line_at_index(
+  eg_contact_information_t *handle, size_t in_index, char **out_address);
+
+/**
+ * Get the Size of the email line collection
+ */
+EG_API size_t eg_contact_information_get_email_line_size(eg_contact_information_t *handle);
+
+/**
+ * Get an email line at a specific index.
+ * 
+ *  Associates an address with the contact.
+ * AddressLine needs to contain the lines that someone would
+ * enter into a web mapping service to find the address on a map.
+ * That is, the value of the field needs to geocode the contact location.
+ * 
+ * @param[in] in_index The index of the text
+ * @param[out] out_text_ref An opaque pointer to the text.  
+ *                          The value is a reference and is not owned by the caller
+ */
+EG_API eg_electionguard_status_t eg_contact_information_get_email_line_at_index(
+  eg_contact_information_t *handle, size_t in_index, eg_internationalized_text_t **out_address_ref);
+
+/**
+ * Get the Size of the phone line collection
+ */
+EG_API size_t eg_contact_information_get_phone_line_size(eg_contact_information_t *handle);
+
+/**
+ * Get a phone line at a specific index.
+ * 
+ *  Associates an address with the contact.
+ * AddressLine needs to contain the lines that someone would
+ * enter into a web mapping service to find the address on a map.
+ * That is, the value of the field needs to geocode the contact location.
+ * 
+ * @param[in] in_index The index of the text
+ * @param[out] out_text_ref An opaque pointer to the text.  
+ *                          The value is a reference and is not owned by the caller
+ */
+EG_API eg_electionguard_status_t eg_contact_information_get_phone_line_at_index(
+  eg_contact_information_t *handle, size_t in_index, eg_internationalized_text_t **out_phone_ref);
+
+EG_API eg_electionguard_status_t eg_contact_information_get_name(eg_contact_information_t *handle,
+                                                                 const char **out_name);
+
+/**
+ * A hash representation of the object. Caller is responsible for lifecycle.
+ */
+EG_API eg_electionguard_status_t eg_contact_information_crypto_hash(
+  eg_contact_information_t *handle, eg_element_mod_q_t **out_crypto_hash);
+
 #endif
 
 #ifndef GeopoliticalUnit
+
+struct eg_geopolitical_unit_s;
+
+/**
+* A geopolitical unit describes any physical or
+* virtual unit of representation or vote/seat aggregation.
+* Use this entity for defining geopolitical units such as
+* cities, districts, jurisdictions, or precincts,
+* for the purpose of associating contests, offices, vote counts,
+* or other information with the geographies.
+*
+* Geopolitical Units are not used when encrypting ballots but are required by
+* ElectionGuard to determine the validity of ballot styles.
+*
+* See: https://developers.google.com/elections-data/reference/gp-unit
+*/
+typedef struct eg_geopolitical_unit_s eg_geopolitical_unit_t;
+
+EG_API eg_electionguard_status_t eg_geopolitical_unit_new(
+  char *in_object_id, char *in_name, eg_reporting_unit_type_t in_reporting_unit_type,
+  eg_geopolitical_unit_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_geopolitical_unit_new_with_contact_info(
+  char *in_object_id, char *in_name, eg_reporting_unit_type_t in_reporting_unit_type,
+  eg_contact_information_t *in_contact_information, eg_geopolitical_unit_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_geopolitical_unit_free(eg_geopolitical_unit_t *handle);
+
+EG_API eg_electionguard_status_t eg_geopolitical_unit_get_object_id(eg_geopolitical_unit_t *handle,
+                                                                    const char **out_object_id);
+
+EG_API eg_electionguard_status_t eg_geopolitical_unit_get_name(eg_geopolitical_unit_t *handle,
+                                                               const char **out_name);
+
+EG_API eg_reporting_unit_type_t get_geopolitical_unit_get_type(eg_geopolitical_unit_t *handle);
+
+/**
+ * A hash representation of the object. Caller is responsible for lifecycle.
+ */
+EG_API eg_electionguard_status_t eg_geopolitical_unit_crypto_hash(
+  eg_geopolitical_unit_t *handle, eg_element_mod_q_t **out_crypto_hash);
 
 #endif
 
 #ifndef BallotStyle
 
+struct eg_ballot_style_s;
+
+/*
+* A BallotStyle works as a key to uniquely specify a set of contests. See also `ContestDescription`.
+*
+* For ElectionGuard, each contest is associated with a specific geopolitical unit,
+* and each ballot style is associated with at least one geopolitical unit.
+*
+* It is up to the consuming application to determine how to interpreit the relationships
+* between these entity types.
+*/
+typedef struct eg_ballot_style_s eg_ballot_style_t;
+
+EG_API eg_electionguard_status_t eg_ballot_style_new(char *in_object_id,
+                                                     char *in_geopolitical_unit_ids[],
+                                                     const size_t in_geopolitical_unit_ids_size,
+                                                     eg_ballot_style_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_ballot_style_new_with_parties(
+  char *in_object_id, char *in_geopolitical_unit_ids[], const size_t in_geopolitical_unit_ids_size,
+  char *in_party_ids[], const size_t in_party_ids_size, char *in_image_uri,
+  eg_ballot_style_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_ballot_style_free(eg_ballot_style_t *handle);
+
+EG_API eg_electionguard_status_t eg_ballot_style_get_object_id(eg_ballot_style_t *handle,
+                                                               const char **out_object_id);
+
+EG_API size_t eg_ballot_style_get_geopolitical_unit_ids_size(eg_ballot_style_t *handle);
+
+EG_API eg_electionguard_status_t eg_ballot_style_get_geopolitical_unit_id_at_index(
+  eg_ballot_style_t *handle, size_t in_index, char **out_geopolitical_unit_id);
+
+EG_API size_t eg_ballot_style_get_party_ids_size(eg_ballot_style_t *handle);
+
+EG_API eg_electionguard_status_t eg_ballot_style_get_party_id_at_index(eg_ballot_style_t *handle,
+                                                                       size_t in_index,
+                                                                       char **out_party_id);
+
+EG_API eg_electionguard_status_t eg_ballot_style_get_image_uri(eg_ballot_style_t *handle,
+                                                               const char **out_image_uri);
+
+/**
+ * A hash representation of the object. Caller is responsible for lifecycle.
+ */
+EG_API eg_electionguard_status_t eg_ballot_style_crypto_hash(eg_ballot_style_t *handle,
+                                                             eg_element_mod_q_t **out_crypto_hash);
+
 #endif
 
 #ifndef Party
 
+struct eg_party_s;
+
+/*
+* Use this entity to describe a political party that can then be referenced from other entities.
+*
+* It is not required to define a party for Electionguard.
+*
+* See: https://developers.google.com/elections-data/reference/party
+*/
+typedef struct eg_party_s eg_party_t;
+
+EG_API eg_electionguard_status_t eg_party_new(char *in_object_id, eg_party_t **out_handle);
+
+// TODO: string in params should all be const i think
+
+EG_API eg_electionguard_status_t eg_party_new_with_extras(char *in_object_id,
+                                                          eg_internationalized_text_t *in_name,
+                                                          char *in_abbreviation, char *in_color,
+                                                          char *in_logo_uri,
+                                                          eg_party_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_party_free(eg_party_t *handle);
+
+EG_API eg_electionguard_status_t eg_party_get_object_id(eg_party_t *handle,
+                                                        const char **out_object_id);
+
+EG_API eg_electionguard_status_t eg_party_get_abbreviation(eg_party_t *handle,
+                                                           const char **out_abbreviation);
+
+EG_API eg_electionguard_status_t eg_party_get_name(eg_party_t *handle,
+                                                   eg_internationalized_text_t **out_name_ref);
+
+EG_API eg_electionguard_status_t eg_party_get_color(eg_party_t *handle, const char **out_color);
+
+EG_API eg_electionguard_status_t eg_party_get_logo_uri(eg_party_t *handle,
+                                                       const char **out_logo_uri);
+
+/**
+ * A hash representation of the object. Caller is responsible for lifecycle.
+ */
+EG_API eg_electionguard_status_t eg_party_crypto_hash(eg_party_t *handle,
+                                                      eg_element_mod_q_t **out_crypto_hash);
+
 #endif
 
 #ifndef Candidate
+
+struct eg_candidate_s;
+
+/*
+* Entity describing information about a candidate in a contest.
+* See: https://developers.google.com/elections-data/reference/candidate
+*
+* Note: The ElectionGuard Data Spec deviates from the NIST model in that
+* selections for any contest type are considered a "candidate".
+* for instance, on a yes-no referendum contest, two `candidate` objects
+* would be included in the model to represent the `affirmative` and `negative`
+* selections for the contest.  See the wiki, readme's, and tests in this repo for more info.
+*/
+typedef struct eg_candidate_s eg_candidate_t;
+
+EG_API eg_electionguard_status_t eg_candidate_new(char *in_object_id, bool in_is_write_in,
+                                                  eg_candidate_t **out_handle);
+
+// TODO: string in params should all be const i think
+
+EG_API eg_electionguard_status_t eg_candidate_new_with_extras(char *in_object_id,
+                                                              eg_internationalized_text_t *in_name,
+                                                              char *in_party_id, char *in_image_uri,
+                                                              bool in_is_write_in,
+                                                              eg_candidate_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_candidate_free(eg_candidate_t *handle);
+
+EG_API eg_electionguard_status_t eg_candidate_get_object_id(eg_candidate_t *handle,
+                                                            const char **out_object_id);
+
+EG_API eg_electionguard_status_t eg_candidate_get_candidate_id(eg_candidate_t *handle,
+                                                               const char **out_candidate_id);
+
+EG_API eg_electionguard_status_t eg_candidate_get_name(eg_candidate_t *handle,
+                                                       eg_internationalized_text_t **out_name_ref);
+
+EG_API eg_electionguard_status_t eg_candidate_get_party_id(eg_candidate_t *handle,
+                                                           const char **out_party_id);
+
+EG_API eg_electionguard_status_t eg_candidate_get_image_uri(eg_candidate_t *handle,
+                                                            const char **out_image_uri);
+
+EG_API bool eg_candidate_get_is_write_in(eg_candidate_t *handle);
+
+/**
+ * A hash representation of the object. Caller is responsible for lifecycle.
+ */
+EG_API eg_electionguard_status_t eg_candidate_crypto_hash(eg_candidate_t *handle,
+                                                          eg_element_mod_q_t **out_crypto_hash);
 
 #endif
 
