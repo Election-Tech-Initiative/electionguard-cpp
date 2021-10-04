@@ -12,6 +12,219 @@
 extern "C" {
 #endif
 
+#ifndef ElectionType
+
+/**
+ * Enumeration for the type of ElectionType
+ * see: https://developers.google.com/elections-data/reference/election-type
+ */
+typedef enum eg_election_type_e {
+    ELECTIONGUARD_ELECTION_TYPE_UNKNOWN = 0,
+    ELECTIONGUARD_ELECTION_TYPE_GENERAL = 1,
+    ELECTIONGUARD_ELECTION_TYPE_PARTISAN_PRIMARY_CLOSED = 2,
+    ELECTIONGUARD_ELECTION_TYPE_PARTISAN_PRIMARY_OPEN = 3,
+    ELECTIONGUARD_ELECTION_TYPE_PRIMARY = 4,
+    ELECTIONGUARD_ELECTION_TYPE_RUNOFF = 5,
+    ELECTIONGUARD_ELECTION_TYPE_SPECIAL = 6,
+    ELECTIONGUARD_ELECTION_TYPE_OTHER = 7,
+} eg_election_type_t;
+
+#endif
+
+#ifndef ReportingUnitType
+
+/**
+ * Enumeration for the type of geopolitical unit
+ * see: https://developers.google.com/elections-data/reference/reporting-unit-type
+ */
+typedef enum eg_reporting_unit_type_e {
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_UNKNOWN = 0,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_BALLOT_BATCH = 1,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_BALLOT_STYLE_AREA = 2,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_BOROUGH = 3,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_CITY = 4,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_CITY_COUNCIL = 5,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_COMBINED_PRECINCT = 6,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_CONGRESSIONAL = 7,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_COUNTRY = 8,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_COUNTY = 9,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_COUNTY_COUNCIL = 10,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_DROP_BOX = 11,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_JUDICIAL = 12,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_MUNICIPALITY = 13,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_POLLING_PLACE = 14,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_PRECINCT = 15,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_SCHOOL = 16,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_SPECIAL = 17,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_SPLIT_PRECINCT = 18,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_STATE = 19,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_STATE_HOUSE = 20,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_STATE_SENATE = 21,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_TOWNSHIP = 22,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_UTILITY = 23,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_VILLAGE = 24,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_VOTE_CENTER = 25,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_WARD = 26,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_WATER = 27,
+    ELECTIONGUARD_REPORTING_UNIT_TYPE_OTHER = 28
+} eg_reporting_unit_type_t;
+
+#endif
+
+#ifndef VoteVariationType
+
+/**
+ * Enumeration for the type of VoteVariationType
+ * see: https://developers.google.com/elections-data/reference/vote-variation
+ */
+typedef enum eg_vote_variation_type_e {
+    ELECTIONGUARD_VOTE_VARIATION_TYPE_UNKNOWN = 0,
+    ELECTIONGUARD_VOTE_VARIATION_TYPE_ONE_OF_M = 1,
+    ELECTIONGUARD_VOTE_VARIATION_TYPE_APPROVAL = 2,
+    ELECTIONGUARD_VOTE_VARIATION_TYPE_BORDA = 3,
+    ELECTIONGUARD_VOTE_VARIATION_TYPE_CUMULATIVE = 4,
+    ELECTIONGUARD_VOTE_VARIATION_TYPE_MAJORITY = 5,
+    ELECTIONGUARD_VOTE_VARIATION_TYPE_N_OF_M = 6,
+    ELECTIONGUARD_VOTE_VARIATION_TYPE_PLURALITY = 7,
+    ELECTIONGUARD_VOTE_VARIATION_TYPE_PROPORTIONAL = 8,
+    ELECTIONGUARD_VOTE_VARIATION_TYPE_RANGE = 9,
+    ELECTIONGUARD_VOTE_VARIATION_TYPE_RCV = 10,
+    ELECTIONGUARD_VOTE_VARIATION_TYPE_SUPER_MAJORITY = 11,
+    ELECTIONGUARD_VOTE_VARIATION_TYPE_OTHER = 12
+} eg_vote_variation_type_t;
+
+#endif
+
+#ifndef AnnotatedString
+
+struct eg_annotated_string_s;
+
+/**
+ * Use this as a type for character strings.
+ * See: https://developers.google.com/elections-data/reference/annotated-string
+ */
+typedef struct eg_annotated_string_s eg_annotated_string_t;
+
+EG_API eg_electionguard_status_t eg_annotated_string_new(const char *in_annotation,
+                                                         const char *in_value,
+                                                         eg_annotated_string_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_annotated_string_free(eg_annotated_string_t *handle);
+
+/**
+ * An annotation of up to 16 characters that's associated with a character string.
+ */
+EG_API eg_electionguard_status_t eg_annotated_string_get_annotation(eg_annotated_string_t *handle,
+                                                                    const char **out_annotation);
+
+/**
+ * The character string
+ */
+EG_API eg_electionguard_status_t eg_annotated_string_get_value(eg_annotated_string_t *handle,
+                                                               const char **out_value);
+
+/**
+ * A hash representation of the object. Caller is responsible for lifecycle.
+ */
+EG_API eg_electionguard_status_t eg_annotated_string_crypto_hash(
+  eg_annotated_string_t *handle, eg_element_mod_q_t **out_crypto_hash);
+
+#endif
+
+#ifndef Language
+
+struct eg_language_s;
+
+/**
+ * The ISO-639 language
+ * see: https://en.wikipedia.org/wiki/ISO_639
+ * see: https://developers.google.com/civics-data/reference/internationalized-text#language-string
+ */
+typedef struct eg_language_s eg_language_t;
+
+EG_API eg_electionguard_status_t eg_language_new(const char *in_value, const char *in_language,
+                                                 eg_language_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_language_free(eg_language_t *handle);
+
+/**
+ * Identifies the language
+ */
+EG_API eg_electionguard_status_t eg_language_get_language(eg_language_t *handle,
+                                                          char **out_annotation);
+
+/**
+ * the value
+ */
+EG_API eg_electionguard_status_t eg_language_get_value(eg_language_t *handle, char **out_value);
+
+/**
+ * A hash representation of the object.  Caller is responsible for lifecycle.
+ */
+EG_API eg_electionguard_status_t eg_language_crypto_hash(eg_language_t *handle,
+                                                         eg_element_mod_q_t **out_crypto_hash);
+
+#endif
+
+#ifndef InternationalizedText
+
+struct eg_internationalized_text_s;
+
+/**
+ * Data entity used to represent multi-national text. Use when text on a ballot contains multi-national text.
+ * See: https://developers.google.com/elections-data/reference/internationalized-text
+ */
+typedef struct eg_internationalized_text_s eg_internationalized_text_t;
+
+EG_API eg_electionguard_status_t eg_internationalized_text_new(
+  eg_language_t *in_text[], const size_t in_text_size, eg_internationalized_text_t **out_handle);
+
+EG_API eg_electionguard_status_t
+eg_internationalized_text_free(eg_internationalized_text_t *handle);
+
+/**
+ * Get the Size of the text collection
+ */
+EG_API size_t eg_internationalized_text_get_text_size(eg_internationalized_text_t *handle);
+
+/**
+ * Get a text at a specific index.
+ * 
+ * @param[in] in_index The index of the text
+ * @param[out] out_text_ref An opaque pointer to the text.  
+ *                          The value is a reference and is not owned by the caller
+ */
+EG_API eg_electionguard_status_t eg_internationalized_text_get_text_at_index(
+  eg_internationalized_text_t *handle, size_t in_index, eg_language_t **out_text_ref);
+
+/**
+ * A hash representation of the object. Caller is responsible for lifecycle.
+ */
+EG_API eg_electionguard_status_t
+eg_intertnationalized_text_crypto_hash(eg_language_t *handle, eg_element_mod_q_t **out_crypto_hash);
+
+#endif
+
+#ifndef ContactInformation
+
+#endif
+
+#ifndef GeopoliticalUnit
+
+#endif
+
+#ifndef BallotStyle
+
+#endif
+
+#ifndef Party
+
+#endif
+
+#ifndef Candidate
+
+#endif
+
 #ifndef SelectionDescription
 
 struct eg_selection_description_s;

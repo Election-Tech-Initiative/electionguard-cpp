@@ -251,6 +251,8 @@ namespace electionguard
 
     Language::Language(const Language &other) : pimpl(other.pimpl->clone()) {}
 
+    Language::Language(Language &&other) : pimpl(move(other.pimpl)) {}
+
     Language::Language(string value, string language) : pimpl(new Impl(move(value), move(language)))
     {
     }

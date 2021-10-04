@@ -36,8 +36,8 @@ EG_API eg_electionguard_status_t eg_extended_data_new(char *in_value, uint64_t i
                                                       eg_extended_data_t **out_handle)
 {
     try {
-        auto extendedData = make_unique<ExtendedData>(string(in_value), in_length);
-        *out_handle = AS_TYPE(eg_extended_data_t, extendedData.release());
+        auto result = make_unique<ExtendedData>(string(in_value), in_length);
+        *out_handle = AS_TYPE(eg_extended_data_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_extended_data_new", e);
@@ -60,8 +60,8 @@ EG_API eg_electionguard_status_t eg_extended_data_get_value(eg_extended_data_t *
                                                             char **out_value)
 {
     try {
-        auto value = AS_TYPE(ExtendedData, handle)->value;
-        *out_value = dynamicCopy(value);
+        auto result = AS_TYPE(ExtendedData, handle)->value;
+        *out_value = dynamicCopy(result);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -90,9 +90,9 @@ eg_plaintext_ballot_selection_new(const char *in_object_id, uint64_t in_vote,
                                   eg_plaintext_ballot_selection_t **out_handle)
 {
     try {
-        auto selection =
+        auto result =
           make_unique<PlaintextBallotSelection>(in_object_id, in_vote, in_is_placeholder_selection);
-        *out_handle = AS_TYPE(eg_plaintext_ballot_selection_t, selection.release());
+        *out_handle = AS_TYPE(eg_plaintext_ballot_selection_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_plaintext_ballot_selection_new", e);
@@ -109,9 +109,9 @@ eg_electionguard_status_t eg_plaintext_ballot_selection_new_with_extended_data(
         auto extendedData =
           make_unique<ExtendedData>(string(in_extended_data_value), in_extended_data_length);
 
-        auto selection = make_unique<PlaintextBallotSelection>(
+        auto result = make_unique<PlaintextBallotSelection>(
           in_object_id, in_vote, in_is_placeholder_selection, move(extendedData));
-        *out_handle = AS_TYPE(eg_plaintext_ballot_selection_t, selection.release());
+        *out_handle = AS_TYPE(eg_plaintext_ballot_selection_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("submittedeg_plaintext_ballot_selection_new", e);
@@ -136,8 +136,8 @@ eg_plaintext_ballot_selection_get_object_id(eg_plaintext_ballot_selection_t *han
                                             char **out_object_id)
 {
     try {
-        auto objectId = AS_TYPE(PlaintextBallotSelection, handle)->getObjectId();
-        *out_object_id = dynamicCopy(objectId);
+        auto result = AS_TYPE(PlaintextBallotSelection, handle)->getObjectId();
+        *out_object_id = dynamicCopy(result);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -164,11 +164,11 @@ bool eg_plaintext_ballot_selection_get_is_placeholder(eg_plaintext_ballot_select
 
 eg_electionguard_status_t
 eg_plaintext_ballot_selection_get_extended_data(eg_plaintext_ballot_selection_t *handle,
-                                                eg_extended_data_t **out_extended_data)
+                                                eg_extended_data_t **out_extended_data_ref)
 {
     try {
-        auto *extendedData = AS_TYPE(PlaintextBallotSelection, handle)->getExtendedData();
-        *out_extended_data = AS_TYPE(eg_extended_data_t, extendedData);
+        auto *reference = AS_TYPE(PlaintextBallotSelection, handle)->getExtendedData();
+        *out_extended_data_ref = AS_TYPE(eg_extended_data_t, reference);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -204,8 +204,8 @@ eg_ciphertext_ballot_selection_get_object_id(eg_ciphertext_ballot_selection_t *h
                                              char **out_object_id)
 {
     try {
-        auto objectId = AS_TYPE(CiphertextBallotSelection, handle)->getObjectId();
-        *out_object_id = dynamicCopy(objectId);
+        auto result = AS_TYPE(CiphertextBallotSelection, handle)->getObjectId();
+        *out_object_id = dynamicCopy(result);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -230,8 +230,8 @@ eg_ciphertext_ballot_selection_get_description_hash(eg_ciphertext_ballot_selecti
                                                     eg_element_mod_q_t **out_hash_ref)
 {
     try {
-        auto *descriptionHash = AS_TYPE(CiphertextBallotSelection, handle)->getDescriptionHash();
-        *out_hash_ref = AS_TYPE(eg_element_mod_q_t, descriptionHash);
+        auto *reference = AS_TYPE(CiphertextBallotSelection, handle)->getDescriptionHash();
+        *out_hash_ref = AS_TYPE(eg_element_mod_q_t, reference);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_selection_get_ciphertext", e);
@@ -249,8 +249,8 @@ eg_ciphertext_ballot_selection_get_ciphertext(eg_ciphertext_ballot_selection_t *
                                               eg_elgamal_ciphertext_t **out_ciphertext_ref)
 {
     try {
-        auto *ciphertext = AS_TYPE(CiphertextBallotSelection, handle)->getCiphertext();
-        *out_ciphertext_ref = AS_TYPE(eg_elgamal_ciphertext_t, ciphertext);
+        auto *reference = AS_TYPE(CiphertextBallotSelection, handle)->getCiphertext();
+        *out_ciphertext_ref = AS_TYPE(eg_elgamal_ciphertext_t, reference);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_selection_get_ciphertext", e);
@@ -263,8 +263,8 @@ eg_ciphertext_ballot_selection_get_crypto_hash(eg_ciphertext_ballot_selection_t 
                                                eg_element_mod_q_t **out_hash_ref)
 {
     try {
-        auto *hash = AS_TYPE(CiphertextBallotSelection, handle)->getCryptoHash();
-        *out_hash_ref = AS_TYPE(eg_element_mod_q_t, hash);
+        auto *reference = AS_TYPE(CiphertextBallotSelection, handle)->getCryptoHash();
+        *out_hash_ref = AS_TYPE(eg_element_mod_q_t, reference);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_selection_get_crypto_hash", e);
@@ -277,8 +277,8 @@ eg_ciphertext_ballot_selection_get_nonce(eg_ciphertext_ballot_selection_t *handl
                                          eg_element_mod_q_t **out_nonce_ref)
 {
     try {
-        auto *nonce = AS_TYPE(CiphertextBallotSelection, handle)->getNonce();
-        *out_nonce_ref = AS_TYPE(eg_element_mod_q_t, nonce);
+        auto *reference = AS_TYPE(CiphertextBallotSelection, handle)->getNonce();
+        *out_nonce_ref = AS_TYPE(eg_element_mod_q_t, reference);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_selection_get_nonce", e);
@@ -291,8 +291,8 @@ eg_ciphertext_ballot_selection_get_proof(eg_ciphertext_ballot_selection_t *handl
                                          eg_disjunctive_chaum_pedersen_proof_t **out_proof_ref)
 {
     try {
-        auto *proof = AS_TYPE(CiphertextBallotSelection, handle)->getProof();
-        *out_proof_ref = AS_TYPE(eg_disjunctive_chaum_pedersen_proof_t, proof);
+        auto *reference = AS_TYPE(CiphertextBallotSelection, handle)->getProof();
+        *out_proof_ref = AS_TYPE(eg_disjunctive_chaum_pedersen_proof_t, reference);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_selection_get_proof", e);
@@ -307,9 +307,8 @@ eg_ciphertext_ballot_selection_crypto_hash_with(eg_ciphertext_ballot_selection_t
 {
     try {
         auto *encryptionSeed = AS_TYPE(ElementModQ, in_encryption_seed);
-        auto cryptoHash =
-          AS_TYPE(CiphertextBallotSelection, handle)->crypto_hash_with(*encryptionSeed);
-        *out_crypto_hash = AS_TYPE(eg_element_mod_q_t, cryptoHash.release());
+        auto result = AS_TYPE(CiphertextBallotSelection, handle)->crypto_hash_with(*encryptionSeed);
+        *out_crypto_hash = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_selection_crypto_hash_with", e);
@@ -353,8 +352,8 @@ eg_plaintext_ballot_contest_get_object_id(eg_plaintext_ballot_contest_t *handle,
                                           char **out_object_id)
 {
     try {
-        auto objectId = AS_TYPE(PlaintextBallotContest, handle)->getObjectId();
-        *out_object_id = dynamicCopy(objectId);
+        auto result = AS_TYPE(PlaintextBallotContest, handle)->getObjectId();
+        *out_object_id = dynamicCopy(result);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -366,8 +365,8 @@ eg_plaintext_ballot_contest_get_object_id(eg_plaintext_ballot_contest_t *handle,
 size_t eg_plaintext_ballot_contest_get_selections_size(eg_plaintext_ballot_contest_t *handle)
 {
     try {
-        auto contests = AS_TYPE(PlaintextBallotContest, handle)->getSelections();
-        return contests.size();
+        auto collection = AS_TYPE(PlaintextBallotContest, handle)->getSelections();
+        return collection.size();
     } catch (const exception &e) {
         Log::error("eg_plaintext_ballot_contest_get_selections_size", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
@@ -379,10 +378,10 @@ eg_electionguard_status_t eg_plaintext_ballot_contest_get_selection_at_index(
   eg_plaintext_ballot_selection_t **out_selection_ref)
 {
     try {
-        auto selections = AS_TYPE(PlaintextBallotContest, handle)->getSelections();
-        auto *selection = &selections.at(in_index).get();
+        auto collection = AS_TYPE(PlaintextBallotContest, handle)->getSelections();
+        auto *reference = &collection.at(in_index).get();
 
-        *out_selection_ref = AS_TYPE(eg_plaintext_ballot_selection_t, selection);
+        *out_selection_ref = AS_TYPE(eg_plaintext_ballot_selection_t, reference);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -428,8 +427,8 @@ eg_ciphertext_ballot_contest_get_object_id(eg_ciphertext_ballot_contest_t *handl
                                            char **out_object_id)
 {
     try {
-        auto objectId = AS_TYPE(CiphertextBallotContest, handle)->getObjectId();
-        *out_object_id = dynamicCopy(objectId);
+        auto result = AS_TYPE(CiphertextBallotContest, handle)->getObjectId();
+        *out_object_id = dynamicCopy(result);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -454,8 +453,8 @@ eg_ciphertext_ballot_contest_get_description_hash(eg_ciphertext_ballot_contest_t
                                                   eg_element_mod_q_t **out_hash_ref)
 {
     try {
-        auto *descriptionHash = AS_TYPE(CiphertextBallotContest, handle)->getDescriptionHash();
-        *out_hash_ref = AS_TYPE(eg_element_mod_q_t, descriptionHash);
+        auto *reference = AS_TYPE(CiphertextBallotContest, handle)->getDescriptionHash();
+        *out_hash_ref = AS_TYPE(eg_element_mod_q_t, reference);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_contest_get_description_hash", e);
@@ -465,8 +464,8 @@ eg_ciphertext_ballot_contest_get_description_hash(eg_ciphertext_ballot_contest_t
 
 size_t eg_ciphertext_ballot_contest_get_selections_size(eg_ciphertext_ballot_contest_t *handle)
 {
-    auto contests = AS_TYPE(CiphertextBallotContest, handle)->getSelections();
-    return contests.size();
+    auto collection = AS_TYPE(CiphertextBallotContest, handle)->getSelections();
+    return collection.size();
 }
 
 eg_electionguard_status_t eg_ciphertext_ballot_contest_get_selection_at_index(
@@ -474,10 +473,10 @@ eg_electionguard_status_t eg_ciphertext_ballot_contest_get_selection_at_index(
   eg_ciphertext_ballot_selection_t **out_selection_ref)
 {
     try {
-        auto selections = AS_TYPE(CiphertextBallotContest, handle)->getSelections();
-        auto *selection = &selections.at(in_index).get();
+        auto collection = AS_TYPE(CiphertextBallotContest, handle)->getSelections();
+        auto *reference = &collection.at(in_index).get();
 
-        *out_selection_ref = AS_TYPE(eg_ciphertext_ballot_selection_t, selection);
+        *out_selection_ref = AS_TYPE(eg_ciphertext_ballot_selection_t, reference);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -491,8 +490,8 @@ eg_ciphertext_ballot_contest_get_nonce(eg_ciphertext_ballot_contest_t *handle,
                                        eg_element_mod_q_t **out_nonce_ref)
 {
     try {
-        auto *nonce = AS_TYPE(CiphertextBallotContest, handle)->getNonce();
-        *out_nonce_ref = AS_TYPE(eg_element_mod_q_t, nonce);
+        auto *reference = AS_TYPE(CiphertextBallotContest, handle)->getNonce();
+        *out_nonce_ref = AS_TYPE(eg_element_mod_q_t, reference);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_contest_get_nonce", e);
@@ -504,10 +503,8 @@ eg_electionguard_status_t eg_ciphertext_ballot_contest_get_ciphertext_accumulati
   eg_ciphertext_ballot_contest_t *handle, eg_elgamal_ciphertext_t **out_ciphertext_accumulation_ref)
 {
     try {
-        auto *ciphertext_accumulation =
-          AS_TYPE(CiphertextBallotContest, handle)->getCiphertextAccumulation();
-        *out_ciphertext_accumulation_ref =
-          AS_TYPE(eg_elgamal_ciphertext_t, ciphertext_accumulation);
+        auto *reference = AS_TYPE(CiphertextBallotContest, handle)->getCiphertextAccumulation();
+        *out_ciphertext_accumulation_ref = AS_TYPE(eg_elgamal_ciphertext_t, reference);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_contest_get_ciphertext_accumulation", e);
@@ -520,8 +517,8 @@ eg_ciphertext_ballot_contest_get_crypto_hash(eg_ciphertext_ballot_contest_t *han
                                              eg_element_mod_q_t **out_hash_ref)
 {
     try {
-        auto *hash = AS_TYPE(CiphertextBallotContest, handle)->getCryptoHash();
-        *out_hash_ref = AS_TYPE(eg_element_mod_q_t, hash);
+        auto *reference = AS_TYPE(CiphertextBallotContest, handle)->getCryptoHash();
+        *out_hash_ref = AS_TYPE(eg_element_mod_q_t, reference);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_contest_get_crypto_hash", e);
@@ -534,8 +531,8 @@ eg_ciphertext_ballot_contest_get_proof(eg_ciphertext_ballot_selection_t *handle,
                                        eg_disjunctive_chaum_pedersen_proof_t **out_proof_ref)
 {
     try {
-        auto *proof = AS_TYPE(CiphertextBallotContest, handle)->getProof();
-        *out_proof_ref = AS_TYPE(eg_disjunctive_chaum_pedersen_proof_t, proof);
+        auto *reference = AS_TYPE(CiphertextBallotContest, handle)->getProof();
+        *out_proof_ref = AS_TYPE(eg_disjunctive_chaum_pedersen_proof_t, reference);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_contest_get_proof", e);
@@ -550,9 +547,8 @@ eg_ciphertext_ballot_contest_crypto_hash_with(eg_ciphertext_ballot_contest_t *ha
 {
     try {
         auto *encryptionSeed = AS_TYPE(ElementModQ, in_encryption_seed);
-        auto cryptoHash =
-          AS_TYPE(CiphertextBallotContest, handle)->crypto_hash_with(*encryptionSeed);
-        *out_crypto_hash = AS_TYPE(eg_element_mod_q_t, cryptoHash.release());
+        auto result = AS_TYPE(CiphertextBallotContest, handle)->crypto_hash_with(*encryptionSeed);
+        *out_crypto_hash = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_contest_crypto_hash_with", e);
@@ -565,8 +561,8 @@ eg_ciphertext_ballot_contest_aggregate_nonce(eg_ciphertext_ballot_contest_t *han
                                              eg_element_mod_q_t **out_aggregate_nonce)
 {
     try {
-        auto aggregateNonce = AS_TYPE(CiphertextBallotContest, handle)->aggregateNonce();
-        *out_aggregate_nonce = AS_TYPE(eg_element_mod_q_t, aggregateNonce.release());
+        auto result = AS_TYPE(CiphertextBallotContest, handle)->aggregateNonce();
+        *out_aggregate_nonce = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_contest_crypto_hash_with", e);
@@ -578,8 +574,8 @@ eg_electionguard_status_t eg_ciphertext_ballot_contest_elgamal_accumulate(
   eg_ciphertext_ballot_contest_t *handle, eg_elgamal_ciphertext_t **out_ciphertext_accumulation)
 {
     try {
-        auto accumulation = AS_TYPE(CiphertextBallotContest, handle)->elgamalAccumulate();
-        *out_ciphertext_accumulation = AS_TYPE(eg_elgamal_ciphertext_t, accumulation.release());
+        auto result = AS_TYPE(CiphertextBallotContest, handle)->elgamalAccumulate();
+        *out_ciphertext_accumulation = AS_TYPE(eg_elgamal_ciphertext_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_contest_elgamal_accumulate", e);
@@ -622,8 +618,8 @@ eg_electionguard_status_t eg_plaintext_ballot_get_object_id(eg_plaintext_ballot_
                                                             char **out_object_id)
 {
     try {
-        auto objectId = AS_TYPE(PlaintextBallot, handle)->getObjectId();
-        *out_object_id = dynamicCopy(objectId);
+        auto result = AS_TYPE(PlaintextBallot, handle)->getObjectId();
+        *out_object_id = dynamicCopy(result);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -636,8 +632,8 @@ eg_electionguard_status_t eg_plaintext_ballot_get_style_id(eg_plaintext_ballot_t
                                                            char **out_style_id)
 {
     try {
-        auto ballotStyle = AS_TYPE(PlaintextBallot, handle)->getStyleId();
-        *out_style_id = dynamicCopy(ballotStyle);
+        auto result = AS_TYPE(PlaintextBallot, handle)->getStyleId();
+        *out_style_id = dynamicCopy(result);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -648,8 +644,8 @@ eg_electionguard_status_t eg_plaintext_ballot_get_style_id(eg_plaintext_ballot_t
 
 size_t eg_plaintext_ballot_get_contests_size(eg_plaintext_ballot_t *handle)
 {
-    auto contests = AS_TYPE(PlaintextBallot, handle)->getContests();
-    return contests.size();
+    auto collection = AS_TYPE(PlaintextBallot, handle)->getContests();
+    return collection.size();
 }
 
 eg_electionguard_status_t
@@ -657,10 +653,10 @@ eg_plaintext_ballot_get_contest_at_index(eg_plaintext_ballot_t *handle, size_t i
                                          eg_plaintext_ballot_contest_t **out_contest_ref)
 {
     try {
-        auto contests = AS_TYPE(PlaintextBallot, handle)->getContests();
-        auto *contest = &contests.at(in_index).get();
+        auto collection = AS_TYPE(PlaintextBallot, handle)->getContests();
+        auto *reference = &collection.at(in_index).get();
 
-        *out_contest_ref = AS_TYPE(eg_plaintext_ballot_contest_t, contest);
+        *out_contest_ref = AS_TYPE(eg_plaintext_ballot_contest_t, reference);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -674,9 +670,9 @@ eg_electionguard_status_t eg_plaintext_ballot_from_json(char *in_data,
 {
     try {
         auto data = string(in_data);
-        auto deserialized = PlaintextBallot::fromJson(data);
+        auto result = PlaintextBallot::fromJson(data);
 
-        *out_handle = AS_TYPE(eg_plaintext_ballot_t, deserialized.release());
+        *out_handle = AS_TYPE(eg_plaintext_ballot_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("submittedeg_plaintext_ballot_from_json", e);
@@ -689,9 +685,9 @@ eg_electionguard_status_t eg_plaintext_ballot_from_bson(uint8_t *in_data, uint64
 {
     try {
         auto data_bytes = vector<uint8_t>(in_data, in_data + in_length);
-        auto deserialized = PlaintextBallot::fromBson(data_bytes);
+        auto result = PlaintextBallot::fromBson(data_bytes);
 
-        *out_handle = AS_TYPE(eg_plaintext_ballot_t, deserialized.release());
+        *out_handle = AS_TYPE(eg_plaintext_ballot_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("submittedeg_plaintext_ballot_from_bson", e);
@@ -704,9 +700,9 @@ eg_electionguard_status_t eg_plaintext_ballot_from_msgpack(uint8_t *in_data, uin
 {
     try {
         auto data_bytes = vector<uint8_t>(in_data, in_data + in_length);
-        auto deserialized = PlaintextBallot::fromMsgPack(data_bytes);
+        auto result = PlaintextBallot::fromMsgPack(data_bytes);
 
-        *out_handle = AS_TYPE(eg_plaintext_ballot_t, deserialized.release());
+        *out_handle = AS_TYPE(eg_plaintext_ballot_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_plaintext_ballot_from_msgpack", e);
@@ -719,9 +715,10 @@ eg_electionguard_status_t eg_plaintext_ballot_to_json(eg_plaintext_ballot_t *han
 {
     try {
         auto *domain_type = AS_TYPE(PlaintextBallot, handle);
-        auto data_string = domain_type->toJson();
+        auto result = domain_type->toJson();
+
         size_t size = 0;
-        *out_data = dynamicCopy(data_string, &size);
+        *out_data = dynamicCopy(result, &size);
         *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -736,10 +733,10 @@ eg_electionguard_status_t eg_plaintext_ballot_to_bson(eg_plaintext_ballot_t *han
 {
     try {
         auto *domain_type = AS_TYPE(PlaintextBallot, handle);
-        auto data_bytes = domain_type->toBson();
+        auto result = domain_type->toBson();
 
         size_t size = 0;
-        *out_data = dynamicCopy(data_bytes, &size);
+        *out_data = dynamicCopy(result, &size);
         *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -754,10 +751,10 @@ eg_electionguard_status_t eg_plaintext_ballot_to_msgpack(eg_plaintext_ballot_t *
 {
     try {
         auto *domain_type = AS_TYPE(PlaintextBallot, handle);
-        auto data_bytes = domain_type->toMsgPack();
+        auto result = domain_type->toMsgPack();
 
         size_t size = 0;
-        *out_data = dynamicCopy(data_bytes, &size);
+        *out_data = dynamicCopy(result, &size);
         *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -786,8 +783,8 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_object_id(eg_ciphertext_ballo
                                                              char **out_object_id)
 {
     try {
-        auto objectId = AS_TYPE(CiphertextBallot, handle)->getObjectId();
-        *out_object_id = dynamicCopy(objectId);
+        auto result = AS_TYPE(CiphertextBallot, handle)->getObjectId();
+        *out_object_id = dynamicCopy(result);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -800,8 +797,8 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_style_id(eg_ciphertext_ballot
                                                             char **out_style_id)
 {
     try {
-        auto ballotStyle = AS_TYPE(CiphertextBallot, handle)->getStyleId();
-        *out_style_id = dynamicCopy(ballotStyle);
+        auto result = AS_TYPE(CiphertextBallot, handle)->getStyleId();
+        *out_style_id = dynamicCopy(result);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -815,8 +812,8 @@ eg_ciphertext_ballot_get_manifest_hash(eg_ciphertext_ballot_t *handle,
                                        eg_element_mod_q_t **out_manifest_hash_ref)
 {
     try {
-        auto *manifestHash = AS_TYPE(CiphertextBallot, handle)->getManifestHash();
-        *out_manifest_hash_ref = AS_TYPE(eg_element_mod_q_t, manifestHash);
+        auto *reference = AS_TYPE(CiphertextBallot, handle)->getManifestHash();
+        *out_manifest_hash_ref = AS_TYPE(eg_element_mod_q_t, reference);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_get_manifest_hash", e);
@@ -829,8 +826,8 @@ eg_ciphertext_ballot_get_ballot_code_seed(eg_ciphertext_ballot_t *handle,
                                           eg_element_mod_q_t **out_ballot_code_seed_ref)
 {
     try {
-        auto *codeSeed = AS_TYPE(CiphertextBallot, handle)->getBallotCodeSeed();
-        *out_ballot_code_seed_ref = AS_TYPE(eg_element_mod_q_t, codeSeed);
+        auto *reference = AS_TYPE(CiphertextBallot, handle)->getBallotCodeSeed();
+        *out_ballot_code_seed_ref = AS_TYPE(eg_element_mod_q_t, reference);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_get_ballot_code_seed", e);
@@ -840,8 +837,8 @@ eg_ciphertext_ballot_get_ballot_code_seed(eg_ciphertext_ballot_t *handle,
 
 size_t eg_ciphertext_ballot_get_contests_size(eg_ciphertext_ballot_t *handle)
 {
-    auto contests = AS_TYPE(CiphertextBallot, handle)->getContests();
-    return contests.size();
+    auto collection = AS_TYPE(CiphertextBallot, handle)->getContests();
+    return collection.size();
 }
 
 eg_electionguard_status_t
@@ -849,10 +846,10 @@ eg_ciphertext_ballot_get_contest_at_index(eg_ciphertext_ballot_t *handle, size_t
                                           eg_ciphertext_ballot_contest_t **out_contest_ref)
 {
     try {
-        auto contests = AS_TYPE(CiphertextBallot, handle)->getContests();
-        auto *contest = &contests.at(in_index).get();
+        auto collection = AS_TYPE(CiphertextBallot, handle)->getContests();
+        auto *reference = &collection.at(in_index).get();
 
-        *out_contest_ref = AS_TYPE(eg_ciphertext_ballot_contest_t, contest);
+        *out_contest_ref = AS_TYPE(eg_ciphertext_ballot_contest_t, reference);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -866,8 +863,8 @@ eg_ciphertext_ballot_get_ballot_code(eg_ciphertext_ballot_t *handle,
                                      eg_element_mod_q_t **out_ballot_code_ref)
 {
     try {
-        auto *code = AS_TYPE(CiphertextBallot, handle)->getBallotCode();
-        *out_ballot_code_ref = AS_TYPE(eg_element_mod_q_t, code);
+        auto *reference = AS_TYPE(CiphertextBallot, handle)->getBallotCode();
+        *out_ballot_code_ref = AS_TYPE(eg_element_mod_q_t, reference);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -879,8 +876,8 @@ eg_ciphertext_ballot_get_ballot_code(eg_ciphertext_ballot_t *handle,
 uint64_t eg_ciphertext_ballot_get_timestamp(eg_ciphertext_ballot_t *ciphertext)
 {
     try {
-        auto timestamp = AS_TYPE(CiphertextBallot, ciphertext)->getTimestamp();
-        return timestamp;
+        auto result = AS_TYPE(CiphertextBallot, ciphertext)->getTimestamp();
+        return result;
     } catch (const exception &e) {
         Log::error(":eg_ciphertext_ballot_get_timestamp", e);
         return 0;
@@ -891,8 +888,8 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_nonce(eg_ciphertext_ballot_t 
                                                          eg_element_mod_q_t **out_nonce_ref)
 {
     try {
-        auto *nonce = AS_TYPE(CiphertextBallot, handle)->getNonce();
-        *out_nonce_ref = AS_TYPE(eg_element_mod_q_t, nonce);
+        auto *reference = AS_TYPE(CiphertextBallot, handle)->getNonce();
+        *out_nonce_ref = AS_TYPE(eg_element_mod_q_t, reference);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_ciphertext_ballot_get_nonce", e);
@@ -904,8 +901,8 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_crypto_hash(eg_ciphertext_bal
                                                                eg_element_mod_q_t **out_hash_ref)
 {
     try {
-        auto *cryptoHash = AS_TYPE(CiphertextBallot, handle)->getCryptoHash();
-        *out_hash_ref = AS_TYPE(eg_element_mod_q_t, cryptoHash);
+        auto *reference = AS_TYPE(CiphertextBallot, handle)->getCryptoHash();
+        *out_hash_ref = AS_TYPE(eg_element_mod_q_t, reference);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_ciphertext_ballot_get_crypto_hash", e);
@@ -920,8 +917,8 @@ eg_ciphertext_ballot_crypto_hash_with(eg_ciphertext_ballot_t *handle,
 {
     try {
         auto *manifestHash = AS_TYPE(ElementModQ, in_manifest_hash);
-        auto cryptoHash = AS_TYPE(CiphertextBallot, handle)->crypto_hash_with(*manifestHash);
-        *out_hash_ref = AS_TYPE(eg_element_mod_q_t, cryptoHash.release());
+        auto result = AS_TYPE(CiphertextBallot, handle)->crypto_hash_with(*manifestHash);
+        *out_hash_ref = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_ciphertext_ballot_crypto_hash_with", e);
@@ -952,9 +949,9 @@ eg_electionguard_status_t eg_ciphertext_ballot_from_json(char *in_data,
 {
     try {
         auto data = string(in_data);
-        auto deserialized = CiphertextBallot::fromJson(data);
+        auto result = CiphertextBallot::fromJson(data);
 
-        *out_handle = AS_TYPE(eg_ciphertext_ballot_t, deserialized.release());
+        *out_handle = AS_TYPE(eg_ciphertext_ballot_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_ciphertext_ballot_from_json", e);
@@ -967,9 +964,9 @@ eg_electionguard_status_t eg_ciphertext_ballot_from_bson(uint8_t *in_data, uint6
 {
     try {
         auto data_bytes = vector<uint8_t>(in_data, in_data + in_length);
-        auto deserialized = CiphertextBallot::fromBson(data_bytes);
+        auto result = CiphertextBallot::fromBson(data_bytes);
 
-        *out_handle = AS_TYPE(eg_ciphertext_ballot_t, deserialized.release());
+        *out_handle = AS_TYPE(eg_ciphertext_ballot_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_ciphertext_ballot_from_bson", e);
@@ -982,9 +979,9 @@ eg_electionguard_status_t eg_ciphertext_ballot_from_msgpack(uint8_t *in_data, ui
 {
     try {
         auto data_bytes = vector<uint8_t>(in_data, in_data + in_length);
-        auto deserialized = CiphertextBallot::fromMsgPack(data_bytes);
+        auto result = CiphertextBallot::fromMsgPack(data_bytes);
 
-        *out_handle = AS_TYPE(eg_ciphertext_ballot_t, deserialized.release());
+        *out_handle = AS_TYPE(eg_ciphertext_ballot_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_ciphertext_ballot_from_msgpack", e);
@@ -997,10 +994,10 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_json(eg_ciphertext_ballot_t *h
 {
     try {
         auto *domain_type = AS_TYPE(CiphertextBallot, handle);
-        auto data_string = domain_type->toJson(false);
+        auto result = domain_type->toJson(false);
 
         size_t size = 0;
-        *out_data = dynamicCopy(data_string, &size);
+        *out_data = dynamicCopy(result, &size);
         *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -1016,10 +1013,10 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_json_with_nonces(eg_ciphertext
 {
     try {
         auto *domain_type = AS_TYPE(CiphertextBallot, handle);
-        auto data_string = domain_type->toJson(true);
+        auto result = domain_type->toJson(true);
 
         size_t size = 0;
-        *out_data = dynamicCopy(data_string, &size);
+        *out_data = dynamicCopy(result, &size);
         *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -1034,10 +1031,10 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_bson(eg_ciphertext_ballot_t *h
 {
     try {
         auto *domain_type = AS_TYPE(CiphertextBallot, handle);
-        auto data_bytes = domain_type->toBson(false);
+        auto result = domain_type->toBson(false);
 
         size_t size = 0;
-        *out_data = dynamicCopy(data_bytes, &size);
+        *out_data = dynamicCopy(result, &size);
         *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -1053,10 +1050,10 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_bson_with_nonces(eg_ciphertext
 {
     try {
         auto *domain_type = AS_TYPE(CiphertextBallot, handle);
-        auto data_bytes = domain_type->toBson(true);
+        auto result = domain_type->toBson(true);
 
         size_t size = 0;
-        *out_data = dynamicCopy(data_bytes, &size);
+        *out_data = dynamicCopy(result, &size);
         *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -1071,10 +1068,10 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_msgpack(eg_ciphertext_ballot_t
 {
     try {
         auto *domain_type = AS_TYPE(CiphertextBallot, handle);
-        auto data_bytes = domain_type->toMsgPack(false);
+        auto result = domain_type->toMsgPack(false);
 
         size_t size = 0;
-        *out_data = dynamicCopy(data_bytes, &size);
+        *out_data = dynamicCopy(result, &size);
         *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -1090,10 +1087,10 @@ eg_ciphertext_ballot_to_msgpack_with_nonces(eg_ciphertext_ballot_t *handle, uint
 {
     try {
         auto *domain_type = AS_TYPE(CiphertextBallot, handle);
-        auto data_bytes = domain_type->toMsgPack(true);
+        auto result = domain_type->toMsgPack(true);
 
         size_t size = 0;
-        *out_data = dynamicCopy(data_bytes, &size);
+        *out_data = dynamicCopy(result, &size);
         *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -1134,9 +1131,9 @@ eg_electionguard_status_t eg_submitted_ballot_from(eg_ciphertext_ballot_t *in_ci
 {
     try {
         auto *ciphertext = AS_TYPE(CiphertextBallot, in_ciphertext);
-        auto submitted = SubmittedBallot::from(*ciphertext, (BallotBoxState)in_state);
+        auto result = SubmittedBallot::from(*ciphertext, (BallotBoxState)in_state);
 
-        *out_handle = AS_TYPE(eg_submitted_ballot_t, submitted.release());
+        *out_handle = AS_TYPE(eg_submitted_ballot_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("submittedeg_submitted_ballot_from", e);
@@ -1149,9 +1146,9 @@ eg_electionguard_status_t eg_submitted_ballot_from_json(char *in_data,
 {
     try {
         auto data = string(in_data);
-        auto deserialized = SubmittedBallot::fromJson(data);
+        auto result = SubmittedBallot::fromJson(data);
 
-        *out_handle = AS_TYPE(eg_submitted_ballot_t, deserialized.release());
+        *out_handle = AS_TYPE(eg_submitted_ballot_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_submitted_ballot_from_json", e);
@@ -1164,9 +1161,9 @@ eg_electionguard_status_t eg_submitted_ballot_from_bson(uint8_t *in_data, uint64
 {
     try {
         auto data_bytes = vector<uint8_t>(in_data, in_data + in_length);
-        auto deserialized = SubmittedBallot::fromBson(data_bytes);
+        auto result = SubmittedBallot::fromBson(data_bytes);
 
-        *out_handle = AS_TYPE(eg_submitted_ballot_t, deserialized.release());
+        *out_handle = AS_TYPE(eg_submitted_ballot_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_submitted_ballot_from_bson", e);
@@ -1179,9 +1176,9 @@ eg_electionguard_status_t eg_submitted_ballot_from_msgpack(uint8_t *in_data, uin
 {
     try {
         auto data_bytes = vector<uint8_t>(in_data, in_data + in_length);
-        auto deserialized = SubmittedBallot::fromMsgPack(data_bytes);
+        auto result = SubmittedBallot::fromMsgPack(data_bytes);
 
-        *out_handle = AS_TYPE(eg_submitted_ballot_t, deserialized.release());
+        *out_handle = AS_TYPE(eg_submitted_ballot_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_submitted_ballot_from_msgpack", e);
@@ -1194,10 +1191,10 @@ eg_electionguard_status_t eg_submitted_ballot_to_json(eg_submitted_ballot_t *han
 {
     try {
         auto *domain_type = AS_TYPE(SubmittedBallot, handle);
-        auto data_string = domain_type->toJson();
+        auto result = domain_type->toJson();
 
         size_t size = 0;
-        *out_data = dynamicCopy(data_string, &size);
+        *out_data = dynamicCopy(result, &size);
         *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -1212,10 +1209,10 @@ eg_electionguard_status_t eg_submitted_ballot_to_bson(eg_submitted_ballot_t *han
 {
     try {
         auto *domain_type = AS_TYPE(SubmittedBallot, handle);
-        auto data_bytes = domain_type->toBson();
+        auto result = domain_type->toBson();
 
         size_t size = 0;
-        *out_data = dynamicCopy(data_bytes, &size);
+        *out_data = dynamicCopy(result, &size);
         *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -1230,10 +1227,10 @@ eg_electionguard_status_t eg_submitted_ballot_to_msgpack(eg_submitted_ballot_t *
 {
     try {
         auto *domain_type = AS_TYPE(SubmittedBallot, handle);
-        auto data_bytes = domain_type->toMsgPack();
+        auto result = domain_type->toMsgPack();
 
         size_t size = 0;
-        *out_data = dynamicCopy(data_bytes, &size);
+        *out_data = dynamicCopy(result, &size);
         *out_size = size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;

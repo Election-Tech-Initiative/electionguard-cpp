@@ -9,6 +9,7 @@
 bool strings_are_equal(char *expected, char *actual);
 
 bool test_simple_manifest_is_valid(void);
+bool test_can_construct_internationalized_text(void);
 static bool test_can_deserialize_election_description(void);
 static bool test_can_construct_internal_election_description_from_election_description(void);
 static bool test_can_deserlialze_internal_election_description(void);
@@ -16,7 +17,8 @@ static bool test_can_deserlialze_internal_election_description(void);
 bool test_manifest(void)
 {
     printf("\n -------- test_manifest.c --------- \n");
-    return test_simple_manifest_is_valid() && test_can_deserialize_election_description() &&
+    return test_simple_manifest_is_valid() && test_can_construct_internationalized_text() &&
+           test_can_deserialize_election_description() &&
            test_can_construct_internal_election_description_from_election_description() &&
            test_can_deserlialze_internal_election_description();
 }
@@ -88,6 +90,53 @@ bool test_can_deserialize_election_description(void)
     eg_election_manifest_free(result);
 
     free(election_scope_id);
+
+    return true;
+}
+
+bool test_can_construct_internationalized_text(void)
+{
+    printf("\n -------- test_can_construct_internationalized_text -------- \n");
+    // Arrange
+    eg_language_t *language_1 = NULL;
+    if (eg_language_new("some words", "en", &language_1)) {
+        assert(false);
+    }
+
+    eg_language_t *language_2 = NULL;
+    if (eg_language_new("algunas palabras", "es", &language_2)) {
+        assert(false);
+    }
+
+    eg_language_t *languages[2];
+    languages[0] = language_1;
+    languages[1] = language_2;
+
+    // Act
+    eg_internationalized_text_t *text = NULL;
+    if (eg_internationalized_text_new(languages, 2, &text)) {
+        assert(false);
+    }
+
+    // Assert
+    eg_language_t *actual = NULL;
+    if (eg_internationalized_text_get_text_at_index(text, 1, &actual)) {
+        assert(false);
+    }
+
+    char *text_string = NULL;
+    if (eg_language_get_value(actual, &text_string)) {
+        assert(false);
+    }
+
+    // todo: compare strungs
+
+    assert(strings_are_equal(text_string, "algunas palabras") == true);
+
+    eg_language_free(language_1);
+    eg_language_free(language_2);
+
+    eg_internationalized_text_free(text);
 
     return true;
 }
