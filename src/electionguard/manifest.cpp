@@ -563,6 +563,8 @@ namespace electionguard
     {
     }
 
+    GeopoliticalUnit::GeopoliticalUnit(GeopoliticalUnit &&other) : pimpl(move(other.pimpl)) {}
+
     GeopoliticalUnit::GeopoliticalUnit(const string &objectId, const string &name,
                                        const ReportingUnitType type)
         : pimpl(new Impl(objectId, name, type))
@@ -651,6 +653,8 @@ namespace electionguard
     // Lifecycle Methods
 
     BallotStyle::BallotStyle(const BallotStyle &other) : pimpl(other.pimpl->clone()) {}
+
+    BallotStyle::BallotStyle(BallotStyle &&other) : pimpl(move(other.pimpl)) {}
 
     BallotStyle::BallotStyle(const string &objectId, vector<string> geopoliticalUnitIds)
         : pimpl(new Impl(objectId, move(geopoliticalUnitIds)))
@@ -744,6 +748,8 @@ namespace electionguard
     // Lifecycle Methods
 
     Party::Party(const Party &other) : pimpl(other.pimpl->clone()) {}
+
+    Party::Party(Party &&other) : pimpl(move(other.pimpl)) {}
 
     Party::Party(const string &objectId) : pimpl(new Impl(objectId)) {}
 
@@ -862,6 +868,8 @@ namespace electionguard
 
     Candidate::Candidate(const Candidate &other) : pimpl(other.pimpl->clone()) {}
 
+    Candidate::Candidate(Candidate &&other) : pimpl(move(other.pimpl)) {}
+
     Candidate::Candidate(const string &objectId, bool isWriteIn)
         : pimpl(new Impl(objectId, isWriteIn))
     {
@@ -944,6 +952,11 @@ namespace electionguard
 
     SelectionDescription::SelectionDescription(const SelectionDescription &other)
         : pimpl(other.pimpl->clone())
+    {
+    }
+
+    SelectionDescription::SelectionDescription(SelectionDescription &&other)
+        : pimpl(move(other.pimpl))
     {
     }
 
@@ -1106,6 +1119,8 @@ namespace electionguard
         : pimpl(other.pimpl->clone())
     {
     }
+
+    ContestDescription::ContestDescription(ContestDescription &&other) : pimpl(move(other.pimpl)) {}
 
     ContestDescription::ContestDescription(const string &objectId,
                                            const string &electoralDistrictId,
@@ -1285,6 +1300,12 @@ namespace electionguard
     ContestDescriptionWithPlaceholders::ContestDescriptionWithPlaceholders(
       const ContestDescriptionWithPlaceholders &other)
         : ContestDescription(other), pimpl(other.pimpl->clone())
+    {
+    }
+
+    ContestDescriptionWithPlaceholders::ContestDescriptionWithPlaceholders(
+      ContestDescriptionWithPlaceholders &&other)
+        : ContestDescription(other), pimpl(move(other.pimpl))
     {
     }
 
@@ -1505,6 +1526,8 @@ namespace electionguard
     };
 
     // Lifecycle Methods
+
+    Manifest::Manifest(Manifest &&other) : pimpl(move(other.pimpl)) {}
 
     Manifest::Manifest(const string &electionScopeId, ElectionType type,
                        system_clock::time_point startDate, system_clock::time_point endDate,
@@ -1786,6 +1809,8 @@ namespace electionguard
     };
 
     // Lifecycle Methods
+
+    InternalManifest::InternalManifest(InternalManifest &&other) : pimpl(move(other.pimpl)) {}
 
     InternalManifest::InternalManifest(
       vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,

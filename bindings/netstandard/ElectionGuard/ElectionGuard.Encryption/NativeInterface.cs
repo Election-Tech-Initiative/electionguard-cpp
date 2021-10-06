@@ -27,6 +27,80 @@ namespace ElectionGuard
         Unknown = 999
     }
 
+    /// <Summary>
+    /// Enumeration for the type of ElectionType
+    /// see: https://developers.google.com/elections-data/reference/election-type
+    /// </Summary>
+    public enum ElectionType
+    {
+        unknown = 0,
+        general = 1,
+        partisanPrimaryClosed = 2,
+        partisanPrimaryOpen = 3,
+        primary = 4,
+        runoff = 5,
+        special = 6,
+        other = 7
+    };
+
+    /// <Summary>
+    /// Enumeration for the type of geopolitical unit
+    /// see: https://developers.google.com/elections-data/reference/reporting-unit-type
+    /// </Summary>
+    public enum ReportingUnitType
+    {
+        unknown = 0,
+        ballotBatch = 1,
+        ballotStyleArea = 2,
+        borough = 3,
+        city = 4,
+        cityCouncil = 5,
+        combinedPrecinct = 6,
+        congressional = 7,
+        country = 8,
+        county = 9,
+        countyCouncil = 10,
+        dropBox = 11,
+        judicial = 12,
+        municipality = 13,
+        polling_place = 14,
+        precinct = 15,
+        school = 16,
+        special = 17,
+        splitPrecinct = 18,
+        state = 19,
+        stateHouse = 20,
+        stateSenate = 21,
+        township = 22,
+        utility = 23,
+        village = 24,
+        voteCenter = 25,
+        ward = 26,
+        water = 27,
+        other = 28,
+    };
+
+    /// <Summary>
+    /// Enumeration for the type of VoteVariationType
+    /// see: https://developers.google.com/elections-data/reference/vote-variation
+    /// </Summary>
+    public enum VoteVariationType
+    {
+        unknown = 0,
+        one_of_m = 1,
+        approval = 2,
+        borda = 3,
+        cumulative = 4,
+        majority = 5,
+        n_of_m = 6,
+        plurality = 7,
+        proportional = 8,
+        range = 9,
+        rcv = 10,
+        super_majority = 11,
+        other = 12
+    };
+
     internal static unsafe class NativeInterface
     {
         const string DllName = "electionguard";
@@ -407,6 +481,531 @@ namespace ElectionGuard
 
         }
 
+
+        #endregion
+
+        #region AnnotatedString
+
+        internal static unsafe class AnnotatedString
+        {
+            internal unsafe struct AnnotatedStringType { };
+
+            internal class AnnotatedStringHandle
+                : ElectionguardSafeHandle<AnnotatedStringType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = AnnotatedString.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"AnnotatedString Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_annotated_string_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string annotation,
+                [MarshalAs(UnmanagedType.LPStr)] string value,
+                out AnnotatedStringHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_annotated_string_free")]
+            internal static extern Status Free(AnnotatedStringHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_annotated_string_get_annotation")]
+            internal static extern Status GetAnnotation(
+                AnnotatedStringHandle handle, out IntPtr language);
+
+
+            [DllImport(DllName, EntryPoint = "eg_annotated_string_get_value")]
+            internal static extern Status GetValue(
+                AnnotatedStringHandle handle, out IntPtr value);
+
+            [DllImport(DllName, EntryPoint = "eg_annotated_string_crypto_hash")]
+            internal static extern Status CryptoHash(
+                AnnotatedStringHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region Language
+
+        internal static unsafe class Language
+        {
+            internal unsafe struct LanguageType { };
+
+            internal class LanguageHandle
+                : ElectionguardSafeHandle<LanguageType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = Language.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"Language Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_language_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string value,
+                [MarshalAs(UnmanagedType.LPStr)] string language,
+                out LanguageHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_language_free")]
+            internal static extern Status Free(LanguageHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_language_get_value")]
+            internal static extern Status GetValue(
+                LanguageHandle handle, out IntPtr value);
+
+            [DllImport(DllName, EntryPoint = "eg_language_get_language")]
+            internal static extern Status GetLanguage(
+                LanguageHandle handle, out IntPtr language);
+
+            [DllImport(DllName, EntryPoint = "eg_language_crypto_hash")]
+            internal static extern Status CryptoHash(
+                LanguageHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region InternationalizedText
+
+        internal static unsafe class InternationalizedText
+        {
+            internal unsafe struct InternationalizedTextType { };
+
+            internal class InternationalizedTextHandle
+                : ElectionguardSafeHandle<InternationalizedTextType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = InternationalizedText.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"InternationalizedText Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_internationalized_text_new")]
+            internal static extern Status New(
+                // TODO: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] text,
+                long textSize,
+                out InternationalizedTextHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_internationalized_text_free")]
+            internal static extern Status Free(InternationalizedTextHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_internationalized_text_get_text_size")]
+            internal static extern ulong GetTextSize(
+                InternationalizedTextHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_internationalized_text_get_text_at_index")]
+            internal static extern Status GetTextAtIndex(
+                InternationalizedTextHandle handle,
+                ulong index,
+                out Language.LanguageHandle text);
+
+            [DllImport(DllName, EntryPoint = "eg_intertnationalized_text_crypto_hash")]
+            internal static extern Status CryptoHash(
+                InternationalizedTextHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region ContactInformation
+
+        internal static unsafe class ContactInformation
+        {
+            internal unsafe struct ContactInformationType { };
+
+            internal class ContactInformationHandle
+                : ElectionguardSafeHandle<ContactInformationType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = ContactInformation.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"ContactInformation Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string name,
+                out ContactInformationHandle handle);
+
+            // TODO: add eg_contact_information_new_with_collections
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_free")]
+            internal static extern Status Free(ContactInformationHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_get_address_line_size")]
+            internal static extern ulong GetAddressLineSize(
+                ContactInformationHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_get_address_line_at_index")]
+            internal static extern Status GetAddressLineAtIndex(
+                ContactInformationHandle handle,
+                ulong index,
+                out IntPtr address);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_get_email_line_size")]
+            internal static extern ulong GetEmailLineSize(
+                ContactInformationHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_get_email_line_at_index")]
+            internal static extern Status GetEmailLineAtIndex(
+                ContactInformationHandle handle,
+                ulong index,
+                out InternationalizedText.InternationalizedTextHandle email);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_get_phone_line_size")]
+            internal static extern ulong GetPhoneLineSize(
+                ContactInformationHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_get_email_line_at_index")]
+            internal static extern Status GePhoneLineAtIndex(
+                ContactInformationHandle handle,
+                ulong index,
+                out InternationalizedText.InternationalizedTextHandle phone);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_get_name")]
+            internal static extern Status GetName(
+                ContactInformationHandle handle, out IntPtr value);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_crypto_hash")]
+            internal static extern Status CryptoHash(
+                ContactInformationHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region GeopoliticalUnit
+
+        internal static unsafe class GeopoliticalUnit
+        {
+            internal unsafe struct GeopoliticalUnitType { };
+
+            internal class GeopoliticalUnitHandle
+                : ElectionguardSafeHandle<GeopoliticalUnitType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = GeopoliticalUnit.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"GeopoliticalUnit Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_geopolitical_unit_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPStr)] string name,
+                ReportingUnitType reportingUnitType,
+                out GeopoliticalUnitHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_geopolitical_unit_new_with_contact_info")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPStr)] string name,
+                ReportingUnitType reportingUnitType,
+                ContactInformation.ContactInformationHandle contactInformation,
+                out GeopoliticalUnitHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_geopolitical_unit_free")]
+            internal static extern Status Free(GeopoliticalUnitHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_geopolitical_unit_get_object_id")]
+            internal static extern Status GetObjectId(
+                GeopoliticalUnitHandle handle, out IntPtr objectId);
+
+            [DllImport(DllName, EntryPoint = "eg_geopolitical_unit_get_name")]
+            internal static extern Status GetName(
+                GeopoliticalUnitHandle handle, out IntPtr name);
+
+            [DllImport(DllName, EntryPoint = "get_geopolitical_unit_get_type")]
+            internal static extern ReportingUnitType GetReportingUnitType(
+                GeopoliticalUnitHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_geopolitical_unit_crypto_hash")]
+            internal static extern Status CryptoHash(
+                GeopoliticalUnitHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region BallotStyle
+
+        internal static unsafe class BallotStyle
+        {
+            internal unsafe struct BallotStyleType { };
+
+            internal class BallotStyleHandle
+                : ElectionguardSafeHandle<BallotStyleType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = BallotStyle.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"BallotStyle Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string[] gpUnitIds,
+                long gpUnitIdsSize,
+                out BallotStyleHandle handle);
+
+            // TODO eg_ballot_style_new_with_parties
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_free")]
+            internal static extern Status Free(BallotStyleHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_get_object_id")]
+            internal static extern Status GetObjectId(
+                BallotStyleHandle handle, out IntPtr objectId);
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_get_geopolitical_unit_ids_size")]
+            internal static extern ulong GetGeopoliticalUnitSize(
+                BallotStyleHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_get_geopolitical_unit_id_at_index")]
+            internal static extern Status GetGeopoliticalInitIdAtIndex(
+                BallotStyleHandle handle,
+                ulong index,
+                out IntPtr gpUnitId);
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_get_party_ids_size")]
+            internal static extern ulong GetPartyIdsSize(
+                BallotStyleHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_get_party_id_at_index")]
+            internal static extern Status GetPartyIdAtIndex(
+                BallotStyleHandle handle,
+                ulong index,
+                out IntPtr partyId);
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_get_image_uri")]
+            internal static extern Status GetImageUri(
+                BallotStyleHandle handle, out IntPtr imageUri);
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_crypto_hash")]
+            internal static extern Status CryptoHash(
+                BallotStyleHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region Party
+
+        internal static unsafe class Party
+        {
+            internal unsafe struct PartyType { };
+
+            internal class PartyHandle
+                : ElectionguardSafeHandle<PartyType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = Party.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"Party Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_party_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                out PartyHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_party_free")]
+            internal static extern Status Free(PartyHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_party_crypto_hash")]
+            internal static extern Status CryptoHash(
+                PartyHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region Candidate
+
+        internal static unsafe class Candidate
+        {
+            internal unsafe struct CandidateType { };
+
+            internal class CandidateHandle
+                : ElectionguardSafeHandle<CandidateType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = Candidate.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"Candidate Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_candidate_free")]
+            internal static extern Status Free(CandidateHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_candidate_crypto_hash")]
+            internal static extern Status CryptoHash(
+                CandidateHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region SelectionDescription
+
+        internal static unsafe class SelectionDescription
+        {
+            internal unsafe struct SelectionDescriptionType { };
+
+            internal class SelectionDescriptionHandle
+                : ElectionguardSafeHandle<SelectionDescriptionType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = SelectionDescription.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"SelectionDescription Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_selection_description_free")]
+            internal static extern Status Free(SelectionDescriptionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_selection_description_crypto_hash")]
+            internal static extern Status CryptoHash(
+                SelectionDescriptionHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region ContestDescription
+
+        internal static unsafe class ContestDescription
+        {
+            internal unsafe struct ContestDescriptionType { };
+
+            internal class ContestDescriptionHandle
+                : ElectionguardSafeHandle<ContestDescriptionType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = ContestDescription.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"ContestDescription Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_free")]
+            internal static extern Status Free(ContestDescriptionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_crypto_hash")]
+            internal static extern Status CryptoHash(
+                ContestDescriptionHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region ContestDescriptionWithPlaceholders
+
+        internal static unsafe class ContestDescriptionWithPlaceholders
+        {
+            internal unsafe struct ContestDescriptionWithPlaceholdersType { };
+
+            internal class ContestDescriptionWithPlaceholdersHandle
+                : ElectionguardSafeHandle<ContestDescriptionWithPlaceholdersType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = ContestDescriptionWithPlaceholders.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"ContestDescriptionWithPlaceholders Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_with_placeholders_free")]
+            internal static extern Status Free(ContestDescriptionWithPlaceholdersHandle handle);
+        }
 
         #endregion
 

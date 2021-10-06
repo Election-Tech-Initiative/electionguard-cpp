@@ -8,6 +8,33 @@ namespace ElectionGuard.Encrypt.Tests
     public class TestManifest
     {
         [Test]
+        public void Test_Can_Construct_Internationalized_Text()
+        {
+            // Arrange
+            var language_1 = new Language("some words", "en");
+            var language_2 = new Language("algunas palabras", "es");
+            var languages = new[] { language_1, language_2 };
+
+            // Act
+            var subject = new InternationalizedText(languages);
+
+            // Assert
+            var actual = subject.GetTextAt(0);
+            Assert.That(actual.Value == "some words");
+        }
+
+        [Test]
+        public void Test_Can_Construct_Ballot_style()
+        {
+            var gpUnitIds = new[] { "gp-unit-1", "gp-unit-2" };
+
+            var subject = new BallotStyle("some-object-id", gpUnitIds);
+
+            var actual = subject.GetGeopoliticalUnitIdAt(0);
+            Assert.That(actual == "gp-unit-1");
+        }
+
+        [Test]
         public void Test_Can_Deserialize_Election_Description()
         {
             // Arrange

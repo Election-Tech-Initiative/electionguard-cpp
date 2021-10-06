@@ -317,7 +317,7 @@ namespace electionguard
     {
       public:
         GeopoliticalUnit(const GeopoliticalUnit &other);
-        GeopoliticalUnit(const GeopoliticalUnit &&other);
+        GeopoliticalUnit(GeopoliticalUnit &&other);
         explicit GeopoliticalUnit(const std::string &objectId, const std::string &name,
                                   const ReportingUnitType type);
         explicit GeopoliticalUnit(const std::string &objectId, const std::string &name,
@@ -374,7 +374,7 @@ namespace electionguard
     {
       public:
         BallotStyle(const BallotStyle &other);
-        BallotStyle(const BallotStyle &&other);
+        BallotStyle(BallotStyle &&other);
         explicit BallotStyle(const std::string &objectId,
                              std::vector<std::string> geopoliticalUnitIds);
         explicit BallotStyle(const std::string &objectId,
@@ -432,7 +432,7 @@ namespace electionguard
     {
       public:
         Party(const Party &other);
-        Party(const Party &&other);
+        Party(Party &&other);
         explicit Party(const std::string &objectId);
         explicit Party(const std::string &objectId, const std::string &abbreviation);
         explicit Party(const std::string &objectId, std::unique_ptr<InternationalizedText> name,
@@ -498,7 +498,7 @@ namespace electionguard
     {
       public:
         Candidate(const Candidate &other);
-        Candidate(const Candidate &&other);
+        Candidate(Candidate &&other);
         explicit Candidate(const std::string &objectId, bool isWriteIn = false);
         explicit Candidate(const std::string &objectId, const std::string &partyId, bool isWriteIn);
         explicit Candidate(const std::string &objectId, std::unique_ptr<InternationalizedText> name,
@@ -572,7 +572,7 @@ namespace electionguard
     {
       public:
         SelectionDescription(const SelectionDescription &other);
-        SelectionDescription(const SelectionDescription &&other);
+        SelectionDescription(SelectionDescription &&other);
         explicit SelectionDescription(const std::string &objectId, const std::string &candidateId,
                                       const uint64_t sequenceOrder);
         ~SelectionDescription();
@@ -627,7 +627,7 @@ namespace electionguard
     {
       public:
         ContestDescription(const ContestDescription &other);
-        ContestDescription(const ContestDescription &&other);
+        ContestDescription(ContestDescription &&other);
         explicit ContestDescription(const std::string &objectId,
                                     const std::string &electoralDistrictId,
                                     const uint64_t sequenceOrder,
@@ -747,7 +747,7 @@ namespace electionguard
     {
       public:
         ContestDescriptionWithPlaceholders(const ContestDescriptionWithPlaceholders &other);
-        ContestDescriptionWithPlaceholders(const ContestDescriptionWithPlaceholders &&other);
+        ContestDescriptionWithPlaceholders(ContestDescriptionWithPlaceholders &&other);
         explicit ContestDescriptionWithPlaceholders(
           const ContestDescription &other,
           std::vector<std::unique_ptr<SelectionDescription>> placeholderSelections);
@@ -825,7 +825,7 @@ namespace electionguard
     {
       public:
         Manifest(const Manifest &other);
-        Manifest(const Manifest &&other);
+        Manifest(Manifest &&other);
         explicit Manifest(const std::string &electionScopeId, ElectionType type,
                           std::chrono::system_clock::time_point startDate,
                           std::chrono::system_clock::time_point endDate,
@@ -943,7 +943,7 @@ namespace electionguard
     {
       public:
         InternalManifest(const InternalManifest &other);
-        InternalManifest(const InternalManifest &&other);
+        InternalManifest(InternalManifest &&other);
         explicit InternalManifest(
           std::vector<std::unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
           std::vector<std::unique_ptr<ContestDescriptionWithPlaceholders>> contests,
