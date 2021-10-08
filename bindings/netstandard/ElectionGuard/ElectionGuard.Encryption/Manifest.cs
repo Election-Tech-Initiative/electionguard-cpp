@@ -21,8 +21,15 @@ namespace ElectionGuard
 
     #region AnnotatedString
 
+    /// <Summary>
+    /// Use this as a type for character strings.
+    /// See: https://developers.google.com/elections-data/reference/annotated-string
+    /// </Summary>
     public class AnnotatedString : DisposableBase
     {
+        /// <Summary>
+        /// An annotation of up to 16 characters that's associated with a character string.
+        /// </Summary>
         public unsafe string Annotation
         {
             get
@@ -38,6 +45,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The character string
+        /// </Summary>
         public unsafe string Value
         {
             get
@@ -99,8 +109,16 @@ namespace ElectionGuard
 
     #region Language
 
+    /// <Summary>
+    /// The ISO-639 language
+    /// see: https://en.wikipedia.org/wiki/ISO_639
+    /// see: https://developers.google.com/civics-data/reference/internationalized-text#language-string
+    /// </Summary>
     public class Language : DisposableBase
     {
+        /// <Summary>
+        /// The value
+        /// </Summary>
         public unsafe string Value
         {
             get
@@ -116,6 +134,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Identifies the language
+        /// </Summary>
         public unsafe string LanguageAbbreviation
         {
             get
@@ -177,8 +198,15 @@ namespace ElectionGuard
 
     #region InternationalizedText
 
+    /// <Summary>
+    /// Data entity used to represent multi-national text. Use when text on a ballot contains multi-national text.
+    /// See: https://developers.google.com/elections-data/reference/internationalized-text
+    /// </Summary>
     public class InternationalizedText : DisposableBase
     {
+        /// <Summary>
+        /// A string of possibly non-English text.
+        /// </Summary>
         public unsafe ulong TextSize
         {
             get
@@ -253,8 +281,19 @@ namespace ElectionGuard
 
     #region ContactInformation
 
+    /// <Summary>
+    /// For defining contact information about objects such as persons, boards of authorities, and organizations.
+    ///
+    /// Contact Information values are not used internally by ElectionGuard when encrypting ballots
+    /// but are included for checking the validity of a supplied manifest.
+    ///
+    /// See: https://developers.google.com/elections-data/reference/contact-information
+    /// </Summary>
     public class ContactInformation : DisposableBase
     {
+        /// <Summary>
+        /// Get the size of the address collection
+        /// </Summary>
         public unsafe ulong AddressLineSize
         {
             get
@@ -265,6 +304,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Get the size of the email collection
+        /// </Summary>
         public unsafe ulong EmailLineSize
         {
             get
@@ -275,6 +317,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Get the size of the phone collection
+        /// </Summary>
         public unsafe ulong PhoneLineSeize
         {
             get
@@ -311,6 +356,12 @@ namespace ElectionGuard
             Handle = null;
         }
 
+        /// <Summary>
+        /// Associates an address with the contact.
+        /// AddressLine needs to contain the lines that someone would
+        /// enter into a web mapping service to find the address on a map.
+        /// That is, the value of the field needs to geocode the contact location.
+        /// </Summary>
         public unsafe string GetAddressLineAt(ulong index)
         {
             var status = NativeInterface.ContactInformation.GetAddressLineAtIndex(
@@ -323,6 +374,9 @@ namespace ElectionGuard
             return Marshal.PtrToStringAnsi(value);
         }
 
+        /// <Summary>
+        /// Associates an email address with the contact.
+        /// </Summary>
         public unsafe InternationalizedText GetEmailLineAt(ulong index)
         {
             var status = NativeInterface.ContactInformation.GetEmailLineAtIndex(
@@ -335,6 +389,9 @@ namespace ElectionGuard
             return new InternationalizedText(value);
         }
 
+        /// <Summary>
+        /// Associates a phone number with the contact.
+        /// </Summary>
         public unsafe InternationalizedText GetPhoneLineAt(ulong index)
         {
             var status = NativeInterface.ContactInformation.GetPhoneLineAtIndex(
@@ -367,8 +424,24 @@ namespace ElectionGuard
 
     #region GeopoliticalUnit
 
+    /// <Summary>
+    /// A geopolitical unit describes any physical or
+    /// virtual unit of representation or vote/seat aggregation.
+    /// Use this entity for defining geopolitical units such as
+    /// cities, districts, jurisdictions, or precincts,
+    /// for the purpose of associating contests, offices, vote counts,
+    /// or other information with the geographies.
+    ///
+    /// Geopolitical Units are not used when encrypting ballots but are required by
+    /// ElectionGuard to determine the validity of ballot styles.
+    ///
+    /// See: https://developers.google.com/elections-data/reference/gp-unit
+    /// </Summary>
     public class GeopoliticalUnit : DisposableBase
     {
+        /// <Summary>
+        /// Unique internal identifier that's used by other elements to reference this element.
+        /// </Summary>
         public unsafe string ObjectId
         {
             get
@@ -384,6 +457,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Name of the geopolitical unit.
+        /// </Summary>
         public unsafe string Name
         {
             get
@@ -399,6 +475,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The type of reporting unit
+        /// </Summary>
         public unsafe ReportingUnitType ReportingUnitType
         {
             get
@@ -458,8 +537,20 @@ namespace ElectionGuard
 
     #region BallotStyle
 
+    /// <Summary>
+    /// A BallotStyle works as a key to uniquely specify a set of contests. See also `ContestDescription`.
+    ///
+    /// For ElectionGuard, each contest is associated with a specific geopolitical unit,
+    /// and each ballot style is associated with at least one geopolitical unit.
+    ///
+    /// It is up to the consuming application to determine how to interpreit the relationships
+    /// between these entity types.
+    /// </Summary>
     public class BallotStyle : DisposableBase
     {
+        /// <Summary>
+        /// Unique internal identifier that's used by other elements to reference this element.
+        /// </Summary>
         public unsafe string ObjectId
         {
             get
@@ -475,6 +566,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// the size of the geopolitical unit id collection
+        /// </Summary>
         public unsafe ulong GeopoliticalUnitIdsSize
         {
             get
@@ -485,6 +579,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// the size of the party id collection
+        /// </Summary>
         public unsafe ulong PartyIdsSize
         {
             get
@@ -521,6 +618,9 @@ namespace ElectionGuard
             Handle = null;
         }
 
+        /// <Summary>
+        /// the Geopolitical Unit Id or id's that correlate to this ballot style
+        /// </Summary>
         public unsafe String GetGeopoliticalUnitIdAt(ulong index)
         {
             var status = NativeInterface.BallotStyle.GetGeopoliticalInitIdAtIndex(
@@ -533,6 +633,9 @@ namespace ElectionGuard
             return Marshal.PtrToStringAnsi(value);
         }
 
+        /// <Summary>
+        /// the Party Id or Id's (if any) for this ballot style
+        /// </Summary>
         public unsafe String GetPartyIdAt(ulong index)
         {
             var status = NativeInterface.BallotStyle.GetPartyIdAtIndex(
@@ -565,8 +668,18 @@ namespace ElectionGuard
 
     #region Party
 
+    /// <Summary>
+    /// Use this entity to describe a political party that can then be referenced from other entities.
+    ///
+    /// It is not required to define a party for Electionguard.
+    ///
+    /// See: https://developers.google.com/elections-data/reference/party
+    /// </Summary>
     public class Party : DisposableBase
     {
+        /// <Summary>
+        /// Unique internal identifier that's used by other elements to reference this element.
+        /// </Summary>
         public unsafe string ObjectId
         {
             get
@@ -582,6 +695,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Abbreviation of the party
+        /// </Summary>
         public unsafe string Abbreviation
         {
             get
@@ -597,6 +713,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Name of the party
+        /// </Summary>
         public unsafe InternationalizedText Name
         {
             get
@@ -612,6 +731,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// An optional color in hex
+        /// </Summary>
         public unsafe string Color
         {
             get
@@ -627,6 +749,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// An optional logo uri
+        /// </Summary>
         public unsafe string LogoUri
         {
             get
@@ -700,8 +825,21 @@ namespace ElectionGuard
 
     #region Candidate
 
+    /// <Summary>
+    /// Entity describing information about a candidate in a contest.
+    /// See: https://developers.google.com/elections-data/reference/candidate
+    ///
+    /// Note: The ElectionGuard Data Spec deviates from the NIST model in that
+    /// selections for any contest type are considered a "candidate".
+    /// for instance, on a yes-no referendum contest, two `candidate` objects
+    /// would be included in the model to represent the `affirmative` and `negative`
+    /// selections for the contest.  See the wiki, readme's, and tests in this repo for more info.
+    /// </Summary>
     public class Candidate : DisposableBase
     {
+        /// <Summary>
+        /// Unique internal identifier that's used by other elements to reference this element.
+        /// </Summary>
         public unsafe string ObjectId
         {
             get
@@ -717,6 +855,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// A convenience accessor for getObjectId
+        /// </Summary>
         public unsafe string CandidateId
         {
             get
@@ -732,6 +873,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Name of the candidate
+        /// </Summary>
         public unsafe string Name
         {
             get
@@ -747,6 +891,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Optional party id of the candidate
+        /// </Summary>
         public unsafe string PartyId
         {
             get
@@ -762,6 +909,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Optional image uri for the candidate
+        /// </Summary>
         public unsafe string ImageUri
         {
             get
@@ -835,9 +985,25 @@ namespace ElectionGuard
 
     #region SelectionDescription
 
+    /// <summary>
+    /// Data entity for the ballot selections in a contest,
+    /// for example linking candidates and parties to their vote counts.
+    /// See: https://developers.google.com/elections-data/reference/ballot-selection
+    ///
+    /// Note: The ElectionGuard Data Spec deviates from the NIST model in that
+    /// there is no difference for different types of selections.
+    ///
+    /// The ElectionGuard Data Spec deviates from the NIST model in that
+    /// `sequence_order` is a required field since it is used for ordering selections
+    /// in a contest to ensure various encryption primitives are deterministic.
+    /// For a given election, the sequence of selections displayed to a user may be different
+    /// however that information is not captured by default when encrypting a specific ballot.
+    /// </summary>
     public class SelectionDescription : DisposableBase
     {
-
+        /// <Summary>
+        /// Unique internal identifier that's used by other elements to reference this element.
+        /// </Summary>
         public unsafe string ObjectId
         {
             get
@@ -853,6 +1019,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// the object id of the candidate
+        /// </Summary>
         public unsafe string CandidateId
         {
             get
@@ -868,6 +1037,11 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The sequence order defining this selections place in the contest selection collection.
+        /// Note: this is specifically for programs to interpret and does not necessarily represent
+        /// the order in which selections are presented to a user.
+        /// </Summary>
         public unsafe ulong SequenceOrder
         {
             get
@@ -925,8 +1099,21 @@ namespace ElectionGuard
 
     #region ContestDescription
 
+    /// <summary>
+    /// Use this data entity for describing a contest and linking the contest
+    /// to the associated candidates and parties.
+    /// See: https://developers.google.com/elections-data/reference/contest
+    /// Note: The ElectionGuard Data Spec deviates from the NIST model in that
+    /// `sequence_order` is a required field since it is used for ordering selections
+    /// in a contest to ensure various encryption primitives are deterministic.
+    /// For a given election, the sequence of contests displayed to a user may be different
+    /// however that information is not captured by default when encrypting a specific ballot.
+    /// </summary>
     public class ContestDescription : DisposableBase
     {
+        /// <Summary>
+        /// Unique internal identifier that's used by other elements to reference this element.
+        /// </Summary>
         public unsafe string ObjectId
         {
             get
@@ -942,6 +1129,10 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The object id of the geopolitical unit associated with this contest.
+        /// Note: in concordance with the NIST standard, the name `ElectoralDistrictId` is kept
+        /// </Summary>
         public unsafe string ElectoralDistrictId
         {
             get
@@ -957,6 +1148,11 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The sequence order defining this contest's place in the contest collection of the ballot style.
+        /// Note: this is specifically for programs to interpret and does not necessarily represent
+        /// the order in which contests are presented to a user.
+        /// </Summary>
         public unsafe ulong SequenceOrder
         {
             get
@@ -966,6 +1162,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The vote variation type.  Currently ElectionGuard supports one_of_m and n_of_m
+        /// </Summary>
         public unsafe VoteVariationType VoteVariationType
         {
             get
@@ -975,6 +1174,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The number of candidates that are elected in the contest, which is the n of an n-of-m contest
+        /// </Summary>
         public unsafe ulong NumberElected
         {
             get
@@ -984,6 +1186,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The maximum number of votes or write-ins allowed per voter in this contest.
+        /// </Summary>
         public unsafe ulong VotesAllowed
         {
             get
@@ -993,6 +1198,10 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Name of the contest as it's listed on the results report,
+        /// not necessarily as it appears on the ballot.
+        /// </Summary>
         public unsafe string Name
         {
             get
@@ -1008,6 +1217,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Title of the contest, which must match how it appears on the voters' ballots.
+        /// </Summary>
         public unsafe InternationalizedText BallotTitle
         {
             get
@@ -1023,6 +1235,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Subtitle of the contest, which must match how it appears on the voters' ballots.
+        /// </Summary>
         public unsafe InternationalizedText BallotSubTitle
         {
             get
@@ -1038,6 +1253,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The size of the selections collection
+        /// </Summary>
         public unsafe ulong SelectionsSize
         {
             get
@@ -1158,6 +1376,9 @@ namespace ElectionGuard
             Handle = null;
         }
 
+        /// <Summary>
+        /// The collection of selections in this contest.
+        /// </Summary>
         public unsafe SelectionDescription GetSelectionAtIndex(ulong index)
         {
             var status = NativeInterface.ContestDescription.GetSelectionAtIndex(
@@ -1190,8 +1411,17 @@ namespace ElectionGuard
 
     #region ContestDescriptionWithPlaceholders
 
+    /// <summary>
+    /// ContestDescriptionWithPlaceholders is a `ContestDescription` with ElectionGuard `placeholder_selections`.
+    /// (The ElectionGuard spec requires for n-of-m elections that there be *exactly* n counters that are one
+    /// with the rest zero, so if a voter deliberately undervotes, one or more of the placeholder counters will
+    /// become one. This allows the `ConstantChaumPedersenProof` to verify correctly for undervoted contests.)
+    /// </summary>
     public class ContestDescriptionWithPlaceholders : DisposableBase
     {
+        /// <Summary>
+        /// Unique internal identifier that's used by other elements to reference this element.
+        /// </Summary>
         public unsafe string ObjectId
         {
             get
@@ -1207,6 +1437,10 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The object id of the geopolitical unit associated with this contest.
+        /// Note: in concordance with the NIST standard, the name `ElectoralDistrictId` is kept
+        /// </Summary>
         public unsafe string ElectoralDistrictId
         {
             get
@@ -1222,6 +1456,11 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The sequence order defining this contest's place in the contest collection of the ballot style.
+        /// Note: this is specifically for programs to interpret and does not necessarily represent
+        /// the order in which contests are presented to a user.
+        /// </Summary>
         public unsafe ulong SequenceOrder
         {
             get
@@ -1231,6 +1470,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The vote variation type.  Currently ElectionGuard supports one_of_m and n_of_m
+        /// </Summary>
         public unsafe VoteVariationType VoteVariationType
         {
             get
@@ -1240,6 +1482,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The number of candidates that are elected in the contest, which is the n of an n-of-m contest
+        /// </Summary>
         public unsafe ulong NumberElected
         {
             get
@@ -1249,6 +1494,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The maximum number of votes or write-ins allowed per voter in this contest.
+        /// </Summary>
         public unsafe ulong VotesAllowed
         {
             get
@@ -1258,6 +1506,10 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Name of the contest as it's listed on the results report,
+        /// not necessarily as it appears on the ballot.
+        /// </Summary>
         public unsafe string Name
         {
             get
@@ -1273,6 +1525,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Title of the contest, which must match how it appears on the voters' ballots.
+        /// </Summary>
         public unsafe InternationalizedText BallotTitle
         {
             get
@@ -1288,6 +1543,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Subtitle of the contest, which must match how it appears on the voters' ballots.
+        /// </Summary>
         public unsafe InternationalizedText BallotSubTitle
         {
             get
@@ -1303,6 +1561,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The size of the selections collection
+        /// </Summary>
         public unsafe ulong SelectionsSize
         {
             get
@@ -1312,6 +1573,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The size of the placeholder collection
+        /// </Summary>
         public unsafe ulong PlaceholdersSize
         {
             get
@@ -1470,6 +1734,9 @@ namespace ElectionGuard
             Handle = null;
         }
 
+        /// <Summary>
+        /// The collection of selections in this contest.
+        /// </Summary>
         public unsafe SelectionDescription GetSelectionAtIndex(ulong index)
         {
             var status = NativeInterface.ContestDescriptionWithPlaceholders.GetSelectionAtIndex(
@@ -1482,6 +1749,9 @@ namespace ElectionGuard
             return new SelectionDescription(value);
         }
 
+        /// <Summary>
+        /// The collection of placeholders in this contest.
+        /// </Summary>
         public unsafe SelectionDescription GetPlaceholderAtIndex(ulong index)
         {
             var status = NativeInterface.ContestDescriptionWithPlaceholders.GetPlaceholderAtIndex(
@@ -1546,6 +1816,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Enumerated type of election, such as partisan-primary or open-primary.
+        /// </Summary>
         public unsafe ElectionType ElectionType
         {
             get
@@ -1555,7 +1828,9 @@ namespace ElectionGuard
             }
         }
 
-        // TODO: datetime type
+        /// <Summary>
+        /// The start date/time of the election.
+        /// </Summary>
         public unsafe DateTime StartDate
         {
             get
@@ -1565,6 +1840,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The end date/time of the election.
+        /// </Summary>
         public unsafe DateTime EndDate
         {
             get
@@ -1574,6 +1852,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The size of the geopolitical units collection
+        /// </Summary>
         public unsafe ulong GeopoliticalUnitsSize
         {
             get
@@ -1583,6 +1864,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The size of the parties collection
+        /// </Summary>
         public unsafe ulong PartiesSize
         {
             get
@@ -1592,6 +1876,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The size of the candidates collection
+        /// </Summary>
         public unsafe ulong CandidatesSize
         {
             get
@@ -1601,6 +1888,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The size of the contests collection
+        /// </Summary>
         public unsafe ulong ContestsSize
         {
             get
@@ -1610,6 +1900,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The size of the ballot styles collection
+        /// </Summary>
         public unsafe ulong BallotStylesSize
         {
             get
@@ -1619,6 +1912,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The friendly name of the election
+        /// </Summary>
         public unsafe InternationalizedText Name
         {
             get
@@ -1634,6 +1930,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The contact information for the election
+        /// </Summary>
         public unsafe ContactInformation ContactInfo
         {
             get
@@ -1746,6 +2045,9 @@ namespace ElectionGuard
             Handle = null;
         }
 
+        /// <Summary>
+        /// Collection of geopolitical units for this election.
+        /// </Summary>
         public unsafe GeopoliticalUnit GetGeopoliticalUnitAtIndex(ulong index)
         {
             var status = NativeInterface.Manifest.GetGeopoliticalUnitAtIndex(
@@ -1758,6 +2060,9 @@ namespace ElectionGuard
             return new GeopoliticalUnit(value);
         }
 
+        /// <Summary>
+        /// Collection of parties for this election.
+        /// </Summary>
         public unsafe Party GetPartyAtIndex(ulong index)
         {
             var status = NativeInterface.Manifest.GetPartyAtIndex(
@@ -1770,6 +2075,9 @@ namespace ElectionGuard
             return new Party(value);
         }
 
+        /// <Summary>
+        /// Collection of candidates for this election.
+        /// </Summary>
         public unsafe Candidate GetCandidateAtIndex(ulong index)
         {
             var status = NativeInterface.Manifest.GetCandidateAtIndex(
@@ -1782,6 +2090,9 @@ namespace ElectionGuard
             return new Candidate(value);
         }
 
+        /// <Summary>
+        /// Collection of contests for this election.
+        /// </Summary>
         public unsafe ContestDescription GetContestAtIndex(ulong index)
         {
             var status = NativeInterface.Manifest.GetContestAtIndex(
@@ -1794,6 +2105,9 @@ namespace ElectionGuard
             return new ContestDescription(value);
         }
 
+        /// <Summary>
+        /// Collection of ballot styles for this election.
+        /// </Summary>
         public unsafe BallotStyle GetBallotStyleAtIndex(ulong index)
         {
             var status = NativeInterface.Manifest.GetBallotStyleAtIndex(
@@ -1821,6 +2135,9 @@ namespace ElectionGuard
             return new ElementModQ(value);
         }
 
+        /// <Summary>
+        /// Check wether the election manifest is valid and well-formed.
+        /// </Summary>
         public unsafe bool IsValid()
         {
             var value = NativeInterface.Manifest.IsValid(Handle);
@@ -1911,6 +2228,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The size of the geopolitical units collection
+        /// </Summary>
         public unsafe ulong GeopoliticalUnitsSize
         {
             get
@@ -1920,6 +2240,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The size of the contests collection
+        /// </Summary>
         public unsafe ulong ContestsSize
         {
             get
@@ -1929,6 +2252,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The size of the ballot styles collection
+        /// </Summary>
         public unsafe ulong BallotStylesSize
         {
             get
@@ -1981,6 +2307,9 @@ namespace ElectionGuard
             Handle = null;
         }
 
+        /// <Summary>
+        /// Collection of geopolitical units for this election.
+        /// </Summary>
         public unsafe GeopoliticalUnit GetGeopoliticalUnitAtIndex(ulong index)
         {
             var status = NativeInterface.InternalManifest.GetGeopoliticalUnitAtIndex(
@@ -1993,6 +2322,9 @@ namespace ElectionGuard
             return new GeopoliticalUnit(value);
         }
 
+        /// <Summary>
+        /// Collection of contests for this election.
+        /// </Summary>
         public unsafe ContestDescription GetContestAtIndex(ulong index)
         {
             var status = NativeInterface.InternalManifest.GetContestAtIndex(
@@ -2005,6 +2337,9 @@ namespace ElectionGuard
             return new ContestDescription(value);
         }
 
+        /// <Summary>
+        /// Collection of ballot styles for this election.
+        /// </Summary>
         public unsafe BallotStyle GetBallotStyleAtIndex(ulong index)
         {
             var status = NativeInterface.InternalManifest.GetBallotStyleAtIndex(

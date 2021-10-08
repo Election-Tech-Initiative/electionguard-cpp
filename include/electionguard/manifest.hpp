@@ -531,6 +531,10 @@ namespace electionguard
         /// Optional party id of the candidate
         /// </Summary>
         std::string getPartyId() const;
+
+        /// <Summary>
+        /// Optional image uri for the candidate
+        /// </Summary>
         std::string getImageUri() const;
 
         /// <Summary>
@@ -715,7 +719,7 @@ namespace electionguard
         InternationalizedText *getBallotSubtitle() const;
 
         /// <Summary>
-        /// The collection of selections in this contest.  Order is not guaranteed.
+        /// The collection of selections in this contest.
         /// </Summary>
         std::vector<std::reference_wrapper<SelectionDescription>> getSelections() const;
 
@@ -860,7 +864,15 @@ namespace electionguard
         /// Enumerated type of election, such as partisan-primary or open-primary.
         /// </Summary>
         ElectionType getElectionType() const;
+
+        /// <Summary>
+        /// The start date/time of the election.
+        /// </Summary>
         std::chrono::system_clock::time_point getStartDate() const;
+
+        /// <Summary>
+        /// The end date/time of the election.
+        /// </Summary>
         std::chrono::system_clock::time_point getEndDate() const;
 
         /// <Summary>
@@ -888,6 +900,9 @@ namespace electionguard
         /// </Summary>
         std::vector<std::reference_wrapper<BallotStyle>> getBallotStyles() const;
 
+        /// <Summary>
+        /// The friendly name of the election
+        /// </Summary>
         InternationalizedText *getName() const;
         ContactInformation *getContactInformation() const;
 
