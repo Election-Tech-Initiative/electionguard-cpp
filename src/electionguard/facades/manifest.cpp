@@ -1581,7 +1581,7 @@ bool eg_contest_description_with_placeholders_is_placeholder(
     return AS_TYPE(ContestDescriptionWithPlaceholders, handle)->IsPlaceholder(*selection);
 }
 
-bool eg_contest_description_with_placeholders_selection_for_id(
+eg_electionguard_status_t eg_contest_description_with_placeholders_selection_for_id(
   eg_contest_description_with_placeholders_t *handle, char *in_selection_id,
   eg_selection_description_t **out_selection_ref)
 {
@@ -1939,6 +1939,17 @@ eg_electionguard_status_t eg_election_manifest_crypto_hash(eg_election_manifest_
     }
 }
 
+bool eg_election_manifest_is_valid(eg_election_manifest_t *handle)
+{
+    try {
+        auto result = AS_TYPE(Manifest, handle)->isValid();
+        return result;
+    } catch (const exception &e) {
+        Log::error(":eg_election_manifest_is_valid", e);
+        return false;
+    }
+}
+
 eg_electionguard_status_t eg_election_manifest_from_json(char *in_data,
                                                          eg_election_manifest_t **out_handle)
 {
@@ -1965,6 +1976,21 @@ eg_electionguard_status_t eg_election_manifest_from_bson(uint8_t *in_data, uint6
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_election_manifest_from_bson", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_election_manifest_from_msgpack(uint8_t *in_data, uint64_t in_length,
+                                                            eg_election_manifest_t **out_handle)
+{
+    try {
+        auto data_bytes = vector<uint8_t>(in_data, in_data + in_length);
+        auto result = Manifest::fromMsgPack(data_bytes);
+
+        *out_handle = AS_TYPE(eg_election_manifest_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_election_manifest_from_msgpack", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -2001,6 +2027,24 @@ eg_electionguard_status_t eg_election_manifest_to_bson(eg_election_manifest_t *h
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_internal_manifest_to_bson", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_election_manifest_to_msgpack(eg_election_manifest_t *handle,
+                                                          uint8_t **out_data, size_t *out_size)
+{
+    try {
+        auto *domain_type = AS_TYPE(Manifest, handle);
+        auto result = domain_type->toMsgPack();
+
+        size_t size = 0;
+        *out_data = dynamicCopy(result, &size);
+        *out_size = size;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_election_manifest_to_msgpack", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -2157,6 +2201,21 @@ eg_electionguard_status_t eg_internal_manifest_from_bson(uint8_t *in_data, uint6
     }
 }
 
+eg_electionguard_status_t eg_internal_manifest_from_msgpack(uint8_t *in_data, uint64_t in_length,
+                                                            eg_internal_manifest_t **out_handle)
+{
+    try {
+        auto data_bytes = vector<uint8_t>(in_data, in_data + in_length);
+        auto result = InternalManifest::fromMsgPack(data_bytes);
+
+        *out_handle = AS_TYPE(eg_internal_manifest_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_internal_manifest_from_msgpack", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 eg_electionguard_status_t eg_internal_manifest_to_json(eg_internal_manifest_t *handle,
                                                        char **out_data, size_t *out_size)
 {
@@ -2181,6 +2240,24 @@ eg_electionguard_status_t eg_internal_manifest_to_bson(eg_internal_manifest_t *h
     try {
         auto *domain_type = AS_TYPE(InternalManifest, handle);
         auto result = domain_type->toBson();
+
+        size_t size = 0;
+        *out_data = dynamicCopy(result, &size);
+        *out_size = size;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_internal_manifest_to_bson", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_internal_manifest_to_msgpack(eg_internal_manifest_t *handle,
+                                                          uint8_t **out_data, size_t *out_size)
+{
+    try {
+        auto *domain_type = AS_TYPE(InternalManifest, handle);
+        auto result = domain_type->toMsgPack();
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);

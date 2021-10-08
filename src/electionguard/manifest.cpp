@@ -1695,10 +1695,11 @@ namespace electionguard
                 candidateIds.insert(id);
             }
 
+            auto partyId_empty = item.get().getPartyId().empty();
+            auto partyId_found = partyIds.find(item.get().getPartyId()) != partyIds.end();
+
             candidates_have_valid_party_ids =
-              candidates_have_valid_party_ids &&
-              (item.get().getPartyId().empty() ||
-               partyIds.find(item.get().getPartyId()) != partyIds.end());
+              candidates_have_valid_party_ids && (partyId_empty || partyId_found);
         }
 
         auto candidates_have_valid_length = candidateIds.size() == pimpl->candidates.size();
@@ -1772,6 +1773,8 @@ namespace electionguard
 
     vector<uint8_t> Manifest::toBson() const { return ManifestSerializer::toBson(*this); }
 
+    vector<uint8_t> Manifest::toMsgPack() const { return ManifestSerializer::toMsgPack(*this); }
+
     string Manifest::toJson() { return ManifestSerializer::toJson(*this); }
 
     string Manifest::toJson() const { return ManifestSerializer::toJson(*this); }
@@ -1784,6 +1787,11 @@ namespace electionguard
     unique_ptr<Manifest> Manifest::fromBson(vector<uint8_t> data)
     {
         return ManifestSerializer::fromBson(move(data));
+    }
+
+    unique_ptr<Manifest> Manifest::fromMsgPack(vector<uint8_t> data)
+    {
+        return ManifestSerializer::fromMsgPack(move(data));
     }
 
     unique_ptr<ElementModQ> Manifest::crypto_hash() { return pimpl->crypto_hash(); }
@@ -1922,6 +1930,11 @@ namespace electionguard
         return InternalManifestSerializer::toBson(*this);
     }
 
+    vector<uint8_t> InternalManifest::toMsgPack() const
+    {
+        return InternalManifestSerializer::toMsgPack(*this);
+    }
+
     string InternalManifest::toJson() { return InternalManifestSerializer::toJson(*this); }
 
     string InternalManifest::toJson() const { return InternalManifestSerializer::toJson(*this); }
@@ -1934,6 +1947,11 @@ namespace electionguard
     unique_ptr<InternalManifest> InternalManifest::fromBson(vector<uint8_t> data)
     {
         return InternalManifestSerializer::fromBson(move(data));
+    }
+
+    unique_ptr<InternalManifest> InternalManifest::fromMsgPack(vector<uint8_t> data)
+    {
+        return InternalManifestSerializer::fromMsgPack(move(data));
     }
 
     // Protected Methods

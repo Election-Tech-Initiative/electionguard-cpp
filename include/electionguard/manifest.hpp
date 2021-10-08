@@ -894,29 +894,39 @@ namespace electionguard
         bool isValid() const;
 
         /// <Summary>
-        /// Export the ballot representation as BSON
+        /// Export the representation as BSON
         /// </Summary>
         std::vector<uint8_t> toBson() const;
 
         /// <Summary>
-        /// Export the ballot representation as JSON
+        /// Export the representation as MsgPack
+        /// </Summary>
+        std::vector<uint8_t> toMsgPack() const;
+
+        /// <Summary>
+        /// Export the representation as JSON
         /// </Summary>
         std::string toJson();
 
         /// <Summary>
-        /// Export the ballot representation as JSON
+        /// Export the representation as JSON
         /// </Summary>
         std::string toJson() const;
 
         /// <Summary>
-        /// Import the ballot representation from JSON
+        /// Import the representation from JSON
         /// </Summary>
         static std::unique_ptr<Manifest> fromJson(std::string data);
 
         /// <Summary>
-        /// Import the ballot representation from BSON
+        /// Import the representation from BSON
         /// </Summary>
         static std::unique_ptr<Manifest> fromBson(std::vector<uint8_t> data);
+
+        /// <Summary>
+        /// Import the representation from MsgPack
+        /// </Summary>
+        static std::unique_ptr<Manifest> fromMsgPack(std::vector<uint8_t> data);
 
         /// <Summary>
         /// A hash representation of the object
@@ -989,6 +999,12 @@ namespace electionguard
         /// Export the ballot representation as BSON
         /// </Summary>
         std::vector<uint8_t> toBson() const;
+
+        /// <Summary>
+        /// Export the representation as MsgPack
+        /// </Summary>
+        std::vector<uint8_t> toMsgPack() const;
+
         /// <Summary>
         /// Export the ballot representation as JSON
         /// </Summary>
@@ -1008,6 +1024,11 @@ namespace electionguard
         /// Import the ballot representation from BSON
         /// </Summary>
         static std::unique_ptr<InternalManifest> fromBson(std::vector<uint8_t> data);
+
+        /// <Summary>
+        /// Import the representation from MsgPack
+        /// </Summary>
+        static std::unique_ptr<InternalManifest> fromMsgPack(std::vector<uint8_t> data);
 
       protected:
         static std::vector<std::unique_ptr<ContestDescriptionWithPlaceholders>>

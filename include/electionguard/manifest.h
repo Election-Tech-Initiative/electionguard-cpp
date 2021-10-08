@@ -726,7 +726,7 @@ EG_API eg_electionguard_status_t eg_contest_description_with_placeholders_get_pl
 EG_API bool eg_contest_description_with_placeholders_is_placeholder(
   eg_contest_description_with_placeholders_t *handle, eg_selection_description_t *in_selection);
 
-EG_API bool eg_contest_description_with_placeholders_selection_for_id(
+EG_API eg_electionguard_status_t eg_contest_description_with_placeholders_selection_for_id(
   eg_contest_description_with_placeholders_t *handle, char *in_selection_id,
   eg_selection_description_t **out_selection_ref);
 
@@ -822,10 +822,15 @@ EG_API eg_electionguard_status_t eg_election_manifest_get_contact_info(
 EG_API eg_electionguard_status_t eg_election_manifest_crypto_hash(
   eg_election_manifest_t *handle, eg_element_mod_q_t **out_owned_hash);
 
+EG_API bool eg_election_manifest_is_valid(eg_election_manifest_t *handle);
+
 EG_API eg_electionguard_status_t
 eg_election_manifest_from_json(char *in_data, eg_election_manifest_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_election_manifest_from_bson(
+  uint8_t *in_data, uint64_t in_length, eg_election_manifest_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_election_manifest_from_msgpack(
   uint8_t *in_data, uint64_t in_length, eg_election_manifest_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_election_manifest_to_json(eg_election_manifest_t *handle,
@@ -834,6 +839,10 @@ EG_API eg_electionguard_status_t eg_election_manifest_to_json(eg_election_manife
 // returns the size and fills out_data, caller is responsible for freeing the out_data
 EG_API eg_electionguard_status_t eg_election_manifest_to_bson(eg_election_manifest_t *handle,
                                                               uint8_t **out_data, size_t *out_size);
+
+EG_API eg_electionguard_status_t eg_election_manifest_to_msgpack(eg_election_manifest_t *handle,
+                                                                 uint8_t **out_data,
+                                                                 size_t *out_size);
 
 #endif
 
@@ -895,12 +904,19 @@ eg_internal_manifest_from_json(char *in_data, eg_internal_manifest_t **out_handl
 EG_API eg_electionguard_status_t eg_internal_manifest_from_bson(
   uint8_t *in_data, uint64_t in_length, eg_internal_manifest_t **out_handle);
 
+EG_API eg_electionguard_status_t eg_internal_manifest_from_msgpack(
+  uint8_t *in_data, uint64_t in_length, eg_internal_manifest_t **out_handle);
+
 EG_API eg_electionguard_status_t eg_internal_manifest_to_json(eg_internal_manifest_t *handle,
                                                               char **out_data, size_t *out_size);
 
 // returns the size and fills out_data, caller is responsible for freeing the out_data
 EG_API eg_electionguard_status_t eg_internal_manifest_to_bson(eg_internal_manifest_t *handle,
                                                               uint8_t **out_data, size_t *out_size);
+
+EG_API eg_electionguard_status_t eg_internal_manifest_to_msgpack(eg_internal_manifest_t *handle,
+                                                                 uint8_t **out_data,
+                                                                 size_t *out_size);
 
 #endif
 
