@@ -2161,7 +2161,7 @@ namespace ElectionGuard
         }
 
         /// <Summary>
-        /// Export the ballot representation as MsgPack
+        /// Export the ballot representation as ToBson
         /// </Summary>
         public unsafe byte[] ToBson()
         {

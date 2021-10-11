@@ -192,7 +192,7 @@ eg_electionguard_status_t eg_internationalized_text_new(eg_language_t *in_text[]
     try {
         vector<unique_ptr<Language>> collection;
         collection.reserve(in_text_size);
-        for (auto i = 0; i < in_text_size; i++) {
+        for (size_t i = 0; i < in_text_size; i++) {
             auto *element = AS_TYPE(Language, in_text[i]);
             unique_ptr<Language> lang(new Language(std::move(*element)));
             collection.push_back(std::move(lang));
@@ -283,13 +283,13 @@ eg_electionguard_status_t eg_contact_information_new_with_collections(
     try {
         vector<string> address;
         address.reserve(in_address_line_size);
-        for (auto i = 0; i < in_address_line_size; i++) {
+        for (size_t i = 0; i < in_address_line_size; i++) {
             address.push_back(in_address_line[i]);
         }
 
         vector<unique_ptr<AnnotatedString>> email;
         email.reserve(in_email_line_size);
-        for (auto i = 0; i < in_email_line_size; i++) {
+        for (size_t i = 0; i < in_email_line_size; i++) {
             auto *element = AS_TYPE(AnnotatedString, in_email_line[i]);
             unique_ptr<AnnotatedString> annotated(new AnnotatedString(std::move(*element)));
             email.push_back(std::move(annotated));
@@ -297,7 +297,7 @@ eg_electionguard_status_t eg_contact_information_new_with_collections(
 
         vector<unique_ptr<AnnotatedString>> phone;
         email.reserve(in_phone_line_size);
-        for (auto i = 0; i < in_phone_line_size; i++) {
+        for (size_t i = 0; i < in_phone_line_size; i++) {
             auto *element = AS_TYPE(AnnotatedString, in_phone_line[i]);
             unique_ptr<AnnotatedString> annotated(new AnnotatedString(std::move(*element)));
             phone.push_back(std::move(annotated));
@@ -531,7 +531,7 @@ eg_electionguard_status_t eg_ballot_style_new(char *in_object_id, char *in_geopo
         auto objectId = string(in_object_id);
         vector<string> gpUnitIds;
         gpUnitIds.reserve(in_geopolitical_unit_ids_size);
-        for (auto i = 0; i < in_geopolitical_unit_ids_size; i++) {
+        for (size_t i = 0; i < in_geopolitical_unit_ids_size; i++) {
             gpUnitIds.push_back(in_geopolitical_unit_ids[i]);
         }
 
@@ -556,13 +556,13 @@ eg_ballot_style_new_with_parties(char *in_object_id, char *in_geopolitical_unit_
         auto imageUri = string(in_image_uri);
         vector<string> gpUnitIds;
         gpUnitIds.reserve(in_geopolitical_unit_ids_size);
-        for (auto i = 0; i < in_geopolitical_unit_ids_size; i++) {
+        for (size_t i = 0; i < in_geopolitical_unit_ids_size; i++) {
             gpUnitIds.push_back(in_geopolitical_unit_ids[i]);
         }
 
         vector<string> partyIds;
         gpUnitIds.reserve(in_party_ids_size);
-        for (auto i = 0; i < in_party_ids_size; i++) {
+        for (size_t i = 0; i < in_party_ids_size; i++) {
             partyIds.push_back(in_party_ids[i]);
         }
 
@@ -1058,7 +1058,7 @@ eg_contest_description_new(const char *in_object_id, char *in_electoral_district
 
         vector<unique_ptr<SelectionDescription>> selections;
         selections.reserve(in_selections_size);
-        for (auto i = 0; i < in_selections_size; i++) {
+        for (size_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1094,7 +1094,7 @@ eg_electionguard_status_t eg_contest_description_new_with_title(
 
         vector<unique_ptr<SelectionDescription>> selections;
         selections.reserve(in_selections_size);
-        for (auto i = 0; i < in_selections_size; i++) {
+        for (size_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1129,7 +1129,7 @@ eg_electionguard_status_t eg_contest_description_new_with_parties(
 
         vector<unique_ptr<SelectionDescription>> selections;
         selections.reserve(in_selections_size);
-        for (auto i = 0; i < in_selections_size; i++) {
+        for (size_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1138,7 +1138,7 @@ eg_electionguard_status_t eg_contest_description_new_with_parties(
 
         vector<string> partyIds;
         partyIds.reserve(in_primary_party_ids_size);
-        for (auto i = 0; i < in_primary_party_ids_size; i++) {
+        for (size_t i = 0; i < in_primary_party_ids_size; i++) {
             partyIds.push_back(in_primary_party_ids[i]);
         }
 
@@ -1172,7 +1172,7 @@ eg_electionguard_status_t eg_contest_description_new_with_title_and_parties(
 
         vector<unique_ptr<SelectionDescription>> selections;
         selections.reserve(in_selections_size);
-        for (auto i = 0; i < in_selections_size; i++) {
+        for (size_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1181,7 +1181,7 @@ eg_electionguard_status_t eg_contest_description_new_with_title_and_parties(
 
         vector<string> partyIds;
         partyIds.reserve(in_primary_party_ids_size);
-        for (auto i = 0; i < in_primary_party_ids_size; i++) {
+        for (size_t i = 0; i < in_primary_party_ids_size; i++) {
             partyIds.push_back(in_primary_party_ids[i]);
         }
 
@@ -1356,7 +1356,7 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new(
 
         vector<unique_ptr<SelectionDescription>> selections;
         selections.reserve(in_selections_size);
-        for (auto i = 0; i < in_selections_size; i++) {
+        for (size_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1365,7 +1365,7 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new(
 
         vector<unique_ptr<SelectionDescription>> placeholders;
         placeholders.reserve(in_placeholder_selections_size);
-        for (auto i = 0; i < in_placeholder_selections_size; i++) {
+        for (size_t i = 0; i < in_placeholder_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_placeholder_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1402,7 +1402,7 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_titl
 
         vector<unique_ptr<SelectionDescription>> selections;
         selections.reserve(in_selections_size);
-        for (auto i = 0; i < in_selections_size; i++) {
+        for (size_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1411,7 +1411,7 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_titl
 
         vector<unique_ptr<SelectionDescription>> placeholders;
         placeholders.reserve(in_placeholder_selections_size);
-        for (auto i = 0; i < in_placeholder_selections_size; i++) {
+        for (size_t i = 0; i < in_placeholder_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_placeholder_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1448,7 +1448,7 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_part
 
         vector<unique_ptr<SelectionDescription>> selections;
         selections.reserve(in_selections_size);
-        for (auto i = 0; i < in_selections_size; i++) {
+        for (size_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1457,7 +1457,7 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_part
 
         vector<unique_ptr<SelectionDescription>> placeholders;
         placeholders.reserve(in_placeholder_selections_size);
-        for (auto i = 0; i < in_placeholder_selections_size; i++) {
+        for (size_t i = 0; i < in_placeholder_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_placeholder_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1466,7 +1466,7 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_part
 
         vector<string> partyIds;
         partyIds.reserve(in_primary_party_ids_size);
-        for (auto i = 0; i < in_primary_party_ids_size; i++) {
+        for (size_t i = 0; i < in_primary_party_ids_size; i++) {
             partyIds.push_back(in_primary_party_ids[i]);
         }
 
@@ -1501,7 +1501,7 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_titl
 
         vector<unique_ptr<SelectionDescription>> selections;
         selections.reserve(in_selections_size);
-        for (auto i = 0; i < in_selections_size; i++) {
+        for (size_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1510,7 +1510,7 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_titl
 
         vector<unique_ptr<SelectionDescription>> placeholders;
         placeholders.reserve(in_placeholder_selections_size);
-        for (auto i = 0; i < in_placeholder_selections_size; i++) {
+        for (size_t i = 0; i < in_placeholder_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_placeholder_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1519,7 +1519,7 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_titl
 
         vector<string> partyIds;
         partyIds.reserve(in_primary_party_ids_size);
-        for (auto i = 0; i < in_primary_party_ids_size; i++) {
+        for (size_t i = 0; i < in_primary_party_ids_size; i++) {
             partyIds.push_back(in_primary_party_ids[i]);
         }
 
@@ -1621,7 +1621,7 @@ eg_election_manifest_new(char *in_election_scope_id, eg_election_type_t in_elect
 
         vector<unique_ptr<GeopoliticalUnit>> gpUnits;
         gpUnits.reserve(in_geopolitical_units_size);
-        for (auto i = 0; i < in_geopolitical_units_size; i++) {
+        for (size_t i = 0; i < in_geopolitical_units_size; i++) {
             auto *element = AS_TYPE(GeopoliticalUnit, in_geopolitical_units[i]);
             unique_ptr<GeopoliticalUnit> annotated(new GeopoliticalUnit(std::move(*element)));
             gpUnits.push_back(std::move(annotated));
@@ -1629,7 +1629,7 @@ eg_election_manifest_new(char *in_election_scope_id, eg_election_type_t in_elect
 
         vector<unique_ptr<Party>> parties;
         parties.reserve(in_parties_size);
-        for (auto i = 0; i < in_parties_size; i++) {
+        for (size_t i = 0; i < in_parties_size; i++) {
             auto *element = AS_TYPE(Party, in_parties[i]);
             unique_ptr<Party> annotated(new Party(std::move(*element)));
             parties.push_back(std::move(annotated));
@@ -1637,7 +1637,7 @@ eg_election_manifest_new(char *in_election_scope_id, eg_election_type_t in_elect
 
         vector<unique_ptr<Candidate>> candidates;
         candidates.reserve(in_candidates_size);
-        for (auto i = 0; i < in_candidates_size; i++) {
+        for (size_t i = 0; i < in_candidates_size; i++) {
             auto *element = AS_TYPE(Candidate, in_candidates[i]);
             unique_ptr<Candidate> annotated(new Candidate(std::move(*element)));
             candidates.push_back(std::move(annotated));
@@ -1645,7 +1645,7 @@ eg_election_manifest_new(char *in_election_scope_id, eg_election_type_t in_elect
 
         vector<unique_ptr<ContestDescription>> contests;
         contests.reserve(in_contests_size);
-        for (auto i = 0; i < in_contests_size; i++) {
+        for (size_t i = 0; i < in_contests_size; i++) {
             auto *element = AS_TYPE(ContestDescription, in_contests[i]);
             unique_ptr<ContestDescription> annotated(new ContestDescription(std::move(*element)));
             contests.push_back(std::move(annotated));
@@ -1653,7 +1653,7 @@ eg_election_manifest_new(char *in_election_scope_id, eg_election_type_t in_elect
 
         vector<unique_ptr<BallotStyle>> ballotStyles;
         ballotStyles.reserve(in_ballot_styles_size);
-        for (auto i = 0; i < in_ballot_styles_size; i++) {
+        for (size_t i = 0; i < in_ballot_styles_size; i++) {
             auto *element = AS_TYPE(BallotStyle, in_ballot_styles[i]);
             unique_ptr<BallotStyle> annotated(new BallotStyle(std::move(*element)));
             ballotStyles.push_back(std::move(annotated));
@@ -1688,7 +1688,7 @@ eg_electionguard_status_t eg_election_manifest_new_with_contact(
 
         vector<unique_ptr<GeopoliticalUnit>> gpUnits;
         gpUnits.reserve(in_geopolitical_units_size);
-        for (auto i = 0; i < in_geopolitical_units_size; i++) {
+        for (size_t i = 0; i < in_geopolitical_units_size; i++) {
             auto *element = AS_TYPE(GeopoliticalUnit, in_geopolitical_units[i]);
             unique_ptr<GeopoliticalUnit> annotated(new GeopoliticalUnit(std::move(*element)));
             gpUnits.push_back(std::move(annotated));
@@ -1696,7 +1696,7 @@ eg_electionguard_status_t eg_election_manifest_new_with_contact(
 
         vector<unique_ptr<Party>> parties;
         parties.reserve(in_parties_size);
-        for (auto i = 0; i < in_parties_size; i++) {
+        for (size_t i = 0; i < in_parties_size; i++) {
             auto *element = AS_TYPE(Party, in_parties[i]);
             unique_ptr<Party> annotated(new Party(std::move(*element)));
             parties.push_back(std::move(annotated));
@@ -1704,7 +1704,7 @@ eg_electionguard_status_t eg_election_manifest_new_with_contact(
 
         vector<unique_ptr<Candidate>> candidates;
         candidates.reserve(in_candidates_size);
-        for (auto i = 0; i < in_candidates_size; i++) {
+        for (size_t i = 0; i < in_candidates_size; i++) {
             auto *element = AS_TYPE(Candidate, in_candidates[i]);
             unique_ptr<Candidate> annotated(new Candidate(std::move(*element)));
             candidates.push_back(std::move(annotated));
@@ -1712,7 +1712,7 @@ eg_electionguard_status_t eg_election_manifest_new_with_contact(
 
         vector<unique_ptr<ContestDescription>> contests;
         contests.reserve(in_contests_size);
-        for (auto i = 0; i < in_contests_size; i++) {
+        for (size_t i = 0; i < in_contests_size; i++) {
             auto *element = AS_TYPE(ContestDescription, in_contests[i]);
             unique_ptr<ContestDescription> annotated(new ContestDescription(std::move(*element)));
             contests.push_back(std::move(annotated));
@@ -1720,7 +1720,7 @@ eg_electionguard_status_t eg_election_manifest_new_with_contact(
 
         vector<unique_ptr<BallotStyle>> ballotStyles;
         ballotStyles.reserve(in_ballot_styles_size);
-        for (auto i = 0; i < in_ballot_styles_size; i++) {
+        for (size_t i = 0; i < in_ballot_styles_size; i++) {
             auto *element = AS_TYPE(BallotStyle, in_ballot_styles[i]);
             unique_ptr<BallotStyle> annotated(new BallotStyle(std::move(*element)));
             ballotStyles.push_back(std::move(annotated));
@@ -1775,14 +1775,26 @@ eg_election_type_t eg_election_manifest_get_type(eg_election_manifest_t *handle)
 
 uint64_t eg_election_manifest_get_start_date(eg_election_manifest_t *handle)
 {
-    // TODO:
-    return 0;
+    try {
+        return AS_TYPE(Manifest, handle)->getStartDate().time_since_epoch().count() *
+               system_clock::period::num / system_clock::period::den;
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_election_manifest_get_election_scope_id", e);
+        return 0;
+    }
 }
 
 uint64_t eg_election_manifest_get_end_date(eg_election_manifest_t *handle)
 {
-    // TODO:
-    return 0;
+    try {
+        return AS_TYPE(Manifest, handle)->getEndDate().time_since_epoch().count() *
+               system_clock::period::num / system_clock::period::den;
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_election_manifest_get_election_scope_id", e);
+        return 0;
+    }
 }
 
 size_t eg_election_manifest_get_geopolitical_units_size(eg_election_manifest_t *handle)

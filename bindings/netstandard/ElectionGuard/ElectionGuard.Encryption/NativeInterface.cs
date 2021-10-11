@@ -1088,7 +1088,7 @@ namespace ElectionGuard
                 [MarshalAs(UnmanagedType.LPStr)] string name,
                 InternationalizedText.InternationalizedTextHandle ballotTitle,
                 InternationalizedText.InternationalizedTextHandle ballotSubTitle,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
                 ulong selectionsSize,
                 out ContestDescriptionHandle handle);
@@ -1101,10 +1101,10 @@ namespace ElectionGuard
                 VoteVariationType voteVariation,
                 ulong numberElected,
                 [MarshalAs(UnmanagedType.LPStr)] string name,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
                 ulong selectionsSize,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] string[] primaryPartyIds,
                 ulong primaryPartyIdsSize,
                 out ContestDescriptionHandle handle);
@@ -1120,10 +1120,10 @@ namespace ElectionGuard
                 [MarshalAs(UnmanagedType.LPStr)] string name,
                 InternationalizedText.InternationalizedTextHandle ballotTitle,
                 InternationalizedText.InternationalizedTextHandle ballotSubTitle,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
                 ulong selectionsSize,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] string[] primaryPartyIds,
                 ulong primaryPartyIdsSize,
                 out ContestDescriptionHandle handle);
@@ -1216,10 +1216,10 @@ namespace ElectionGuard
                 VoteVariationType voteVariation,
                 ulong numberElected,
                 [MarshalAs(UnmanagedType.LPStr)] string name,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
                 ulong selectionsSize,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] placeholders,
                 ulong placeholdersSize,
                 out ContestDescriptionWithPlaceholdersHandle handle);
@@ -1235,10 +1235,10 @@ namespace ElectionGuard
                 [MarshalAs(UnmanagedType.LPStr)] string name,
                 InternationalizedText.InternationalizedTextHandle ballotTitle,
                 InternationalizedText.InternationalizedTextHandle ballotSubTitle,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
                 ulong selectionsSize,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] placeholders,
                 ulong placeholdersSize,
                 out ContestDescriptionWithPlaceholdersHandle handle);
@@ -1251,13 +1251,13 @@ namespace ElectionGuard
                 VoteVariationType voteVariation,
                 ulong numberElected,
                 [MarshalAs(UnmanagedType.LPStr)] string name,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
                 ulong selectionsSize,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] string[] primaryPartyIds,
                 ulong primaryPartyIdsSize,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] placeholders,
                 ulong placeholdersSize,
                 out ContestDescriptionWithPlaceholdersHandle handle);
@@ -1273,13 +1273,13 @@ namespace ElectionGuard
                 [MarshalAs(UnmanagedType.LPStr)] string name,
                 InternationalizedText.InternationalizedTextHandle ballotTitle,
                 InternationalizedText.InternationalizedTextHandle ballotSubTitle,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
                 ulong selectionsSize,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] string[] primaryPartyIds,
                 ulong primaryPartyIdsSize,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] placeholders,
                 ulong placeholdersSize,
                 out ContestDescriptionWithPlaceholdersHandle handle);
@@ -1398,15 +1398,19 @@ namespace ElectionGuard
                 ElectionType electionType,
                 ulong startDate,
                 ulong endDate,
-                // TODO: type safety
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] gpUnits,
                 ulong gpUnitsSize,
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] parties,
                 ulong partiesSize,
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] candidates,
                 ulong candidatesSize,
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] contests,
                 ulong contestSize,
+                // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] ballotStyles,
                 ulong ballotStylesSize,
                 out ManifestHandle handle);
