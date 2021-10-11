@@ -20,12 +20,98 @@ namespace ElectionGuard
         ELECTIONGUARD_STATUS_UNKNOWN
     }
 
+    /// <Summary>
+    /// Enumeration used when marking a ballot as cast or spoiled
+    /// </Summary>
     public enum BallotBoxState
     {
+        /// <Summary>
+        /// A ballot that has been explicitly cast
+        /// </Summary>
         Cast = 1,
+        /// <Summary>
+        /// A ballot that has been explicitly spoiled
+        /// </Summary>
         Spoiled = 2,
+        /// <Summary>
+        /// A ballot whose state is unknown to ElectionGuard and will not be included in any election results
+        /// </Summary>
         Unknown = 999
     }
+
+    /// <Summary>
+    /// Enumeration for the type of ElectionType
+    /// see: https://developers.google.com/elections-data/reference/election-type
+    /// </Summary>
+    public enum ElectionType
+    {
+        unknown = 0,
+        general = 1,
+        partisanPrimaryClosed = 2,
+        partisanPrimaryOpen = 3,
+        primary = 4,
+        runoff = 5,
+        special = 6,
+        other = 7
+    };
+
+    /// <Summary>
+    /// Enumeration for the type of geopolitical unit
+    /// see: https://developers.google.com/elections-data/reference/reporting-unit-type
+    /// </Summary>
+    public enum ReportingUnitType
+    {
+        unknown = 0,
+        ballotBatch = 1,
+        ballotStyleArea = 2,
+        borough = 3,
+        city = 4,
+        cityCouncil = 5,
+        combinedPrecinct = 6,
+        congressional = 7,
+        country = 8,
+        county = 9,
+        countyCouncil = 10,
+        dropBox = 11,
+        judicial = 12,
+        municipality = 13,
+        polling_place = 14,
+        precinct = 15,
+        school = 16,
+        special = 17,
+        splitPrecinct = 18,
+        state = 19,
+        stateHouse = 20,
+        stateSenate = 21,
+        township = 22,
+        utility = 23,
+        village = 24,
+        voteCenter = 25,
+        ward = 26,
+        water = 27,
+        other = 28,
+    };
+
+    /// <Summary>
+    /// Enumeration for the type of VoteVariationType
+    /// see: https://developers.google.com/elections-data/reference/vote-variation
+    /// </Summary>
+    public enum VoteVariationType
+    {
+        unknown = 0,
+        one_of_m = 1,
+        approval = 2,
+        borda = 3,
+        cumulative = 4,
+        majority = 5,
+        n_of_m = 6,
+        plurality = 7,
+        proportional = 8,
+        range = 9,
+        rcv = 10,
+        super_majority = 11,
+        other = 12
+    };
 
     internal static unsafe class NativeInterface
     {
@@ -410,6 +496,879 @@ namespace ElectionGuard
 
         #endregion
 
+        #region AnnotatedString
+
+        internal static unsafe class AnnotatedString
+        {
+            internal unsafe struct AnnotatedStringType { };
+
+            internal class AnnotatedStringHandle
+                : ElectionguardSafeHandle<AnnotatedStringType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = AnnotatedString.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"AnnotatedString Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_annotated_string_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string annotation,
+                [MarshalAs(UnmanagedType.LPStr)] string value,
+                out AnnotatedStringHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_annotated_string_free")]
+            internal static extern Status Free(AnnotatedStringHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_annotated_string_get_annotation")]
+            internal static extern Status GetAnnotation(
+                AnnotatedStringHandle handle, out IntPtr language);
+
+
+            [DllImport(DllName, EntryPoint = "eg_annotated_string_get_value")]
+            internal static extern Status GetValue(
+                AnnotatedStringHandle handle, out IntPtr value);
+
+            [DllImport(DllName, EntryPoint = "eg_annotated_string_crypto_hash")]
+            internal static extern Status CryptoHash(
+                AnnotatedStringHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region Language
+
+        internal static unsafe class Language
+        {
+            internal unsafe struct LanguageType { };
+
+            internal class LanguageHandle
+                : ElectionguardSafeHandle<LanguageType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = Language.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"Language Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_language_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string value,
+                [MarshalAs(UnmanagedType.LPStr)] string language,
+                out LanguageHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_language_free")]
+            internal static extern Status Free(LanguageHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_language_get_value")]
+            internal static extern Status GetValue(
+                LanguageHandle handle, out IntPtr value);
+
+            [DllImport(DllName, EntryPoint = "eg_language_get_language")]
+            internal static extern Status GetLanguage(
+                LanguageHandle handle, out IntPtr language);
+
+            [DllImport(DllName, EntryPoint = "eg_language_crypto_hash")]
+            internal static extern Status CryptoHash(
+                LanguageHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region InternationalizedText
+
+        internal static unsafe class InternationalizedText
+        {
+            internal unsafe struct InternationalizedTextType { };
+
+            internal class InternationalizedTextHandle
+                : ElectionguardSafeHandle<InternationalizedTextType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = InternationalizedText.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"InternationalizedText Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_internationalized_text_new")]
+            internal static extern Status New(
+                // TODO: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] text,
+                long textSize,
+                out InternationalizedTextHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_internationalized_text_free")]
+            internal static extern Status Free(InternationalizedTextHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_internationalized_text_get_text_size")]
+            internal static extern ulong GetTextSize(
+                InternationalizedTextHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_internationalized_text_get_text_at_index")]
+            internal static extern Status GetTextAtIndex(
+                InternationalizedTextHandle handle,
+                ulong index,
+                out Language.LanguageHandle text);
+
+            [DllImport(DllName, EntryPoint = "eg_intertnationalized_text_crypto_hash")]
+            internal static extern Status CryptoHash(
+                InternationalizedTextHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region ContactInformation
+
+        internal static unsafe class ContactInformation
+        {
+            internal unsafe struct ContactInformationType { };
+
+            internal class ContactInformationHandle
+                : ElectionguardSafeHandle<ContactInformationType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = ContactInformation.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"ContactInformation Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string name,
+                out ContactInformationHandle handle);
+
+            // TODO: add eg_contact_information_new_with_collections
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_free")]
+            internal static extern Status Free(ContactInformationHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_get_address_line_size")]
+            internal static extern ulong GetAddressLineSize(
+                ContactInformationHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_get_address_line_at_index")]
+            internal static extern Status GetAddressLineAtIndex(
+                ContactInformationHandle handle,
+                ulong index,
+                out IntPtr address);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_get_email_line_size")]
+            internal static extern ulong GetEmailLineSize(
+                ContactInformationHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_get_email_line_at_index")]
+            internal static extern Status GetEmailLineAtIndex(
+                ContactInformationHandle handle,
+                ulong index,
+                out InternationalizedText.InternationalizedTextHandle email);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_get_phone_line_size")]
+            internal static extern ulong GetPhoneLineSize(
+                ContactInformationHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_get_email_line_at_index")]
+            internal static extern Status GetPhoneLineAtIndex(
+                ContactInformationHandle handle,
+                ulong index,
+                out InternationalizedText.InternationalizedTextHandle phone);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_get_name")]
+            internal static extern Status GetName(
+                ContactInformationHandle handle, out IntPtr value);
+
+            [DllImport(DllName, EntryPoint = "eg_contact_information_crypto_hash")]
+            internal static extern Status CryptoHash(
+                ContactInformationHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region GeopoliticalUnit
+
+        internal static unsafe class GeopoliticalUnit
+        {
+            internal unsafe struct GeopoliticalUnitType { };
+
+            internal class GeopoliticalUnitHandle
+                : ElectionguardSafeHandle<GeopoliticalUnitType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = GeopoliticalUnit.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"GeopoliticalUnit Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_geopolitical_unit_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPStr)] string name,
+                ReportingUnitType reportingUnitType,
+                out GeopoliticalUnitHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_geopolitical_unit_new_with_contact_info")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPStr)] string name,
+                ReportingUnitType reportingUnitType,
+                ContactInformation.ContactInformationHandle contactInformation,
+                out GeopoliticalUnitHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_geopolitical_unit_free")]
+            internal static extern Status Free(GeopoliticalUnitHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_geopolitical_unit_get_object_id")]
+            internal static extern Status GetObjectId(
+                GeopoliticalUnitHandle handle, out IntPtr objectId);
+
+            [DllImport(DllName, EntryPoint = "eg_geopolitical_unit_get_name")]
+            internal static extern Status GetName(
+                GeopoliticalUnitHandle handle, out IntPtr name);
+
+            [DllImport(DllName, EntryPoint = "get_geopolitical_unit_get_type")]
+            internal static extern ReportingUnitType GetReportingUnitType(
+                GeopoliticalUnitHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_geopolitical_unit_crypto_hash")]
+            internal static extern Status CryptoHash(
+                GeopoliticalUnitHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region BallotStyle
+
+        internal static unsafe class BallotStyle
+        {
+            internal unsafe struct BallotStyleType { };
+
+            internal class BallotStyleHandle
+                : ElectionguardSafeHandle<BallotStyleType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = BallotStyle.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"BallotStyle Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string[] gpUnitIds,
+                long gpUnitIdsSize,
+                out BallotStyleHandle handle);
+
+            // TODO eg_ballot_style_new_with_parties
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_free")]
+            internal static extern Status Free(BallotStyleHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_get_object_id")]
+            internal static extern Status GetObjectId(
+                BallotStyleHandle handle, out IntPtr objectId);
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_get_geopolitical_unit_ids_size")]
+            internal static extern ulong GetGeopoliticalUnitSize(
+                BallotStyleHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_get_geopolitical_unit_id_at_index")]
+            internal static extern Status GetGeopoliticalInitIdAtIndex(
+                BallotStyleHandle handle,
+                ulong index,
+                out IntPtr gpUnitId);
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_get_party_ids_size")]
+            internal static extern ulong GetPartyIdsSize(
+                BallotStyleHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_get_party_id_at_index")]
+            internal static extern Status GetPartyIdAtIndex(
+                BallotStyleHandle handle,
+                ulong index,
+                out IntPtr partyId);
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_get_image_uri")]
+            internal static extern Status GetImageUri(
+                BallotStyleHandle handle, out IntPtr imageUri);
+
+            [DllImport(DllName, EntryPoint = "eg_ballot_style_crypto_hash")]
+            internal static extern Status CryptoHash(
+                BallotStyleHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region Party
+
+        internal static unsafe class Party
+        {
+            internal unsafe struct PartyType { };
+
+            internal class PartyHandle
+                : ElectionguardSafeHandle<PartyType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = Party.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"Party Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_party_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                out PartyHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_party_new_with_extras")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                InternationalizedText.InternationalizedTextHandle name,
+                [MarshalAs(UnmanagedType.LPStr)] string abbreviation,
+                [MarshalAs(UnmanagedType.LPStr)] string color,
+                [MarshalAs(UnmanagedType.LPStr)] string logoUri,
+                out PartyHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_party_free")]
+            internal static extern Status Free(PartyHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_party_get_object_id")]
+            internal static extern Status GetObjectId(
+                PartyHandle handle, out IntPtr objectId);
+
+            [DllImport(DllName, EntryPoint = "eg_party_get_abbreviation")]
+            internal static extern Status GetAbbreviation(
+                PartyHandle handle, out IntPtr abbreviation);
+
+            [DllImport(DllName, EntryPoint = "eg_party_get_name")]
+            internal static extern Status GetName(
+                PartyHandle handle, out InternationalizedText.InternationalizedTextHandle name);
+
+            [DllImport(DllName, EntryPoint = "eg_party_get_color")]
+            internal static extern Status GetColor(
+                PartyHandle handle, out IntPtr color);
+
+            [DllImport(DllName, EntryPoint = "eg_party_get_logo_uri")]
+            internal static extern Status GetLogoUri(
+                PartyHandle handle, out IntPtr logoUri);
+
+            [DllImport(DllName, EntryPoint = "eg_party_crypto_hash")]
+            internal static extern Status CryptoHash(
+                PartyHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region Candidate
+
+        internal static unsafe class Candidate
+        {
+            internal unsafe struct CandidateType { };
+
+            internal class CandidateHandle
+                : ElectionguardSafeHandle<CandidateType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = Candidate.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"Candidate Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_candidate_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                bool isWriteIn,
+                out CandidateHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_candidate_new_with_extras")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                InternationalizedText.InternationalizedTextHandle name,
+                [MarshalAs(UnmanagedType.LPStr)] string partyId,
+                [MarshalAs(UnmanagedType.LPStr)] string imageUri,
+                bool isWriteIn,
+                out CandidateHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_candidate_free")]
+            internal static extern Status Free(CandidateHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_candidate_get_object_id")]
+            internal static extern Status GetObjectId(
+                CandidateHandle handle, out IntPtr objectId);
+
+            [DllImport(DllName, EntryPoint = "eg_candidate_get_candidate_id")]
+            internal static extern Status GetCandidateId(
+                CandidateHandle handle, out IntPtr candidateId);
+
+            [DllImport(DllName, EntryPoint = "eg_candidate_get_name")]
+            internal static extern Status GetName(
+                CandidateHandle handle, out IntPtr name);
+
+            [DllImport(DllName, EntryPoint = "eg_candidate_get_party_id")]
+            internal static extern Status GetPartyId(
+                CandidateHandle handle, out IntPtr partyId);
+
+            [DllImport(DllName, EntryPoint = "eg_candidate_get_image_uri")]
+            internal static extern Status GetImageUri(
+                CandidateHandle handle, out IntPtr iamgeUri);
+
+            [DllImport(DllName, EntryPoint = "eg_candidate_crypto_hash")]
+            internal static extern Status CryptoHash(
+                CandidateHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region SelectionDescription
+
+        internal static unsafe class SelectionDescription
+        {
+            internal unsafe struct SelectionDescriptionType { };
+
+            internal class SelectionDescriptionHandle
+                : ElectionguardSafeHandle<SelectionDescriptionType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = SelectionDescription.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"SelectionDescription Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_selection_description_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPStr)] string candidateId,
+                ulong sequenceOrder,
+                out SelectionDescriptionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_selection_description_free")]
+            internal static extern Status Free(SelectionDescriptionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_selection_description_get_object_id")]
+            internal static extern Status GetObjectId(
+                SelectionDescriptionHandle handle, out IntPtr objectId);
+
+            [DllImport(DllName, EntryPoint = "eg_selection_description_get_candidate_id")]
+            internal static extern Status GetCandidateId(
+                SelectionDescriptionHandle handle, out IntPtr candidateId);
+
+            [DllImport(DllName, EntryPoint = "eg_selection_description_get_sequence_order")]
+            internal static extern ulong GetSequenceOrder(
+                SelectionDescriptionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_selection_description_crypto_hash")]
+            internal static extern Status CryptoHash(
+                SelectionDescriptionHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region ContestDescription
+
+        internal static unsafe class ContestDescription
+        {
+            internal unsafe struct ContestDescriptionType { };
+
+            internal class ContestDescriptionHandle
+                : ElectionguardSafeHandle<ContestDescriptionType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = ContestDescription.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"ContestDescription Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPStr)] string electoralDistrictId,
+                ulong sequenceOrder,
+                VoteVariationType voteVariation,
+                ulong numberElected,
+                [MarshalAs(UnmanagedType.LPStr)] string name,
+                // TODO: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
+                ulong selectionsSize,
+                out ContestDescriptionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_new_with_title")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPStr)] string electoralDistrictId,
+                ulong sequenceOrder,
+                VoteVariationType voteVariation,
+                ulong numberElected,
+                ulong votesAllowed,
+                [MarshalAs(UnmanagedType.LPStr)] string name,
+                InternationalizedText.InternationalizedTextHandle ballotTitle,
+                InternationalizedText.InternationalizedTextHandle ballotSubTitle,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
+                ulong selectionsSize,
+                out ContestDescriptionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_new_with_parties")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPStr)] string electoralDistrictId,
+                ulong sequenceOrder,
+                VoteVariationType voteVariation,
+                ulong numberElected,
+                [MarshalAs(UnmanagedType.LPStr)] string name,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
+                ulong selectionsSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] string[] primaryPartyIds,
+                ulong primaryPartyIdsSize,
+                out ContestDescriptionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_new_with_title_and_parties")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPStr)] string electoralDistrictId,
+                ulong sequenceOrder,
+                VoteVariationType voteVariation,
+                ulong numberElected,
+                ulong votesAllowed,
+                [MarshalAs(UnmanagedType.LPStr)] string name,
+                InternationalizedText.InternationalizedTextHandle ballotTitle,
+                InternationalizedText.InternationalizedTextHandle ballotSubTitle,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
+                ulong selectionsSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] string[] primaryPartyIds,
+                ulong primaryPartyIdsSize,
+                out ContestDescriptionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_free")]
+            internal static extern Status Free(ContestDescriptionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_object_id")]
+            internal static extern Status GetObjectId(
+                ContestDescriptionHandle handle, out IntPtr objectId);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_electoral_district_id")]
+            internal static extern Status GetElectoralDistrictId(
+                ContestDescriptionHandle handle, out IntPtr electoralDistrictId);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_sequence_order")]
+            internal static extern ulong GetSequenceOrder(
+                ContestDescriptionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_vote_variation")]
+            internal static extern VoteVariationType GetVoteVariationType(
+                ContestDescriptionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_number_elected")]
+            internal static extern ulong GetNumberElected(
+                ContestDescriptionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_votes_allowed")]
+            internal static extern ulong GetVotesAllowed(
+                ContestDescriptionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_name")]
+            internal static extern Status GetName(
+                ContestDescriptionHandle handle, out IntPtr name);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_ballot_title")]
+            internal static extern Status GetBallotTitle(
+                ContestDescriptionHandle handle, out InternationalizedText.InternationalizedTextHandle name);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_ballot_subtitle")]
+            internal static extern Status GetBallotSubTitle(
+                ContestDescriptionHandle handle, out InternationalizedText.InternationalizedTextHandle name);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_selections_size")]
+            internal static extern ulong GetSelectionsSize(
+                ContestDescriptionHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_selection_at_index")]
+            internal static extern Status GetSelectionAtIndex(
+                ContestDescriptionHandle handle,
+                ulong index,
+                out SelectionDescription.SelectionDescriptionHandle partyId);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_crypto_hash")]
+            internal static extern Status CryptoHash(
+                ContestDescriptionHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+        }
+
+        #endregion
+
+        #region ContestDescriptionWithPlaceholders
+
+        internal static unsafe class ContestDescriptionWithPlaceholders
+        {
+            internal unsafe struct ContestDescriptionWithPlaceholdersType { };
+
+            internal class ContestDescriptionWithPlaceholdersHandle
+                : ElectionguardSafeHandle<ContestDescriptionWithPlaceholdersType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = ContestDescriptionWithPlaceholders.Free(this);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"ContestDescriptionWithPlaceholders Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_with_placeholders_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPStr)] string electoralDistrictId,
+                ulong sequenceOrder,
+                VoteVariationType voteVariation,
+                ulong numberElected,
+                [MarshalAs(UnmanagedType.LPStr)] string name,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
+                ulong selectionsSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] placeholders,
+                ulong placeholdersSize,
+                out ContestDescriptionWithPlaceholdersHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_with_placeholders_new_with_title")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPStr)] string electoralDistrictId,
+                ulong sequenceOrder,
+                VoteVariationType voteVariation,
+                ulong numberElected,
+                ulong votesAllowed,
+                [MarshalAs(UnmanagedType.LPStr)] string name,
+                InternationalizedText.InternationalizedTextHandle ballotTitle,
+                InternationalizedText.InternationalizedTextHandle ballotSubTitle,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
+                ulong selectionsSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] placeholders,
+                ulong placeholdersSize,
+                out ContestDescriptionWithPlaceholdersHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_with_placeholders_new_with_parties")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPStr)] string electoralDistrictId,
+                ulong sequenceOrder,
+                VoteVariationType voteVariation,
+                ulong numberElected,
+                [MarshalAs(UnmanagedType.LPStr)] string name,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
+                ulong selectionsSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] string[] primaryPartyIds,
+                ulong primaryPartyIdsSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] placeholders,
+                ulong placeholdersSize,
+                out ContestDescriptionWithPlaceholdersHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_with_placeholders_new_with_title_and_parties")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPStr)] string electoralDistrictId,
+                ulong sequenceOrder,
+                VoteVariationType voteVariation,
+                ulong numberElected,
+                ulong votesAllowed,
+                [MarshalAs(UnmanagedType.LPStr)] string name,
+                InternationalizedText.InternationalizedTextHandle ballotTitle,
+                InternationalizedText.InternationalizedTextHandle ballotSubTitle,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
+                ulong selectionsSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] string[] primaryPartyIds,
+                ulong primaryPartyIdsSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] placeholders,
+                ulong placeholdersSize,
+                out ContestDescriptionWithPlaceholdersHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_with_placeholders_free")]
+            internal static extern Status Free(ContestDescriptionWithPlaceholdersHandle handle);
+
+            #region ContestDescription Methods
+
+            // Since the underlying c++ class inherits from ContestDescription
+            // these functions call those methods subsituting the 
+            // ContestDescriptionWithPlaceholdersHandle opaque pointer type
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_object_id")]
+            internal static extern Status GetObjectId(
+                ContestDescriptionWithPlaceholdersHandle handle, out IntPtr objectId);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_electoral_district_id")]
+            internal static extern Status GetElectoralDistrictId(
+                ContestDescriptionWithPlaceholdersHandle handle, out IntPtr electoralDistrictId);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_sequence_order")]
+            internal static extern ulong GetSequenceOrder(
+                ContestDescriptionWithPlaceholdersHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_vote_variation")]
+            internal static extern VoteVariationType GetVoteVariationType(
+                ContestDescriptionWithPlaceholdersHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_number_elected")]
+            internal static extern ulong GetNumberElected(
+                ContestDescriptionWithPlaceholdersHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_votes_allowed")]
+            internal static extern ulong GetVotesAllowed(
+                ContestDescriptionWithPlaceholdersHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_name")]
+            internal static extern Status GetName(
+                ContestDescriptionWithPlaceholdersHandle handle, out IntPtr name);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_ballot_title")]
+            internal static extern Status GetBallotTitle(
+                ContestDescriptionWithPlaceholdersHandle handle, out InternationalizedText.InternationalizedTextHandle name);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_ballot_subtitle")]
+            internal static extern Status GetBallotSubTitle(
+                ContestDescriptionWithPlaceholdersHandle handle, out InternationalizedText.InternationalizedTextHandle name);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_selections_size")]
+            internal static extern ulong GetSelectionsSize(
+                ContestDescriptionWithPlaceholdersHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_get_selection_at_index")]
+            internal static extern Status GetSelectionAtIndex(
+                ContestDescriptionWithPlaceholdersHandle handle,
+                ulong index,
+                out SelectionDescription.SelectionDescriptionHandle partyId);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_crypto_hash")]
+            internal static extern Status CryptoHash(
+                ContestDescriptionWithPlaceholdersHandle handle,
+                out ElementModQ.ElementModQHandle crypto_hash);
+
+            #endregion
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_with_placeholders_get_placeholders_size")]
+            internal static extern ulong GetPlaceholdersSize(
+                ContestDescriptionWithPlaceholdersHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_with_placeholders_get_placeholder_at_index")]
+            internal static extern Status GetPlaceholderAtIndex(
+                ContestDescriptionWithPlaceholdersHandle handle,
+                ulong index,
+                out SelectionDescription.SelectionDescriptionHandle partyId);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_with_placeholders_is_placeholder")]
+            internal static extern bool IsPlaceholder(
+                ContestDescriptionWithPlaceholdersHandle handle, SelectionDescription.SelectionDescriptionHandle selection);
+
+            [DllImport(DllName, EntryPoint = "eg_contest_description_with_placeholders_selection_for_id")]
+            internal static extern Status SelectionForId(
+                ContestDescriptionWithPlaceholdersHandle handle,
+                [MarshalAs(UnmanagedType.LPStr)] string selectionId,
+                SelectionDescription.SelectionDescriptionHandle selection);
+        }
+
+        #endregion
+
         #region Manifest
 
         internal static unsafe class Manifest
@@ -433,6 +1392,31 @@ namespace ElectionGuard
                 }
             }
 
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string electionScopeId,
+                ElectionType electionType,
+                ulong startDate,
+                ulong endDate,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] gpUnits,
+                ulong gpUnitsSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] parties,
+                ulong partiesSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] candidates,
+                ulong candidatesSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] contests,
+                ulong contestSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] ballotStyles,
+                ulong ballotStylesSize,
+                out ManifestHandle handle);
+
+            // TODO: eg_election_manifest_new_with_contact
+
             [DllImport(DllName, EntryPoint = "eg_election_manifest_free")]
             internal static extern Status Free(ManifestHandle handle);
 
@@ -440,10 +1424,85 @@ namespace ElectionGuard
             internal static extern Status GetElectionScopeId(
                 ManifestHandle handle, out IntPtr election_scope_id);
 
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_type")]
+            internal static extern ElectionType GetElectionType(
+                ManifestHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_start_date")]
+            internal static extern ulong GetStartDate(
+                ManifestHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_end_date")]
+            internal static extern ulong GetEndDate(
+                ManifestHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_geopolitical_units_size")]
+            internal static extern ulong GetGeopoliticalUnitsSize(
+                ManifestHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_geopolitical_unit_at_index")]
+            internal static extern Status GetGeopoliticalUnitAtIndex(
+                ManifestHandle handle,
+                ulong index,
+                out GeopoliticalUnit.GeopoliticalUnitHandle gpUnit);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_parties_size")]
+            internal static extern ulong GetPartiesSize(
+                ManifestHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_party_at_index")]
+            internal static extern Status GetPartyAtIndex(
+                ManifestHandle handle,
+                ulong index,
+                out Party.PartyHandle party);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_candidates_size")]
+            internal static extern ulong GetCandidatesSize(
+                ManifestHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_candidate_at_index")]
+            internal static extern Status GetCandidateAtIndex(
+                ManifestHandle handle,
+                ulong index,
+                out Candidate.CandidateHandle candidate);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_contests_size")]
+            internal static extern ulong GetContestsSize(
+                ManifestHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_contest_at_index")]
+            internal static extern Status GetContestAtIndex(
+                ManifestHandle handle,
+                ulong index,
+                out ContestDescription.ContestDescriptionHandle contest);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_ballot_styles_size")]
+            internal static extern ulong GetBallotStylesSize(
+                ManifestHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_ballot_style_at_index")]
+            internal static extern Status GetBallotStyleAtIndex(
+                ManifestHandle handle,
+                ulong index,
+                out BallotStyle.BallotStyleHandle ballotStyle);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_name")]
+            internal static extern Status GetName(
+                ManifestHandle handle,
+                out InternationalizedText.InternationalizedTextHandle name);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_contact_info")]
+            internal static extern Status GetContactInfo(
+                ManifestHandle handle,
+                out ContactInformation.ContactInformationHandle contactInfo);
+
             [DllImport(DllName, EntryPoint = "eg_election_manifest_crypto_hash")]
             internal static extern Status CryptoHash(
                 ManifestHandle handle,
                 out ElementModQ.ElementModQHandle crypto_hash);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_is_valid")]
+            internal static extern bool IsValid(ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_from_json")]
             internal static extern Status FromJson(
@@ -452,7 +1511,11 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_from_bson")]
             internal static extern Status FromBson(
-                uint* data, ulong length, ManifestHandle handle);
+                byte* data, ulong length, out ManifestHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_from_msgpack")]
+            internal static extern Status FromMsgPack(
+                byte* data, ulong length, out ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_to_json")]
             internal static extern Status ToJson(
@@ -460,7 +1523,11 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_to_bson")]
             internal static extern Status ToBson(
-                ManifestHandle handle, out uint* data, out UIntPtr size);
+                ManifestHandle handle, out IntPtr data, out UIntPtr size);
+
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_to_msgpack")]
+            internal static extern Status ToMsgPack(
+                ManifestHandle handle, out IntPtr data, out UIntPtr size);
         }
 
         #endregion
@@ -502,6 +1569,36 @@ namespace ElectionGuard
                 InternalManifestHandle handle,
                 out ElementModQ.ElementModQHandle manifest_hash);
 
+            [DllImport(DllName, EntryPoint = "eg_internal_manifest_get_geopolitical_units_size")]
+            internal static extern ulong GetGeopoliticalUnitsSize(
+                InternalManifestHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_internal_manifest_get_geopolitical_unit_at_index")]
+            internal static extern Status GetGeopoliticalUnitAtIndex(
+                InternalManifestHandle handle,
+                ulong index,
+                out GeopoliticalUnit.GeopoliticalUnitHandle gpUnit);
+
+            [DllImport(DllName, EntryPoint = "eg_internal_manifest_get_contests_size")]
+            internal static extern ulong GetContestsSize(
+                InternalManifestHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_internal_manifest_get_contest_at_index")]
+            internal static extern Status GetContestAtIndex(
+                InternalManifestHandle handle,
+                ulong index,
+                out ContestDescription.ContestDescriptionHandle contest);
+
+            [DllImport(DllName, EntryPoint = "eg_internal_manifest_get_ballot_styles_size")]
+            internal static extern ulong GetBallotStylesSize(
+                InternalManifestHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_internal_manifest_get_ballot_style_at_index")]
+            internal static extern Status GetBallotStyleAtIndex(
+                InternalManifestHandle handle,
+                ulong index,
+                out BallotStyle.BallotStyleHandle ballotStyle);
+
             [DllImport(DllName, EntryPoint = "eg_internal_manifest_from_json")]
             internal static extern Status FromJson(
                 [MarshalAs(UnmanagedType.LPStr)] string data,
@@ -509,7 +1606,11 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_internal_manifest_from_bson")]
             internal static extern Status FromBson(
-                uint* data, ulong length, InternalManifestHandle handle);
+                byte* data, ulong length, out InternalManifestHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_internal_manifest_from_msgpack")]
+            internal static extern Status FromMsgPack(
+                byte* data, ulong length, out InternalManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_internal_manifest_to_json")]
             internal static extern Status ToJson(
@@ -517,7 +1618,11 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_internal_manifest_to_bson")]
             internal static extern Status ToBson(
-                InternalManifestHandle handle, out uint* data, out UIntPtr size);
+                InternalManifestHandle handle, out IntPtr data, out UIntPtr size);
+
+            [DllImport(DllName, EntryPoint = "eg_internal_manifest_to_msgpack")]
+            internal static extern Status ToMsgPack(
+                InternalManifestHandle handle, out IntPtr data, out UIntPtr size);
         }
 
         #endregion

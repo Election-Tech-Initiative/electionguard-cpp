@@ -551,6 +551,12 @@ namespace electionguard
             {
                 return json::to_bson(fromObject(serializable));
             }
+
+            static vector<uint8_t> toMsgPack(const electionguard::Manifest &serializable)
+            {
+                return json::to_msgpack(fromObject(serializable));
+            }
+
             static string toJson(const electionguard::Manifest &serializable)
             {
                 return fromObject(serializable).dump();
@@ -559,6 +565,11 @@ namespace electionguard
             static unique_ptr<electionguard::Manifest> fromBson(vector<uint8_t> data)
             {
                 return toObject(json::from_bson(data));
+            }
+
+            static unique_ptr<electionguard::Manifest> fromMsgPack(vector<uint8_t> data)
+            {
+                return toObject(json::from_msgpack(data));
             }
 
             static unique_ptr<electionguard::Manifest> fromJson(string data)
@@ -677,6 +688,12 @@ namespace electionguard
             {
                 return json::to_bson(fromObject(serializable));
             }
+
+            static vector<uint8_t> toMsgPack(const electionguard::InternalManifest &serializable)
+            {
+                return json::to_msgpack(fromObject(serializable));
+            }
+
             static string toJson(const electionguard::InternalManifest &serializable)
             {
                 return fromObject(serializable).dump();
@@ -685,6 +702,11 @@ namespace electionguard
             static unique_ptr<electionguard::InternalManifest> fromBson(vector<uint8_t> data)
             {
                 return toObject(json::from_bson(data));
+            }
+
+            static unique_ptr<electionguard::InternalManifest> fromMsgPack(vector<uint8_t> data)
+            {
+                return toObject(json::from_msgpack(data));
             }
 
             static unique_ptr<electionguard::InternalManifest> fromJson(string data)

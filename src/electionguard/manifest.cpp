@@ -188,6 +188,8 @@ namespace electionguard
 
     AnnotatedString::AnnotatedString(const AnnotatedString &other) : pimpl(other.pimpl->clone()) {}
 
+    AnnotatedString::AnnotatedString(AnnotatedString &&other) : pimpl(move(other.pimpl)) {}
+
     AnnotatedString::AnnotatedString(string annotation, string value)
         : pimpl(new Impl(move(annotation), move(value)))
     {
@@ -250,6 +252,8 @@ namespace electionguard
     // Lifecycle Methods
 
     Language::Language(const Language &other) : pimpl(other.pimpl->clone()) {}
+
+    Language::Language(Language &&other) : pimpl(move(other.pimpl)) {}
 
     Language::Language(string value, string language) : pimpl(new Impl(move(value), move(language)))
     {
@@ -321,6 +325,11 @@ namespace electionguard
 
     InternationalizedText::InternationalizedText(const InternationalizedText &other)
         : pimpl(other.pimpl->clone())
+    {
+    }
+
+    InternationalizedText::InternationalizedText(InternationalizedText &&other)
+        : pimpl(move(other.pimpl))
     {
     }
 
@@ -437,6 +446,8 @@ namespace electionguard
     {
     }
 
+    ContactInformation::ContactInformation(ContactInformation &&other) : pimpl(move(other.pimpl)) {}
+
     ContactInformation::ContactInformation(string name) : pimpl(new Impl(move(name))) {}
 
     ContactInformation::ContactInformation(vector<string> addressLine, string name)
@@ -552,6 +563,8 @@ namespace electionguard
     {
     }
 
+    GeopoliticalUnit::GeopoliticalUnit(GeopoliticalUnit &&other) : pimpl(move(other.pimpl)) {}
+
     GeopoliticalUnit::GeopoliticalUnit(const string &objectId, const string &name,
                                        const ReportingUnitType type)
         : pimpl(new Impl(objectId, name, type))
@@ -640,6 +653,8 @@ namespace electionguard
     // Lifecycle Methods
 
     BallotStyle::BallotStyle(const BallotStyle &other) : pimpl(other.pimpl->clone()) {}
+
+    BallotStyle::BallotStyle(BallotStyle &&other) : pimpl(move(other.pimpl)) {}
 
     BallotStyle::BallotStyle(const string &objectId, vector<string> geopoliticalUnitIds)
         : pimpl(new Impl(objectId, move(geopoliticalUnitIds)))
@@ -733,6 +748,8 @@ namespace electionguard
     // Lifecycle Methods
 
     Party::Party(const Party &other) : pimpl(other.pimpl->clone()) {}
+
+    Party::Party(Party &&other) : pimpl(move(other.pimpl)) {}
 
     Party::Party(const string &objectId) : pimpl(new Impl(objectId)) {}
 
@@ -851,6 +868,8 @@ namespace electionguard
 
     Candidate::Candidate(const Candidate &other) : pimpl(other.pimpl->clone()) {}
 
+    Candidate::Candidate(Candidate &&other) : pimpl(move(other.pimpl)) {}
+
     Candidate::Candidate(const string &objectId, bool isWriteIn)
         : pimpl(new Impl(objectId, isWriteIn))
     {
@@ -933,6 +952,11 @@ namespace electionguard
 
     SelectionDescription::SelectionDescription(const SelectionDescription &other)
         : pimpl(other.pimpl->clone())
+    {
+    }
+
+    SelectionDescription::SelectionDescription(SelectionDescription &&other)
+        : pimpl(move(other.pimpl))
     {
     }
 
@@ -1095,6 +1119,8 @@ namespace electionguard
         : pimpl(other.pimpl->clone())
     {
     }
+
+    ContestDescription::ContestDescription(ContestDescription &&other) : pimpl(move(other.pimpl)) {}
 
     ContestDescription::ContestDescription(const string &objectId,
                                            const string &electoralDistrictId,
@@ -1274,6 +1300,12 @@ namespace electionguard
     ContestDescriptionWithPlaceholders::ContestDescriptionWithPlaceholders(
       const ContestDescriptionWithPlaceholders &other)
         : ContestDescription(other), pimpl(other.pimpl->clone())
+    {
+    }
+
+    ContestDescriptionWithPlaceholders::ContestDescriptionWithPlaceholders(
+      ContestDescriptionWithPlaceholders &&other)
+        : ContestDescription(other), pimpl(move(other.pimpl))
     {
     }
 
@@ -1495,6 +1527,8 @@ namespace electionguard
 
     // Lifecycle Methods
 
+    Manifest::Manifest(Manifest &&other) : pimpl(move(other.pimpl)) {}
+
     Manifest::Manifest(const string &electionScopeId, ElectionType type,
                        system_clock::time_point startDate, system_clock::time_point endDate,
                        vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
@@ -1661,10 +1695,11 @@ namespace electionguard
                 candidateIds.insert(id);
             }
 
+            auto partyId_empty = item.get().getPartyId().empty();
+            auto partyId_found = partyIds.find(item.get().getPartyId()) != partyIds.end();
+
             candidates_have_valid_party_ids =
-              candidates_have_valid_party_ids &&
-              (item.get().getPartyId().empty() ||
-               partyIds.find(item.get().getPartyId()) != partyIds.end());
+              candidates_have_valid_party_ids && (partyId_empty || partyId_found);
         }
 
         auto candidates_have_valid_length = candidateIds.size() == pimpl->candidates.size();
@@ -1738,6 +1773,8 @@ namespace electionguard
 
     vector<uint8_t> Manifest::toBson() const { return ManifestSerializer::toBson(*this); }
 
+    vector<uint8_t> Manifest::toMsgPack() const { return ManifestSerializer::toMsgPack(*this); }
+
     string Manifest::toJson() { return ManifestSerializer::toJson(*this); }
 
     string Manifest::toJson() const { return ManifestSerializer::toJson(*this); }
@@ -1750,6 +1787,11 @@ namespace electionguard
     unique_ptr<Manifest> Manifest::fromBson(vector<uint8_t> data)
     {
         return ManifestSerializer::fromBson(move(data));
+    }
+
+    unique_ptr<Manifest> Manifest::fromMsgPack(vector<uint8_t> data)
+    {
+        return ManifestSerializer::fromMsgPack(move(data));
     }
 
     unique_ptr<ElementModQ> Manifest::crypto_hash() { return pimpl->crypto_hash(); }
@@ -1775,6 +1817,8 @@ namespace electionguard
     };
 
     // Lifecycle Methods
+
+    InternalManifest::InternalManifest(InternalManifest &&other) : pimpl(move(other.pimpl)) {}
 
     InternalManifest::InternalManifest(
       vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
@@ -1886,6 +1930,11 @@ namespace electionguard
         return InternalManifestSerializer::toBson(*this);
     }
 
+    vector<uint8_t> InternalManifest::toMsgPack() const
+    {
+        return InternalManifestSerializer::toMsgPack(*this);
+    }
+
     string InternalManifest::toJson() { return InternalManifestSerializer::toJson(*this); }
 
     string InternalManifest::toJson() const { return InternalManifestSerializer::toJson(*this); }
@@ -1898,6 +1947,11 @@ namespace electionguard
     unique_ptr<InternalManifest> InternalManifest::fromBson(vector<uint8_t> data)
     {
         return InternalManifestSerializer::fromBson(move(data));
+    }
+
+    unique_ptr<InternalManifest> InternalManifest::fromMsgPack(vector<uint8_t> data)
+    {
+        return InternalManifestSerializer::fromMsgPack(move(data));
     }
 
     // Protected Methods

@@ -126,7 +126,7 @@ namespace electionguard
     {
       public:
         AnnotatedString(const AnnotatedString &other);
-        AnnotatedString(const AnnotatedString &&other);
+        AnnotatedString(AnnotatedString &&other);
         explicit AnnotatedString(std::string annotation, std::string value);
         ~AnnotatedString();
 
@@ -209,7 +209,7 @@ namespace electionguard
     {
       public:
         InternationalizedText(const InternationalizedText &other);
-        InternationalizedText(const InternationalizedText &&other);
+        InternationalizedText(InternationalizedText &&other);
         explicit InternationalizedText(std::vector<std::unique_ptr<Language>> text);
         ~InternationalizedText();
 
@@ -249,7 +249,7 @@ namespace electionguard
     {
       public:
         ContactInformation(const ContactInformation &other);
-        ContactInformation(const ContactInformation &&other);
+        ContactInformation(ContactInformation &&other);
         explicit ContactInformation(std::string name);
         explicit ContactInformation(std::vector<std::string> addressLine,
                                     std::string name = nullptr);
@@ -317,7 +317,7 @@ namespace electionguard
     {
       public:
         GeopoliticalUnit(const GeopoliticalUnit &other);
-        GeopoliticalUnit(const GeopoliticalUnit &&other);
+        GeopoliticalUnit(GeopoliticalUnit &&other);
         explicit GeopoliticalUnit(const std::string &objectId, const std::string &name,
                                   const ReportingUnitType type);
         explicit GeopoliticalUnit(const std::string &objectId, const std::string &name,
@@ -374,7 +374,7 @@ namespace electionguard
     {
       public:
         BallotStyle(const BallotStyle &other);
-        BallotStyle(const BallotStyle &&other);
+        BallotStyle(BallotStyle &&other);
         explicit BallotStyle(const std::string &objectId,
                              std::vector<std::string> geopoliticalUnitIds);
         explicit BallotStyle(const std::string &objectId,
@@ -432,7 +432,7 @@ namespace electionguard
     {
       public:
         Party(const Party &other);
-        Party(const Party &&other);
+        Party(Party &&other);
         explicit Party(const std::string &objectId);
         explicit Party(const std::string &objectId, const std::string &abbreviation);
         explicit Party(const std::string &objectId, std::unique_ptr<InternationalizedText> name,
@@ -498,7 +498,7 @@ namespace electionguard
     {
       public:
         Candidate(const Candidate &other);
-        Candidate(const Candidate &&other);
+        Candidate(Candidate &&other);
         explicit Candidate(const std::string &objectId, bool isWriteIn = false);
         explicit Candidate(const std::string &objectId, const std::string &partyId, bool isWriteIn);
         explicit Candidate(const std::string &objectId, std::unique_ptr<InternationalizedText> name,
@@ -531,6 +531,10 @@ namespace electionguard
         /// Optional party id of the candidate
         /// </Summary>
         std::string getPartyId() const;
+
+        /// <Summary>
+        /// Optional image uri for the candidate
+        /// </Summary>
         std::string getImageUri() const;
 
         /// <Summary>
@@ -572,7 +576,7 @@ namespace electionguard
     {
       public:
         SelectionDescription(const SelectionDescription &other);
-        SelectionDescription(const SelectionDescription &&other);
+        SelectionDescription(SelectionDescription &&other);
         explicit SelectionDescription(const std::string &objectId, const std::string &candidateId,
                                       const uint64_t sequenceOrder);
         ~SelectionDescription();
@@ -627,7 +631,7 @@ namespace electionguard
     {
       public:
         ContestDescription(const ContestDescription &other);
-        ContestDescription(const ContestDescription &&other);
+        ContestDescription(ContestDescription &&other);
         explicit ContestDescription(const std::string &objectId,
                                     const std::string &electoralDistrictId,
                                     const uint64_t sequenceOrder,
@@ -715,7 +719,7 @@ namespace electionguard
         InternationalizedText *getBallotSubtitle() const;
 
         /// <Summary>
-        /// The collection of selections in this contest.  Order is not guaranteed.
+        /// The collection of selections in this contest.
         /// </Summary>
         std::vector<std::reference_wrapper<SelectionDescription>> getSelections() const;
 
@@ -747,7 +751,7 @@ namespace electionguard
     {
       public:
         ContestDescriptionWithPlaceholders(const ContestDescriptionWithPlaceholders &other);
-        ContestDescriptionWithPlaceholders(const ContestDescriptionWithPlaceholders &&other);
+        ContestDescriptionWithPlaceholders(ContestDescriptionWithPlaceholders &&other);
         explicit ContestDescriptionWithPlaceholders(
           const ContestDescription &other,
           std::vector<std::unique_ptr<SelectionDescription>> placeholderSelections);
@@ -825,7 +829,7 @@ namespace electionguard
     {
       public:
         Manifest(const Manifest &other);
-        Manifest(const Manifest &&other);
+        Manifest(Manifest &&other);
         explicit Manifest(const std::string &electionScopeId, ElectionType type,
                           std::chrono::system_clock::time_point startDate,
                           std::chrono::system_clock::time_point endDate,
@@ -860,7 +864,15 @@ namespace electionguard
         /// Enumerated type of election, such as partisan-primary or open-primary.
         /// </Summary>
         ElectionType getElectionType() const;
+
+        /// <Summary>
+        /// The start date/time of the election.
+        /// </Summary>
         std::chrono::system_clock::time_point getStartDate() const;
+
+        /// <Summary>
+        /// The end date/time of the election.
+        /// </Summary>
         std::chrono::system_clock::time_point getEndDate() const;
 
         /// <Summary>
@@ -888,35 +900,48 @@ namespace electionguard
         /// </Summary>
         std::vector<std::reference_wrapper<BallotStyle>> getBallotStyles() const;
 
+        /// <Summary>
+        /// The friendly name of the election
+        /// </Summary>
         InternationalizedText *getName() const;
         ContactInformation *getContactInformation() const;
 
         bool isValid() const;
 
         /// <Summary>
-        /// Export the ballot representation as BSON
+        /// Export the representation as BSON
         /// </Summary>
         std::vector<uint8_t> toBson() const;
 
         /// <Summary>
-        /// Export the ballot representation as JSON
+        /// Export the representation as MsgPack
+        /// </Summary>
+        std::vector<uint8_t> toMsgPack() const;
+
+        /// <Summary>
+        /// Export the representation as JSON
         /// </Summary>
         std::string toJson();
 
         /// <Summary>
-        /// Export the ballot representation as JSON
+        /// Export the representation as JSON
         /// </Summary>
         std::string toJson() const;
 
         /// <Summary>
-        /// Import the ballot representation from JSON
+        /// Import the representation from JSON
         /// </Summary>
         static std::unique_ptr<Manifest> fromJson(std::string data);
 
         /// <Summary>
-        /// Import the ballot representation from BSON
+        /// Import the representation from BSON
         /// </Summary>
         static std::unique_ptr<Manifest> fromBson(std::vector<uint8_t> data);
+
+        /// <Summary>
+        /// Import the representation from MsgPack
+        /// </Summary>
+        static std::unique_ptr<Manifest> fromMsgPack(std::vector<uint8_t> data);
 
         /// <Summary>
         /// A hash representation of the object
@@ -943,7 +968,7 @@ namespace electionguard
     {
       public:
         InternalManifest(const InternalManifest &other);
-        InternalManifest(const InternalManifest &&other);
+        InternalManifest(InternalManifest &&other);
         explicit InternalManifest(
           std::vector<std::unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
           std::vector<std::unique_ptr<ContestDescriptionWithPlaceholders>> contests,
@@ -989,6 +1014,12 @@ namespace electionguard
         /// Export the ballot representation as BSON
         /// </Summary>
         std::vector<uint8_t> toBson() const;
+
+        /// <Summary>
+        /// Export the representation as MsgPack
+        /// </Summary>
+        std::vector<uint8_t> toMsgPack() const;
+
         /// <Summary>
         /// Export the ballot representation as JSON
         /// </Summary>
@@ -1008,6 +1039,11 @@ namespace electionguard
         /// Import the ballot representation from BSON
         /// </Summary>
         static std::unique_ptr<InternalManifest> fromBson(std::vector<uint8_t> data);
+
+        /// <Summary>
+        /// Import the representation from MsgPack
+        /// </Summary>
+        static std::unique_ptr<InternalManifest> fromMsgPack(std::vector<uint8_t> data);
 
       protected:
         static std::vector<std::unique_ptr<ContestDescriptionWithPlaceholders>>

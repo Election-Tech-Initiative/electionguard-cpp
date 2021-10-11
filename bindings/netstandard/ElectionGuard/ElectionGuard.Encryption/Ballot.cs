@@ -19,6 +19,9 @@ namespace ElectionGuard
     using NativeCompactCiphertextBallot = NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle;
     using NativeSubmittedBallot = NativeInterface.SubmittedBallot.SubmittedBallotHandle;
 
+    /// <summary>
+    /// Indicates the binary format
+    /// </summary>
     public enum BinarySerializationEncoding
     {
         BSON,
@@ -412,7 +415,7 @@ namespace ElectionGuard
             return new ElementModQ(cryptoHash);
         }
 
-        /// <sumary>
+        /// <summary>
         /// Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key.
         /// Calling this function expects that the object is in a well-formed encrypted state
         /// with the elgamal encrypted `message` field populated along with
@@ -633,7 +636,7 @@ namespace ElectionGuard
         }
 
         /// <summary>
-        /// The nonce used to generate the encryption. Sensitive & should be treated as a secret
+        /// The nonce used to generate the encryption. Sensitive &amp; should be treated as a secret
         /// </summary>
         public unsafe ElementModQ Nonce
         {
