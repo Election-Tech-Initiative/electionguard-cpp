@@ -136,8 +136,6 @@ bool test_can_construct_internationalized_text(void)
     // because they are owned by internationalized_text
 
     free(text_string);
-    //eg_language_free(language_2);
-
     eg_internationalized_text_free(text);
 
     return true;
