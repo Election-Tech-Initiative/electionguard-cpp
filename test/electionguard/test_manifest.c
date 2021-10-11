@@ -132,8 +132,8 @@ bool test_can_construct_internationalized_text(void)
 
     assert(strings_are_equal(text_string, "algunas palabras") == true);
 
-    // We dont need to free language_1 and language_2
-    // because they are owned by internationalized_text
+    eg_language_free(language_1);
+    eg_language_free(language_2);
 
     free(text_string);
     eg_internationalized_text_free(text);
@@ -162,9 +162,6 @@ bool test_can_construct_ballot_style(void)
     }
 
     assert(strings_are_equal(text_string, gpUnits[0]) == true);
-
-    // We dont need to free gpUnits 1 and gpUnits 2
-    // because they are owned by ballot_style
 
     free(text_string);
     eg_ballot_style_free(actual);
