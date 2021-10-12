@@ -827,6 +827,24 @@ eg_electionguard_status_t eg_candidate_new(char *in_object_id, bool in_is_write_
 
 // TODO: string in params should all be const i think
 
+eg_electionguard_status_t eg_candidate_new_with_party(char *in_object_id, char *in_party_id,
+                                                      bool in_is_write_in,
+                                                      eg_candidate_t **out_handle)
+{
+    try {
+        auto objectId = string(in_object_id);
+        auto partyId = string(in_object_id);
+
+        auto result = make_unique<Candidate>(objectId, partyId, in_is_write_in);
+
+        *out_handle = AS_TYPE(eg_candidate_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_candidate_new_with_party", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 eg_electionguard_status_t eg_candidate_new_with_extras(char *in_object_id,
                                                        eg_internationalized_text_t *in_name,
                                                        char *in_party_id, char *in_image_uri,

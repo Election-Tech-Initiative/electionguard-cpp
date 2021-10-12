@@ -89,6 +89,11 @@ namespace electionguard
     {
     }
 
+    PlaintextBallotSelection::PlaintextBallotSelection(PlaintextBallotSelection &&other)
+        : pimpl(move(other.pimpl))
+    {
+    }
+
     PlaintextBallotSelection::PlaintextBallotSelection(
       string objectId, uint64_t vote, bool isPlaceholderSelection /* = false */,
       unique_ptr<ExtendedData> extendedData /* = nullptr*/)
@@ -349,6 +354,11 @@ namespace electionguard
 
     PlaintextBallotContest::PlaintextBallotContest(const PlaintextBallotContest &other)
         : pimpl(other.pimpl->clone())
+    {
+    }
+
+    PlaintextBallotContest::PlaintextBallotContest(PlaintextBallotContest &&other)
+        : pimpl(move(other.pimpl))
     {
     }
 

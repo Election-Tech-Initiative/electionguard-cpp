@@ -91,7 +91,7 @@ namespace electionguard
     {
       public:
         PlaintextBallotSelection(const PlaintextBallotSelection &other);
-        PlaintextBallotSelection(const PlaintextBallotSelection &&other);
+        PlaintextBallotSelection(PlaintextBallotSelection &&other);
         PlaintextBallotSelection(std::string objectId, uint64_t vote,
                                  bool isPlaceholderSelection = false,
                                  std::unique_ptr<ExtendedData> extendedData = nullptr);
@@ -313,7 +313,7 @@ namespace electionguard
     {
       public:
         PlaintextBallotContest(const PlaintextBallotContest &other);
-        PlaintextBallotContest(const PlaintextBallotContest &&other);
+        PlaintextBallotContest(PlaintextBallotContest &&other);
         PlaintextBallotContest(const std::string &objectId,
                                std::vector<std::unique_ptr<PlaintextBallotSelection>> selections);
         ~PlaintextBallotContest();

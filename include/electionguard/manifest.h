@@ -466,6 +466,10 @@ EG_API eg_electionguard_status_t eg_candidate_new(char *in_object_id, bool in_is
 
 // TODO: string in params should all be const i think
 
+EG_API eg_electionguard_status_t eg_candidate_new_with_party(char *in_object_id, char *in_party_id,
+                                                             bool in_is_write_in,
+                                                             eg_candidate_t **out_handle);
+
 EG_API eg_electionguard_status_t eg_candidate_new_with_extras(char *in_object_id,
                                                               eg_internationalized_text_t *in_name,
                                                               char *in_party_id, char *in_image_uri,

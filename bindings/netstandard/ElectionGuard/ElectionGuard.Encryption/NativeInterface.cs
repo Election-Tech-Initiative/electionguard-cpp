@@ -948,6 +948,13 @@ namespace ElectionGuard
                 bool isWriteIn,
                 out CandidateHandle handle);
 
+            [DllImport(DllName, EntryPoint = "eg_candidate_new_with_party")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPStr)] string partyId,
+                bool isWriteIn,
+                out CandidateHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_candidate_new_with_extras")]
             internal static extern Status New(
                 [MarshalAs(UnmanagedType.LPStr)] string objectId,
@@ -1919,6 +1926,14 @@ namespace ElectionGuard
                 }
             }
 
+            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                // TODO: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
+                ulong selectionsSize,
+                out PlaintextBallotContestHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_free")]
             internal static extern Status Free(PlaintextBallotContestHandle handle);
 
@@ -2057,6 +2072,15 @@ namespace ElectionGuard
                     return true;
                 }
             }
+
+            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_new")]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                [MarshalAs(UnmanagedType.LPStr)] string styleId,
+                // TODO: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] contests,
+                ulong contestsSize,
+                out PlaintextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_free")]
             internal static extern Status Free(PlaintextBallotHandle handle);

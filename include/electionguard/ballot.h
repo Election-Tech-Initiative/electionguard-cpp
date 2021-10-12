@@ -287,7 +287,9 @@ struct eg_plaintext_ballot_contest_s;
  */
 typedef struct eg_plaintext_ballot_contest_s eg_plaintext_ballot_contest_t;
 
-// TODO: implement constructor
+EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_new(
+  char *object_id, eg_plaintext_ballot_selection_t *in_selections[],
+  const size_t in_selections_size, eg_plaintext_ballot_contest_t **out_handle);
 
 EG_API eg_electionguard_status_t
 eg_plaintext_ballot_contest_free(eg_plaintext_ballot_contest_t *handle);
@@ -504,7 +506,9 @@ struct eg_plaintext_ballot_s;
  */
 typedef struct eg_plaintext_ballot_s eg_plaintext_ballot_t;
 
-// no constructors defined.  Use `eg_plaintext_ballot_from_json` or `eg_plaintext_ballot_from_bson`
+EG_API eg_electionguard_status_t eg_plaintext_ballot_new(
+  char *in_object_id, char *in_style_id, eg_plaintext_ballot_contest_t *in_contests[],
+  const size_t in_contests_size, eg_plaintext_ballot_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle);
 

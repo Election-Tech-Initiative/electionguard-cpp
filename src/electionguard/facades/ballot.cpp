@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <iostream>
 #include <memory>
+#include <vector>
 
 extern "C" {
 #include "electionguard/ballot.h"
@@ -29,6 +30,9 @@ using electionguard::PlaintextBallotSelection;
 using electionguard::SubmittedBallot;
 
 using std::make_unique;
+using std::string;
+using std::unique_ptr;
+using std::vector;
 
 #pragma region ExtendedData
 
@@ -336,6 +340,32 @@ bool eg_ciphertext_ballot_selection_is_valid_encryption(
 
 #pragma region PlaintextBallotContest
 
+eg_electionguard_status_t eg_plaintext_ballot_contest_new(
+  char *in_object_id, eg_plaintext_ballot_selection_t *in_selections[],
+  const size_t in_selections_size, eg_plaintext_ballot_contest_t **out_handle)
+{
+    try {
+        auto objectId = string(in_object_id);
+
+        vector<unique_ptr<PlaintextBallotSelection>> selections;
+        selections.reserve(in_selections_size);
+        for (size_t i = 0; i < in_selections_size; i++) {
+            auto *element = AS_TYPE(PlaintextBallotSelection, in_selections[i]);
+            unique_ptr<PlaintextBallotSelection> wrapped(
+              new PlaintextBallotSelection(std::move(*element)));
+            selections.push_back(std::move(wrapped));
+        }
+
+        auto result = make_unique<PlaintextBallotContest>(objectId, move(selections));
+
+        *out_handle = AS_TYPE(eg_plaintext_ballot_contest_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_plaintext_ballot_contest_new", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 eg_electionguard_status_t eg_plaintext_ballot_contest_free(eg_plaintext_ballot_contest_t *handle)
 {
     if (handle == nullptr) {
@@ -602,6 +632,34 @@ bool eg_ciphertext_ballot_contest_is_valid_encryption(
 #pragma endregion
 
 #pragma region PlaintextBallot
+
+eg_electionguard_status_t eg_plaintext_ballot_new(char *in_object_id, char *in_style_id,
+                                                  eg_plaintext_ballot_contest_t *in_contests[],
+                                                  const size_t in_contests_size,
+                                                  eg_plaintext_ballot_t **out_handle)
+{
+    try {
+        auto objectId = string(in_object_id);
+        auto styleId = string(in_style_id);
+
+        vector<unique_ptr<PlaintextBallotContest>> contests;
+        contests.reserve(in_contests_size);
+        for (size_t i = 0; i < in_contests_size; i++) {
+            auto *element = AS_TYPE(PlaintextBallotContest, in_contests[i]);
+            unique_ptr<PlaintextBallotContest> wrapped(
+              new PlaintextBallotContest(std::move(*element)));
+            contests.push_back(std::move(wrapped));
+        }
+
+        auto result = make_unique<PlaintextBallot>(objectId, styleId, move(contests));
+
+        *out_handle = AS_TYPE(eg_plaintext_ballot_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_plaintext_ballot_new", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
 
 eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle)
 {
