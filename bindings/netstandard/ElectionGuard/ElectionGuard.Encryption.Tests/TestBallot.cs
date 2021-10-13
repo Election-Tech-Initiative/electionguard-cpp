@@ -48,6 +48,26 @@ namespace ElectionGuard.Encrypt.Tests
         }
 
         [Test]
+        public void Test_Can_Construct_plaintext_Ballot()
+        {
+            var selections = new[] {
+                new PlaintextBallotSelection("some-selection-id-1", 1),
+                new PlaintextBallotSelection("some-selection-d-2", 0)
+            };
+
+            var contests = new[] {
+                new PlaintextBallotContest("some-contest-id", selections)
+            };
+
+            var ballot = new PlaintextBallot("some-ballot-id", "some-ballot-style-id", contests);
+
+            var contest = ballot.GetContestAt(0);
+            var selection = contest.GetSelectionAt(0);
+
+            Assert.That(selection.Vote == 1);
+        }
+
+        [Test]
         public void Test_Plaintext_Ballot_Selection_Is_Valid()
         {
             // Arrange

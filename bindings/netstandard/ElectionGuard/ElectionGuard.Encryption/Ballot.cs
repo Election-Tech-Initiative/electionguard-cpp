@@ -493,6 +493,23 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        public unsafe PlaintextBallotContest(string objectId, PlaintextBallotSelection[] selections)
+        {
+            IntPtr[] selectionPointers = new IntPtr[selections.Length];
+            for (var i = 0; i < selections.Length; i++)
+            {
+                selectionPointers[i] = selections[i].Handle.Ptr;
+                selections[i].Dispose();
+            }
+
+            var status = NativeInterface.PlaintextBallotContest.New(
+                objectId, selectionPointers, (ulong)selectionPointers.LongLength, out Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"PlaintextBallotContest Error Status: {status}");
+            }
+        }
+
         /// <Summary>
         /// Get a selection at a specific index.
         /// </Summary>
@@ -866,6 +883,24 @@ namespace ElectionGuard
                 {
                     Console.WriteLine($"PlaintextBallot Error Binary Ctor: {status}");
                 }
+            }
+        }
+
+        public unsafe PlaintextBallot(
+            string objectId, string styleId, PlaintextBallotContest[] contests)
+        {
+            IntPtr[] contestPointers = new IntPtr[contests.Length];
+            for (var i = 0; i < contests.Length; i++)
+            {
+                contestPointers[i] = contests[i].Handle.Ptr;
+                contests[i].Dispose();
+            }
+
+            var status = NativeInterface.PlaintextBallot.New(
+                objectId, styleId, contestPointers, (ulong)contestPointers.LongLength, out Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"PlaintextBallot Error Status: {status}");
             }
         }
 

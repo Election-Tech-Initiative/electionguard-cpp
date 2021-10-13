@@ -944,6 +944,16 @@ namespace ElectionGuard
             }
         }
 
+        public unsafe Candidate(string objectId, string partyId, bool isWriteIn)
+        {
+            var status = NativeInterface.Candidate.New(
+                objectId, partyId, isWriteIn, out Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"Candidate Error Status: {status}");
+            }
+        }
+
         public unsafe Candidate(
             string objectId, InternationalizedText name,
             string partyId, string imageUri, bool isWriteIn)
