@@ -7,7 +7,7 @@ set(META_PROJECT_EXPORT      "ElectionGuard")
 set(META_PROJECT_TARGET      "electionguard")
 set(META_VERSION_MAJOR       "0")
 set(META_VERSION_MINOR       "1")
-set(META_VERSION_PATCH       "2")
+set(META_VERSION_PATCH       "3")
 set(META_VERSION             "${META_VERSION_MAJOR}.${META_VERSION_MINOR}.${META_VERSION_PATCH}")
 
 set(LIBRARY_PUBLIC_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
