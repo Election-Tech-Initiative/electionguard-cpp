@@ -1,4 +1,4 @@
-.PHONY: all build build-msvc build-android build-ios clean environment format memcheck sanitize sanitize-asan sanitize-tsan test test-msvc test-netstandard
+.PHONY: all build build-msvc build-android build-ios clean clean-netstandard environment format memcheck sanitize sanitize-asan sanitize-tsan test test-msvc test-netstandard
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_BUILD_DIR=$(realpath .)/build
@@ -187,6 +187,10 @@ else
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/ios" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/ios; fi
 endif
 
+clean-netstandard: 
+	@echo 🗑️ CLEAN NETSTANDARD
+	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+
 format: build
 	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 && $(MAKE) format
 
@@ -343,6 +347,7 @@ endif
 test-netstandard: build-netstandard
 	@echo 🧪 TEST NETSTANDARD
 	dotnet test --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	dotnet test --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /property:Platform=x86
 
 coverage:
 	@echo ✅ CHECK COVERAGE

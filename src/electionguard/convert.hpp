@@ -137,7 +137,7 @@ namespace electionguard
         // iterate over a window
         for (size_t i = 0; i < bytes.size(); i += offset) {
 
-            uint64_t as_int;
+            uint64_t as_int = 0;
             auto remaining = bytes.size() - i;
 
             if (remaining > offset) {
