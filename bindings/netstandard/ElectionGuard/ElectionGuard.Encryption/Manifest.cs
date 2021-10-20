@@ -233,7 +233,8 @@ namespace ElectionGuard
                 nativeText[i] = text[i].Handle.Ptr;
                 text[i].Dispose();
             }
-            var status = NativeInterface.InternationalizedText.New(nativeText, text.Length, out Handle);
+
+            var status = NativeInterface.InternationalizedText.New(nativeText, (ulong)nativeText.Length, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"InternationalizedText Error Status: {status}");
@@ -602,7 +603,7 @@ namespace ElectionGuard
 
         public unsafe BallotStyle(string objectId, string[] gpUnitIds)
         {
-            var status = NativeInterface.BallotStyle.New(objectId, gpUnitIds, gpUnitIds.Length, out Handle);
+            var status = NativeInterface.BallotStyle.New(objectId, gpUnitIds, (ulong)gpUnitIds.Length, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"BallotStyle Error Status: {status}");
@@ -2160,7 +2161,7 @@ namespace ElectionGuard
         public unsafe string ToJson()
         {
             var status = NativeInterface.Manifest.ToJson(
-                Handle, out IntPtr pointer, out UIntPtr size);
+                Handle, out IntPtr pointer, out ulong size);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"ToJson Error Status: {status}");
@@ -2177,12 +2178,17 @@ namespace ElectionGuard
         {
 
             var status = NativeInterface.Manifest.ToBson(
-                Handle, out IntPtr data, out UIntPtr size);
+                Handle, out IntPtr data, out ulong size);
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"Manifest Error ToBson: {status}");
                 return null;
+            }
+
+            if (size > int.MaxValue)
+            {
+                Console.WriteLine($"Manifest Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -2198,12 +2204,17 @@ namespace ElectionGuard
         {
 
             var status = NativeInterface.Manifest.ToMsgPack(
-                Handle, out IntPtr data, out UIntPtr size);
+                Handle, out IntPtr data, out ulong size);
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"Manifest Error ToMsgPack: {status}");
                 return null;
+            }
+
+            if (size > int.MaxValue)
+            {
+                Console.WriteLine($"Manifest Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -2368,7 +2379,7 @@ namespace ElectionGuard
         public unsafe string ToJson()
         {
             var status = NativeInterface.InternalManifest.ToJson(
-                Handle, out IntPtr pointer, out UIntPtr size);
+                Handle, out IntPtr pointer, out ulong size);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"ToJson Error Status: {status}");
@@ -2385,12 +2396,17 @@ namespace ElectionGuard
         {
 
             var status = NativeInterface.InternalManifest.ToBson(
-                Handle, out IntPtr data, out UIntPtr size);
+                Handle, out IntPtr data, out ulong size);
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"InternalManifest Error ToBson: {status}");
                 return null;
+            }
+
+            if (size > int.MaxValue)
+            {
+                Console.WriteLine($"InternalManifest Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -2406,12 +2422,17 @@ namespace ElectionGuard
         {
 
             var status = NativeInterface.InternalManifest.ToMsgPack(
-                Handle, out IntPtr data, out UIntPtr size);
+                Handle, out IntPtr data, out ulong size);
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"InternalManifest Error ToMsgPack: {status}");
                 return null;
+            }
+
+            if (size > int.MaxValue)
+            {
+                Console.WriteLine($"InternalManifest Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];

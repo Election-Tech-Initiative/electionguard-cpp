@@ -1,29 +1,33 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net48</TargetFrameworks>
     <Platforms>x64;x86</Platforms>
 
     <!-- Project -->
     <RootNamespace>ElectionGuard.Encryption</RootNamespace>
     <AssemblyName>ElectionGuard.Encryption</AssemblyName>
-    <Version>0.1.3</Version>
-    <AssemblyVersion>0.1.3.0</AssemblyVersion>
-    <AssemblyFileVersion>0.1.3.0</AssemblyFileVersion>
-    
+    <Version>0.1.4</Version>
+    <AssemblyVersion>0.1.4.0</AssemblyVersion>
+    <AssemblyFileVersion>0.1.4.0</AssemblyFileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
 
     <!-- Package -->
     <PackageId>ElectionGuard.Encryption</PackageId>
     <Title>ElectionGuard Encryption</Title>
     <Description>Open source implementation of ElectionGuard's ballot encryption.</Description>
     <Authors>Microsoft</Authors>
-    <PackageVersion>0.1.3</PackageVersion>
+    <PackageVersion>0.1.4</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/microsoft/electionguard-cpp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/microsoft/electionguard-cpp</RepositoryUrl>
-    <PackageTags>Microsoft; Electionguard;Encryption;Windows;MacOS;Linux</PackageTags>
+    <PackageTags>Microsoft;Electionguard;Encryption;Windows;MacOS;Linux</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <!-- <PackageReleaseNotes>Changelog</PackageReleaseNotes> -->
   </PropertyGroup>
 
@@ -48,14 +52,30 @@
     <ElectionGuardLibs>..\..\..\..\build\libs</ElectionGuardLibs>
   </PropertyGroup>
   <ItemGroup Label="C++ Built Libraries">
-    <None Name="Windows MSVC x86" Visible="false" Include="$(ElectionGuardLibs)\msvc\Win32\src\$(Configuration)\*.dll*" Pack="true" PackagePath="runtimes\win-x86\native">
+    <Content Name="Windows MSVC x86" Include="$(ElectionGuardLibs)\msvc\Win32\src\$(Configuration)\*.dll*" Pack="true">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
-    </None>
-    <None Name="Windows MSVC x64" Visible="false" Include="$(ElectionGuardLibs)\msvc\x64\src\$(Configuration)\*.dll*" Pack="true" PackagePath="runtimes\win-x64\native">
+      <PackageCopyToOutput Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">true</PackageCopyToOutput>
+    </Content>
+    <Content Name="Windows MSVC x86 symbols" Include="$(ElectionGuardLibs)\msvc\Win32\src\$(Configuration)\*.pdb*" Pack="true">
+      <CopyToOutputDirectory Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
+      <PackageCopyToOutput Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">true</PackageCopyToOutput>
+    </Content>
+    <Content Name="Windows MSVC x64" Include="$(ElectionGuardLibs)\msvc\x64\src\$(Configuration)\*.dll*" Pack="true">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
-    </None>
-    <None Name="MacOS" Visible="false" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.dylib" CopyToOutputDirectory="Always" Pack="true" PackagePath="runtimes\osx-x64\native" />
-    <None Name="Linux" Visible="false" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.so" CopyToOutputDirectory="Always" Pack="true" PackagePath="runtimes\linux-x64\native" />
+      <PackageCopyToOutput Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">true</PackageCopyToOutput>
+    </Content>
+    <Content Name="Windows MSVC x64 symbols" Include="$(ElectionGuardLibs)\msvc\x64\src\$(Configuration)\*.pdb*" Pack="true">
+      <CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
+      <PackageCopyToOutput Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">true</PackageCopyToOutput>
+    </Content>
+    <Content Name="MacOS" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.dylib" Pack="true" PackagePath="runtimes\osx-x64\native">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
+    <Content Name="Linux" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.so" Pack="true" PackagePath="runtimes\linux-x64\native" >
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
   </ItemGroup>
 
   <ItemGroup Label="Additional Package Files">

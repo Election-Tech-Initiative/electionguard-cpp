@@ -132,7 +132,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = ElementModP.Free(this);
+                    var status = ElementModP.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"ElementModP Error Free: {status}");
@@ -151,11 +151,11 @@ namespace ElectionGuard
                 ulong* in_data, out ElementModPHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_free")]
-            internal static extern Status Free(ElementModPHandle handle);
+            internal static extern Status Free(ElementModPType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_get_data")]
             internal static extern Status GetData(
-                ElementModPHandle handle, ulong** out_data, out UIntPtr out_size);
+                ElementModPHandle handle, ulong** out_data, out ulong out_size);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_to_hex")]
             internal static extern Status ToHex(
@@ -173,7 +173,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = ElementModQ.Free(this);
+                    var status = ElementModQ.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"ElementModQ Error Free: {status}");
@@ -192,11 +192,11 @@ namespace ElectionGuard
                 ulong* in_data, out ElementModQHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_free")]
-            internal static extern Status Free(ElementModQHandle handle);
+            internal static extern Status Free(ElementModQType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_get_data")]
             internal static extern Status GetData(
-                ElementModQHandle handle, ulong** out_data, out UIntPtr out_size);
+                ElementModQHandle handle, ulong** out_data, out ulong out_size);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_to_hex")]
             internal static extern Status ToHex(
@@ -251,7 +251,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = ElGamalKeyPair.Free(this);
+                    var status = ElGamalKeyPair.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"ElGamalKeyPair Error Free: {status}");
@@ -267,7 +267,7 @@ namespace ElectionGuard
                 out ElGamalKeyPairHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_elgamal_keypair_free")]
-            internal static extern Status Free(ElGamalKeyPairHandle handle);
+            internal static extern Status Free(ElGamalKeyPairType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_elgamal_keypair_get_public_key")]
             internal static extern Status GetPublicKey(
@@ -292,7 +292,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = ElGamalCiphertext.Free(this);
+                    var status = ElGamalCiphertext.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"ElGamalCiphertext Error Free: {status}");
@@ -303,7 +303,7 @@ namespace ElectionGuard
             }
 
             [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_free")]
-            internal static extern Status Free(ElGamalCiphertextHandle handle);
+            internal static extern Status Free(ElGamalCiphertextType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_get_pad")]
             internal static extern Status GetPad(
@@ -353,7 +353,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = DisjunctiveChaumPedersenProof.Free(this);
+                    var status = DisjunctiveChaumPedersenProof.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"DisjunctiveChaumPedersenProof Error Free: {status}");
@@ -364,7 +364,7 @@ namespace ElectionGuard
             }
 
             [DllImport(DllName, EntryPoint = "eg_disjunctive_chaum_pedersen_proof_free")]
-            internal static extern Status Free(DisjunctiveChaumPedersenProofHandle handle);
+            internal static extern Status Free(DisjunctiveChaumPedersenProofType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_disjunctive_chaum_pedersen_proof_get_zero_pad")]
             internal static extern Status GetZeroPad(
@@ -441,7 +441,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = ConstantChaumPedersenProof.Free(this);
+                    var status = ConstantChaumPedersenProof.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"ConstantChaumPedersenProof Error Free: {status}");
@@ -452,7 +452,7 @@ namespace ElectionGuard
             }
 
             [DllImport(DllName, EntryPoint = "eg_constant_chaum_pedersen_proof_free")]
-            internal static extern Status Free(ConstantChaumPedersenProofHandle handle);
+            internal static extern Status Free(ConstantChaumPedersenProofType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_constant_chaum_pedersen_proof_get_pad")]
             internal static extern Status GetPad(
@@ -509,7 +509,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = AnnotatedString.Free(this);
+                    var status = AnnotatedString.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"AnnotatedString Error Free: {status}");
@@ -526,7 +526,7 @@ namespace ElectionGuard
                 out AnnotatedStringHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_annotated_string_free")]
-            internal static extern Status Free(AnnotatedStringHandle handle);
+            internal static extern Status Free(AnnotatedStringType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_annotated_string_get_annotation")]
             internal static extern Status GetAnnotation(
@@ -558,7 +558,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = Language.Free(this);
+                    var status = Language.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"Language Error Free: {status}");
@@ -568,24 +568,29 @@ namespace ElectionGuard
                 }
             }
 
-            [DllImport(DllName, EntryPoint = "eg_language_new")]
+            [DllImport(DllName, EntryPoint = "eg_language_new",
+                CallingConvention = CallingConvention.Cdecl)]
             internal static extern Status New(
                 [MarshalAs(UnmanagedType.LPStr)] string value,
                 [MarshalAs(UnmanagedType.LPStr)] string language,
                 out LanguageHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_language_free")]
-            internal static extern Status Free(LanguageHandle handle);
+            [DllImport(DllName, EntryPoint = "eg_language_free",
+                CallingConvention = CallingConvention.Cdecl)]
+            internal static extern Status Free(LanguageType* handle);
 
-            [DllImport(DllName, EntryPoint = "eg_language_get_value")]
+            [DllImport(DllName, EntryPoint = "eg_language_get_value",
+                CallingConvention = CallingConvention.Cdecl)]
             internal static extern Status GetValue(
                 LanguageHandle handle, out IntPtr value);
 
-            [DllImport(DllName, EntryPoint = "eg_language_get_language")]
+            [DllImport(DllName, EntryPoint = "eg_language_get_language",
+                CallingConvention = CallingConvention.Cdecl)]
             internal static extern Status GetLanguage(
                 LanguageHandle handle, out IntPtr language);
 
-            [DllImport(DllName, EntryPoint = "eg_language_crypto_hash")]
+            [DllImport(DllName, EntryPoint = "eg_language_crypto_hash",
+                CallingConvention = CallingConvention.Cdecl)]
             internal static extern Status CryptoHash(
                 LanguageHandle handle,
                 out ElementModQ.ElementModQHandle crypto_hash);
@@ -606,7 +611,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = InternationalizedText.Free(this);
+                    var status = InternationalizedText.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"InternationalizedText Error Free: {status}");
@@ -615,28 +620,33 @@ namespace ElectionGuard
                     return true;
                 }
             }
-
-            [DllImport(DllName, EntryPoint = "eg_internationalized_text_new")]
+            // TODO: add get last error, and probably strings in utf8
+            [DllImport(DllName, EntryPoint = "eg_internationalized_text_new", 
+                CallingConvention = CallingConvention.Cdecl)]
             internal static extern Status New(
                 // TODO: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] text,
-                long textSize,
+                ulong textSize,
                 out InternationalizedTextHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_internationalized_text_free")]
-            internal static extern Status Free(InternationalizedTextHandle handle);
+            [DllImport(DllName, EntryPoint = "eg_internationalized_text_free",
+                CallingConvention = CallingConvention.Cdecl)]
+            internal static extern Status Free(InternationalizedTextType* handle);
 
-            [DllImport(DllName, EntryPoint = "eg_internationalized_text_get_text_size")]
+            [DllImport(DllName, EntryPoint = "eg_internationalized_text_get_text_size",
+                CallingConvention = CallingConvention.Cdecl)]
             internal static extern ulong GetTextSize(
                 InternationalizedTextHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_internationalized_text_get_text_at_index")]
+            [DllImport(DllName, EntryPoint = "eg_internationalized_text_get_text_at_index",
+                CallingConvention = CallingConvention.Cdecl)]
             internal static extern Status GetTextAtIndex(
                 InternationalizedTextHandle handle,
                 ulong index,
                 out Language.LanguageHandle text);
 
-            [DllImport(DllName, EntryPoint = "eg_intertnationalized_text_crypto_hash")]
+            [DllImport(DllName, EntryPoint = "eg_intertnationalized_text_crypto_hash",
+                CallingConvention = CallingConvention.Cdecl)]
             internal static extern Status CryptoHash(
                 InternationalizedTextHandle handle,
                 out ElementModQ.ElementModQHandle crypto_hash);
@@ -657,7 +667,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = ContactInformation.Free(this);
+                    var status = ContactInformation.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"ContactInformation Error Free: {status}");
@@ -675,7 +685,7 @@ namespace ElectionGuard
             // TODO: add eg_contact_information_new_with_collections
 
             [DllImport(DllName, EntryPoint = "eg_contact_information_free")]
-            internal static extern Status Free(ContactInformationHandle handle);
+            internal static extern Status Free(ContactInformationType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_contact_information_get_address_line_size")]
             internal static extern ulong GetAddressLineSize(
@@ -732,7 +742,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = GeopoliticalUnit.Free(this);
+                    var status = GeopoliticalUnit.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"GeopoliticalUnit Error Free: {status}");
@@ -758,7 +768,7 @@ namespace ElectionGuard
                 out GeopoliticalUnitHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_geopolitical_unit_free")]
-            internal static extern Status Free(GeopoliticalUnitHandle handle);
+            internal static extern Status Free(GeopoliticalUnitType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_geopolitical_unit_get_object_id")]
             internal static extern Status GetObjectId(
@@ -793,7 +803,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = BallotStyle.Free(this);
+                    var status = BallotStyle.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"BallotStyle Error Free: {status}");
@@ -807,13 +817,13 @@ namespace ElectionGuard
             internal static extern Status New(
                 [MarshalAs(UnmanagedType.LPStr)] string objectId,
                 [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string[] gpUnitIds,
-                long gpUnitIdsSize,
+                ulong gpUnitIdsSize,
                 out BallotStyleHandle handle);
 
             // TODO eg_ballot_style_new_with_parties
 
             [DllImport(DllName, EntryPoint = "eg_ballot_style_free")]
-            internal static extern Status Free(BallotStyleHandle handle);
+            internal static extern Status Free(BallotStyleType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_ballot_style_get_object_id")]
             internal static extern Status GetObjectId(
@@ -864,7 +874,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = Party.Free(this);
+                    var status = Party.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"Party Error Free: {status}");
@@ -889,7 +899,7 @@ namespace ElectionGuard
                 out PartyHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_party_free")]
-            internal static extern Status Free(PartyHandle handle);
+            internal static extern Status Free(PartyType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_party_get_object_id")]
             internal static extern Status GetObjectId(
@@ -932,7 +942,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = Candidate.Free(this);
+                    var status = Candidate.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"Candidate Error Free: {status}");
@@ -965,7 +975,7 @@ namespace ElectionGuard
                 out CandidateHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_candidate_free")]
-            internal static extern Status Free(CandidateHandle handle);
+            internal static extern Status Free(CandidateType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_candidate_get_object_id")]
             internal static extern Status GetObjectId(
@@ -1008,7 +1018,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = SelectionDescription.Free(this);
+                    var status = SelectionDescription.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"SelectionDescription Error Free: {status}");
@@ -1026,7 +1036,7 @@ namespace ElectionGuard
                 out SelectionDescriptionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_selection_description_free")]
-            internal static extern Status Free(SelectionDescriptionHandle handle);
+            internal static extern Status Free(SelectionDescriptionType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_selection_description_get_object_id")]
             internal static extern Status GetObjectId(
@@ -1061,7 +1071,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = ContestDescription.Free(this);
+                    var status = ContestDescription.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"ContestDescription Error Free: {status}");
@@ -1136,7 +1146,7 @@ namespace ElectionGuard
                 out ContestDescriptionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_contest_description_free")]
-            internal static extern Status Free(ContestDescriptionHandle handle);
+            internal static extern Status Free(ContestDescriptionType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_contest_description_get_object_id")]
             internal static extern Status GetObjectId(
@@ -1205,7 +1215,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = ContestDescriptionWithPlaceholders.Free(this);
+                    var status = ContestDescriptionWithPlaceholders.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"ContestDescriptionWithPlaceholders Error Free: {status}");
@@ -1292,7 +1302,7 @@ namespace ElectionGuard
                 out ContestDescriptionWithPlaceholdersHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_contest_description_with_placeholders_free")]
-            internal static extern Status Free(ContestDescriptionWithPlaceholdersHandle handle);
+            internal static extern Status Free(ContestDescriptionWithPlaceholdersType* handle);
 
             #region ContestDescription Methods
 
@@ -1389,7 +1399,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = Manifest.Free(this);
+                    var status = Manifest.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"Manifest Error Free: {status}");
@@ -1425,7 +1435,7 @@ namespace ElectionGuard
             // TODO: eg_election_manifest_new_with_contact
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_free")]
-            internal static extern Status Free(ManifestHandle handle);
+            internal static extern Status Free(ManifestType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_get_election_scope_id")]
             internal static extern Status GetElectionScopeId(
@@ -1526,15 +1536,15 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_to_json")]
             internal static extern Status ToJson(
-                ManifestHandle handle, out IntPtr data, out UIntPtr size);
+                ManifestHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_to_bson")]
             internal static extern Status ToBson(
-                ManifestHandle handle, out IntPtr data, out UIntPtr size);
+                ManifestHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_to_msgpack")]
             internal static extern Status ToMsgPack(
-                ManifestHandle handle, out IntPtr data, out UIntPtr size);
+                ManifestHandle handle, out IntPtr data, out ulong size);
         }
 
         #endregion
@@ -1552,7 +1562,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = InternalManifest.Free(this);
+                    var status = InternalManifest.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"InternalManifest Error Free: {status}");
@@ -1569,7 +1579,7 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_internal_manifest_free")]
             internal static extern Status Free(
-                InternalManifestHandle handle);
+                InternalManifestType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_internal_manifest_get_manifest_hash")]
             internal static extern Status GetManifestHash(
@@ -1621,15 +1631,15 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_internal_manifest_to_json")]
             internal static extern Status ToJson(
-                InternalManifestHandle handle, out IntPtr data, out UIntPtr size);
+                InternalManifestHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_internal_manifest_to_bson")]
             internal static extern Status ToBson(
-                InternalManifestHandle handle, out IntPtr data, out UIntPtr size);
+                InternalManifestHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_internal_manifest_to_msgpack")]
             internal static extern Status ToMsgPack(
-                InternalManifestHandle handle, out IntPtr data, out UIntPtr size);
+                InternalManifestHandle handle, out IntPtr data, out ulong size);
         }
 
         #endregion
@@ -1647,7 +1657,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = CiphertextElectionContext.Free(this);
+                    var status = CiphertextElectionContext.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"CiphertextElectionContext Error Free: {status}");
@@ -1658,7 +1668,7 @@ namespace ElectionGuard
             }
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_free")]
-            internal static extern Status Free(CiphertextElectionContextHandle handle);
+            internal static extern Status Free(CiphertextElectionType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_get_elgamal_public_key")]
             internal static extern Status GetElGamalPublicKey(
@@ -1714,11 +1724,11 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_to_json")]
             internal static extern Status ToJson(
-                CiphertextElectionContextHandle handle, out IntPtr data, out UIntPtr size);
+                CiphertextElectionContextHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_to_bson")]
             internal static extern Status ToBson(
-                CiphertextElectionContextHandle handle, out uint* data, out UIntPtr size);
+                CiphertextElectionContextHandle handle, out uint* data, out ulong size);
         }
 
         #endregion
@@ -1736,7 +1746,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = ExtendedData.Free(this);
+                    var status = ExtendedData.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"ExtendedData Error Free: {status}");
@@ -1749,18 +1759,18 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_extended_data_new")]
             internal static extern Status New(
                 [MarshalAs(UnmanagedType.LPStr)] string value,
-                long length,
+                ulong length,
                 out ExtendedDataHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_extended_data_free")]
-            internal static extern Status Free(ExtendedDataHandle handle);
+            internal static extern Status Free(ExtendedDataType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_extended_data_get_value")]
             internal static extern Status GetValue(
                 ExtendedDataHandle handle, out IntPtr object_id);
 
             [DllImport(DllName, EntryPoint = "eg_extended_data_get_length")]
-            internal static extern long GetLength(ExtendedDataHandle handle);
+            internal static extern ulong GetLength(ExtendedDataHandle handle);
 
         }
 
@@ -1779,7 +1789,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = PlaintextBallotSelection.Free(this);
+                    var status = PlaintextBallotSelection.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"PlaintextBallotSelection Error Free: {status}");
@@ -1792,28 +1802,28 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_new")]
             internal static extern Status New(
                 [MarshalAs(UnmanagedType.LPStr)] string objectId,
-                long vote,
+                ulong vote,
                 bool isPlaceholderSelection,
                 out PlaintextBallotSelectionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_new_with_extended_data")]
             internal static extern Status New(
                 [MarshalAs(UnmanagedType.LPStr)] string objectId,
-                long vote,
+                ulong vote,
                 bool isPlaceholderSelection,
                 [MarshalAs(UnmanagedType.LPStr)] string extendedData,
-                long extendedDataLength,
+                ulong extendedDataLength,
                 out PlaintextBallotSelectionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_free")]
-            internal static extern Status Free(PlaintextBallotSelectionHandle handle);
+            internal static extern Status Free(PlaintextBallotSelectionType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_get_object_id")]
             internal static extern Status GetObjectId(
                 PlaintextBallotSelectionHandle handle, out IntPtr object_id);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_get_vote")]
-            internal static extern long GetVote(
+            internal static extern ulong GetVote(
                 PlaintextBallotSelectionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_get_is_placeholder")]
@@ -1841,7 +1851,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = CiphertextBallotSelection.Free(this);
+                    var status = CiphertextBallotSelection.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"CiphertextBallotSelection Error Free: {status}");
@@ -1852,14 +1862,14 @@ namespace ElectionGuard
             }
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_free")]
-            internal static extern Status Free(CiphertextBallotSelectionHandle handle);
+            internal static extern Status Free(CiphertextBallotSelectionType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_get_object_id")]
             internal static extern Status GetObjectId(
                 CiphertextBallotSelectionHandle handle, out IntPtr object_id);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_get_sequence_order")]
-            internal static extern long GetSequenceOrder(CiphertextBallotSelectionHandle handle);
+            internal static extern ulong GetSequenceOrder(CiphertextBallotSelectionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_selection_get_description_hash")]
             internal static extern Status GetDescriptionHash(
@@ -1916,7 +1926,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = PlaintextBallotContest.Free(this);
+                    var status = PlaintextBallotContest.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"PlaintextBallotContest Error Free: {status}");
@@ -1935,7 +1945,7 @@ namespace ElectionGuard
                 out PlaintextBallotContestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_free")]
-            internal static extern Status Free(PlaintextBallotContestHandle handle);
+            internal static extern Status Free(PlaintextBallotContestType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_get_object_id")]
             internal static extern Status GetObjectId(
@@ -1955,9 +1965,9 @@ namespace ElectionGuard
             internal static extern bool IsValid(
                 PlaintextBallotContestHandle handle,
                 [MarshalAs(UnmanagedType.LPStr)] string expected_object_id,
-                long expected_num_selections,
-                long expected_num_elected,
-                long votes_allowed);
+                ulong expected_num_selections,
+                ulong expected_num_elected,
+                ulong votes_allowed);
         }
 
         internal static unsafe class CiphertextBallotContest
@@ -1972,7 +1982,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = CiphertextBallotContest.Free(this);
+                    var status = CiphertextBallotContest.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"CiphertextBallotContest Error Free: {status}");
@@ -1983,14 +1993,14 @@ namespace ElectionGuard
             }
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_free")]
-            internal static extern Status Free(CiphertextBallotContestHandle handle);
+            internal static extern Status Free(CiphertextBallotContestType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_get_object_id")]
             internal static extern Status GetObjectId(
                 CiphertextBallotContestHandle handle, out IntPtr object_id);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_get_sequence_order")]
-            internal static extern long GetSequenceOrder(CiphertextBallotContestHandle handle);
+            internal static extern ulong GetSequenceOrder(CiphertextBallotContestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_contest_get_description_hash")]
             internal static extern Status GetDescriptionHash(
@@ -2063,7 +2073,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = PlaintextBallot.Free(this);
+                    var status = PlaintextBallot.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"PlaintextBallot Error Free: {status}");
@@ -2083,7 +2093,7 @@ namespace ElectionGuard
                 out PlaintextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_free")]
-            internal static extern Status Free(PlaintextBallotHandle handle);
+            internal static extern Status Free(PlaintextBallotType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_object_id")]
             internal static extern Status GetObjectId(
@@ -2117,15 +2127,17 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_to_json")]
             internal static extern Status ToJson(
-                PlaintextBallotHandle handle, out IntPtr data, out UIntPtr size);
+                PlaintextBallotHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_to_bson")]
             internal static extern Status ToBson(
-                PlaintextBallotHandle handle, out IntPtr data, out UIntPtr size);
+                PlaintextBallotHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_to_msgpack")]
             internal static extern Status ToMsgPack(
-                PlaintextBallotHandle handle, out IntPtr data, out UIntPtr size);
+                PlaintextBallotHandle handle, out IntPtr data, out ulong size);
+
+            // TODO: implement MsgPackFree
         }
 
         internal static unsafe class CompactPlaintextBallot
@@ -2140,7 +2152,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = CompactPlaintextBallot.Free(this);
+                    var status = CompactPlaintextBallot.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"CompactPlaintextBallot Error Free: {status}");
@@ -2151,7 +2163,7 @@ namespace ElectionGuard
             }
 
             [DllImport(DllName, EntryPoint = "eg_compact_plaintext_ballot_free")]
-            internal static extern Status Free(CompactPlaintextBallotHandle handle);
+            internal static extern Status Free(CompactPlaintextBallotType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_compact_plaintext_ballot_from_msgpack")]
             internal static extern Status FromMsgPack(
@@ -2159,7 +2171,7 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_compact_plaintext_ballot_to_msgpack")]
             internal static extern Status ToMsgPack(
-                CompactPlaintextBallotHandle handle, out IntPtr data, out UIntPtr size);
+                CompactPlaintextBallotHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_compact_plaintext_ballot_msgpack_free")]
             internal static extern Status MsgPackFree(IntPtr data);
@@ -2177,7 +2189,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = CiphertextBallot.Free(this);
+                    var status = CiphertextBallot.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"CiphertextBallot Error Free: {status}");
@@ -2188,7 +2200,7 @@ namespace ElectionGuard
             }
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_free")]
-            internal static extern Status Free(CiphertextBallotHandle handle);
+            internal static extern Status Free(CiphertextBallotType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_object_id")]
             internal static extern Status GetObjectId(
@@ -2225,7 +2237,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_timestamp")]
             internal static extern Status GetTimestamp(
                 CiphertextBallotHandle handle,
-                out long timestamp);
+                out ulong timestamp);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_nonce")]
             internal static extern Status GetNonce(
@@ -2265,27 +2277,27 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_to_json")]
             internal static extern Status ToJson(
-                CiphertextBallotHandle handle, out IntPtr data, out UIntPtr size);
+                CiphertextBallotHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_to_json_with_nonces")]
             internal static extern Status ToJsonWithNonces(
-                CiphertextBallotHandle handle, out IntPtr data, out UIntPtr size);
+                CiphertextBallotHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_to_bson")]
             internal static extern Status ToBson(
-                CiphertextBallotHandle handle, out IntPtr data, out UIntPtr size);
+                CiphertextBallotHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_to_bson_with_nonces")]
             internal static extern Status ToBsonWithNonces(
-                CiphertextBallotHandle handle, out IntPtr data, out UIntPtr size);
+                CiphertextBallotHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_to_msgpack")]
             internal static extern Status ToMsgPack(
-                CiphertextBallotHandle handle, out IntPtr data, out UIntPtr size);
+                CiphertextBallotHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_to_msgpack_with_nonces")]
             internal static extern Status ToMsgPackWithNonces(
-                CiphertextBallotHandle handle, out IntPtr data, out UIntPtr size);
+                CiphertextBallotHandle handle, out IntPtr data, out ulong size);
         }
 
         internal static unsafe class CompactCiphertextBallot
@@ -2300,7 +2312,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = CompactCiphertextBallot.Free(this);
+                    var status = CompactCiphertextBallot.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"CompactCiphertextBallot Error Free: {status}");
@@ -2311,7 +2323,7 @@ namespace ElectionGuard
             }
 
             [DllImport(DllName, EntryPoint = "eg_compact_ciphertext_ballot_free")]
-            internal static extern Status Free(CompactCiphertextBallotHandle handle);
+            internal static extern Status Free(CompactCiphertextBallotType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_compact_ciphertext_ballot_get_object_id")]
             internal static extern Status GetObjectId(
@@ -2323,7 +2335,7 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_compact_ciphertext_ballot_to_msgpack")]
             internal static extern Status ToMsgPack(
-                CompactCiphertextBallotHandle handle, out IntPtr data, out UIntPtr size);
+                CompactCiphertextBallotHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_compact_ciphertext_ballot_msgpack_free")]
             internal static extern Status MsgPackFree(IntPtr data);
@@ -2346,7 +2358,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = SubmittedBallot.Free(this);
+                    var status = SubmittedBallot.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"SubmittedBallot Error Free: {status}");
@@ -2357,7 +2369,7 @@ namespace ElectionGuard
             }
 
             [DllImport(DllName, EntryPoint = "eg_submitted_ballot_free")]
-            internal static extern Status Free(SubmittedBallotHandle handle);
+            internal static extern Status Free(SubmittedBallotType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_submitted_ballot_get_state")]
             internal static extern BallotBoxState GetState(SubmittedBallotHandle handle);
@@ -2408,7 +2420,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_timestamp")]
             internal static extern Status GetTimestamp(
                 SubmittedBallotHandle handle,
-                out long timestamp);
+                out ulong timestamp);
 
             // GetNonce is not provided
 
@@ -2443,15 +2455,15 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_submitted_ballot_to_json")]
             internal static extern Status ToJson(
-                SubmittedBallotHandle handle, out IntPtr data, out UIntPtr size);
+                SubmittedBallotHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_submitted_ballot_to_bson")]
             internal static extern Status ToBson(
-                SubmittedBallotHandle handle, out IntPtr data, out UIntPtr size);
+                SubmittedBallotHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_submitted_ballot_to_msgpack")]
             internal static extern Status ToMsgPack(
-                SubmittedBallotHandle handle, out IntPtr data, out UIntPtr size);
+                SubmittedBallotHandle handle, out IntPtr data, out ulong size);
 
         }
 
@@ -2471,7 +2483,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = EncryptionDevice.Free(this);
+                    var status = EncryptionDevice.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"EncryptionDevice Error Free: {status}");
@@ -2490,7 +2502,7 @@ namespace ElectionGuard
                 out EncryptionDeviceHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encryption_device_free")]
-            internal static extern Status Free(EncryptionDeviceHandle handle);
+            internal static extern Status Free(EncryptionDeviceType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_encryption_device_get_hash")]
             internal static extern Status GetHash(
@@ -2510,7 +2522,7 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    var status = EncryptionMediator.Free(this);
+                    var status = EncryptionMediator.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
                         Console.WriteLine($"EncryptionMediator Error Free: {status}");
@@ -2528,7 +2540,7 @@ namespace ElectionGuard
                 out EncryptionMediatorHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encryption_mediator_free")]
-            internal static extern Status Free(EncryptionMediatorHandle handle);
+            internal static extern Status Free(EncryptionMediatorType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_encryption_mediator_compact_encrypt_ballot")]
             internal static extern Status CompactEncrypt(
