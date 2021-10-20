@@ -236,7 +236,7 @@ if(OPTION_ENABLE_TESTS)
     if(MSVC)
         #TODO: renenable warnings as errors when the correct ones are defined
        #target_compile_options(${META_PROJECT_TARGET} PUBLIC /W4 /WX)C5059
-       target_compile_options(${META_PROJECT_TARGET} PUBLIC /Zi)
+       target_compile_options(${META_PROJECT_TARGET} PUBLIC /Zi) # Generates complete debugging information.
     endif()
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
