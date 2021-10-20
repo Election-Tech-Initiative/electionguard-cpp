@@ -103,10 +103,10 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_from_bson(
   uint8_t *in_data, uint64_t in_length, eg_ciphertext_election_context_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_to_json(
-  eg_ciphertext_election_context_t *handle, char **out_data, size_t *out_size);
+  eg_ciphertext_election_context_t *handle, char **out_data, uint64_t *out_size);
 
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_to_bson(
-  eg_ciphertext_election_context_t *handle, uint8_t **out_data, size_t *out_size);
+  eg_ciphertext_election_context_t *handle, uint8_t **out_data, uint64_t *out_size);
 
 #endif
 

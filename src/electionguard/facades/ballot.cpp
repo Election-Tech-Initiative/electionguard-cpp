@@ -28,6 +28,7 @@ using electionguard::PlaintextBallot;
 using electionguard::PlaintextBallotContest;
 using electionguard::PlaintextBallotSelection;
 using electionguard::SubmittedBallot;
+using electionguard::uint64_to_size;
 
 using std::make_unique;
 using std::string;
@@ -342,14 +343,14 @@ bool eg_ciphertext_ballot_selection_is_valid_encryption(
 
 eg_electionguard_status_t eg_plaintext_ballot_contest_new(
   char *in_object_id, eg_plaintext_ballot_selection_t *in_selections[],
-  const size_t in_selections_size, eg_plaintext_ballot_contest_t **out_handle)
+  const uint64_t in_selections_size, eg_plaintext_ballot_contest_t **out_handle)
 {
     try {
         auto objectId = string(in_object_id);
 
         vector<unique_ptr<PlaintextBallotSelection>> selections;
-        selections.reserve(in_selections_size);
-        for (size_t i = 0; i < in_selections_size; i++) {
+        selections.reserve(uint64_to_size(in_selections_size));
+        for (uint64_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(PlaintextBallotSelection, in_selections[i]);
             unique_ptr<PlaintextBallotSelection> wrapped(
               new PlaintextBallotSelection(std::move(*element)));
@@ -392,11 +393,11 @@ eg_plaintext_ballot_contest_get_object_id(eg_plaintext_ballot_contest_t *handle,
     }
 }
 
-size_t eg_plaintext_ballot_contest_get_selections_size(eg_plaintext_ballot_contest_t *handle)
+uint64_t eg_plaintext_ballot_contest_get_selections_size(eg_plaintext_ballot_contest_t *handle)
 {
     try {
         auto collection = AS_TYPE(PlaintextBallotContest, handle)->getSelections();
-        return collection.size();
+        return (uint64_t)collection.size();
     } catch (const exception &e) {
         Log::error("eg_plaintext_ballot_contest_get_selections_size", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
@@ -404,12 +405,12 @@ size_t eg_plaintext_ballot_contest_get_selections_size(eg_plaintext_ballot_conte
 }
 
 eg_electionguard_status_t eg_plaintext_ballot_contest_get_selection_at_index(
-  eg_plaintext_ballot_contest_t *handle, size_t in_index,
+  eg_plaintext_ballot_contest_t *handle, uint64_t in_index,
   eg_plaintext_ballot_selection_t **out_selection_ref)
 {
     try {
         auto collection = AS_TYPE(PlaintextBallotContest, handle)->getSelections();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_selection_ref = AS_TYPE(eg_plaintext_ballot_selection_t, reference);
 
@@ -492,19 +493,19 @@ eg_ciphertext_ballot_contest_get_description_hash(eg_ciphertext_ballot_contest_t
     }
 }
 
-size_t eg_ciphertext_ballot_contest_get_selections_size(eg_ciphertext_ballot_contest_t *handle)
+uint64_t eg_ciphertext_ballot_contest_get_selections_size(eg_ciphertext_ballot_contest_t *handle)
 {
     auto collection = AS_TYPE(CiphertextBallotContest, handle)->getSelections();
-    return collection.size();
+    return (uint64_t)collection.size();
 }
 
 eg_electionguard_status_t eg_ciphertext_ballot_contest_get_selection_at_index(
-  eg_ciphertext_ballot_contest_t *handle, size_t in_index,
+  eg_ciphertext_ballot_contest_t *handle, uint64_t in_index,
   eg_ciphertext_ballot_selection_t **out_selection_ref)
 {
     try {
         auto collection = AS_TYPE(CiphertextBallotContest, handle)->getSelections();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_selection_ref = AS_TYPE(eg_ciphertext_ballot_selection_t, reference);
 
@@ -635,7 +636,7 @@ bool eg_ciphertext_ballot_contest_is_valid_encryption(
 
 eg_electionguard_status_t eg_plaintext_ballot_new(char *in_object_id, char *in_style_id,
                                                   eg_plaintext_ballot_contest_t *in_contests[],
-                                                  const size_t in_contests_size,
+                                                  const uint64_t in_contests_size,
                                                   eg_plaintext_ballot_t **out_handle)
 {
     try {
@@ -643,8 +644,8 @@ eg_electionguard_status_t eg_plaintext_ballot_new(char *in_object_id, char *in_s
         auto styleId = string(in_style_id);
 
         vector<unique_ptr<PlaintextBallotContest>> contests;
-        contests.reserve(in_contests_size);
-        for (size_t i = 0; i < in_contests_size; i++) {
+        contests.reserve(uint64_to_size(in_contests_size));
+        for (uint64_t i = 0; i < in_contests_size; i++) {
             auto *element = AS_TYPE(PlaintextBallotContest, in_contests[i]);
             unique_ptr<PlaintextBallotContest> wrapped(
               new PlaintextBallotContest(std::move(*element)));
@@ -700,19 +701,19 @@ eg_electionguard_status_t eg_plaintext_ballot_get_style_id(eg_plaintext_ballot_t
     }
 }
 
-size_t eg_plaintext_ballot_get_contests_size(eg_plaintext_ballot_t *handle)
+uint64_t eg_plaintext_ballot_get_contests_size(eg_plaintext_ballot_t *handle)
 {
     auto collection = AS_TYPE(PlaintextBallot, handle)->getContests();
-    return collection.size();
+    return (uint64_t)collection.size();
 }
 
 eg_electionguard_status_t
-eg_plaintext_ballot_get_contest_at_index(eg_plaintext_ballot_t *handle, size_t in_index,
+eg_plaintext_ballot_get_contest_at_index(eg_plaintext_ballot_t *handle, uint64_t in_index,
                                          eg_plaintext_ballot_contest_t **out_contest_ref)
 {
     try {
         auto collection = AS_TYPE(PlaintextBallot, handle)->getContests();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_contest_ref = AS_TYPE(eg_plaintext_ballot_contest_t, reference);
 
@@ -769,7 +770,7 @@ eg_electionguard_status_t eg_plaintext_ballot_from_msgpack(uint8_t *in_data, uin
 }
 
 eg_electionguard_status_t eg_plaintext_ballot_to_json(eg_plaintext_ballot_t *handle,
-                                                      char **out_data, size_t *out_size)
+                                                      char **out_data, uint64_t *out_size)
 {
     try {
         auto *domain_type = AS_TYPE(PlaintextBallot, handle);
@@ -777,7 +778,7 @@ eg_electionguard_status_t eg_plaintext_ballot_to_json(eg_plaintext_ballot_t *han
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -787,7 +788,7 @@ eg_electionguard_status_t eg_plaintext_ballot_to_json(eg_plaintext_ballot_t *han
 }
 
 eg_electionguard_status_t eg_plaintext_ballot_to_bson(eg_plaintext_ballot_t *handle,
-                                                      uint8_t **out_data, size_t *out_size)
+                                                      uint8_t **out_data, uint64_t *out_size)
 {
     try {
         auto *domain_type = AS_TYPE(PlaintextBallot, handle);
@@ -795,7 +796,7 @@ eg_electionguard_status_t eg_plaintext_ballot_to_bson(eg_plaintext_ballot_t *han
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -805,7 +806,7 @@ eg_electionguard_status_t eg_plaintext_ballot_to_bson(eg_plaintext_ballot_t *han
 }
 
 eg_electionguard_status_t eg_plaintext_ballot_to_msgpack(eg_plaintext_ballot_t *handle,
-                                                         uint8_t **out_data, size_t *out_size)
+                                                         uint8_t **out_data, uint64_t *out_size)
 {
     try {
         auto *domain_type = AS_TYPE(PlaintextBallot, handle);
@@ -813,7 +814,7 @@ eg_electionguard_status_t eg_plaintext_ballot_to_msgpack(eg_plaintext_ballot_t *
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -893,19 +894,19 @@ eg_ciphertext_ballot_get_ballot_code_seed(eg_ciphertext_ballot_t *handle,
     }
 }
 
-size_t eg_ciphertext_ballot_get_contests_size(eg_ciphertext_ballot_t *handle)
+uint64_t eg_ciphertext_ballot_get_contests_size(eg_ciphertext_ballot_t *handle)
 {
     auto collection = AS_TYPE(CiphertextBallot, handle)->getContests();
-    return collection.size();
+    return (uint64_t)collection.size();
 }
 
 eg_electionguard_status_t
-eg_ciphertext_ballot_get_contest_at_index(eg_ciphertext_ballot_t *handle, size_t in_index,
+eg_ciphertext_ballot_get_contest_at_index(eg_ciphertext_ballot_t *handle, uint64_t in_index,
                                           eg_ciphertext_ballot_contest_t **out_contest_ref)
 {
     try {
         auto collection = AS_TYPE(CiphertextBallot, handle)->getContests();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_contest_ref = AS_TYPE(eg_ciphertext_ballot_contest_t, reference);
 
@@ -1056,7 +1057,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_json(eg_ciphertext_ballot_t *h
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -1075,7 +1076,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_json_with_nonces(eg_ciphertext
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -1093,7 +1094,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_bson(eg_ciphertext_ballot_t *h
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -1112,7 +1113,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_bson_with_nonces(eg_ciphertext
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -1130,7 +1131,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_to_msgpack(eg_ciphertext_ballot_t
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -1149,7 +1150,7 @@ eg_ciphertext_ballot_to_msgpack_with_nonces(eg_ciphertext_ballot_t *handle, uint
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -1253,7 +1254,7 @@ eg_electionguard_status_t eg_submitted_ballot_to_json(eg_submitted_ballot_t *han
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -1271,7 +1272,7 @@ eg_electionguard_status_t eg_submitted_ballot_to_bson(eg_submitted_ballot_t *han
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -1289,7 +1290,7 @@ eg_electionguard_status_t eg_submitted_ballot_to_msgpack(eg_submitted_ballot_t *
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {

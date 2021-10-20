@@ -25,7 +25,7 @@ eg_electionguard_status_t eg_hash_elems_string(const char *a, eg_element_mod_q_t
     }
 }
 
-eg_electionguard_status_t eg_hash_elems_strings(const char **a, size_t in_length,
+eg_electionguard_status_t eg_hash_elems_strings(const char **a, uint64_t in_length,
                                                 eg_element_mod_q_t **out_handle)
 {
     try {

@@ -289,7 +289,7 @@ typedef struct eg_plaintext_ballot_contest_s eg_plaintext_ballot_contest_t;
 
 EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_new(
   char *object_id, eg_plaintext_ballot_selection_t *in_selections[],
-  const size_t in_selections_size, eg_plaintext_ballot_contest_t **out_handle);
+  const uint64_t in_selections_size, eg_plaintext_ballot_contest_t **out_handle);
 
 EG_API eg_electionguard_status_t
 eg_plaintext_ballot_contest_free(eg_plaintext_ballot_contest_t *handle);
@@ -304,7 +304,7 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_get_object_id(
 /**
  * Get the Size of the selections collection
  */
-EG_API size_t
+EG_API uint64_t
 eg_plaintext_ballot_contest_get_selections_size(eg_plaintext_ballot_contest_t *handle);
 
 /**
@@ -315,7 +315,7 @@ eg_plaintext_ballot_contest_get_selections_size(eg_plaintext_ballot_contest_t *h
  *                               The value is a reference and is not owned by the caller
  */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_get_selection_at_index(
-  eg_plaintext_ballot_contest_t *handle, size_t in_index,
+  eg_plaintext_ballot_contest_t *handle, uint64_t in_index,
   eg_plaintext_ballot_selection_t **out_selection_ref);
 
 /**
@@ -381,7 +381,7 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_description_ha
 /**
  * Get the Size of the selections collection
  */
-EG_API size_t
+EG_API uint64_t
 eg_ciphertext_ballot_contest_get_selections_size(eg_ciphertext_ballot_contest_t *handle);
 
 /**
@@ -392,7 +392,7 @@ eg_ciphertext_ballot_contest_get_selections_size(eg_ciphertext_ballot_contest_t 
  *                               The value is a reference and is not owned by the caller
  */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_selection_at_index(
-  eg_ciphertext_ballot_contest_t *handle, size_t in_index,
+  eg_ciphertext_ballot_contest_t *handle, uint64_t in_index,
   eg_ciphertext_ballot_selection_t **out_selection_ref);
 
 /**
@@ -508,7 +508,7 @@ typedef struct eg_plaintext_ballot_s eg_plaintext_ballot_t;
 
 EG_API eg_electionguard_status_t eg_plaintext_ballot_new(
   char *in_object_id, char *in_style_id, eg_plaintext_ballot_contest_t *in_contests[],
-  const size_t in_contests_size, eg_plaintext_ballot_t **out_handle);
+  const uint64_t in_contests_size, eg_plaintext_ballot_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle);
 
@@ -530,7 +530,7 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_get_style_id(eg_plaintext_b
 /**
  * Get the size of the contest collection
  */
-EG_API size_t eg_plaintext_ballot_get_contests_size(eg_plaintext_ballot_t *handle);
+EG_API uint64_t eg_plaintext_ballot_get_contests_size(eg_plaintext_ballot_t *handle);
 
 /**
  * Get a contest at a specific index.
@@ -539,8 +539,9 @@ EG_API size_t eg_plaintext_ballot_get_contests_size(eg_plaintext_ballot_t *handl
  * @param[out] out_contest_ref An opaque pointer to the contest.  
  *                               The value is a reference and is not owned by the caller
  */
-EG_API eg_electionguard_status_t eg_plaintext_ballot_get_contest_at_index(
-  eg_plaintext_ballot_t *handle, size_t in_index, eg_plaintext_ballot_contest_t **out_contest_ref);
+EG_API eg_electionguard_status_t
+eg_plaintext_ballot_get_contest_at_index(eg_plaintext_ballot_t *handle, uint64_t in_index,
+                                         eg_plaintext_ballot_contest_t **out_contest_ref);
 
 /**
  * Import the ballot representation from JSON
@@ -564,20 +565,21 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_from_msgpack(
  * Export the ballot representation as JSON
  */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_to_json(eg_plaintext_ballot_t *handle,
-                                                             char **out_data, size_t *out_size);
+                                                             char **out_data, uint64_t *out_size);
 
 /**
  * Export the ballot representation as BSON
  */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_to_bson(eg_plaintext_ballot_t *handle,
-                                                             uint8_t **out_data, size_t *out_size);
+                                                             uint8_t **out_data,
+                                                             uint64_t *out_size);
 
 /**
  * Export the ballot representation as MsgPack
  */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_to_msgpack(eg_plaintext_ballot_t *handle,
                                                                 uint8_t **out_data,
-                                                                size_t *out_size);
+                                                                uint64_t *out_size);
 
 #endif
 
@@ -637,7 +639,7 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_ballot_code_seed(
 /**
  * Get the size of the contests collection
  */
-EG_API size_t eg_ciphertext_ballot_get_contests_size(eg_ciphertext_ballot_t *handle);
+EG_API uint64_t eg_ciphertext_ballot_get_contests_size(eg_ciphertext_ballot_t *handle);
 
 /**
  * Get a contest at a specific index.
@@ -647,7 +649,7 @@ EG_API size_t eg_ciphertext_ballot_get_contests_size(eg_ciphertext_ballot_t *han
  *                             The value is a reference and is not owned by the caller
  */
 EG_API eg_electionguard_status_t
-eg_ciphertext_ballot_get_contest_at_index(eg_ciphertext_ballot_t *handle, size_t in_index,
+eg_ciphertext_ballot_get_contest_at_index(eg_ciphertext_ballot_t *handle, uint64_t in_index,
                                           eg_ciphertext_ballot_contest_t **out_contest_ref);
 
 /**
