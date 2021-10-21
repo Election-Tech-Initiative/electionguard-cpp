@@ -22,7 +22,6 @@ This repository is `pre-release` software to showcase the ElectionGuard API impl
 | [`.clang-format`](.clang-format)       | Style guidelines                           |
 | [`.gitignore`](.gitignore)             | Define what to ignore at commit time.      |
 | [`CMakeLists.txt`](CMakeLists.txt)     | Root CMake file                            |
-| `CHANGELOG.md`                         | List of changes to the sample.             |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md)   | Guidelines for contributing to the sample. |
 | [`README.md`](README.md)               | This README file.                          |
 | [`LICENSE`](LICENSE)                   | The license for the sample.                |
