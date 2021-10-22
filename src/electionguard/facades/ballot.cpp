@@ -333,7 +333,7 @@ bool eg_ciphertext_ballot_selection_is_valid_encryption(
           ->isValidEncryption(*encryptionSeed, *publicKey, *cryptoExtendedBaseHash);
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_selection_is_valid_encryption", e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+        return false;
     }
 }
 
@@ -434,7 +434,7 @@ bool eg_plaintext_ballot_contest_is_valid(eg_plaintext_ballot_contest_t *handle,
                     in_expected_num_elected, in_votes_allowed);
     } catch (const exception &e) {
         Log::error("eg_plaintext_ballot_contest_is_valid", e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+        return false;
     }
 }
 
