@@ -10,22 +10,21 @@ This repository is `pre-release` software to showcase the ElectionGuard API impl
 
 ## 📁 In This Repository
 
-| File/folder       | Description                                |
-| ----------------- | ------------------------------------------ |
-| `.github`         | Github workflows and issue templates       |
-| `.vscode`         | VS Code configurations                     |
-| `/bindings`       | Binding interfaces for different languages |
-| `/cmake`          | `CMake` dependencies`                      |
-| `/include`        | Public include headers                     |
-| `/src`            | ElectionGuard source code                  |
-| `/test`           | Unit tests                                 |
-| `.clang-format`   | Style guidelines                           |
-| `.gitignore`      | Define what to ignore at commit time.      |
-| `CmakeLists.txt`  | Root CMake file                            |
-| `CHANGELOG.md`    | List of changes to the sample.             |
-| `CONTRIBUTING.md` | Guidelines for contributing to the sample. |
-| `README.md`       | This README file.                          |
-| `LICENSE`         | The license for the sample.                |
+| File/folder                            | Description                                |
+| -------------------------------------  | ------------------------------------------ |
+| [`.github`](.github)                   | Github workflows and issue templates       |
+| [`.vscode`](.vscode)                   | VS Code configurations                     |
+| [`/bindings`](/bindings)               | Binding interfaces for different languages |
+| [`/cmake`](/cmake)                     | `CMake` dependencies`                      |
+| [`/include`](/include)                 | Public include headers                     |
+| [`/src`](/src)                         | ElectionGuard source code                  |
+| [`/test`](/test)                       | Unit tests                                 |
+| [`.clang-format`](.clang-format)       | Style guidelines                           |
+| [`.gitignore`](.gitignore)             | Define what to ignore at commit time.      |
+| [`CMakeLists.txt`](CMakeLists.txt)     | Root CMake file                            |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md)   | Guidelines for contributing to the sample. |
+| [`README.md`](README.md)               | This README file.                          |
+| [`LICENSE`](LICENSE)                   | The license for the sample.                |
 
 ## ❓ What Is ElectionGuard?
 
