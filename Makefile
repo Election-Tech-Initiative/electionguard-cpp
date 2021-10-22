@@ -166,8 +166,9 @@ else
 	make build
 endif
 
-	@echo 🖥️ BUILD NETSTANDARD
+	@echo 🖥️ BUILD NETSTANDARD  
 	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /property:Platform=x86
 
 clean:
 	@echo 🗑️ Cleaning Output Directory

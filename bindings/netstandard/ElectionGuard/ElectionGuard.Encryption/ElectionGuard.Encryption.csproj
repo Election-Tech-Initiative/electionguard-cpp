@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net48</TargetFrameworks>
@@ -55,6 +55,7 @@
     <Content Name="Windows MSVC x86" Include="$(ElectionGuardLibs)\msvc\Win32\src\$(Configuration)\*.dll*" Pack="true">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
       <PackageCopyToOutput Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">true</PackageCopyToOutput>
+      <PackagePath>runtimes\win-x86\native</PackagePath>
     </Content>
     <Content Name="Windows MSVC x86 symbols" Include="$(ElectionGuardLibs)\msvc\Win32\src\$(Configuration)\*.pdb*" Pack="true">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
@@ -63,6 +64,7 @@
     <Content Name="Windows MSVC x64" Include="$(ElectionGuardLibs)\msvc\x64\src\$(Configuration)\*.dll*" Pack="true">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
       <PackageCopyToOutput Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">true</PackageCopyToOutput>
+      <PackagePath>runtimes\win-x64\native</PackagePath>
     </Content>
     <Content Name="Windows MSVC x64 symbols" Include="$(ElectionGuardLibs)\msvc\x64\src\$(Configuration)\*.pdb*" Pack="true">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
@@ -76,6 +78,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>
+    <None Include="Electionguard.Encryption.targets">
+      <PackagePath>build\</PackagePath>
+      <Pack>true</Pack>
+    </None>
   </ItemGroup>
 
   <ItemGroup Label="Additional Package Files">
