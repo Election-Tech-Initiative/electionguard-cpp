@@ -197,13 +197,13 @@ bool test_can_construct_internal_election_description_from_election_description(
     }
 
     uint64_t *expected_hash_data = NULL;
-    size_t expected_hash_data_size;
+    uint64_t expected_hash_data_size;
     if (eg_element_mod_q_get_data(expected, &expected_hash_data, &expected_hash_data_size)) {
         assert(false);
     }
 
     uint64_t *actual_hash_data = NULL;
-    size_t actual_hash_data_size;
+    uint64_t actual_hash_data_size;
     if (eg_element_mod_q_get_data(actual, &actual_hash_data, &actual_hash_data_size)) {
         assert(false);
     }
@@ -266,7 +266,7 @@ bool test_can_deserlialze_internal_election_description(void)
     }
 
     uint64_t *actual_hash_data = NULL;
-    size_t actual_hash_data_size;
+    uint64_t actual_hash_data_size;
     if (eg_element_mod_q_get_data(actual, &actual_hash_data, &actual_hash_data_size)) {
         assert(false);
     }

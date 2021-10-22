@@ -77,7 +77,7 @@ bool test_ballot_property_getters()
     assert(strings_are_equal("ballot-id-123", ballot_id) == true);
 
     // iterate over the contests in the ballot
-    for (size_t i = 0; i < eg_plaintext_ballot_get_contests_size(subject); i++) {
+    for (uint64_t i = 0; i < eg_plaintext_ballot_get_contests_size(subject); i++) {
 
         eg_plaintext_ballot_contest_t *contest = NULL;
         if (eg_plaintext_ballot_get_contest_at_index(subject, i, &contest)) {
@@ -95,7 +95,7 @@ bool test_ballot_property_getters()
         assert(strings_are_equal(expected_contest_id, contest_id) == true);
 
         // iterate over the selections in the contest
-        for (size_t j = 0; j < eg_plaintext_ballot_contest_get_selections_size(contest); j++) {
+        for (uint64_t j = 0; j < eg_plaintext_ballot_contest_get_selections_size(contest); j++) {
             eg_plaintext_ballot_selection_t *selection = NULL;
             if (eg_plaintext_ballot_contest_get_selection_at_index(contest, j, &selection)) {
                 assert(false);
@@ -149,7 +149,7 @@ bool test_ballot_serialization(void)
     }
 
     char *derived;
-    size_t size;
+    uint64_t size;
     if (eg_plaintext_ballot_to_json(fromJson, &derived, &size)) {
         assert(false);
     }
