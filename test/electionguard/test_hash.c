@@ -16,7 +16,7 @@ bool test_hash_elems(void)
         assert(false);
     }
     uint64_t *string_hash_data = NULL;
-    size_t string_hash_data_size;
+    uint64_t string_hash_data_size;
     if (eg_element_mod_q_get_data(string_hash, &string_hash_data, &string_hash_data_size)) {
         assert(false);
     }
@@ -33,7 +33,7 @@ bool test_hash_elems(void)
         assert(false);
     }
     uint64_t *strings_hash_data = NULL;
-    size_t strings_hash_data_size;
+    uint64_t strings_hash_data_size;
     if (eg_element_mod_q_get_data(string_hash, &strings_hash_data, &strings_hash_data_size)) {
         assert(false);
     }
@@ -49,7 +49,7 @@ bool test_hash_elems(void)
         assert(false);
     }
     uint64_t *int_hash_data = NULL;
-    size_t int_hash_data_size;
+    uint64_t int_hash_data_size;
     if (eg_element_mod_q_get_data(string_hash, &int_hash_data, &int_hash_data_size)) {
         assert(false);
     }

@@ -76,7 +76,7 @@ eg_electionguard_status_t eg_element_mod_p_free(eg_element_mod_p_t *handle)
 }
 
 eg_electionguard_status_t eg_element_mod_p_get_data(eg_element_mod_p_t *handle, uint64_t **out_data,
-                                                    size_t *out_size)
+                                                    uint64_t *out_size)
 {
     if (handle == nullptr) {
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
@@ -84,7 +84,7 @@ eg_electionguard_status_t eg_element_mod_p_get_data(eg_element_mod_p_t *handle, 
 
     auto *element = AS_TYPE(ElementModP, handle);
     *out_data = element->get();
-    *out_size = MAX_P_LEN;
+    *out_size = (uint64_t)MAX_P_LEN;
 
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
@@ -152,7 +152,7 @@ eg_electionguard_status_t eg_element_mod_q_free(eg_element_mod_q_t *handle)
 }
 
 eg_electionguard_status_t eg_element_mod_q_get_data(eg_element_mod_q_t *handle, uint64_t **out_data,
-                                                    size_t *out_size)
+                                                    uint64_t *out_size)
 {
     if (handle == nullptr) {
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
@@ -160,7 +160,7 @@ eg_electionguard_status_t eg_element_mod_q_get_data(eg_element_mod_q_t *handle, 
 
     auto *element = AS_TYPE(ElementModQ, handle);
     *out_data = element->get();
-    *out_size = (size_t)MAX_Q_LEN;
+    *out_size = (uint64_t)MAX_Q_LEN;
 
     return ELECTIONGUARD_STATUS_SUCCESS;
 }

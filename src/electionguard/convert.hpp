@@ -88,6 +88,14 @@ namespace electionguard
         return stream.str();
     }
 
+    inline size_t uint64_to_size(uint64_t number)
+    {
+        if (number > SIZE_MAX) {
+            throw std::out_of_range("the uint64_t value is larger than the size_t width");
+        }
+        return (size_t)number;
+    }
+
     inline vector<uint8_t> bignum_to_bytes(const vector<uint64_t> &bignum)
     {
         size_t offset = sizeof(uint64_t) / sizeof(uint8_t);
@@ -137,7 +145,7 @@ namespace electionguard
         // iterate over a window
         for (size_t i = 0; i < bytes.size(); i += offset) {
 
-            uint64_t as_int;
+            uint64_t as_int = 0;
             auto remaining = bytes.size() - i;
 
             if (remaining > offset) {

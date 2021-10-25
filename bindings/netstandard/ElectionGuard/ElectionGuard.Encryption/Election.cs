@@ -152,7 +152,7 @@ namespace ElectionGuard
         public unsafe string ToJson()
         {
             var status = NativeInterface.CiphertextElectionContext.ToJson(
-                Handle, out IntPtr pointer, out UIntPtr size);
+                Handle, out IntPtr pointer, out ulong size);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"ToJson Error Status: {status}");

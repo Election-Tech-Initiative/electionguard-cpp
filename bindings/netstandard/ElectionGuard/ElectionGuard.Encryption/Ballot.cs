@@ -58,7 +58,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The length of the string value
         /// </Summary>
-        public unsafe long Length
+        public unsafe ulong Length
         {
             get
             {
@@ -73,7 +73,7 @@ namespace ElectionGuard
             Handle = handle;
         }
 
-        public unsafe ExtendedData(string value, long length)
+        public unsafe ExtendedData(string value, ulong length)
         {
             var status = NativeInterface.ExtendedData.New(
                 value, length, out Handle);
@@ -138,7 +138,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the plaintext vote
         /// </Summary>
-        public unsafe long Vote
+        public unsafe ulong Vote
         {
             get
             {
@@ -183,7 +183,7 @@ namespace ElectionGuard
         }
 
         public unsafe PlaintextBallotSelection(
-            string objectId, long vote, bool isPlaceholder = false)
+            string objectId, ulong vote, bool isPlaceholder = false)
         {
             var status = NativeInterface.PlaintextBallotSelection.New(
                 objectId, vote, isPlaceholder, out Handle);
@@ -194,11 +194,11 @@ namespace ElectionGuard
         }
 
         public unsafe PlaintextBallotSelection(
-            string objectId, long vote, bool isPlaceholder, string extendedData)
+            string objectId, ulong vote, bool isPlaceholder, string extendedData)
         {
             var status = NativeInterface.PlaintextBallotSelection.New(
                 objectId, vote, isPlaceholder,
-                extendedData, extendedData.Length, out Handle);
+                extendedData, (ulong)extendedData.Length, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"PlaintextBallotSelection Error Status: {status}");
@@ -276,7 +276,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the sequence order of the selection
         /// </Summary>
-        public unsafe long SequenceOrder
+        public unsafe ulong SequenceOrder
         {
             get
             {
@@ -532,9 +532,9 @@ namespace ElectionGuard
         /// </Summary>
         public unsafe bool IsValid(
             string expectedObjectId,
-            long expectedNumSelections,
-            long expectedNumElected,
-            long votesAllowed = 0)
+            ulong expectedNumSelections,
+            ulong expectedNumElected,
+            ulong votesAllowed = 0)
         {
             return NativeInterface.PlaintextBallotContest.IsValid(
                 Handle,
@@ -596,7 +596,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the sequence order of the contest
         /// </Summary>
-        public unsafe long SequenceOrder
+        public unsafe ulong SequenceOrder
         {
             get
             {
@@ -931,7 +931,7 @@ namespace ElectionGuard
         public unsafe string ToJson()
         {
             var status = NativeInterface.PlaintextBallot.ToJson(
-                Handle, out IntPtr pointer, out UIntPtr size);
+                Handle, out IntPtr pointer, out ulong size);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"PlaintextBallot Error ToJson: {status}");
@@ -948,7 +948,7 @@ namespace ElectionGuard
         {
 
             var status = NativeInterface.PlaintextBallot.ToBson(
-                Handle, out IntPtr data, out UIntPtr size);
+                Handle, out IntPtr data, out ulong size);
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
@@ -956,8 +956,14 @@ namespace ElectionGuard
                 return null;
             }
 
+            if (size > int.MaxValue)
+            {
+                Console.WriteLine($"PlaintextBallot Error ToBson: size is too big");
+            }
+
             var byteArray = new byte[(int)size];
             Marshal.Copy(data, byteArray, 0, (int)size);
+            // TODO: use PlaintextBallot.MsgPackFree
             NativeInterface.CompactCiphertextBallot.MsgPackFree(data);
             return byteArray;
         }
@@ -969,12 +975,17 @@ namespace ElectionGuard
         {
 
             var status = NativeInterface.PlaintextBallot.ToMsgPack(
-                Handle, out IntPtr data, out UIntPtr size);
+                Handle, out IntPtr data, out ulong size);
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"PlaintextBallot Error ToMsgPack: {status}");
                 return null;
+            }
+
+            if (size > int.MaxValue)
+            {
+                Console.WriteLine($"PlaintextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1026,12 +1037,17 @@ namespace ElectionGuard
         {
 
             var status = NativeInterface.CompactPlaintextBallot.ToMsgPack(
-                Handle, out IntPtr data, out UIntPtr size);
+                Handle, out IntPtr data, out ulong size);
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CompactPlaintextBallot Error ToJson: {status}");
+                Console.WriteLine($"CompactPlaintextBallot Error ToMsgPack: {status}");
                 return null;
+            }
+
+            if (size > int.MaxValue)
+            {
+                Console.WriteLine($"CompactPlaintextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1045,11 +1061,7 @@ namespace ElectionGuard
             base.DisposeUnmanaged();
 
             if (Handle == null) return;
-            var status = NativeInterface.CompactPlaintextBallot.Free(Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CompactPlaintextBallot Error DisposeUnmanaged: {status}");
-            }
+            Handle.Dispose();
             Handle = null;
         }
     }
@@ -1185,12 +1197,12 @@ namespace ElectionGuard
         /// provide units as it is up to the host system to indicate the scale.
         /// Typically a host may use seconds since epoch or ticks since epoch
         /// </summary>
-        public unsafe long Timestamp
+        public unsafe ulong Timestamp
         {
             get
             {
                 var status = NativeInterface.CiphertextBallot.GetTimestamp(
-                    Handle, out long value);
+                    Handle, out ulong value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     Console.WriteLine($"CiphertextBallot Error Timestamp: {status}");
@@ -1285,7 +1297,7 @@ namespace ElectionGuard
         {
             var status = withNonces
                 ? NativeInterface.CiphertextBallot.ToJsonWithNonces(
-                Handle, out IntPtr pointer, out UIntPtr size)
+                Handle, out IntPtr pointer, out ulong size)
                 : NativeInterface.CiphertextBallot.ToJson(
                 Handle, out pointer, out size);
 
@@ -1294,8 +1306,7 @@ namespace ElectionGuard
                 Console.WriteLine($"CiphertextBallot Error ToJson: {status}");
                 return null;
             }
-            var json = Marshal.PtrToStringAnsi(pointer, (int)size);
-            Marshal.FreeHGlobal(pointer);
+            var json = Marshal.PtrToStringAnsi(pointer);
             return json;
         }
 
@@ -1307,7 +1318,7 @@ namespace ElectionGuard
 
             var status = withNonces
                 ? NativeInterface.CiphertextBallot.ToBsonWithNonces(
-                Handle, out IntPtr data, out UIntPtr size)
+                Handle, out IntPtr data, out ulong size)
                 : NativeInterface.CiphertextBallot.ToBson(
                 Handle, out data, out size);
 
@@ -1315,6 +1326,11 @@ namespace ElectionGuard
             {
                 Console.WriteLine($"CiphertextBallot Error ToBson: {status}");
                 return null;
+            }
+
+            if (size > int.MaxValue)
+            {
+                Console.WriteLine($"CiphertextBallot Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1331,7 +1347,7 @@ namespace ElectionGuard
 
             var status = withNonces
                 ? NativeInterface.CiphertextBallot.ToMsgPack(
-                Handle, out IntPtr data, out UIntPtr size)
+                Handle, out IntPtr data, out ulong size)
                 : NativeInterface.CiphertextBallot.ToMsgPack(
                 Handle, out data, out size);
 
@@ -1339,6 +1355,11 @@ namespace ElectionGuard
             {
                 Console.WriteLine($"CiphertextBallot Error ToMsgPack: {status}");
                 return null;
+            }
+
+            if (size > int.MaxValue)
+            {
+                Console.WriteLine($"CiphertextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1352,11 +1373,7 @@ namespace ElectionGuard
             base.DisposeUnmanaged();
 
             if (Handle == null) return;
-            var status = NativeInterface.CiphertextBallot.Free(Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CiphertextBallot Error DisposeUnmanaged: {status}");
-            }
+            Handle.Dispose();
             Handle = null;
         }
     }
@@ -1421,12 +1438,17 @@ namespace ElectionGuard
         {
 
             var status = NativeInterface.CompactCiphertextBallot.ToMsgPack(
-                Handle, out IntPtr data, out UIntPtr size);
+                Handle, out IntPtr data, out ulong size);
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"CompactCiphertextBallot Error ToMsgPack: {status}");
                 return null;
+            }
+
+            if (size > int.MaxValue)
+            {
+                Console.WriteLine($"CompactCiphertextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1440,11 +1462,7 @@ namespace ElectionGuard
             base.DisposeUnmanaged();
 
             if (Handle == null) return;
-            var status = NativeInterface.CompactCiphertextBallot.Free(Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CompactCiphertextBallot Error DisposeUnmanaged: {status}");
-            }
+            Handle.Dispose();
             Handle = null;
         }
     }
@@ -1584,12 +1602,12 @@ namespace ElectionGuard
         /// provide units as it is up to the host system to indicate the scale.
         /// Typically a host may use seconds since epoch or ticks since epoch
         /// </summary>
-        public unsafe long Timestamp
+        public unsafe ulong Timestamp
         {
             get
             {
                 var status = NativeInterface.SubmittedBallot.GetTimestamp(
-                    Handle, out long value);
+                    Handle, out ulong value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     Console.WriteLine($"SubmittedBallot Error Timestamp: {status}");
@@ -1677,7 +1695,7 @@ namespace ElectionGuard
         public unsafe string ToJson()
         {
             var status = NativeInterface.SubmittedBallot.ToJson(
-                Handle, out IntPtr pointer, out UIntPtr size);
+                Handle, out IntPtr pointer, out ulong size);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"SubmittedBallot Error ToJson: {status}");
@@ -1694,12 +1712,17 @@ namespace ElectionGuard
         {
 
             var status = NativeInterface.SubmittedBallot.ToBson(
-                Handle, out IntPtr data, out UIntPtr size);
+                Handle, out IntPtr data, out ulong size);
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"SubmittedBallot Error ToBson: {status}");
                 return null;
+            }
+
+            if (size > int.MaxValue)
+            {
+                Console.WriteLine($"SubmittedBallot Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1715,12 +1738,17 @@ namespace ElectionGuard
         {
 
             var status = NativeInterface.SubmittedBallot.ToMsgPack(
-                Handle, out IntPtr data, out UIntPtr size);
+                Handle, out IntPtr data, out ulong size);
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 Console.WriteLine($"SubmittedBallot Error ToMsgPack: {status}");
                 return null;
+            }
+
+            if (size > int.MaxValue)
+            {
+                Console.WriteLine($"SubmittedBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];

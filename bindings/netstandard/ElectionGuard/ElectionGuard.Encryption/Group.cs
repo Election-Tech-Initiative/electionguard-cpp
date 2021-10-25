@@ -86,8 +86,8 @@ namespace ElectionGuard
             var data = new ulong[MAX_SIZE];
             fixed (ulong* element = new ulong[MAX_SIZE])
             {
-                var status = NativeInterface.ElementModP.GetData(Handle, &element, out UIntPtr size);
-                if (size.ToUInt64() != MAX_SIZE)
+                var status = NativeInterface.ElementModP.GetData(Handle, &element, out ulong size);
+                if (size != MAX_SIZE)
                 {
                     Console.WriteLine("wrong size");
                     return null;
@@ -188,8 +188,8 @@ namespace ElectionGuard
             var data = new ulong[MAX_SIZE];
             fixed (ulong* element = new ulong[MAX_SIZE])
             {
-                var status = NativeInterface.ElementModQ.GetData(Handle, &element, out UIntPtr size);
-                if (size.ToUInt64() != MAX_SIZE)
+                var status = NativeInterface.ElementModQ.GetData(Handle, &element, out ulong size);
+                if (size != MAX_SIZE)
                 {
                     Console.WriteLine("wrong size");
                     return null;

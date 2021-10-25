@@ -177,7 +177,7 @@ struct eg_internationalized_text_s;
 typedef struct eg_internationalized_text_s eg_internationalized_text_t;
 
 EG_API eg_electionguard_status_t eg_internationalized_text_new(
-  eg_language_t *in_text[], const size_t in_text_size, eg_internationalized_text_t **out_handle);
+  eg_language_t *in_text[], const uint64_t in_text_size, eg_internationalized_text_t **out_handle);
 
 EG_API eg_electionguard_status_t
 eg_internationalized_text_free(eg_internationalized_text_t *handle);
@@ -185,7 +185,7 @@ eg_internationalized_text_free(eg_internationalized_text_t *handle);
 /**
  * Get the Size of the text collection
  */
-EG_API size_t eg_internationalized_text_get_text_size(eg_internationalized_text_t *handle);
+EG_API uint64_t eg_internationalized_text_get_text_size(eg_internationalized_text_t *handle);
 
 /**
  * Get a text at a specific index.
@@ -195,7 +195,7 @@ EG_API size_t eg_internationalized_text_get_text_size(eg_internationalized_text_
  *                          The value is a reference and is not owned by the caller
  */
 EG_API eg_electionguard_status_t eg_internationalized_text_get_text_at_index(
-  eg_internationalized_text_t *handle, size_t in_index, eg_language_t **out_text_ref);
+  eg_internationalized_text_t *handle, uint64_t in_index, eg_language_t **out_text_ref);
 
 /**
  * A hash representation of the object. Caller is responsible for lifecycle.
@@ -223,9 +223,9 @@ EG_API eg_electionguard_status_t eg_contact_information_new(char *in_name,
                                                             eg_contact_information_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_contact_information_new_with_collections(
-  char *in_name, char *in_address_line[], const size_t in_address_line_size,
-  eg_annotated_string_t *in_email_line[], const size_t in_email_line_size,
-  eg_annotated_string_t *in_phone_line[], const size_t in_phone_line_size,
+  char *in_name, char *in_address_line[], const uint64_t in_address_line_size,
+  eg_annotated_string_t *in_email_line[], const uint64_t in_email_line_size,
+  eg_annotated_string_t *in_phone_line[], const uint64_t in_phone_line_size,
   eg_contact_information_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_contact_information_free(eg_contact_information_t *handle);
@@ -233,7 +233,7 @@ EG_API eg_electionguard_status_t eg_contact_information_free(eg_contact_informat
 /**
  * Get the Size of the address collection
  */
-EG_API size_t eg_contact_information_get_address_line_size(eg_contact_information_t *handle);
+EG_API uint64_t eg_contact_information_get_address_line_size(eg_contact_information_t *handle);
 
 /**
  * Get an address line at a specific index.
@@ -248,12 +248,12 @@ EG_API size_t eg_contact_information_get_address_line_size(eg_contact_informatio
  *                          The value is a reference and is not owned by the caller
  */
 EG_API eg_electionguard_status_t eg_contact_information_get_address_line_at_index(
-  eg_contact_information_t *handle, size_t in_index, char **out_address);
+  eg_contact_information_t *handle, uint64_t in_index, char **out_address);
 
 /**
  * Get the Size of the email line collection
  */
-EG_API size_t eg_contact_information_get_email_line_size(eg_contact_information_t *handle);
+EG_API uint64_t eg_contact_information_get_email_line_size(eg_contact_information_t *handle);
 
 /**
  * Get an email line at a specific index.
@@ -267,13 +267,14 @@ EG_API size_t eg_contact_information_get_email_line_size(eg_contact_information_
  * @param[out] out_text_ref An opaque pointer to the text.  
  *                          The value is a reference and is not owned by the caller
  */
-EG_API eg_electionguard_status_t eg_contact_information_get_email_line_at_index(
-  eg_contact_information_t *handle, size_t in_index, eg_internationalized_text_t **out_address_ref);
+EG_API eg_electionguard_status_t
+eg_contact_information_get_email_line_at_index(eg_contact_information_t *handle, uint64_t in_index,
+                                               eg_internationalized_text_t **out_address_ref);
 
 /**
  * Get the Size of the phone line collection
  */
-EG_API size_t eg_contact_information_get_phone_line_size(eg_contact_information_t *handle);
+EG_API uint64_t eg_contact_information_get_phone_line_size(eg_contact_information_t *handle);
 
 /**
  * Get a phone line at a specific index.
@@ -288,7 +289,7 @@ EG_API size_t eg_contact_information_get_phone_line_size(eg_contact_information_
  *                          The value is a reference and is not owned by the caller
  */
 EG_API eg_electionguard_status_t eg_contact_information_get_phone_line_at_index(
-  eg_contact_information_t *handle, size_t in_index, eg_internationalized_text_t **out_phone_ref);
+  eg_contact_information_t *handle, uint64_t in_index, eg_internationalized_text_t **out_phone_ref);
 
 EG_API eg_electionguard_status_t eg_contact_information_get_name(eg_contact_information_t *handle,
                                                                  const char **out_name);
@@ -363,28 +364,28 @@ typedef struct eg_ballot_style_s eg_ballot_style_t;
 
 EG_API eg_electionguard_status_t eg_ballot_style_new(char *in_object_id,
                                                      char *in_geopolitical_unit_ids[],
-                                                     const size_t in_geopolitical_unit_ids_size,
+                                                     const uint64_t in_geopolitical_unit_ids_size,
                                                      eg_ballot_style_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_ballot_style_new_with_parties(
-  char *in_object_id, char *in_geopolitical_unit_ids[], const size_t in_geopolitical_unit_ids_size,
-  char *in_party_ids[], const size_t in_party_ids_size, char *in_image_uri,
-  eg_ballot_style_t **out_handle);
+  char *in_object_id, char *in_geopolitical_unit_ids[],
+  const uint64_t in_geopolitical_unit_ids_size, char *in_party_ids[],
+  const uint64_t in_party_ids_size, char *in_image_uri, eg_ballot_style_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_ballot_style_free(eg_ballot_style_t *handle);
 
 EG_API eg_electionguard_status_t eg_ballot_style_get_object_id(eg_ballot_style_t *handle,
                                                                const char **out_object_id);
 
-EG_API size_t eg_ballot_style_get_geopolitical_unit_ids_size(eg_ballot_style_t *handle);
+EG_API uint64_t eg_ballot_style_get_geopolitical_unit_ids_size(eg_ballot_style_t *handle);
 
 EG_API eg_electionguard_status_t eg_ballot_style_get_geopolitical_unit_id_at_index(
-  eg_ballot_style_t *handle, size_t in_index, char **out_geopolitical_unit_id);
+  eg_ballot_style_t *handle, uint64_t in_index, char **out_geopolitical_unit_id);
 
-EG_API size_t eg_ballot_style_get_party_ids_size(eg_ballot_style_t *handle);
+EG_API uint64_t eg_ballot_style_get_party_ids_size(eg_ballot_style_t *handle);
 
 EG_API eg_electionguard_status_t eg_ballot_style_get_party_id_at_index(eg_ballot_style_t *handle,
-                                                                       size_t in_index,
+                                                                       uint64_t in_index,
                                                                        char **out_party_id);
 
 EG_API eg_electionguard_status_t eg_ballot_style_get_image_uri(eg_ballot_style_t *handle,
@@ -657,10 +658,10 @@ EG_API eg_electionguard_status_t eg_contest_description_get_ballot_title(
 EG_API eg_electionguard_status_t eg_contest_description_get_ballot_subtitle(
   eg_contest_description_t *handle, eg_internationalized_text_t **out_ballot_subtitle_ref);
 
-EG_API size_t eg_contest_description_get_selections_size(eg_contest_description_t *handle);
+EG_API uint64_t eg_contest_description_get_selections_size(eg_contest_description_t *handle);
 
 EG_API eg_electionguard_status_t
-eg_contest_description_get_selection_at_index(eg_contest_description_t *handle, size_t in_index,
+eg_contest_description_get_selection_at_index(eg_contest_description_t *handle, uint64_t in_index,
                                               eg_selection_description_t **out_selection_ref);
 
 /**
@@ -720,11 +721,11 @@ eg_contest_description_with_placeholders_new_with_title_and_parties(
 EG_API eg_electionguard_status_t
 eg_contest_description_with_placeholders_free(eg_contest_description_with_placeholders_t *handle);
 
-EG_API size_t eg_contest_description_with_placeholders_get_placeholders_size(
+EG_API uint64_t eg_contest_description_with_placeholders_get_placeholders_size(
   eg_contest_description_with_placeholders_t *handle);
 
 EG_API eg_electionguard_status_t eg_contest_description_with_placeholders_get_placeholder_at_index(
-  eg_contest_description_with_placeholders_t *handle, size_t in_index,
+  eg_contest_description_with_placeholders_t *handle, uint64_t in_index,
   eg_contest_description_with_placeholders_t **out_placeholder_ref);
 
 EG_API bool eg_contest_description_with_placeholders_is_placeholder(
@@ -784,30 +785,30 @@ EG_API uint64_t eg_election_manifest_get_start_date(eg_election_manifest_t *hand
 
 EG_API uint64_t eg_election_manifest_get_end_date(eg_election_manifest_t *handle);
 
-EG_API size_t eg_election_manifest_get_geopolitical_units_size(eg_election_manifest_t *handle);
+EG_API uint64_t eg_election_manifest_get_geopolitical_units_size(eg_election_manifest_t *handle);
 
 EG_API eg_electionguard_status_t eg_election_manifest_get_geopolitical_unit_at_index(
-  eg_election_manifest_t *handle, size_t in_index, eg_geopolitical_unit_t **out_gp_unit_ref);
+  eg_election_manifest_t *handle, uint64_t in_index, eg_geopolitical_unit_t **out_gp_unit_ref);
 
-EG_API size_t eg_election_manifest_get_parties_size(eg_election_manifest_t *handle);
+EG_API uint64_t eg_election_manifest_get_parties_size(eg_election_manifest_t *handle);
 
 EG_API eg_electionguard_status_t eg_election_manifest_get_party_at_index(
-  eg_election_manifest_t *handle, size_t in_index, eg_party_t **out_party_ref);
+  eg_election_manifest_t *handle, uint64_t in_index, eg_party_t **out_party_ref);
 
-EG_API size_t eg_election_manifest_get_candidates_size(eg_election_manifest_t *handle);
+EG_API uint64_t eg_election_manifest_get_candidates_size(eg_election_manifest_t *handle);
 
 EG_API eg_electionguard_status_t eg_election_manifest_get_candidate_at_index(
-  eg_election_manifest_t *handle, size_t in_index, eg_candidate_t **out_candidate_ref);
+  eg_election_manifest_t *handle, uint64_t in_index, eg_candidate_t **out_candidate_ref);
 
-EG_API size_t eg_election_manifest_get_contests_size(eg_election_manifest_t *handle);
+EG_API uint64_t eg_election_manifest_get_contests_size(eg_election_manifest_t *handle);
 
 EG_API eg_electionguard_status_t eg_election_manifest_get_contest_at_index(
-  eg_election_manifest_t *handle, size_t in_index, eg_contest_description_t **out_contest_ref);
+  eg_election_manifest_t *handle, uint64_t in_index, eg_contest_description_t **out_contest_ref);
 
-EG_API size_t eg_election_manifest_get_ballot_styles_size(eg_election_manifest_t *handle);
+EG_API uint64_t eg_election_manifest_get_ballot_styles_size(eg_election_manifest_t *handle);
 
 EG_API eg_electionguard_status_t eg_election_manifest_get_ballot_style_at_index(
-  eg_election_manifest_t *handle, size_t in_index, eg_ballot_style_t **out_ballot_style_ref);
+  eg_election_manifest_t *handle, uint64_t in_index, eg_ballot_style_t **out_ballot_style_ref);
 
 EG_API eg_electionguard_status_t eg_election_manifest_get_name(
   eg_election_manifest_t *handle, eg_internationalized_text_t **out_name_ref);
@@ -838,15 +839,16 @@ EG_API eg_electionguard_status_t eg_election_manifest_from_msgpack(
   uint8_t *in_data, uint64_t in_length, eg_election_manifest_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_election_manifest_to_json(eg_election_manifest_t *handle,
-                                                              char **out_data, size_t *out_size);
+                                                              char **out_data, uint64_t *out_size);
 
 // returns the size and fills out_data, caller is responsible for freeing the out_data
 EG_API eg_electionguard_status_t eg_election_manifest_to_bson(eg_election_manifest_t *handle,
-                                                              uint8_t **out_data, size_t *out_size);
+                                                              uint8_t **out_data,
+                                                              uint64_t *out_size);
 
 EG_API eg_electionguard_status_t eg_election_manifest_to_msgpack(eg_election_manifest_t *handle,
                                                                  uint8_t **out_data,
-                                                                 size_t *out_size);
+                                                                 uint64_t *out_size);
 
 #endif
 
@@ -882,21 +884,21 @@ EG_API eg_electionguard_status_t eg_internal_manifest_free(eg_internal_manifest_
 EG_API eg_electionguard_status_t eg_internal_manifest_get_manifest_hash(
   eg_internal_manifest_t *handle, eg_element_mod_q_t **out_manifest_hash_ref);
 
-EG_API size_t eg_internal_manifest_get_geopolitical_units_size(eg_internal_manifest_t *handle);
+EG_API uint64_t eg_internal_manifest_get_geopolitical_units_size(eg_internal_manifest_t *handle);
 
 EG_API eg_electionguard_status_t eg_internal_manifest_get_geopolitical_unit_at_index(
-  eg_internal_manifest_t *handle, size_t in_index, eg_geopolitical_unit_t **out_gp_unit_ref);
+  eg_internal_manifest_t *handle, uint64_t in_index, eg_geopolitical_unit_t **out_gp_unit_ref);
 
-EG_API size_t eg_internal_manifest_get_contests_size(eg_internal_manifest_t *handle);
+EG_API uint64_t eg_internal_manifest_get_contests_size(eg_internal_manifest_t *handle);
 
 EG_API eg_electionguard_status_t eg_internal_manifest_get_contest_at_index(
-  eg_internal_manifest_t *handle, size_t in_index,
+  eg_internal_manifest_t *handle, uint64_t in_index,
   eg_contest_description_with_placeholders_t **out_contest_ref);
 
-EG_API size_t eg_internal_manifest_get_ballot_styles_size(eg_internal_manifest_t *handle);
+EG_API uint64_t eg_internal_manifest_get_ballot_styles_size(eg_internal_manifest_t *handle);
 
 EG_API eg_electionguard_status_t eg_internal_manifest_get_ballot_style_at_index(
-  eg_internal_manifest_t *handle, size_t in_index, eg_ballot_style_t **out_ballot_style_ref);
+  eg_internal_manifest_t *handle, uint64_t in_index, eg_ballot_style_t **out_ballot_style_ref);
 
 EG_API eg_electionguard_status_t
 eg_internal_manifest_get_ballot_style(eg_internal_manifest_t *handle, char *in_ballot_style_id,
@@ -912,15 +914,16 @@ EG_API eg_electionguard_status_t eg_internal_manifest_from_msgpack(
   uint8_t *in_data, uint64_t in_length, eg_internal_manifest_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_internal_manifest_to_json(eg_internal_manifest_t *handle,
-                                                              char **out_data, size_t *out_size);
+                                                              char **out_data, uint64_t *out_size);
 
 // returns the size and fills out_data, caller is responsible for freeing the out_data
 EG_API eg_electionguard_status_t eg_internal_manifest_to_bson(eg_internal_manifest_t *handle,
-                                                              uint8_t **out_data, size_t *out_size);
+                                                              uint8_t **out_data,
+                                                              uint64_t *out_size);
 
 EG_API eg_electionguard_status_t eg_internal_manifest_to_msgpack(eg_internal_manifest_t *handle,
                                                                  uint8_t **out_data,
-                                                                 size_t *out_size);
+                                                                 uint64_t *out_size);
 
 #endif
 

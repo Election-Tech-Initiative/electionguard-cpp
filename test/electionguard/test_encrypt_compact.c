@@ -78,7 +78,7 @@ bool test_encrypt_ballot_compact_simple_succeeds(void)
     }
 
     uint8_t *compact_data = NULL;
-    size_t compact_data_size;
+    uint64_t compact_data_size;
     if (eg_compact_ciphertext_ballot_to_msgpack(compact, &compact_data, &compact_data_size)) {
         assert(false);
     }

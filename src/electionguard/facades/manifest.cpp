@@ -33,6 +33,7 @@ using electionguard::Manifest;
 using electionguard::Party;
 using electionguard::ReportingUnitType;
 using electionguard::SelectionDescription;
+using electionguard::uint64_to_size;
 using electionguard::VoteVariationType;
 
 using std::make_unique;
@@ -186,16 +187,16 @@ eg_electionguard_status_t eg_language_crypto_hash(eg_language_t *handle,
 #pragma region InternationalizedText
 
 eg_electionguard_status_t eg_internationalized_text_new(eg_language_t *in_text[],
-                                                        const size_t in_text_size,
+                                                        const uint64_t in_text_size,
                                                         eg_internationalized_text_t **out_handle)
 {
     try {
         vector<unique_ptr<Language>> collection;
-        collection.reserve(in_text_size);
-        for (size_t i = 0; i < in_text_size; i++) {
+        collection.reserve(uint64_to_size(in_text_size));
+        for (uint64_t i = 0; i < in_text_size; i++) {
             auto *element = AS_TYPE(Language, in_text[i]);
-            unique_ptr<Language> lang(new Language(std::move(*element)));
-            collection.push_back(std::move(lang));
+            unique_ptr<Language> lang(new Language(*element));
+            collection.push_back(move(lang));
             //collection.push_back(make_unique<Language>(std::move(*element)));
         }
 
@@ -220,18 +221,18 @@ eg_electionguard_status_t eg_internationalized_text_free(eg_internationalized_te
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-size_t eg_internationalized_text_get_text_size(eg_internationalized_text_t *handle)
+uint64_t eg_internationalized_text_get_text_size(eg_internationalized_text_t *handle)
 {
-    return AS_TYPE(InternationalizedText, handle)->getText().size();
+    return (uint64_t)AS_TYPE(InternationalizedText, handle)->getText().size();
 }
 
 eg_electionguard_status_t
-eg_internationalized_text_get_text_at_index(eg_internationalized_text_t *handle, size_t in_index,
+eg_internationalized_text_get_text_at_index(eg_internationalized_text_t *handle, uint64_t in_index,
                                             eg_language_t **out_text_ref)
 {
     try {
         auto collection = AS_TYPE(InternationalizedText, handle)->getText();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_text_ref = AS_TYPE(eg_language_t, reference);
 
@@ -275,29 +276,29 @@ eg_electionguard_status_t eg_contact_information_new(char *in_name,
 }
 
 eg_electionguard_status_t eg_contact_information_new_with_collections(
-  char *in_name, char *in_address_line[], const size_t in_address_line_size,
-  eg_annotated_string_t *in_email_line[], const size_t in_email_line_size,
-  eg_annotated_string_t *in_phone_line[], const size_t in_phone_line_size,
+  char *in_name, char *in_address_line[], const uint64_t in_address_line_size,
+  eg_annotated_string_t *in_email_line[], const uint64_t in_email_line_size,
+  eg_annotated_string_t *in_phone_line[], const uint64_t in_phone_line_size,
   eg_contact_information_t **out_handle)
 {
     try {
         vector<string> address;
-        address.reserve(in_address_line_size);
-        for (size_t i = 0; i < in_address_line_size; i++) {
+        address.reserve(uint64_to_size(in_address_line_size));
+        for (uint64_t i = 0; i < in_address_line_size; i++) {
             address.push_back(in_address_line[i]);
         }
 
         vector<unique_ptr<AnnotatedString>> email;
-        email.reserve(in_email_line_size);
-        for (size_t i = 0; i < in_email_line_size; i++) {
+        email.reserve(uint64_to_size(in_email_line_size));
+        for (uint64_t i = 0; i < in_email_line_size; i++) {
             auto *element = AS_TYPE(AnnotatedString, in_email_line[i]);
             unique_ptr<AnnotatedString> annotated(new AnnotatedString(std::move(*element)));
             email.push_back(std::move(annotated));
         }
 
         vector<unique_ptr<AnnotatedString>> phone;
-        email.reserve(in_phone_line_size);
-        for (size_t i = 0; i < in_phone_line_size; i++) {
+        email.reserve(uint64_to_size(in_phone_line_size));
+        for (uint64_t i = 0; i < in_phone_line_size; i++) {
             auto *element = AS_TYPE(AnnotatedString, in_phone_line[i]);
             unique_ptr<AnnotatedString> annotated(new AnnotatedString(std::move(*element)));
             phone.push_back(std::move(annotated));
@@ -325,18 +326,18 @@ eg_electionguard_status_t eg_contact_information_free(eg_contact_information_t *
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-size_t eg_contact_information_get_address_line_size(eg_contact_information_t *handle)
+uint64_t eg_contact_information_get_address_line_size(eg_contact_information_t *handle)
 {
-    return AS_TYPE(ContactInformation, handle)->getAddressLine().size();
+    return (uint64_t)AS_TYPE(ContactInformation, handle)->getAddressLine().size();
 }
 
 eg_electionguard_status_t
-eg_contact_information_get_address_line_at_index(eg_contact_information_t *handle, size_t in_index,
-                                                 char **out_address)
+eg_contact_information_get_address_line_at_index(eg_contact_information_t *handle,
+                                                 uint64_t in_index, char **out_address)
 {
     try {
         auto collection = AS_TYPE(ContactInformation, handle)->getAddressLine();
-        auto reference = collection.at(in_index);
+        auto reference = collection.at(uint64_to_size(in_index));
 
         *out_address = dynamicCopy(reference);
 
@@ -347,18 +348,18 @@ eg_contact_information_get_address_line_at_index(eg_contact_information_t *handl
     }
 }
 
-size_t eg_contact_information_get_email_line_size(eg_contact_information_t *handle)
+uint64_t eg_contact_information_get_email_line_size(eg_contact_information_t *handle)
 {
-    return AS_TYPE(ContactInformation, handle)->getEmail().size();
+    return (uint64_t)AS_TYPE(ContactInformation, handle)->getEmail().size();
 }
 
 eg_electionguard_status_t
-eg_contact_information_get_email_line_at_index(eg_contact_information_t *handle, size_t in_index,
+eg_contact_information_get_email_line_at_index(eg_contact_information_t *handle, uint64_t in_index,
                                                eg_internationalized_text_t **out_address_ref)
 {
     try {
         auto collection = AS_TYPE(ContactInformation, handle)->getEmail();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_address_ref = AS_TYPE(eg_internationalized_text_t, reference);
 
@@ -369,18 +370,18 @@ eg_contact_information_get_email_line_at_index(eg_contact_information_t *handle,
     }
 }
 
-size_t eg_contact_information_get_phone_line_size(eg_contact_information_t *handle)
+uint64_t eg_contact_information_get_phone_line_size(eg_contact_information_t *handle)
 {
-    return AS_TYPE(ContactInformation, handle)->getPhone().size();
+    return (uint64_t)AS_TYPE(ContactInformation, handle)->getPhone().size();
 }
 
 eg_electionguard_status_t
-eg_contact_information_get_phone_line_at_index(eg_contact_information_t *handle, size_t in_index,
+eg_contact_information_get_phone_line_at_index(eg_contact_information_t *handle, uint64_t in_index,
                                                eg_internationalized_text_t **out_phone_ref)
 {
     try {
         auto collection = AS_TYPE(ContactInformation, handle)->getPhone();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_phone_ref = AS_TYPE(eg_internationalized_text_t, reference);
 
@@ -524,14 +525,14 @@ eg_electionguard_status_t eg_geopolitical_unit_crypto_hash(eg_geopolitical_unit_
 #pragma region BallotStyle
 
 eg_electionguard_status_t eg_ballot_style_new(char *in_object_id, char *in_geopolitical_unit_ids[],
-                                              const size_t in_geopolitical_unit_ids_size,
+                                              const uint64_t in_geopolitical_unit_ids_size,
                                               eg_ballot_style_t **out_handle)
 {
     try {
         auto objectId = string(in_object_id);
         vector<string> gpUnitIds;
-        gpUnitIds.reserve(in_geopolitical_unit_ids_size);
-        for (size_t i = 0; i < in_geopolitical_unit_ids_size; i++) {
+        gpUnitIds.reserve(uint64_to_size(in_geopolitical_unit_ids_size));
+        for (uint64_t i = 0; i < in_geopolitical_unit_ids_size; i++) {
             gpUnitIds.push_back(in_geopolitical_unit_ids[i]);
         }
 
@@ -547,22 +548,22 @@ eg_electionguard_status_t eg_ballot_style_new(char *in_object_id, char *in_geopo
 
 eg_electionguard_status_t
 eg_ballot_style_new_with_parties(char *in_object_id, char *in_geopolitical_unit_ids[],
-                                 const size_t in_geopolitical_unit_ids_size, char *in_party_ids[],
-                                 const size_t in_party_ids_size, char *in_image_uri,
+                                 const uint64_t in_geopolitical_unit_ids_size, char *in_party_ids[],
+                                 const uint64_t in_party_ids_size, char *in_image_uri,
                                  eg_ballot_style_t **out_handle)
 {
     try {
         auto objectId = string(in_object_id);
         auto imageUri = string(in_image_uri);
         vector<string> gpUnitIds;
-        gpUnitIds.reserve(in_geopolitical_unit_ids_size);
-        for (size_t i = 0; i < in_geopolitical_unit_ids_size; i++) {
+        gpUnitIds.reserve(uint64_to_size(in_geopolitical_unit_ids_size));
+        for (uint64_t i = 0; i < in_geopolitical_unit_ids_size; i++) {
             gpUnitIds.push_back(in_geopolitical_unit_ids[i]);
         }
 
         vector<string> partyIds;
-        gpUnitIds.reserve(in_party_ids_size);
-        for (size_t i = 0; i < in_party_ids_size; i++) {
+        gpUnitIds.reserve(uint64_to_size(in_party_ids_size));
+        for (uint64_t i = 0; i < in_party_ids_size; i++) {
             partyIds.push_back(in_party_ids[i]);
         }
 
@@ -601,18 +602,18 @@ eg_electionguard_status_t eg_ballot_style_get_object_id(eg_ballot_style_t *handl
     }
 }
 
-size_t eg_ballot_style_get_geopolitical_unit_ids_size(eg_ballot_style_t *handle)
+uint64_t eg_ballot_style_get_geopolitical_unit_ids_size(eg_ballot_style_t *handle)
 {
-    return AS_TYPE(BallotStyle, handle)->getGeopoliticalUnitIds().size();
+    return (uint64_t)AS_TYPE(BallotStyle, handle)->getGeopoliticalUnitIds().size();
 }
 
 eg_electionguard_status_t
-eg_ballot_style_get_geopolitical_unit_id_at_index(eg_ballot_style_t *handle, size_t in_index,
+eg_ballot_style_get_geopolitical_unit_id_at_index(eg_ballot_style_t *handle, uint64_t in_index,
                                                   char **out_geopolitical_unit_id)
 {
     try {
         auto collection = AS_TYPE(BallotStyle, handle)->getGeopoliticalUnitIds();
-        auto reference = collection.at(in_index);
+        auto reference = collection.at(uint64_to_size(in_index));
         *out_geopolitical_unit_id = dynamicCopy(reference);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -622,18 +623,18 @@ eg_ballot_style_get_geopolitical_unit_id_at_index(eg_ballot_style_t *handle, siz
     }
 }
 
-size_t eg_ballot_style_get_party_ids_size(eg_ballot_style_t *handle)
+uint64_t eg_ballot_style_get_party_ids_size(eg_ballot_style_t *handle)
 {
-    return AS_TYPE(BallotStyle, handle)->getPartyIds().size();
+    return (uint64_t)AS_TYPE(BallotStyle, handle)->getPartyIds().size();
 }
 
 eg_electionguard_status_t eg_ballot_style_get_party_id_at_index(eg_ballot_style_t *handle,
-                                                                size_t in_index,
+                                                                uint64_t in_index,
                                                                 char **out_party_id)
 {
     try {
         auto collection = AS_TYPE(BallotStyle, handle)->getPartyIds();
-        auto reference = collection.at(in_index);
+        auto reference = collection.at(uint64_to_size(in_index));
         *out_party_id = dynamicCopy(reference);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -1075,8 +1076,8 @@ eg_contest_description_new(const char *in_object_id, char *in_electoral_district
         auto name = string(in_name);
 
         vector<unique_ptr<SelectionDescription>> selections;
-        selections.reserve(in_selections_size);
-        for (size_t i = 0; i < in_selections_size; i++) {
+        selections.reserve(uint64_to_size(in_selections_size));
+        for (uint64_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1111,8 +1112,8 @@ eg_electionguard_status_t eg_contest_description_new_with_title(
         auto ballotSubTitle = AS_TYPE(InternationalizedText, in_ballot_subtitle);
 
         vector<unique_ptr<SelectionDescription>> selections;
-        selections.reserve(in_selections_size);
-        for (size_t i = 0; i < in_selections_size; i++) {
+        selections.reserve(uint64_to_size(in_selections_size));
+        for (uint64_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1146,8 +1147,8 @@ eg_electionguard_status_t eg_contest_description_new_with_parties(
         auto name = string(in_name);
 
         vector<unique_ptr<SelectionDescription>> selections;
-        selections.reserve(in_selections_size);
-        for (size_t i = 0; i < in_selections_size; i++) {
+        selections.reserve(uint64_to_size(in_selections_size));
+        for (uint64_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1155,8 +1156,8 @@ eg_electionguard_status_t eg_contest_description_new_with_parties(
         }
 
         vector<string> partyIds;
-        partyIds.reserve(in_primary_party_ids_size);
-        for (size_t i = 0; i < in_primary_party_ids_size; i++) {
+        partyIds.reserve(uint64_to_size(in_primary_party_ids_size));
+        for (uint64_t i = 0; i < in_primary_party_ids_size; i++) {
             partyIds.push_back(in_primary_party_ids[i]);
         }
 
@@ -1189,8 +1190,8 @@ eg_electionguard_status_t eg_contest_description_new_with_title_and_parties(
         auto ballotSubTitle = AS_TYPE(InternationalizedText, in_ballot_subtitle);
 
         vector<unique_ptr<SelectionDescription>> selections;
-        selections.reserve(in_selections_size);
-        for (size_t i = 0; i < in_selections_size; i++) {
+        selections.reserve(uint64_to_size(in_selections_size));
+        for (uint64_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1198,8 +1199,8 @@ eg_electionguard_status_t eg_contest_description_new_with_title_and_parties(
         }
 
         vector<string> partyIds;
-        partyIds.reserve(in_primary_party_ids_size);
-        for (size_t i = 0; i < in_primary_party_ids_size; i++) {
+        partyIds.reserve(uint64_to_size(in_primary_party_ids_size));
+        for (uint64_t i = 0; i < in_primary_party_ids_size; i++) {
             partyIds.push_back(in_primary_party_ids[i]);
         }
 
@@ -1321,18 +1322,18 @@ eg_contest_description_get_ballot_subtitle(eg_contest_description_t *handle,
     }
 }
 
-size_t eg_contest_description_get_selections_size(eg_contest_description_t *handle)
+uint64_t eg_contest_description_get_selections_size(eg_contest_description_t *handle)
 {
-    return AS_TYPE(ContestDescription, handle)->getSelections().size();
+    return (uint64_t)AS_TYPE(ContestDescription, handle)->getSelections().size();
 }
 
 eg_electionguard_status_t
-eg_contest_description_get_selection_at_index(eg_contest_description_t *handle, size_t in_index,
+eg_contest_description_get_selection_at_index(eg_contest_description_t *handle, uint64_t in_index,
                                               eg_selection_description_t **out_selection_ref)
 {
     try {
         auto collection = AS_TYPE(ContestDescription, handle)->getSelections();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_selection_ref = AS_TYPE(eg_selection_description_t, reference);
 
@@ -1373,8 +1374,8 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new(
         auto name = string(in_name);
 
         vector<unique_ptr<SelectionDescription>> selections;
-        selections.reserve(in_selections_size);
-        for (size_t i = 0; i < in_selections_size; i++) {
+        selections.reserve(uint64_to_size(in_selections_size));
+        for (uint64_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1382,8 +1383,8 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new(
         }
 
         vector<unique_ptr<SelectionDescription>> placeholders;
-        placeholders.reserve(in_placeholder_selections_size);
-        for (size_t i = 0; i < in_placeholder_selections_size; i++) {
+        placeholders.reserve(uint64_to_size(in_placeholder_selections_size));
+        for (uint64_t i = 0; i < in_placeholder_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_placeholder_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1419,8 +1420,8 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_titl
         auto ballotSubTitle = AS_TYPE(InternationalizedText, in_ballot_subtitle);
 
         vector<unique_ptr<SelectionDescription>> selections;
-        selections.reserve(in_selections_size);
-        for (size_t i = 0; i < in_selections_size; i++) {
+        selections.reserve(uint64_to_size(in_selections_size));
+        for (uint64_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1428,8 +1429,8 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_titl
         }
 
         vector<unique_ptr<SelectionDescription>> placeholders;
-        placeholders.reserve(in_placeholder_selections_size);
-        for (size_t i = 0; i < in_placeholder_selections_size; i++) {
+        placeholders.reserve(uint64_to_size(in_placeholder_selections_size));
+        for (uint64_t i = 0; i < in_placeholder_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_placeholder_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1465,8 +1466,8 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_part
         auto name = string(in_name);
 
         vector<unique_ptr<SelectionDescription>> selections;
-        selections.reserve(in_selections_size);
-        for (size_t i = 0; i < in_selections_size; i++) {
+        selections.reserve(uint64_to_size(in_selections_size));
+        for (uint64_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1474,8 +1475,8 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_part
         }
 
         vector<unique_ptr<SelectionDescription>> placeholders;
-        placeholders.reserve(in_placeholder_selections_size);
-        for (size_t i = 0; i < in_placeholder_selections_size; i++) {
+        placeholders.reserve(uint64_to_size(in_placeholder_selections_size));
+        for (uint64_t i = 0; i < in_placeholder_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_placeholder_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1483,8 +1484,8 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_part
         }
 
         vector<string> partyIds;
-        partyIds.reserve(in_primary_party_ids_size);
-        for (size_t i = 0; i < in_primary_party_ids_size; i++) {
+        partyIds.reserve(uint64_to_size(in_primary_party_ids_size));
+        for (uint64_t i = 0; i < in_primary_party_ids_size; i++) {
             partyIds.push_back(in_primary_party_ids[i]);
         }
 
@@ -1518,8 +1519,8 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_titl
         auto ballotSubTitle = AS_TYPE(InternationalizedText, in_ballot_subtitle);
 
         vector<unique_ptr<SelectionDescription>> selections;
-        selections.reserve(in_selections_size);
-        for (size_t i = 0; i < in_selections_size; i++) {
+        selections.reserve(uint64_to_size(in_selections_size));
+        for (uint64_t i = 0; i < in_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1527,8 +1528,8 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_titl
         }
 
         vector<unique_ptr<SelectionDescription>> placeholders;
-        placeholders.reserve(in_placeholder_selections_size);
-        for (size_t i = 0; i < in_placeholder_selections_size; i++) {
+        placeholders.reserve(uint64_to_size(in_placeholder_selections_size));
+        for (uint64_t i = 0; i < in_placeholder_selections_size; i++) {
             auto *element = AS_TYPE(SelectionDescription, in_placeholder_selections[i]);
             unique_ptr<SelectionDescription> annotated(
               new SelectionDescription(std::move(*element)));
@@ -1536,8 +1537,8 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_new_with_titl
         }
 
         vector<string> partyIds;
-        partyIds.reserve(in_primary_party_ids_size);
-        for (size_t i = 0; i < in_primary_party_ids_size; i++) {
+        partyIds.reserve(uint64_to_size(in_primary_party_ids_size));
+        for (uint64_t i = 0; i < in_primary_party_ids_size; i++) {
             partyIds.push_back(in_primary_party_ids[i]);
         }
 
@@ -1569,19 +1570,19 @@ eg_contest_description_with_placeholders_free(eg_contest_description_with_placeh
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-size_t eg_contest_description_with_placeholders_get_placeholders_size(
+uint64_t eg_contest_description_with_placeholders_get_placeholders_size(
   eg_contest_description_with_placeholders_t *handle)
 {
-    return AS_TYPE(ContestDescriptionWithPlaceholders, handle)->getPlaceholders().size();
+    return (uint64_t)AS_TYPE(ContestDescriptionWithPlaceholders, handle)->getPlaceholders().size();
 }
 
 eg_electionguard_status_t eg_contest_description_with_placeholders_get_placeholder_at_index(
-  eg_contest_description_with_placeholders_t *handle, size_t in_index,
+  eg_contest_description_with_placeholders_t *handle, uint64_t in_index,
   eg_contest_description_with_placeholders_t **out_placeholder_ref)
 {
     try {
         auto collection = AS_TYPE(ContestDescriptionWithPlaceholders, handle)->getPlaceholders();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_placeholder_ref = AS_TYPE(eg_contest_description_with_placeholders_t, reference);
 
@@ -1638,40 +1639,40 @@ eg_election_manifest_new(char *in_election_scope_id, eg_election_type_t in_elect
         std::chrono::system_clock::time_point endDate(std::chrono::milliseconds{in_end_date});
 
         vector<unique_ptr<GeopoliticalUnit>> gpUnits;
-        gpUnits.reserve(in_geopolitical_units_size);
-        for (size_t i = 0; i < in_geopolitical_units_size; i++) {
+        gpUnits.reserve(uint64_to_size(in_geopolitical_units_size));
+        for (uint64_t i = 0; i < in_geopolitical_units_size; i++) {
             auto *element = AS_TYPE(GeopoliticalUnit, in_geopolitical_units[i]);
             unique_ptr<GeopoliticalUnit> annotated(new GeopoliticalUnit(std::move(*element)));
             gpUnits.push_back(std::move(annotated));
         }
 
         vector<unique_ptr<Party>> parties;
-        parties.reserve(in_parties_size);
-        for (size_t i = 0; i < in_parties_size; i++) {
+        parties.reserve(uint64_to_size(in_parties_size));
+        for (uint64_t i = 0; i < in_parties_size; i++) {
             auto *element = AS_TYPE(Party, in_parties[i]);
             unique_ptr<Party> annotated(new Party(std::move(*element)));
             parties.push_back(std::move(annotated));
         }
 
         vector<unique_ptr<Candidate>> candidates;
-        candidates.reserve(in_candidates_size);
-        for (size_t i = 0; i < in_candidates_size; i++) {
+        candidates.reserve(uint64_to_size(in_candidates_size));
+        for (uint64_t i = 0; i < in_candidates_size; i++) {
             auto *element = AS_TYPE(Candidate, in_candidates[i]);
             unique_ptr<Candidate> annotated(new Candidate(std::move(*element)));
             candidates.push_back(std::move(annotated));
         }
 
         vector<unique_ptr<ContestDescription>> contests;
-        contests.reserve(in_contests_size);
-        for (size_t i = 0; i < in_contests_size; i++) {
+        contests.reserve(uint64_to_size(in_contests_size));
+        for (uint64_t i = 0; i < in_contests_size; i++) {
             auto *element = AS_TYPE(ContestDescription, in_contests[i]);
             unique_ptr<ContestDescription> annotated(new ContestDescription(std::move(*element)));
             contests.push_back(std::move(annotated));
         }
 
         vector<unique_ptr<BallotStyle>> ballotStyles;
-        ballotStyles.reserve(in_ballot_styles_size);
-        for (size_t i = 0; i < in_ballot_styles_size; i++) {
+        ballotStyles.reserve(uint64_to_size(in_ballot_styles_size));
+        for (uint64_t i = 0; i < in_ballot_styles_size; i++) {
             auto *element = AS_TYPE(BallotStyle, in_ballot_styles[i]);
             unique_ptr<BallotStyle> annotated(new BallotStyle(std::move(*element)));
             ballotStyles.push_back(std::move(annotated));
@@ -1705,40 +1706,40 @@ eg_electionguard_status_t eg_election_manifest_new_with_contact(
         std::chrono::system_clock::time_point endDate(std::chrono::milliseconds{in_end_date});
 
         vector<unique_ptr<GeopoliticalUnit>> gpUnits;
-        gpUnits.reserve(in_geopolitical_units_size);
-        for (size_t i = 0; i < in_geopolitical_units_size; i++) {
+        gpUnits.reserve(uint64_to_size(in_geopolitical_units_size));
+        for (uint64_t i = 0; i < in_geopolitical_units_size; i++) {
             auto *element = AS_TYPE(GeopoliticalUnit, in_geopolitical_units[i]);
             unique_ptr<GeopoliticalUnit> annotated(new GeopoliticalUnit(std::move(*element)));
             gpUnits.push_back(std::move(annotated));
         }
 
         vector<unique_ptr<Party>> parties;
-        parties.reserve(in_parties_size);
-        for (size_t i = 0; i < in_parties_size; i++) {
+        parties.reserve(uint64_to_size(in_parties_size));
+        for (uint64_t i = 0; i < in_parties_size; i++) {
             auto *element = AS_TYPE(Party, in_parties[i]);
             unique_ptr<Party> annotated(new Party(std::move(*element)));
             parties.push_back(std::move(annotated));
         }
 
         vector<unique_ptr<Candidate>> candidates;
-        candidates.reserve(in_candidates_size);
-        for (size_t i = 0; i < in_candidates_size; i++) {
+        candidates.reserve(uint64_to_size(in_candidates_size));
+        for (uint64_t i = 0; i < in_candidates_size; i++) {
             auto *element = AS_TYPE(Candidate, in_candidates[i]);
             unique_ptr<Candidate> annotated(new Candidate(std::move(*element)));
             candidates.push_back(std::move(annotated));
         }
 
         vector<unique_ptr<ContestDescription>> contests;
-        contests.reserve(in_contests_size);
-        for (size_t i = 0; i < in_contests_size; i++) {
+        contests.reserve(uint64_to_size(in_contests_size));
+        for (uint64_t i = 0; i < in_contests_size; i++) {
             auto *element = AS_TYPE(ContestDescription, in_contests[i]);
             unique_ptr<ContestDescription> annotated(new ContestDescription(std::move(*element)));
             contests.push_back(std::move(annotated));
         }
 
         vector<unique_ptr<BallotStyle>> ballotStyles;
-        ballotStyles.reserve(in_ballot_styles_size);
-        for (size_t i = 0; i < in_ballot_styles_size; i++) {
+        ballotStyles.reserve(uint64_to_size(in_ballot_styles_size));
+        for (uint64_t i = 0; i < in_ballot_styles_size; i++) {
             auto *element = AS_TYPE(BallotStyle, in_ballot_styles[i]);
             unique_ptr<BallotStyle> annotated(new BallotStyle(std::move(*element)));
             ballotStyles.push_back(std::move(annotated));
@@ -1815,18 +1816,17 @@ uint64_t eg_election_manifest_get_end_date(eg_election_manifest_t *handle)
     }
 }
 
-size_t eg_election_manifest_get_geopolitical_units_size(eg_election_manifest_t *handle)
+uint64_t eg_election_manifest_get_geopolitical_units_size(eg_election_manifest_t *handle)
 {
-    return AS_TYPE(Manifest, handle)->getGeopoliticalUnits().size();
+    return (uint64_t)AS_TYPE(Manifest, handle)->getGeopoliticalUnits().size();
 }
 
-eg_electionguard_status_t
-eg_election_manifest_get_geopolitical_unit_at_index(eg_election_manifest_t *handle, size_t in_index,
-                                                    eg_geopolitical_unit_t **out_gp_unit_ref)
+eg_electionguard_status_t eg_election_manifest_get_geopolitical_unit_at_index(
+  eg_election_manifest_t *handle, uint64_t in_index, eg_geopolitical_unit_t **out_gp_unit_ref)
 {
     try {
         auto collection = AS_TYPE(Manifest, handle)->getGeopoliticalUnits();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_gp_unit_ref = AS_TYPE(eg_geopolitical_unit_t, reference);
 
@@ -1837,18 +1837,18 @@ eg_election_manifest_get_geopolitical_unit_at_index(eg_election_manifest_t *hand
     }
 }
 
-size_t eg_election_manifest_get_parties_size(eg_election_manifest_t *handle)
+uint64_t eg_election_manifest_get_parties_size(eg_election_manifest_t *handle)
 {
-    return AS_TYPE(Manifest, handle)->getParties().size();
+    return (uint64_t)AS_TYPE(Manifest, handle)->getParties().size();
 }
 
 eg_electionguard_status_t eg_election_manifest_get_party_at_index(eg_election_manifest_t *handle,
-                                                                  size_t in_index,
+                                                                  uint64_t in_index,
                                                                   eg_party_t **out_party_ref)
 {
     try {
         auto collection = AS_TYPE(Manifest, handle)->getParties();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_party_ref = AS_TYPE(eg_party_t, reference);
 
@@ -1859,18 +1859,18 @@ eg_electionguard_status_t eg_election_manifest_get_party_at_index(eg_election_ma
     }
 }
 
-size_t eg_election_manifest_get_candidates_size(eg_election_manifest_t *handle)
+uint64_t eg_election_manifest_get_candidates_size(eg_election_manifest_t *handle)
 {
-    return AS_TYPE(Manifest, handle)->getCandidates().size();
+    return (uint64_t)AS_TYPE(Manifest, handle)->getCandidates().size();
 }
 
 eg_electionguard_status_t
-eg_election_manifest_get_candidate_at_index(eg_election_manifest_t *handle, size_t in_index,
+eg_election_manifest_get_candidate_at_index(eg_election_manifest_t *handle, uint64_t in_index,
                                             eg_candidate_t **out_candidate_ref)
 {
     try {
         auto collection = AS_TYPE(Manifest, handle)->getCandidates();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_candidate_ref = AS_TYPE(eg_candidate_t, reference);
 
@@ -1881,18 +1881,18 @@ eg_election_manifest_get_candidate_at_index(eg_election_manifest_t *handle, size
     }
 }
 
-size_t eg_election_manifest_get_contests_size(eg_election_manifest_t *handle)
+uint64_t eg_election_manifest_get_contests_size(eg_election_manifest_t *handle)
 {
-    return AS_TYPE(Manifest, handle)->getContests().size();
+    return (uint64_t)AS_TYPE(Manifest, handle)->getContests().size();
 }
 
 eg_electionguard_status_t
-eg_election_manifest_get_contest_at_index(eg_election_manifest_t *handle, size_t in_index,
+eg_election_manifest_get_contest_at_index(eg_election_manifest_t *handle, uint64_t in_index,
                                           eg_contest_description_t **out_contest_ref)
 {
     try {
         auto collection = AS_TYPE(Manifest, handle)->getContests();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_contest_ref = AS_TYPE(eg_contest_description_t, reference);
 
@@ -1903,18 +1903,18 @@ eg_election_manifest_get_contest_at_index(eg_election_manifest_t *handle, size_t
     }
 }
 
-size_t eg_election_manifest_get_ballot_styles_size(eg_election_manifest_t *handle)
+uint64_t eg_election_manifest_get_ballot_styles_size(eg_election_manifest_t *handle)
 {
-    return AS_TYPE(Manifest, handle)->getBallotStyles().size();
+    return (uint64_t)AS_TYPE(Manifest, handle)->getBallotStyles().size();
 }
 
 eg_electionguard_status_t
-eg_election_manifest_get_ballot_style_at_index(eg_election_manifest_t *handle, size_t in_index,
+eg_election_manifest_get_ballot_style_at_index(eg_election_manifest_t *handle, uint64_t in_index,
                                                eg_ballot_style_t **out_ballot_style_ref)
 {
     try {
         auto collection = AS_TYPE(Manifest, handle)->getBallotStyles();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_ballot_style_ref = AS_TYPE(eg_ballot_style_t, reference);
 
@@ -2026,7 +2026,7 @@ eg_electionguard_status_t eg_election_manifest_from_msgpack(uint8_t *in_data, ui
 }
 
 eg_electionguard_status_t eg_election_manifest_to_json(eg_election_manifest_t *handle,
-                                                       char **out_data, size_t *out_size)
+                                                       char **out_data, uint64_t *out_size)
 {
     try {
         auto *domain_type = AS_TYPE(Manifest, handle);
@@ -2034,7 +2034,7 @@ eg_electionguard_status_t eg_election_manifest_to_json(eg_election_manifest_t *h
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -2044,7 +2044,7 @@ eg_electionguard_status_t eg_election_manifest_to_json(eg_election_manifest_t *h
 }
 
 eg_electionguard_status_t eg_election_manifest_to_bson(eg_election_manifest_t *handle,
-                                                       uint8_t **out_data, size_t *out_size)
+                                                       uint8_t **out_data, uint64_t *out_size)
 {
     try {
         auto *domain_type = AS_TYPE(Manifest, handle);
@@ -2052,7 +2052,7 @@ eg_electionguard_status_t eg_election_manifest_to_bson(eg_election_manifest_t *h
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -2062,7 +2062,7 @@ eg_electionguard_status_t eg_election_manifest_to_bson(eg_election_manifest_t *h
 }
 
 eg_electionguard_status_t eg_election_manifest_to_msgpack(eg_election_manifest_t *handle,
-                                                          uint8_t **out_data, size_t *out_size)
+                                                          uint8_t **out_data, uint64_t *out_size)
 {
     try {
         auto *domain_type = AS_TYPE(Manifest, handle);
@@ -2070,7 +2070,7 @@ eg_electionguard_status_t eg_election_manifest_to_msgpack(eg_election_manifest_t
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -2118,18 +2118,17 @@ eg_internal_manifest_get_manifest_hash(eg_internal_manifest_t *handle,
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-size_t eg_internal_manifest_get_geopolitical_units_size(eg_internal_manifest_t *handle)
+uint64_t eg_internal_manifest_get_geopolitical_units_size(eg_internal_manifest_t *handle)
 {
-    return AS_TYPE(InternalManifest, handle)->getGeopoliticalUnits().size();
+    return (uint64_t)AS_TYPE(InternalManifest, handle)->getGeopoliticalUnits().size();
 }
 
-eg_electionguard_status_t
-eg_internal_manifest_get_geopolitical_unit_at_index(eg_internal_manifest_t *handle, size_t in_index,
-                                                    eg_geopolitical_unit_t **out_gp_unit_ref)
+eg_electionguard_status_t eg_internal_manifest_get_geopolitical_unit_at_index(
+  eg_internal_manifest_t *handle, uint64_t in_index, eg_geopolitical_unit_t **out_gp_unit_ref)
 {
     try {
         auto collection = AS_TYPE(InternalManifest, handle)->getGeopoliticalUnits();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_gp_unit_ref = AS_TYPE(eg_geopolitical_unit_t, reference);
 
@@ -2140,18 +2139,18 @@ eg_internal_manifest_get_geopolitical_unit_at_index(eg_internal_manifest_t *hand
     }
 }
 
-size_t eg_internal_manifest_get_contests_size(eg_internal_manifest_t *handle)
+uint64_t eg_internal_manifest_get_contests_size(eg_internal_manifest_t *handle)
 {
-    return AS_TYPE(InternalManifest, handle)->getContests().size();
+    return (uint64_t)AS_TYPE(InternalManifest, handle)->getContests().size();
 }
 
 eg_electionguard_status_t eg_internal_manifest_get_contest_at_index(
-  eg_internal_manifest_t *handle, size_t in_index,
+  eg_internal_manifest_t *handle, uint64_t in_index,
   eg_contest_description_with_placeholders_t **out_contest_ref)
 {
     try {
         auto collection = AS_TYPE(InternalManifest, handle)->getContests();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_contest_ref = AS_TYPE(eg_contest_description_with_placeholders_t, reference);
 
@@ -2162,18 +2161,18 @@ eg_electionguard_status_t eg_internal_manifest_get_contest_at_index(
     }
 }
 
-size_t eg_internal_manifest_get_ballot_styles_size(eg_internal_manifest_t *handle)
+uint64_t eg_internal_manifest_get_ballot_styles_size(eg_internal_manifest_t *handle)
 {
-    return AS_TYPE(InternalManifest, handle)->getBallotStyles().size();
+    return (uint64_t)AS_TYPE(InternalManifest, handle)->getBallotStyles().size();
 }
 
 eg_electionguard_status_t
-eg_internal_manifest_get_ballot_style_at_index(eg_internal_manifest_t *handle, size_t in_index,
+eg_internal_manifest_get_ballot_style_at_index(eg_internal_manifest_t *handle, uint64_t in_index,
                                                eg_ballot_style_t **out_ballot_style_ref)
 {
     try {
         auto collection = AS_TYPE(InternalManifest, handle)->getBallotStyles();
-        auto *reference = &collection.at(in_index).get();
+        auto *reference = &collection.at(uint64_to_size(in_index)).get();
 
         *out_ballot_style_ref = AS_TYPE(eg_ballot_style_t, reference);
 
@@ -2247,7 +2246,7 @@ eg_electionguard_status_t eg_internal_manifest_from_msgpack(uint8_t *in_data, ui
 }
 
 eg_electionguard_status_t eg_internal_manifest_to_json(eg_internal_manifest_t *handle,
-                                                       char **out_data, size_t *out_size)
+                                                       char **out_data, uint64_t *out_size)
 {
     try {
         auto *domain_type = AS_TYPE(InternalManifest, handle);
@@ -2255,7 +2254,7 @@ eg_electionguard_status_t eg_internal_manifest_to_json(eg_internal_manifest_t *h
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -2265,7 +2264,7 @@ eg_electionguard_status_t eg_internal_manifest_to_json(eg_internal_manifest_t *h
 }
 
 eg_electionguard_status_t eg_internal_manifest_to_bson(eg_internal_manifest_t *handle,
-                                                       uint8_t **out_data, size_t *out_size)
+                                                       uint8_t **out_data, uint64_t *out_size)
 {
     try {
         auto *domain_type = AS_TYPE(InternalManifest, handle);
@@ -2273,7 +2272,7 @@ eg_electionguard_status_t eg_internal_manifest_to_bson(eg_internal_manifest_t *h
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -2283,7 +2282,7 @@ eg_electionguard_status_t eg_internal_manifest_to_bson(eg_internal_manifest_t *h
 }
 
 eg_electionguard_status_t eg_internal_manifest_to_msgpack(eg_internal_manifest_t *handle,
-                                                          uint8_t **out_data, size_t *out_size)
+                                                          uint8_t **out_data, uint64_t *out_size)
 {
     try {
         auto *domain_type = AS_TYPE(InternalManifest, handle);
@@ -2291,7 +2290,7 @@ eg_electionguard_status_t eg_internal_manifest_to_msgpack(eg_internal_manifest_t
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {

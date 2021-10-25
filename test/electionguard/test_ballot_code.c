@@ -48,19 +48,19 @@ bool test_ballot_code_rotates(void)
     assert(rotating_hash_2 != NULL);
 
     uint64_t *device_hash_data = NULL;
-    size_t device_hash_size;
+    uint64_t device_hash_size;
     if (eg_element_mod_q_get_data(device_hash, &device_hash_data, &device_hash_size)) {
         assert(false);
     }
 
     uint64_t *rotating_hash_1_data = NULL;
-    size_t rotating_hash_1_size;
+    uint64_t rotating_hash_1_size;
     if (eg_element_mod_q_get_data(rotating_hash_1, &rotating_hash_1_data, &rotating_hash_1_size)) {
         assert(false);
     }
 
     uint64_t *rotating_hash_2_data = NULL;
-    size_t rotating_hash_2_size;
+    uint64_t rotating_hash_2_size;
     if (eg_element_mod_q_get_data(rotating_hash_2, &rotating_hash_2_data, &rotating_hash_2_size)) {
         assert(false);
     }

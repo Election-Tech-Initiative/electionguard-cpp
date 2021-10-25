@@ -4,13 +4,13 @@ using System.Runtime.ConstrainedExecution;
 
 namespace ElectionGuard
 {
-    public abstract class ElectionguardSafeHandle<T>
+    internal abstract class ElectionguardSafeHandle<T>
         : SafeHandleZeroOrMinusOneIsInvalid
         where T : unmanaged
     {
         // Objects constructed with the default constructor
         // own the context
-        public ElectionguardSafeHandle()
+        internal ElectionguardSafeHandle()
             : base(ownsHandle: true)
         {
 
@@ -18,26 +18,35 @@ namespace ElectionGuard
 
         // Objects constructed from a structure pointer
         // do not own the context
-        public unsafe ElectionguardSafeHandle(
+        internal unsafe ElectionguardSafeHandle(
             IntPtr handle)
             : base(ownsHandle: false)
         {
             SetHandle(handle);
         }
 
-        public unsafe ElectionguardSafeHandle(
+        internal unsafe ElectionguardSafeHandle(
+            IntPtr handle, bool ownsHandle)
+            : base(ownsHandle)
+        {
+            SetHandle(handle);
+        }
+
+        internal unsafe ElectionguardSafeHandle(
             T* handle)
             : base(ownsHandle: false)
         {
             SetHandle((IntPtr)handle);
         }
 
-        public unsafe ElectionguardSafeHandle(
+        internal unsafe ElectionguardSafeHandle(
             T* handle, bool ownsHandle)
             : base(ownsHandle)
         {
             SetHandle((IntPtr)handle);
         }
+
+        public unsafe T* TypedPtr => (T*)handle;
 
         public IntPtr Ptr => handle;
 
@@ -47,7 +56,12 @@ namespace ElectionGuard
         {
             try
             {
-                return Free();
+                var freed = Free();
+                if (freed)
+                {
+                    Close();
+                }
+                return freed;
             }
             catch (Exception ex)
             {

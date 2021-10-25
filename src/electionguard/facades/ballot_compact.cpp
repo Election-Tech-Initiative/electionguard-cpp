@@ -1,7 +1,7 @@
 #include "electionguard/ballot_compact.hpp"
 
+#include "../convert.hpp"
 #include "../log.hpp"
-#include "convert.hpp"
 #include "electionguard/group.hpp"
 #include "variant_cast.hpp"
 
@@ -18,6 +18,7 @@ using electionguard::CompactCiphertextBallot;
 using electionguard::CompactPlaintextBallot;
 using electionguard::dynamicCopy;
 using electionguard::Log;
+using electionguard::uint64_to_size;
 
 #pragma region CompactPlaintextBallot
 
@@ -50,7 +51,7 @@ eg_compact_plaintext_ballot_from_msgpack(uint8_t *in_data, uint64_t in_length,
 
 eg_electionguard_status_t
 eg_compact_plaintext_ballot_to_msgpack(eg_compact_plaintext_ballot_t *handle, uint8_t **out_data,
-                                       size_t *out_size)
+                                       uint64_t *out_size)
 {
     try {
         auto *domain_type = AS_TYPE(CompactPlaintextBallot, handle);
@@ -58,7 +59,7 @@ eg_compact_plaintext_ballot_to_msgpack(eg_compact_plaintext_ballot_t *handle, ui
 
         size_t size = 0;
         *out_data = dynamicCopy(data_bytes, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -125,7 +126,7 @@ eg_compact_ciphertext_ballot_from_msgpack(uint8_t *in_data, uint64_t in_length,
 
 eg_electionguard_status_t
 eg_compact_ciphertext_ballot_to_msgpack(eg_compact_ciphertext_ballot_t *handle, uint8_t **out_data,
-                                        size_t *out_size)
+                                        uint64_t *out_size)
 {
     try {
         auto *domain_type = AS_TYPE(CompactCiphertextBallot, handle);
@@ -133,7 +134,7 @@ eg_compact_ciphertext_ballot_to_msgpack(eg_compact_ciphertext_ballot_t *handle, 
 
         size_t size = 0;
         *out_data = dynamicCopy(data_bytes, &size);
-        *out_size = size;
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
