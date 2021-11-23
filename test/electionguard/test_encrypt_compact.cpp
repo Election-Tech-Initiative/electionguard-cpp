@@ -1,7 +1,7 @@
 #include "../../src/electionguard/log.hpp"
-#include "mocks/ballot.hpp"
-#include "mocks/election.hpp"
-#include "mocks/manifest.hpp"
+#include "generators/ballot.hpp"
+#include "generators/election.hpp"
+#include "generators/manifest.hpp"
 
 #include <doctest/doctest.h>
 #include <electionguard/ballot.hpp>
@@ -9,7 +9,7 @@
 #include <electionguard/encrypt.hpp>
 
 using namespace electionguard;
-using namespace electionguard::test::mocks;
+using namespace electionguard::tools::generators;
 using namespace std;
 
 struct TestEncryptFixture {

@@ -22,8 +22,8 @@ EG_API eg_electionguard_status_t eg_test_election_mocks_get_fake_ciphertext_elec
         auto *manifest = AS_TYPE(Manifest, in_manifest);
         auto *publicKey = AS_TYPE(ElementModP, in_public_key);
         auto internal = make_unique<InternalManifest>(*manifest);
-        auto context =
-          electionguard::test::mocks::ElectionGenerator::getFakeContext(*internal, *publicKey);
+        auto context = electionguard::tools::generators::ElectionGenerator::getFakeContext(
+          *internal, *publicKey);
         *out_manifest = AS_TYPE(eg_internal_manifest_t, internal.release());
         *out_context = AS_TYPE(eg_ciphertext_election_context_t, context.release());
         return ELECTIONGUARD_STATUS_SUCCESS;

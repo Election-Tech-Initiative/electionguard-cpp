@@ -1,4 +1,4 @@
-#include "mocks/ballot.h"
+#include "generators/ballot.h"
 #include "utils/utils.h"
 
 #include <assert.h>

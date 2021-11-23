@@ -1,6 +1,6 @@
 /// @file manifest.h
-#ifndef __ELECTIONGUARD_CPP_TEST_MOCKS_MAANIFEST_H_INCLUDED__
-#define __ELECTIONGUARD_CPP_TEST_MOCKS_MAANIFEST_H_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_TOOLS_GENERATORS_MAANIFEST_H_INCLUDED__
+#define __ELECTIONGUARD_CPP_TOOLS_GENERATORS_MAANIFEST_H_INCLUDED__
 
 #include <electionguard/export.h>
 #include <electionguard/manifest.h>
@@ -16,4 +16,4 @@ eg_test_election_mocks_get_simple_election_from_file(eg_election_manifest_t **ou
 }
 #endif
 
-#endif /* __ELECTIONGUARD_CPP_TEST_MOCKS_MAANIFEST_H_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_TOOLS_GENERATORS_MAANIFEST_H_INCLUDED__ */

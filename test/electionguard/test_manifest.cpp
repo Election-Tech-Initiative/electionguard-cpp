@@ -1,6 +1,6 @@
 #include "../../src/electionguard/log.hpp"
-#include "mocks/election.hpp"
-#include "mocks/manifest.hpp"
+#include "generators/election.hpp"
+#include "generators/manifest.hpp"
 
 #include <doctest/doctest.h>
 #include <electionguard/election.hpp>
@@ -8,7 +8,7 @@
 #include <electionguard/manifest.hpp>
 
 using namespace electionguard;
-using namespace electionguard::test::mocks;
+using namespace electionguard::tools::generators;
 using namespace std;
 
 TEST_CASE("Simple Election Is Valid")

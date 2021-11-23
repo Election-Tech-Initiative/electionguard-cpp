@@ -1,6 +1,6 @@
 /// @file election.h
-#ifndef __ELECTIONGUARD_CPP_TEST_MOCKS_ELECTION_H_INCLUDED__
-#define __ELECTIONGUARD_CPP_TEST_MOCKS_ELECTION_H_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_TOOLS_GENERATORS_ELECTION_H_INCLUDED__
+#define __ELECTIONGUARD_CPP_TOOLS_GENERATORS_ELECTION_H_INCLUDED__
 
 #include <electionguard/election.h>
 #include <electionguard/export.h>
@@ -18,4 +18,4 @@ EG_API eg_electionguard_status_t eg_test_election_mocks_get_fake_ciphertext_elec
 }
 #endif
 
-#endif /* __ELECTIONGUARD_CPP_TEST_MOCKS_ELECTION_H_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_TOOLS_GENERATORS_ELECTION_H_INCLUDED__ */
