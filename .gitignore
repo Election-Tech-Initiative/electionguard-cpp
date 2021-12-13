@@ -9,6 +9,8 @@ cmake/CPM.cmake
 
 cmake/ios.toolchain.cmake
 
+data/0.95.0/
+
 ### Xcode and Swift ###
 
 # Created by https://www.toptal.com/developers/gitignore/api/swift,xcode
@@ -145,3 +147,5 @@ appsettings.json
 cmake/CPM_0.31.0.cmake
 
 bindings/netframework/ElectionGuard.NetFramework/packages/
+
+sample-data.zip

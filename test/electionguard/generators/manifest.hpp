@@ -11,6 +11,14 @@
 using namespace electionguard;
 using namespace std;
 
+#ifndef TEST_SPEC_VERSION
+#    define TEST_SPEC_VERSION "0.95.0"
+#endif
+
+#ifndef TEST_USE_SAMPLE
+#    define TEST_USE_SAMPLE "hamilton-general"
+#endif
+
 namespace electionguard::tools::generators
 {
     class ManifestGenerator
@@ -18,14 +26,19 @@ namespace electionguard::tools::generators
       public:
         static unique_ptr<Manifest> getJeffersonCountryManifest_multipleBallotStyle_fromFile()
         {
-            return getSimpleManifestFromFile("election_manifest_jefferson_county.json");
+            return getManifestFromFile("election_manifest_jefferson_county.json");
         }
-        static unique_ptr<Manifest> getSimpleManifestFromFile(const string &filename)
+        static unique_ptr<Manifest> getManifestFromFile(const string &version, const string &sample)
+        {
+            return getManifestFromFile(version + "/sample/" + sample + "/manifest.json");
+        }
+        static unique_ptr<Manifest> getManifestFromFile(const string &filePath)
         {
 
             ifstream file;
-            file.open("data/" + filename);
+            file.open("data/" + filePath);
             if (!file) {
+                //Log::debug(filePath);
                 throw invalid_argument("could not find file");
             }
 

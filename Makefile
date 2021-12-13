@@ -58,6 +58,9 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	choco install wget
 endif
 	wget -O cmake/CPM.cmake https://github.com/TheLartians/CPM.cmake/releases/latest/download/CPM.cmake
+	# TODO: add wget -0 sample-data.zip ...
+	unzip sample-data.zip
+
 
 build:
 	@echo 🧱 BUILD $(TARGET)
@@ -301,6 +304,7 @@ else
 	dotnet ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net5.0/ElectionGuard.Encryption.Bench.dll
 endif
 
+# Test
 test:
 	@echo 🧪 TEST
 ifeq ($(OPERATING_SYSTEM),Windows)
@@ -376,3 +380,8 @@ endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardTests
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardCTests
+
+# Sample Data
+
+generate-sample-data:
+	@echo Generate Sample Data

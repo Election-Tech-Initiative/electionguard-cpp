@@ -36,6 +36,8 @@ option(CAN_USE_VECTOR_INTRINSICS "Use vector intrinsics for math functions if av
 option(USE_32BIT_MATH            "Use the 32 bit optimized math impl"                        OFF)
 option(USE_TEST_PRIMES           "Use the smaller test primes (do not use in prod)"          OFF)
 option(OPTION_ENABLE_TESTS       "Enable support for testing private headers"                OFF)
+option(TEST_SPEC_VERSION         "Use this spec version for tests"                           "0.95.0")
+option(TEST_USE_SAMPLE           "the sample to use, full, hamilton-general, minimal, small" "hamilton-general")
 option(CODE_COVERAGE             "Use code coverage"                                         OFF)
 option(OPTION_GENERATE_DOCS      "Generate documentation"                                    OFF)
 option(USE_DYNAMIC_ANALYSIS      "Enable Dynamic tools"                                      OFF)

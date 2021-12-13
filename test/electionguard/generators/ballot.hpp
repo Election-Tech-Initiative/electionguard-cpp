@@ -65,9 +65,6 @@ namespace electionguard::tools::generators
 
             // jsut loop through and select the necessary amount of trues
             for (const auto &description : contest.getSelections()) {
-                if (maxChoices > contest.getNumberElected()) {
-                    maxChoices = contest.getNumberElected();
-                }
                 if (choices < maxChoices) {
                     ++choices;
                     Log::debug(" " + description.get().getObjectId() + " Adding Selection: TRUE");
