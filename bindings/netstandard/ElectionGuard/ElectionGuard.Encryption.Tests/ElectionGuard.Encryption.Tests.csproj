@@ -31,8 +31,6 @@
   </ItemGroup>
 
   <ItemGroup Label="Json Test Data">
-    <Content Include="..\..\..\..\data\ballot_in_simple.json" Link="Data\ballot_in_simple.json" CopyToOutputDirectory="Always" />
-    <Content Include="..\..\..\..\data\election_manifest_jefferson_county.json" Link="Data\election_manifest_jefferson_county.json" CopyToOutputDirectory="Always" />
-    <Folder Include="Data\" />
+    <Content Include="..\..\..\..\data\**" LinkBase="data\" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

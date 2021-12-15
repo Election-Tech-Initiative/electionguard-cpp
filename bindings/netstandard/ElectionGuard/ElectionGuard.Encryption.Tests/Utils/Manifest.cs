@@ -14,7 +14,20 @@ namespace ElectionGuard.Encryption.Tests.Utils
         /// </summary>
         public static Manifest GetJeffersonCountyManifest_FromFile()
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "Data", "election_manifest_jefferson_county.json");
+            var path = Path.Combine(AppContext.BaseDirectory, "data", "election_manifest_jefferson_county.json");
+            var text = File.ReadAllText(path);
+            return new Manifest(text);
+        }
+
+        public static Manifest GetManifestFromFile(string version, string sample)
+        {
+            var path = Path.Combine(version, "sample", sample, "manifest.json");
+            return GetManifestFromFile(path);
+        }
+
+        public static Manifest GetManifestFromFile(string filepath)
+        {
+            var path = Path.Combine(AppContext.BaseDirectory, "data", filepath);
             var text = File.ReadAllText(path);
             return new Manifest(text);
         }
