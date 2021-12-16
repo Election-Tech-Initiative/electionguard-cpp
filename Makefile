@@ -56,9 +56,11 @@ endif
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo 🏁 WINDOWS INSTALL
 	choco install wget
+	choco install unzip
 endif
 	wget -O cmake/CPM.cmake https://github.com/TheLartians/CPM.cmake/releases/latest/download/CPM.cmake
 	wget -O sample-data.zip https://github.com/microsoft/electionguard/releases/download/v0.95.0/sample-data.zip
+	unzip -o sample-data.zip
 	unzip sample-data.zip
 
 
