@@ -8,24 +8,25 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Node {
+typedef struct eg_electionguard_linked_list_node_t {
     char *value;
     char *key;
-    struct Node *previous;
-    struct Node *next;
-};
+    struct eg_electionguard_linked_list_node_t *previous;
+    struct eg_electionguard_linked_list_node_t *next;
+} eg_electionguard_linked_list_node_t;
 
-struct LinkedList {
+typedef struct eg_electionguard_linked_list_t {
     uint64_t count;
-    struct Node *head;
-    struct Node *tail;
-};
+    eg_electionguard_linked_list_node_t *head;
+    eg_electionguard_linked_list_node_t *tail;
+} eg_electionguard_linked_list_t;
 
-void eg_electionguard_linked_list_delete_last(struct LinkedList *list);
+void eg_electionguard_linked_list_delete_last(eg_electionguard_linked_list_t *list);
 
-struct LinkedList *eg_electionguard_linked_list_new()
+eg_electionguard_linked_list_t *eg_electionguard_linked_list_new()
 {
-    struct LinkedList *list = (struct LinkedList *)malloc(sizeof(struct LinkedList));
+    eg_electionguard_linked_list_t *list =
+      (eg_electionguard_linked_list_t *)malloc(sizeof(eg_electionguard_linked_list_t));
     if (list == NULL) {
         return NULL;
     }
@@ -35,7 +36,7 @@ struct LinkedList *eg_electionguard_linked_list_new()
     return list;
 }
 
-void eg_electionguard_linked_list_free(struct LinkedList *list)
+void eg_electionguard_linked_list_free(eg_electionguard_linked_list_t *list)
 {
     if (list == NULL) {
         return;
@@ -48,9 +49,11 @@ void eg_electionguard_linked_list_free(struct LinkedList *list)
     free(list);
 }
 
-void eg_electionguard_linked_list_append(struct LinkedList *list, char *key, char *value)
+void eg_electionguard_linked_list_append(eg_electionguard_linked_list_t *list, char *key,
+                                         char *value)
 {
-    struct Node *node = (struct Node *)malloc(sizeof(struct Node));
+    eg_electionguard_linked_list_node_t *node =
+      (eg_electionguard_linked_list_node_t *)malloc(sizeof(eg_electionguard_linked_list_node_t));
     node->key = key;
     node->value = value;
     node->previous = NULL;
@@ -70,14 +73,14 @@ void eg_electionguard_linked_list_append(struct LinkedList *list, char *key, cha
     list->count++;
 }
 
-void eg_electionguard_linked_list_delete_last(struct LinkedList *list)
+void eg_electionguard_linked_list_delete_last(eg_electionguard_linked_list_t *list)
 {
     if (list->tail == NULL) {
         // list is empty
         return;
     }
 
-    struct Node *to_remove = list->tail;
+    eg_electionguard_linked_list_node_t *to_remove = list->tail;
 
     // check if it is the only one
     if (list->head == to_remove) {

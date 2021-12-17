@@ -18,7 +18,7 @@ bool test_can_create_lined_list(void)
 {
     printf("\n -------- test_can_create_lined_list --------- \n");
 
-    struct LinkedList *list = eg_electionguard_linked_list_new();
+    eg_electionguard_linked_list_t *list = eg_electionguard_linked_list_new();
     eg_electionguard_linked_list_append(list, "some", "value");
 
     assert(strings_are_equal(list->head->key, "some") == true);
