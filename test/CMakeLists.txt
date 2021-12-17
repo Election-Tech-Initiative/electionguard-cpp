@@ -130,6 +130,7 @@ add_executable(${CTEST_PROJECT_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot_code.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_collections.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_election.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt_compact.c

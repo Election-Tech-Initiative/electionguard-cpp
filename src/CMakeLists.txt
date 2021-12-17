@@ -105,6 +105,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/constants.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/collections.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/crypto_hashable.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/election.h
