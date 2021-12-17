@@ -1,6 +1,6 @@
 /// @file ballot.h
-#ifndef __ELECTIONGUARD_CPP_TEST_MOCKS_BALLOT_H_INCLUDED__
-#define __ELECTIONGUARD_CPP_TEST_MOCKS_BALLOT_H_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_TOOLS_GENERATORS_BALLOT_H_INCLUDED__
+#define __ELECTIONGUARD_CPP_TOOLS_GENERATORS_BALLOT_H_INCLUDED__
 
 #include <electionguard/ballot.h>
 #include <electionguard/export.h>
@@ -16,4 +16,4 @@ eg_test_ballot_mocks_get_simple_ballot_from_file(eg_plaintext_ballot_t **out_han
 }
 #endif
 
-#endif /* __ELECTIONGUARD_CPP_TEST_MOCKS_BALLOT_H_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_TOOLS_GENERATORS_BALLOT_H_INCLUDED__ */

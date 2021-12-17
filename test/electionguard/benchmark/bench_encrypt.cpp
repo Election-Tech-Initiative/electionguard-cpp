@@ -1,6 +1,6 @@
-#include "../mocks/ballot.hpp"
-#include "../mocks/election.hpp"
-#include "../mocks/manifest.hpp"
+#include "../generators/ballot.hpp"
+#include "../generators/election.hpp"
+#include "../generators/manifest.hpp"
 
 #include <benchmark/benchmark.h>
 #include <electionguard/ballot.hpp>
@@ -9,7 +9,7 @@
 #include <electionguard/manifest.hpp>
 
 using namespace electionguard;
-using namespace electionguard::test::mocks;
+using namespace electionguard::tools::generators;
 using namespace std;
 
 #pragma region encryptSelection

@@ -440,7 +440,7 @@ namespace electionguard
 
         // Validate Input
         if (style == nullptr) {
-            throw runtime_error("could not find a ballot style: " + ballot.getStyleId());
+            throw invalid_argument("could not find a ballot style: " + ballot.getStyleId());
         }
 
         // Generate a random seed nonce to use for the contest and selection nonce's on the ballot

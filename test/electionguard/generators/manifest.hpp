@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD_CPP_TEST_MOCKS_MANIFEST_HPP_INCLUDED__
-#define __ELECTIONGUARD_CPP_TEST_MOCKS_MANIFEST_HPP_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_TOOLS_GENERATORS_MANIFEST_HPP_INCLUDED__
+#define __ELECTIONGUARD_CPP_TOOLS_GENERATORS_MANIFEST_HPP_INCLUDED__
 
 #include <electionguard/election.hpp>
 #include <electionguard/export.h>
@@ -11,21 +11,34 @@
 using namespace electionguard;
 using namespace std;
 
-namespace electionguard::test::mocks
+#ifndef TEST_SPEC_VERSION
+#    define TEST_SPEC_VERSION "0.95.0"
+#endif
+
+#ifndef TEST_USE_SAMPLE
+#    define TEST_USE_SAMPLE "hamilton-general"
+#endif
+
+namespace electionguard::tools::generators
 {
     class ManifestGenerator
     {
       public:
         static unique_ptr<Manifest> getJeffersonCountryManifest_multipleBallotStyle_fromFile()
         {
-            return getSimpleManifestFromFile("election_manifest_jefferson_county.json");
+            return getManifestFromFile("election_manifest_jefferson_county.json");
         }
-        static unique_ptr<Manifest> getSimpleManifestFromFile(const string &filename)
+        static unique_ptr<Manifest> getManifestFromFile(const string &version, const string &sample)
+        {
+            return getManifestFromFile(version + "/sample/" + sample + "/manifest.json");
+        }
+        static unique_ptr<Manifest> getManifestFromFile(const string &filePath)
         {
 
             ifstream file;
-            file.open("data/" + filename);
+            file.open("data/" + filePath);
             if (!file) {
+                //Log::debug(filePath);
                 throw invalid_argument("could not find file");
             }
 
@@ -149,6 +162,6 @@ namespace electionguard::test::mocks
               move(parties), move(candidates), move(contests), move(ballotStyles));
         }
     };
-} // namespace electionguard::test::mocks
+} // namespace electionguard::tools::generators
 
-#endif /* __ELECTIONGUARD_CPP_TEST_MOCKS_MANIFEST_HPP_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_TOOLS_GENERATORS_MANIFEST_HPP_INCLUDED__ */

@@ -93,6 +93,10 @@
         "unordered_set": "cpp",
         "hash_map": "cpp",
         "ranges": "cpp",
-        "stop_token": "cpp"
+        "stop_token": "cpp",
+        "ballot.h": "c",
+        "election.h": "c",
+        "manifest.h": "c",
+        "__bits": "cpp"
     },
 }

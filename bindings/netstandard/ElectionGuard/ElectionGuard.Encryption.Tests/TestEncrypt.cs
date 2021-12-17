@@ -32,6 +32,8 @@ namespace ElectionGuard.Encrypt.Tests
             // a property
             Assert.That(ciphertext.ObjectId == ballot.ObjectId);
 
+            Assert.That(ciphertext.BallotCode.ToHex() != null);
+
             // json serialization
             var json = ciphertext.ToJson();
             var fromJson = new CiphertextBallot(json);
@@ -49,6 +51,46 @@ namespace ElectionGuard.Encrypt.Tests
             // submitted ballot
             var submitted = new SubmittedBallot(ciphertext, BallotBoxState.Cast);
             Assert.That(ciphertext.ObjectId == submitted.ObjectId);
+        }
+
+        [Test]
+        public void Test_Encrypt_Ballot_Undervote_Succeeds()
+        {
+            // Configure the election context
+            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
+            var manifest = ManifestGenerator.GetJeffersonCountyManifest_Minimal();
+            var internalManifest = new InternalManifest(manifest);
+            var context = new CiphertextElectionContext(
+                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
+            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
+            var mediator = new EncryptionMediator(internalManifest, context, device);
+
+            // Act
+            var ballot = BallotGenerator.GetFakeBallot(internalManifest, 1);
+            var ciphertext = mediator.Encrypt(ballot);
+
+            // Assert
+
+            // a property
+            Assert.That(ciphertext.IsValidEncryption(context.ManifestHash, keypair.PublicKey, context.CryptoExtendedBaseHash));
+        }
+
+        [Test]
+        public void Test_Encrypt_Ballot_Overvote_Fails()
+        {
+            // Configure the election context
+            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
+            var manifest = ManifestGenerator.GetJeffersonCountyManifest_Minimal();
+            var internalManifest = new InternalManifest(manifest);
+            var context = new CiphertextElectionContext(
+                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
+            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
+            var mediator = new EncryptionMediator(internalManifest, context, device);
+
+            // Act
+            var ballot = BallotGenerator.GetFakeBallot(internalManifest, 2);
+            Assert.Throws<ArgumentException>(() => mediator.Encrypt(ballot));
+
         }
 
         [Test]

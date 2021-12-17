@@ -5,6 +5,7 @@
 
 #include <cerrno>
 #include <exception>
+#include <stdexcept>
 
 extern "C" {
 #include "electionguard/encrypt.h"
@@ -29,7 +30,9 @@ using electionguard::PlaintextBallotContest;
 using electionguard::PlaintextBallotSelection;
 using electionguard::SelectionDescription;
 
+using std::invalid_argument;
 using std::make_unique;
+using std::runtime_error;
 using std::unique_ptr;
 
 #pragma region EncryptionDevice
@@ -119,6 +122,13 @@ eg_encryption_mediator_encrypt_ballot(eg_encryption_mediator_t *handle,
 
         *out_ciphertext_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
+
+    } catch (const invalid_argument &e) {
+        Log::error(":eg_encryption_mediator_encrypt_ballot", e);
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    } catch (const runtime_error &e) {
+        Log::error(":eg_encryption_mediator_encrypt_ballot", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     } catch (const exception &e) {
         Log::error(":eg_encryption_mediator_encrypt_ballot", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
@@ -135,6 +145,12 @@ eg_electionguard_status_t eg_encryption_mediator_compact_encrypt_ballot(
 
         *out_ciphertext_handle = AS_TYPE(eg_compact_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const invalid_argument &e) {
+        Log::error(":eg_encryption_mediator_compact_encrypt_ballot", e);
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    } catch (const runtime_error &e) {
+        Log::error(":eg_encryption_mediator_compact_encrypt_ballot", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     } catch (const exception &e) {
         Log::error(":eg_encryption_mediator_compact_encrypt_ballot", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
@@ -151,6 +167,12 @@ eg_electionguard_status_t eg_encryption_mediator_compact_encrypt_ballot_verify_p
 
         *out_ciphertext_handle = AS_TYPE(eg_compact_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const invalid_argument &e) {
+        Log::error(":eg_encryption_mediator_compact_encrypt_ballot_verify_proofs", e);
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    } catch (const runtime_error &e) {
+        Log::error(":eg_encryption_mediator_compact_encrypt_ballot_verify_proofs", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     } catch (const exception &e) {
         Log::error(":eg_encryption_mediator_compact_encrypt_ballot_verify_proofs", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
@@ -168,6 +190,12 @@ eg_encryption_mediator_encrypt_ballot_verify_proofs(eg_encryption_mediator_t *ha
 
         *out_ciphertext_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const invalid_argument &e) {
+        Log::error(":eg_encryption_mediator_encrypt_ballot_verify_proofs", e);
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    } catch (const runtime_error &e) {
+        Log::error(":eg_encryption_mediator_encrypt_ballot_verify_proofs", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     } catch (const exception &e) {
         Log::error(":eg_encryption_mediator_encrypt_ballot_verify_proofs", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
@@ -199,6 +227,12 @@ eg_electionguard_status_t eg_encrypt_selection(eg_plaintext_ballot_selection_t *
 
         *out_handle = AS_TYPE(eg_ciphertext_ballot_selection_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const invalid_argument &e) {
+        Log::error(":eg_encrypt_selection", e);
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    } catch (const runtime_error &e) {
+        Log::error(":eg_encrypt_selection", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     } catch (const exception &e) {
         Log::error(":eg_encrypt_selection", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
@@ -228,6 +262,12 @@ eg_electionguard_status_t eg_encrypt_contest(
 
         *out_handle = AS_TYPE(eg_ciphertext_ballot_contest_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const invalid_argument &e) {
+        Log::error(":eg_encrypt_contest", e);
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    } catch (const runtime_error &e) {
+        Log::error(":eg_encrypt_contest", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     } catch (const exception &e) {
         Log::error(":eg_encrypt_contest", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
@@ -255,6 +295,12 @@ eg_electionguard_status_t eg_encrypt_ballot(eg_plaintext_ballot_t *in_plaintext,
                                         in_should_verify_proofs);
         *out_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const invalid_argument &e) {
+        Log::error(":eg_encrypt_ballot", e);
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    } catch (const runtime_error &e) {
+        Log::error(":eg_encrypt_ballot", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     } catch (const exception &e) {
         Log::error(":eg_encrypt_ballot", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
@@ -278,6 +324,12 @@ eg_electionguard_status_t eg_encrypt_ballot_with_nonce(
                                         move(nonce_ptr), 0, in_should_verify_proofs);
         *out_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const invalid_argument &e) {
+        Log::error(":eg_encrypt_ballot_with_nonce", e);
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    } catch (const runtime_error &e) {
+        Log::error(":eg_encrypt_ballot_with_nonce", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     } catch (const exception &e) {
         Log::error(":eg_encrypt_ballot_with_nonce", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
@@ -305,6 +357,12 @@ eg_electionguard_status_t eg_encrypt_compact_ballot(eg_plaintext_ballot_t *in_pl
                                                0, in_should_verify_proofs);
         *out_handle = AS_TYPE(eg_compact_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const invalid_argument &e) {
+        Log::error(":eg_encrypt_compact_ballot", e);
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    } catch (const runtime_error &e) {
+        Log::error(":eg_encrypt_compact_ballot", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     } catch (const exception &e) {
         Log::error(":eg_encrypt_compact_ballot", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;

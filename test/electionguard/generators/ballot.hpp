@@ -1,5 +1,5 @@
-#ifndef __ELECTIONGUARD_CPP_TEST_MOCKS_BALLOT_HPP_INCLUDED__
-#define __ELECTIONGUARD_CPP_TEST_MOCKS_BALLOT_HPP_INCLUDED__
+#ifndef __ELECTIONGUARD_CPP_TOOLS_GENERATORS_BALLOT_HPP_INCLUDED__
+#define __ELECTIONGUARD_CPP_TOOLS_GENERATORS_BALLOT_HPP_INCLUDED__
 
 #include "../../../src/electionguard/random.hpp"
 
@@ -14,7 +14,7 @@
 using namespace electionguard;
 using namespace std;
 
-namespace electionguard::test::mocks
+namespace electionguard::tools::generators
 {
     class BallotGenerator
     {
@@ -65,9 +65,6 @@ namespace electionguard::test::mocks
 
             // jsut loop through and select the necessary amount of trues
             for (const auto &description : contest.getSelections()) {
-                if (maxChoices > contest.getNumberElected()) {
-                    maxChoices = contest.getNumberElected();
-                }
                 if (choices < maxChoices) {
                     ++choices;
                     Log::debug(" " + description.get().getObjectId() + " Adding Selection: TRUE");
@@ -97,6 +94,6 @@ namespace electionguard::test::mocks
               ballotId, manifest.getBallotStyles().at(0).get().getObjectId(), move(contests));
         }
     };
-} // namespace electionguard::test::mocks
+} // namespace electionguard::tools::generators
 
-#endif /* __ELECTIONGUARD_CPP_TEST_MOCKS_BALLOT_HPP_INCLUDED__ */
+#endif /* __ELECTIONGUARD_CPP_TOOLS_GENERATORS_BALLOT_HPP_INCLUDED__ */

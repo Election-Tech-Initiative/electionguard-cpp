@@ -16,7 +16,7 @@ EG_API eg_electionguard_status_t
 eg_test_election_mocks_get_simple_election_from_file(eg_election_manifest_t **out_handle)
 {
     try {
-        auto election = electionguard::test::mocks::ManifestGenerator::
+        auto election = electionguard::tools::generators::ManifestGenerator::
           getJeffersonCountryManifest_multipleBallotStyle_fromFile();
         *out_handle = AS_TYPE(eg_election_manifest_t, election.release());
         return ELECTIONGUARD_STATUS_SUCCESS;

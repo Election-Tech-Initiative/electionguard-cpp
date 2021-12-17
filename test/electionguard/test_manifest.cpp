@@ -1,6 +1,6 @@
 #include "../../src/electionguard/log.hpp"
-#include "mocks/election.hpp"
-#include "mocks/manifest.hpp"
+#include "generators/election.hpp"
+#include "generators/manifest.hpp"
 
 #include <doctest/doctest.h>
 #include <electionguard/election.hpp>
@@ -8,21 +8,20 @@
 #include <electionguard/manifest.hpp>
 
 using namespace electionguard;
-using namespace electionguard::test::mocks;
+using namespace electionguard::tools::generators;
 using namespace std;
 
-TEST_CASE("Simple Election Is Valid")
+TEST_CASE("Sample Manifest Is Valid")
 {
-    auto subject = ManifestGenerator::getJeffersonCountryManifest_multipleBallotStyle_fromFile();
+    auto subject = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
 
-    CHECK(subject->getElectionScopeId() == "jefferson-county-primary");
     CHECK(subject->isValid() == true);
 }
 
-TEST_CASE("Can serialize Jefferson County Minimal Manifest")
+TEST_CASE("Can serialize Sample Manifest")
 {
     // Arrange
-    auto subject = ManifestGenerator::getJeffersonCountyManifest_Minimal();
+    auto subject = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
     auto json = subject->toJson();
 
     Log::debug(json);
@@ -36,27 +35,10 @@ TEST_CASE("Can serialize Jefferson County Minimal Manifest")
     CHECK(result->isValid() == true);
 }
 
-TEST_CASE("Can deserialize Jefferson County Manifest from file")
+TEST_CASE("Can construct InternalManifest from Sample Manifest")
 {
     // Arrange
-    auto subject = ManifestGenerator::getJeffersonCountryManifest_multipleBallotStyle_fromFile();
-    auto json = subject->toJson();
-
-    Log::debug(json);
-
-    // Act
-    auto result = Manifest::fromJson(json);
-
-    // Assert
-    CHECK(subject->getElectionScopeId().compare(result->getElectionScopeId()) == 0);
-    CHECK(subject->crypto_hash()->toHex() == result->crypto_hash()->toHex());
-    CHECK(result->isValid() == true);
-}
-
-TEST_CASE("Can construct InternalManifest from Manifest")
-{
-    // Arrange
-    auto data = ManifestGenerator::getJeffersonCountyManifest_Minimal();
+    auto data = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
 
     // Act
     auto result = make_unique<InternalManifest>(*data);

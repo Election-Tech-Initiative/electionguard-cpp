@@ -39,15 +39,15 @@ endif()
 # Utils Library -----------------------------------------------
 
 add_library(${UTILS_PROJECT_TARGET} SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/ballot.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/election.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/manifest.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/manifest.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/mocks/manifest.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/ballot.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/ballot.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/ballot.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/election.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/election.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/election.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/manifest.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/manifest.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/manifest.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/byte_logger.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/constants.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h

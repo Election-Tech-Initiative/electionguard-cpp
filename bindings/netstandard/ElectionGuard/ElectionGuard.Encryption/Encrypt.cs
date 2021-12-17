@@ -31,10 +31,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.EncryptionDevice.New(
                 deviceUuid, sessionUuid, launchCode, location, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"EncryptionDevice New Error Status: {status}");
-            }
+            status.ThrowIfError();
         }
 
         protected override unsafe void DisposeUnmanaged()
@@ -83,20 +80,14 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.EncryptionMediator.EncryptAndVerify(
                 Handle, plaintext.Handle, out NativeCiphertextBallot ciphertext);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"Encrypt Error Status: {status}");
-                }
+                status.ThrowIfError();
                 return new CiphertextBallot(ciphertext);
             }
             else
             {
                 var status = NativeInterface.EncryptionMediator.Encrypt(
                 Handle, plaintext.Handle, out NativeCiphertextBallot ciphertext);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"Encrypt Error Status: {status}");
-                }
+                status.ThrowIfError();
                 return new CiphertextBallot(ciphertext);
             }
 
@@ -112,20 +103,14 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.EncryptionMediator.CompactEncryptAndVerify(
                 Handle, plaintext.Handle, out NativeCompactCiphertextBallot ciphertext);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"InternalManifest Error Status: {status}");
-                }
+                status.ThrowIfError();
                 return new CompactCiphertextBallot(ciphertext);
             }
             else
             {
                 var status = NativeInterface.EncryptionMediator.CompactEncrypt(
                 Handle, plaintext.Handle, out NativeCompactCiphertextBallot ciphertext);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"InternalManifest Error Status: {status}");
-                }
+                status.ThrowIfError();
                 return new CompactCiphertextBallot(ciphertext);
             }
 
@@ -177,10 +162,7 @@ namespace ElectionGuard
                     ballot.Handle, internalManifest.Handle, context.Handle,
                     ballotCodeSeed.Handle, shouldVerifyProofs,
                     out NativeCiphertextBallot ciphertext);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"Encrypt Ballot Error Status: {status}");
-                }
+                status.ThrowIfError();
                 return new CiphertextBallot(ciphertext);
             }
             else
@@ -189,10 +171,7 @@ namespace ElectionGuard
                     ballot.Handle, internalManifest.Handle, context.Handle,
                     ballotCodeSeed.Handle, nonce.Handle, shouldVerifyProofs,
                     out NativeCiphertextBallot ciphertext);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"EncryptWithNonce Ballot Error Status: {status}");
-                }
+                status.ThrowIfError();
                 return new CiphertextBallot(ciphertext);
             }
         }
@@ -232,10 +211,7 @@ namespace ElectionGuard
                 ballot.Handle, internalManifest.Handle, context.Handle,
                 ballotCodeSeed.Handle, verifyProofs,
                 out NativeCompactCiphertextBallot ciphertext);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"Encrypt CompactBallot Error Status: {status}");
-            }
+            status.ThrowIfError();
             return new CompactCiphertextBallot(ciphertext);
         }
     }
