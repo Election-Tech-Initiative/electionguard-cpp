@@ -9,6 +9,7 @@
 #include <chrono>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace electionguard
@@ -35,6 +36,13 @@ namespace electionguard
                                            std::unique_ptr<ElementModQ> manifestHash,
                                            std::unique_ptr<ElementModQ> cryptoBaseHash,
                                            std::unique_ptr<ElementModQ> cryptoExtendedBaseHash);
+        explicit CiphertextElectionContext(
+          const uint64_t numberOfGuardians, const uint64_t quorum,
+          std::unique_ptr<ElementModP> elGamalPublicKey,
+          std::unique_ptr<ElementModQ> commitmentHash, std::unique_ptr<ElementModQ> manifestHash,
+          std::unique_ptr<ElementModQ> cryptoBaseHash,
+          std::unique_ptr<ElementModQ> cryptoExtendedBaseHash,
+          std::unordered_map<std::string, std::string> extendedData);
         ~CiphertextElectionContext();
 
         CiphertextElectionContext &operator=(CiphertextElectionContext other);
@@ -76,6 +84,8 @@ namespace electionguard
         /// </summary>
         const ElementModQ *getCryptoExtendedBaseHash() const;
 
+        const std::unordered_map<std::string, std::string> getExtendedData() const;
+
         /// <summary>
         ///  Makes a CiphertextElectionContext object.
         ///
@@ -92,6 +102,22 @@ namespace electionguard
              std::unique_ptr<ElementModQ> manifestHash);
 
         /// <summary>
+        ///  Makes a CiphertextElectionContext object.
+        ///
+        /// <param name="number_of_guardians"> The number of guardians necessary to generate the public key </param>
+        /// <param name="quorum"> The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians` </param>
+        /// <param name="elGamalPublicKey"> the public key of the election </param>
+        /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
+        /// <param name="manifestHash"> the hash of the election metadata </param>
+        /// <param name="extendedData"> an unordered map of key value strings revelant to the consuming application </param>
+        /// </summary>
+        static std::unique_ptr<CiphertextElectionContext>
+        make(const uint64_t numberOfGuardians, const uint64_t quorum,
+             std::unique_ptr<ElementModP> elGamalPublicKey,
+             std::unique_ptr<ElementModQ> commitmentHash, std::unique_ptr<ElementModQ> manifestHash,
+             std::unordered_map<std::string, std::string> extendedData);
+
+        /// <summary>
         ///  Makes a CiphertextElectionContext object from hex string representations.
         ///
         /// <param name="number_of_guardians"> The number of guardians necessary to generate the public key </param>
@@ -104,6 +130,22 @@ namespace electionguard
         make(const uint64_t numberOfGuardians, const uint64_t quorum,
              const std::string &elGamalPublicKeyInHex, const std::string &commitmentHashInHex,
              const std::string &manifestHashInHex);
+
+        /// <summary>
+        ///  Makes a CiphertextElectionContext object from hex string representations.
+        ///
+        /// <param name="number_of_guardians"> The number of guardians necessary to generate the public key </param>
+        /// <param name="quorum"> The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians` </param>
+        /// <param name="elGamalPublicKeyInHex"> the public key of the election </param>
+        /// <param name="commitmentHashInHex"> the hash of the commitments the guardians make to each other </param>
+        /// <param name="manifestHashInHex"> the hash of the election metadata </param>
+        /// <param name="extendedData"> an unordered map of key value strings revelant to the consuming application </param>
+        /// </summary>
+        static std::unique_ptr<CiphertextElectionContext>
+        make(const uint64_t numberOfGuardians, const uint64_t quorum,
+             const std::string &elGamalPublicKeyInHex, const std::string &commitmentHashInHex,
+             const std::string &manifestHashInHex,
+             std::unordered_map<std::string, std::string> extendedData);
 
         std::vector<uint8_t> toBson() const;
         std::string toJson() const;
