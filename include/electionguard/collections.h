@@ -21,25 +21,28 @@ typedef struct eg_electionguard_linked_list_t {
     eg_electionguard_linked_list_node_t *tail;
 } eg_electionguard_linked_list_t;
 
-void eg_electionguard_linked_list_delete_last(eg_electionguard_linked_list_t *list);
+eg_electionguard_status_t
+eg_electionguard_linked_list_delete_last(eg_electionguard_linked_list_t *list);
 
-eg_electionguard_linked_list_t *eg_electionguard_linked_list_new()
+eg_electionguard_status_t
+eg_electionguard_linked_list_new(eg_electionguard_linked_list_t **out_handle)
 {
     eg_electionguard_linked_list_t *list =
       (eg_electionguard_linked_list_t *)malloc(sizeof(eg_electionguard_linked_list_t));
     if (list == NULL) {
-        return NULL;
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
     list->head = NULL;
     list->tail = NULL;
     list->count = 0;
-    return list;
+    *out_handle = list;
+    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-void eg_electionguard_linked_list_free(eg_electionguard_linked_list_t *list)
+eg_electionguard_status_t eg_electionguard_linked_list_free(eg_electionguard_linked_list_t *list)
 {
     if (list == NULL) {
-        return;
+        return ELECTIONGUARD_STATUS_SUCCESS;
     }
 
     while (list->count > 0) {
@@ -47,13 +50,17 @@ void eg_electionguard_linked_list_free(eg_electionguard_linked_list_t *list)
     }
 
     free(list);
+    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-void eg_electionguard_linked_list_append(eg_electionguard_linked_list_t *list, char *key,
-                                         char *value)
+eg_electionguard_status_t eg_electionguard_linked_list_append(eg_electionguard_linked_list_t *list,
+                                                              char *key, char *value)
 {
     eg_electionguard_linked_list_node_t *node =
       (eg_electionguard_linked_list_node_t *)malloc(sizeof(eg_electionguard_linked_list_node_t));
+    if (node == NULL) {
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
     node->key = key;
     node->value = value;
     node->previous = NULL;
@@ -71,13 +78,15 @@ void eg_electionguard_linked_list_append(eg_electionguard_linked_list_t *list, c
 
     list->tail = node;
     list->count++;
+    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-void eg_electionguard_linked_list_delete_last(eg_electionguard_linked_list_t *list)
+eg_electionguard_status_t
+eg_electionguard_linked_list_delete_last(eg_electionguard_linked_list_t *list)
 {
     if (list->tail == NULL) {
         // list is empty
-        return;
+        return ELECTIONGUARD_STATUS_SUCCESS;
     }
 
     eg_electionguard_linked_list_node_t *to_remove = list->tail;
@@ -95,6 +104,7 @@ void eg_electionguard_linked_list_delete_last(eg_electionguard_linked_list_t *li
 
     list->count--;
     free(to_remove);
+    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 #endif /* __ELECTIONGUARD_CPP_CONSTANTS_H_INCLUDED__ */
