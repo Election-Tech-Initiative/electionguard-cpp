@@ -87,6 +87,8 @@ namespace electionguard
     }
     CiphertextElectionContext::~CiphertextElectionContext() = default;
 
+    // Operator Overloads
+
     CiphertextElectionContext &CiphertextElectionContext::operator=(CiphertextElectionContext other)
     {
         swap(pimpl, other.pimpl);

@@ -7,6 +7,7 @@
 #include <cstring>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 extern "C" {
@@ -23,6 +24,7 @@ using electionguard::Log;
 using std::make_unique;
 using std::string;
 using std::unique_ptr;
+using std::unordered_map;
 using std::vector;
 
 #pragma region CiphertextElectionContext
@@ -83,6 +85,26 @@ eg_electionguard_status_t eg_ciphertext_election_context_get_crypto_extended_bas
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
+eg_electionguard_status_t
+eg_ciphertext_election_context_get_extended_data(eg_ciphertext_election_context_t *handle,
+                                                 eg_linked_list_t **out_extended_data)
+{
+    auto extendedData = AS_TYPE(CiphertextElectionContext, handle)->getExtendedData();
+
+    eg_linked_list_t *extended_data = NULL;
+    if (eg_linked_list_new(&extended_data)) {
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+
+    unordered_map<string, string>::iterator iterator;
+    for (iterator = extendedData.begin(); iterator != extendedData.end(); iterator++) {
+        eg_linked_list_append(extended_data, const_cast<char *>(iterator->first.c_str()),
+                              const_cast<char *>(iterator->second.c_str()));
+    }
+    *out_extended_data = extended_data;
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
 eg_electionguard_status_t eg_ciphertext_election_context_make(
   uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
   eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
@@ -93,18 +115,43 @@ eg_electionguard_status_t eg_ciphertext_election_context_make(
         auto *commitmentHashPtr = AS_TYPE(ElementModQ, in_commitment_hash);
         auto *manifestHashPtr = AS_TYPE(ElementModQ, in_manifest_hash);
 
-        unique_ptr<ElementModP> elGamalPublicKey{publicKeyPtr};
-        unique_ptr<ElementModQ> commitmentHash{commitmentHashPtr};
-        unique_ptr<ElementModQ> manifestHash{manifestHashPtr};
-
         auto context =
-          CiphertextElectionContext::make(in_number_of_guardians, in_quorum, move(elGamalPublicKey),
-                                          move(commitmentHash), move(manifestHash));
+          CiphertextElectionContext::make(in_number_of_guardians, in_quorum, publicKeyPtr->clone(),
+                                          commitmentHashPtr->clone(), manifestHashPtr->clone());
 
         *out_handle = AS_TYPE(eg_ciphertext_election_context_t, context.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_ciphertext_election_context_make", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_ciphertext_election_context_make_with_extended_data(
+  uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
+  eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
+  const eg_linked_list_t *in_extended_data, eg_ciphertext_election_context_t **out_handle)
+{
+    try {
+        auto *publicKeyPtr = AS_TYPE(ElementModP, in_elgamal_public_key);
+        auto *commitmentHashPtr = AS_TYPE(ElementModQ, in_commitment_hash);
+        auto *manifestHashPtr = AS_TYPE(ElementModQ, in_manifest_hash);
+
+        unordered_map<string, string> extendedData = {};
+        eg_linked_list_node_t *node = in_extended_data->head;
+        while (node != NULL) {
+            extendedData[string(node->key)] = string(node->value);
+            node = node->next;
+        }
+
+        auto context = CiphertextElectionContext::make(
+          in_number_of_guardians, in_quorum, publicKeyPtr->clone(), commitmentHashPtr->clone(),
+          manifestHashPtr->clone(), move(extendedData));
+
+        *out_handle = AS_TYPE(eg_ciphertext_election_context_t, context.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_election_context_make_with_extended_data", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -126,6 +173,34 @@ eg_electionguard_status_t eg_ciphertext_election_context_make_from_hex(
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_ciphertext_election_context_make_from_hex", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_ciphertext_election_context_make_from_hex_with_extended_data(
+  uint64_t in_number_of_guardians, uint64_t in_quorum, const char *in_elgamal_public_key,
+  const char *in_commitment_hash, const char *in_manifest_hash,
+  const eg_linked_list_t *in_extended_data, eg_ciphertext_election_context_t **out_handle)
+{
+    try {
+        auto elGamalPublicKey = string(in_elgamal_public_key);
+        auto commitmentHash = string(in_commitment_hash);
+        auto manifestHash = string(in_manifest_hash);
+
+        unordered_map<string, string> extendedData = {};
+        eg_linked_list_node_t *node = in_extended_data->head;
+        while (node != NULL) {
+            extendedData[string(node->key)] = string(node->value);
+            node = node->next;
+        }
+
+        auto context = CiphertextElectionContext::make(
+          in_number_of_guardians, in_quorum, elGamalPublicKey, commitmentHash, manifestHash);
+        *out_handle = AS_TYPE(eg_ciphertext_election_context_t, context.release());
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_election_context_make_from_hex_with_extended_data", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }

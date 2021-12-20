@@ -18,19 +18,19 @@ bool test_can_create_lined_list(void)
 {
     printf("\n -------- test_can_create_lined_list --------- \n");
 
-    eg_electionguard_linked_list_t *list = NULL;
-    if (eg_electionguard_linked_list_new(&list)) {
+    eg_linked_list_t *list = NULL;
+    if (eg_linked_list_new(&list)) {
         assert(false);
     }
 
-    if (eg_electionguard_linked_list_append(list, "some", "value")) {
+    if (eg_linked_list_append(list, "some", "value")) {
         assert(false);
     }
 
     assert(strings_are_equal(list->head->key, "some") == true);
     assert(strings_are_equal(list->head->value, "value") == true);
 
-    eg_electionguard_linked_list_free(list);
+    eg_linked_list_free(list);
 
     return true;
 }
