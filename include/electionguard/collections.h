@@ -2,6 +2,7 @@
 #ifndef __ELECTIONGUARD_CPP_COLLECTIONS_H_INCLUDED__
 #define __ELECTIONGUARD_CPP_COLLECTIONS_H_INCLUDED__
 
+#include "export.h"
 #include "status.h"
 
 #include <stdbool.h>
@@ -10,8 +11,8 @@
 #include <string.h>
 
 typedef struct eg_linked_list_node_t {
-    char *value;
     char *key;
+    char *value;
     struct eg_linked_list_node_t *previous;
     struct eg_linked_list_node_t *next;
 } eg_linked_list_node_t;
@@ -22,9 +23,9 @@ typedef struct eg_linked_list_t {
     eg_linked_list_node_t *tail;
 } eg_linked_list_t;
 
-inline eg_electionguard_status_t eg_linked_list_delete_last(eg_linked_list_t *list);
+EG_API inline eg_electionguard_status_t eg_linked_list_delete_last(eg_linked_list_t *list);
 
-inline eg_electionguard_status_t eg_linked_list_new(eg_linked_list_t **out_handle)
+EG_API inline eg_electionguard_status_t eg_linked_list_new(eg_linked_list_t **out_handle)
 {
     eg_linked_list_t *list = (eg_linked_list_t *)malloc(sizeof(eg_linked_list_t));
     if (list == NULL) {
@@ -37,7 +38,7 @@ inline eg_electionguard_status_t eg_linked_list_new(eg_linked_list_t **out_handl
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-inline eg_electionguard_status_t eg_linked_list_free(eg_linked_list_t *list)
+EG_API inline eg_electionguard_status_t eg_linked_list_free(eg_linked_list_t *list)
 {
     if (list == NULL) {
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -51,8 +52,8 @@ inline eg_electionguard_status_t eg_linked_list_free(eg_linked_list_t *list)
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-inline eg_electionguard_status_t eg_linked_list_append(eg_linked_list_t *list, char *key,
-                                                       char *value)
+EG_API inline eg_electionguard_status_t eg_linked_list_append(eg_linked_list_t *list, char *key,
+                                                              char *value)
 {
     eg_linked_list_node_t *node = (eg_linked_list_node_t *)malloc(sizeof(eg_linked_list_node_t));
     if (node == NULL) {
@@ -100,6 +101,28 @@ inline eg_electionguard_status_t eg_linked_list_delete_last(eg_linked_list_t *li
 
     list->count--;
     free(to_remove);
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+EG_API inline eg_electionguard_status_t
+eg_linked_list_get_value_at(eg_linked_list_t *list, uint64_t position, char **out_result)
+{
+    if (list->count == 0 || position >= list->count) {
+        return ELECTIONGUARD_STATUS_ERROR_OUT_OF_RANGE;
+    }
+
+    eg_linked_list_node_t *node = list->head;
+
+    for (uint64_t i = 1; i <= position; i++) {
+        node = node->next;
+    }
+
+    if (node == NULL) {
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ACCESS;
+    }
+
+    *out_result = node->value;
+
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
