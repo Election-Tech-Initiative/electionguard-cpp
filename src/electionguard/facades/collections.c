@@ -27,21 +27,21 @@ eg_electionguard_status_t eg_linked_list_new(eg_linked_list_t **out_handle)
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_electionguard_status_t eg_linked_list_free(eg_linked_list_t *list)
+eg_electionguard_status_t eg_linked_list_free(eg_linked_list_t *handle)
 {
-    if (list == NULL) {
+    if (handle == NULL) {
         return ELECTIONGUARD_STATUS_SUCCESS;
     }
 
-    while (list->count > 0) {
-        eg_linked_list_delete_last(list);
+    while (handle->count > 0) {
+        eg_linked_list_delete_last(handle);
     }
 
-    free(list);
+    free(handle);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_electionguard_status_t eg_linked_list_append(eg_linked_list_t *in_list, char *in_key,
+eg_electionguard_status_t eg_linked_list_append(eg_linked_list_t *handle, char *in_key,
                                                 char *in_value)
 {
     eg_linked_list_node_t *node = (eg_linked_list_node_t *)malloc(sizeof(eg_linked_list_node_t));
@@ -55,58 +55,58 @@ eg_electionguard_status_t eg_linked_list_append(eg_linked_list_t *in_list, char 
 
     // if a tail is already set
     // then link the previous to this one
-    if (in_list->tail != NULL) {
-        node->previous = in_list->tail;
-        in_list->tail->next = node;
+    if (handle->tail != NULL) {
+        node->previous = handle->tail;
+        handle->tail->next = node;
     }
 
     // if it is the first one, set it to the head
-    if (in_list->head == NULL) {
-        in_list->head = node;
+    if (handle->head == NULL) {
+        handle->head = node;
     }
 
     // set the tail to the node
-    in_list->tail = node;
-    in_list->count++;
+    handle->tail = node;
+    handle->count++;
 
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_electionguard_status_t eg_linked_list_delete_last(eg_linked_list_t *list)
+eg_electionguard_status_t eg_linked_list_delete_last(eg_linked_list_t *handle)
 {
-    if (list->tail == NULL) {
+    if (handle->tail == NULL) {
         // list is empty
         return ELECTIONGUARD_STATUS_SUCCESS;
     }
 
-    eg_linked_list_node_t *to_remove = list->tail;
+    eg_linked_list_node_t *to_remove = handle->tail;
 
     // check if it is the only one
-    if (list->head == to_remove) {
-        list->head = NULL;
+    if (handle->head == to_remove) {
+        handle->head = NULL;
     }
 
-    list->tail = to_remove->previous;
+    handle->tail = to_remove->previous;
 
-    if (list->tail != NULL) {
-        list->tail->next = NULL;
+    if (handle->tail != NULL) {
+        handle->tail->next = NULL;
     }
 
-    list->count--;
+    handle->count--;
     free(to_remove);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-uint64_t eg_linked_list_get_count(eg_linked_list_t *list) { return list->count; }
+uint64_t eg_linked_list_get_count(eg_linked_list_t *handle) { return handle->count; }
 
-eg_electionguard_status_t eg_linked_list_get_element_at(eg_linked_list_t *list, uint64_t position,
+eg_electionguard_status_t eg_linked_list_get_element_at(eg_linked_list_t *handle, uint64_t position,
                                                         char **out_key, char **out_value)
 {
-    if (list->count == 0 || position >= list->count) {
+    if (handle->count == 0 || position >= handle->count) {
         return ELECTIONGUARD_STATUS_ERROR_OUT_OF_RANGE;
     }
 
-    eg_linked_list_node_t *node = list->head;
+    eg_linked_list_node_t *node = handle->head;
 
     for (uint64_t i = 1; i <= position; i++) {
         node = node->next;
@@ -122,14 +122,14 @@ eg_electionguard_status_t eg_linked_list_get_element_at(eg_linked_list_t *list, 
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_electionguard_status_t eg_linked_list_get_value_at(eg_linked_list_t *list, uint64_t position,
+eg_electionguard_status_t eg_linked_list_get_value_at(eg_linked_list_t *handle, uint64_t position,
                                                       char **out_value)
 {
-    if (list->count == 0 || position >= list->count) {
+    if (handle->count == 0 || position >= handle->count) {
         return ELECTIONGUARD_STATUS_ERROR_OUT_OF_RANGE;
     }
 
-    eg_linked_list_node_t *node = list->head;
+    eg_linked_list_node_t *node = handle->head;
 
     for (uint64_t i = 1; i <= position; i++) {
         node = node->next;
