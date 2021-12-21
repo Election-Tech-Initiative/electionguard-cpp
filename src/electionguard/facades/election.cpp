@@ -142,7 +142,7 @@ eg_electionguard_status_t eg_ciphertext_election_context_make_with_extended_data
             char *edKey = NULL;
             char *edValue = NULL;
             if (eg_linked_list_get_element_at(in_extended_data, i, &edKey, &edValue)) {
-                assert(false);
+                return ELECTIONGUARD_STATUS_ERROR_BAD_ACCESS;
             }
             extendedData[string(edKey)] = string(edValue);
         }
@@ -195,7 +195,7 @@ eg_electionguard_status_t eg_ciphertext_election_context_make_from_hex_with_exte
             char *edKey = NULL;
             char *edValue = NULL;
             if (eg_linked_list_get_element_at(in_extended_data, i, &edKey, &edValue)) {
-                assert(false);
+                return ELECTIONGUARD_STATUS_ERROR_BAD_ACCESS;
             }
             extendedData[string(edKey)] = string(edValue);
         }
