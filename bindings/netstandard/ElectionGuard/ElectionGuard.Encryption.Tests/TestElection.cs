@@ -20,5 +20,24 @@ namespace ElectionGuard.Encrypt.Tests
             Assert.That(result.CommitmentHash.ToHex() == "02");
             Assert.That(result.ManifestHash.ToHex() == "02");
         }
+
+        [Test]
+        public void Test_Can_Assign_Extended_Data_To_Ciphertext_Election_Context()
+        {
+            // Arrange
+            var extendedData = new LinkedList();
+            extendedData.Append("ballot_base_uri", "http://something.vote/");
+
+            // Act
+            var context = new CiphertextElectionContext(
+                3, 2,
+                Constants.ONE_MOD_P, Constants.ONE_MOD_Q, Constants.ONE_MOD_Q,
+                extendedData);
+
+            var cachedValue = context.ExtendedData.GetValueAt(0);
+
+            // Assert
+            Assert.That(cachedValue == "http://something.vote/");
+        }
     }
 }

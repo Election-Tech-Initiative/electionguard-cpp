@@ -84,6 +84,9 @@ namespace electionguard
         /// </summary>
         const ElementModQ *getCryptoExtendedBaseHash() const;
 
+        /// <summary>
+        /// Get an unordered map containing the extended data of the election.
+        /// </summary>
         const std::unordered_map<std::string, std::string> getExtendedData() const;
 
         /// <summary>

@@ -57,10 +57,10 @@ namespace ElectionGuard
         /// </summary>
         public unsafe Tuple<string, string> GetElementAt(ulong position)
         {
-            var status = NativeInterface.LinkedList.GetValueAt(
+            var status = NativeInterface.LinkedList.GetElementAt(
                     Handle, position, out IntPtr key, out IntPtr value);
             status.ThrowIfError();
-            return (Marshal.PtrToStringAnsi(key), Marshal.PtrToStringAnsi(value));
+            return Tuple.Create(Marshal.PtrToStringAnsi(key), Marshal.PtrToStringAnsi(value));
         }
 
         /// <summary>

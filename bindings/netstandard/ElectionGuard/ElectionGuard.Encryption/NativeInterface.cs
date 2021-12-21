@@ -2001,6 +2001,13 @@ namespace ElectionGuard
                 CiphertextElectionContextHandle handle,
                 out ElementModQ.ElementModQHandle crypto_extended_base_hash);
 
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_election_context_get_extended_data",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetExtendedData(
+                CiphertextElectionContextHandle handle,
+                out LinkedList.LinkedListHandle extended_data);
+
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Make(
@@ -2011,6 +2018,17 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle manifest_hash,
                 out CiphertextElectionContextHandle handle);
 
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_with_extended_data",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Make(
+                ulong number_of_guardians,
+                ulong quorum,
+                ElementModP.ElementModPHandle elgamal_public_key,
+                ElementModQ.ElementModQHandle commitment_hash,
+                ElementModQ.ElementModQHandle manifest_hash,
+                LinkedList.LinkedListHandle extended_data,
+                out CiphertextElectionContextHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_from_hex",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Make(
@@ -2019,6 +2037,17 @@ namespace ElectionGuard
                 [MarshalAs(UnmanagedType.LPStr)] string hex_elgamal_public_key,
                 [MarshalAs(UnmanagedType.LPStr)] string hex_commitment_hash,
                 [MarshalAs(UnmanagedType.LPStr)] string hex_manifest_hash,
+                out CiphertextElectionContextHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_from_hex",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Make(
+                ulong number_of_guardians,
+                ulong quorum,
+                [MarshalAs(UnmanagedType.LPStr)] string hex_elgamal_public_key,
+                [MarshalAs(UnmanagedType.LPStr)] string hex_commitment_hash,
+                [MarshalAs(UnmanagedType.LPStr)] string hex_manifest_hash,
+                LinkedList.LinkedListHandle extended_data,
                 out CiphertextElectionContextHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_from_json",

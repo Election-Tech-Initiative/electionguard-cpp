@@ -6,6 +6,7 @@ namespace ElectionGuard
     using NativeCiphertextElectionContext = NativeInterface.CiphertextElectionContext.CiphertextElectionContextHandle;
     using NativeElementModP = NativeInterface.ElementModP.ElementModPHandle;
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
+    using NativeLinkedList = NativeInterface.LinkedList.LinkedListHandle;
 
 
     /// <summary>
@@ -112,17 +113,41 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Get a linked list containing the extended data of the election.
+        /// </summary>
+        public unsafe LinkedList ExtendedData
+        {
+            get
+            {
+                var status = NativeInterface.CiphertextElectionContext.GetExtendedData(
+                    Handle, out NativeLinkedList value);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    Console.WriteLine($"GetExtendedData Error Status: {status}");
+                    return null;
+                }
+                return new LinkedList(value);
+            }
+        }
+
         internal unsafe NativeCiphertextElectionContext Handle;
 
         public unsafe CiphertextElectionContext(string json)
         {
             var status = NativeInterface.CiphertextElectionContext.FromJson(json, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CiphertextElectionContext Error Status: {status}");
-            }
+            status.ThrowIfError();
         }
 
+        /// <summary>
+        ///  Makes a CiphertextElectionContext object.
+        ///
+        /// <param name="number_of_guardians"> The number of guardians necessary to generate the public key </param>
+        /// <param name="quorum"> The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians` </param>
+        /// <param name="publicKey"> the public key of the election </param>
+        /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
+        /// <param name="manifestHash"> the hash of the election metadata </param>
+        /// </summary>
         public unsafe CiphertextElectionContext(ulong numberOfGuardians,
                 ulong quorum,
                 ElementModP publicKey,
@@ -130,11 +155,32 @@ namespace ElectionGuard
                 ElementModQ manifestHash)
         {
             var status = NativeInterface.CiphertextElectionContext.Make(
-                numberOfGuardians, quorum, publicKey.Handle, commitmentHash.Handle, manifestHash.Handle, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CiphertextElectionContext Error Status: {status}");
-            }
+                numberOfGuardians, quorum, publicKey.Handle,
+                commitmentHash.Handle, manifestHash.Handle, out Handle);
+            status.ThrowIfError();
+        }
+
+        /// <summary>
+        ///  Makes a CiphertextElectionContext object.
+        ///
+        /// <param name="numberOfGuardians"> The number of guardians necessary to generate the public key </param>
+        /// <param name="quorum"> The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians` </param>
+        /// <param name="publicKey"> the public key of the election </param>
+        /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
+        /// <param name="manifestHash"> the hash of the election metadata </param>
+        /// <param name="extendedData"> an unordered map of key value strings revelant to the consuming application </param>
+        /// </summary>
+        public unsafe CiphertextElectionContext(ulong numberOfGuardians,
+                ulong quorum,
+                ElementModP publicKey,
+                ElementModQ commitmentHash,
+                ElementModQ manifestHash,
+                LinkedList extendedData)
+        {
+            var status = NativeInterface.CiphertextElectionContext.Make(
+                numberOfGuardians, quorum, publicKey.Handle,
+                commitmentHash.Handle, manifestHash.Handle, extendedData.Handle, out Handle);
+            status.ThrowIfError();
         }
 
         protected override unsafe void DisposeUnmanaged()
@@ -153,11 +199,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.CiphertextElectionContext.ToJson(
                 Handle, out IntPtr pointer, out ulong size);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"ToJson Error Status: {status}");
-                return null;
-            }
+            status.ThrowIfError();
             var json = Marshal.PtrToStringAnsi(pointer);
             return json;
         }
