@@ -14,30 +14,25 @@
 extern "C" {
 #endif
 
-typedef struct eg_linked_list_node_t {
-    char *key;
-    char *value;
-    struct eg_linked_list_node_t *previous;
-    struct eg_linked_list_node_t *next;
-} eg_linked_list_node_t;
-
-typedef struct eg_linked_list_t {
-    uint64_t count;
-    eg_linked_list_node_t *head;
-    eg_linked_list_node_t *tail;
-} eg_linked_list_t;
+typedef struct eg_linked_list_s eg_linked_list_t;
 
 EG_API eg_electionguard_status_t eg_linked_list_new(eg_linked_list_t **out_handle);
 
-EG_API eg_electionguard_status_t eg_linked_list_free(eg_linked_list_t *list);
+EG_API eg_electionguard_status_t eg_linked_list_free(eg_linked_list_t *in_list);
 
-EG_API eg_electionguard_status_t eg_linked_list_append(eg_linked_list_t *list, char *key,
-                                                       char *value);
+EG_API eg_electionguard_status_t eg_linked_list_append(eg_linked_list_t *in_list, char *in_key,
+                                                       char *in_value);
 
 EG_API eg_electionguard_status_t eg_linked_list_delete_last(eg_linked_list_t *list);
 
+EG_API uint64_t eg_linked_list_get_count(eg_linked_list_t *list);
+
+EG_API eg_electionguard_status_t eg_linked_list_get_element_at(eg_linked_list_t *list,
+                                                               uint64_t position, char **out_key,
+                                                               char **out_value);
+
 EG_API eg_electionguard_status_t eg_linked_list_get_value_at(eg_linked_list_t *list,
-                                                             uint64_t position, char **out_result);
+                                                             uint64_t position, char **out_value);
 
 #ifdef __cplusplus
 }

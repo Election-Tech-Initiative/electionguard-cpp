@@ -105,7 +105,7 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_make(
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_make_with_extended_data(
   uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
   eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
-  const eg_linked_list_t *in_extended_data, eg_ciphertext_election_context_t **out_handle);
+  eg_linked_list_t *in_extended_data, eg_ciphertext_election_context_t **out_handle);
 
 /**
  * Makes a CiphertextElectionContext object from the hex string representations.
@@ -135,8 +135,8 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_make_from_hex(
  */
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_make_from_hex_with_extended_data(
   uint64_t in_number_of_guardians, uint64_t in_quorum, const char *in_elgamal_public_key,
-  const char *in_commitment_hash, const char *in_manifest_hash,
-  const eg_linked_list_t *in_extended_data, eg_ciphertext_election_context_t **out_handle);
+  const char *in_commitment_hash, const char *in_manifest_hash, eg_linked_list_t *in_extended_data,
+  eg_ciphertext_election_context_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_from_json(
   char *in_data, eg_ciphertext_election_context_t **out_handle);

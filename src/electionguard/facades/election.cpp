@@ -2,6 +2,7 @@
 
 #include "../log.hpp"
 #include "convert.hpp"
+#include "electionguard/collections.h"
 #include "variant_cast.hpp"
 
 #include <cstring>
@@ -11,7 +12,6 @@
 #include <vector>
 
 extern "C" {
-
 #include "electionguard/election.h"
 }
 
@@ -130,7 +130,7 @@ eg_electionguard_status_t eg_ciphertext_election_context_make(
 eg_electionguard_status_t eg_ciphertext_election_context_make_with_extended_data(
   uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
   eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
-  const eg_linked_list_t *in_extended_data, eg_ciphertext_election_context_t **out_handle)
+  eg_linked_list_t *in_extended_data, eg_ciphertext_election_context_t **out_handle)
 {
     try {
         auto *publicKeyPtr = AS_TYPE(ElementModP, in_elgamal_public_key);
@@ -138,10 +138,13 @@ eg_electionguard_status_t eg_ciphertext_election_context_make_with_extended_data
         auto *manifestHashPtr = AS_TYPE(ElementModQ, in_manifest_hash);
 
         unordered_map<string, string> extendedData = {};
-        eg_linked_list_node_t *node = in_extended_data->head;
-        while (node != NULL) {
-            extendedData[string(node->key)] = string(node->value);
-            node = node->next;
+        for (uint64_t i = 0; i < eg_linked_list_get_count(in_extended_data); i++) {
+            char *edKey = NULL;
+            char *edValue = NULL;
+            if (eg_linked_list_get_element_at(in_extended_data, i, &edKey, &edValue)) {
+                assert(false);
+            }
+            extendedData[string(edKey)] = string(edValue);
         }
 
         auto context = CiphertextElectionContext::make(
@@ -179,8 +182,8 @@ eg_electionguard_status_t eg_ciphertext_election_context_make_from_hex(
 
 eg_electionguard_status_t eg_ciphertext_election_context_make_from_hex_with_extended_data(
   uint64_t in_number_of_guardians, uint64_t in_quorum, const char *in_elgamal_public_key,
-  const char *in_commitment_hash, const char *in_manifest_hash,
-  const eg_linked_list_t *in_extended_data, eg_ciphertext_election_context_t **out_handle)
+  const char *in_commitment_hash, const char *in_manifest_hash, eg_linked_list_t *in_extended_data,
+  eg_ciphertext_election_context_t **out_handle)
 {
     try {
         auto elGamalPublicKey = string(in_elgamal_public_key);
@@ -188,10 +191,13 @@ eg_electionguard_status_t eg_ciphertext_election_context_make_from_hex_with_exte
         auto manifestHash = string(in_manifest_hash);
 
         unordered_map<string, string> extendedData = {};
-        eg_linked_list_node_t *node = in_extended_data->head;
-        while (node != NULL) {
-            extendedData[string(node->key)] = string(node->value);
-            node = node->next;
+        for (uint64_t i = 0; i < eg_linked_list_get_count(in_extended_data); i++) {
+            char *edKey = NULL;
+            char *edValue = NULL;
+            if (eg_linked_list_get_element_at(in_extended_data, i, &edKey, &edValue)) {
+                assert(false);
+            }
+            extendedData[string(edKey)] = string(edValue);
         }
 
         auto context = CiphertextElectionContext::make(

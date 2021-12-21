@@ -53,11 +53,15 @@ bool test_assign_extended_data_to_ciphertext_election_context()
     if (eg_ciphertext_election_context_get_extended_data(context, &cached)) {
         assert(false);
     }
-    eg_linked_list_node_t *resolved = cached->head;
 
-    // Assert
+    char *cached_value = NULL;
+    if (eg_linked_list_get_value_at(cached, 0, &cached_value)) {
+        assert(false);
+    }
 
-    assert(strings_are_equal(extended_data->head->value, resolved->value) == true);
+    // // Assert
+
+    assert(strings_are_equal(cached_value, "http://something.vote/") == true);
 
     // Cleanup
 

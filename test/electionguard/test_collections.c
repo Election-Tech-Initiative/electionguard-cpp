@@ -34,24 +34,23 @@ bool test_can_create_linked_list(void)
         assert(false);
     }
 
+    char *first_key = NULL;
     char *first_value = NULL;
-    if (eg_linked_list_get_value_at(list, 0, &first_value)) {
+    if (eg_linked_list_get_element_at(list, 0, &first_key, &first_value)) {
         assert(false);
     }
 
+    char *second_key = NULL;
     char *second_value = NULL;
-    if (eg_linked_list_get_value_at(list, 1, &second_value)) {
+    if (eg_linked_list_get_element_at(list, 1, &second_key, &second_value)) {
         assert(false);
     }
 
     // Assert
-    assert(strings_are_equal(list->head->key, "some") == true);
-    assert(strings_are_equal(list->head->value, "value") == true);
-    assert(strings_are_equal(list->tail->key, "another") == true);
-    assert(strings_are_equal(list->tail->value, "thing") == true);
-
-    assert(strings_are_equal(list->head->value, first_value) == true);
-    assert(strings_are_equal(list->tail->value, second_value) == true);
+    assert(strings_are_equal(first_key "some") == true);
+    assert(strings_are_equal(first_value, "value") == true);
+    assert(strings_are_equal(second_key, "another") == true);
+    assert(strings_are_equal(second_value, "thing") == true);
 
     eg_linked_list_free(list);
 
