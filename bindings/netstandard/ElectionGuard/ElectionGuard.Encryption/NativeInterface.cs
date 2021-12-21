@@ -150,6 +150,71 @@ namespace ElectionGuard
 
         internal unsafe struct CharPtr { };
 
+        #region Collections
+
+        internal static unsafe class LinkedList
+        {
+            internal unsafe struct LinkedListType { };
+
+            internal class LinkedListHandle
+                : ElectionguardSafeHandle<LinkedListType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = LinkedList.Free(TypedPtr);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"LinkedList Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_linked_list_new",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status New(out LinkedListHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_linked_list_free",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Free(LinkedListType* handle);
+
+            [DllImport(DllName, EntryPoint = "eg_linked_list_append",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Append(
+                LinkedListHandle handle,
+                [MarshalAs(UnmanagedType.LPStr)] string key,
+                [MarshalAs(UnmanagedType.LPStr)] string value);
+
+            [DllImport(DllName, EntryPoint = "eg_linked_list_delete_last",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status DeleteLast(LinkedListHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_linked_list_get_count",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern ulong GetCount(
+                LinkedListHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_linked_list_get_element_at",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetElementAt(
+                LinkedListHandle handle,
+                ulong position,
+                out IntPtr key,
+                out IntPtr value);
+
+            [DllImport(DllName, EntryPoint = "eg_linked_list_get_value_at",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetValueAt(
+                LinkedListHandle handle,
+                ulong position,
+                out IntPtr value);
+        }
+
+        #endregion
+
         #region Group
 
         internal static unsafe class ElementModP
