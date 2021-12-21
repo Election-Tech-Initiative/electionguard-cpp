@@ -68,7 +68,7 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_get_crypto_exten
   eg_ciphertext_election_context_t *handle, eg_element_mod_q_t **out_crypto_extended_base_hash_ref);
 
 /**
- * The `extended base hash code (𝑄')` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
+ * The extended data for the election.
  * 
  * @param[out] out_extended_data A linked list of the extended data.  
  *                               The caller is responsible for freeing the linked list
