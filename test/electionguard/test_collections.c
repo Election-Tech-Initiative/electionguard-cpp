@@ -47,7 +47,7 @@ bool test_can_create_linked_list(void)
     }
 
     // Assert
-    assert(strings_are_equal(first_key "some") == true);
+    assert(strings_are_equal(first_key, "some") == true);
     assert(strings_are_equal(first_value, "value") == true);
     assert(strings_are_equal(second_key, "another") == true);
     assert(strings_are_equal(second_value, "thing") == true);
