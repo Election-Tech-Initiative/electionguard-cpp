@@ -37,6 +37,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/ballot_compact.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/ballot.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/chaum_pedersen.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/collections.c
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/election.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/elgamal.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/encrypt.cpp
@@ -105,6 +106,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/constants.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/collections.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/crypto_hashable.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/election.h

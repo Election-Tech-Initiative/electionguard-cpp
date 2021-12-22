@@ -150,6 +150,71 @@ namespace ElectionGuard
 
         internal unsafe struct CharPtr { };
 
+        #region Collections
+
+        internal static unsafe class LinkedList
+        {
+            internal unsafe struct LinkedListType { };
+
+            internal class LinkedListHandle
+                : ElectionguardSafeHandle<LinkedListType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = LinkedList.Free(TypedPtr);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        Console.WriteLine($"LinkedList Error Free: {status}");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_linked_list_new",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status New(out LinkedListHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_linked_list_free",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Free(LinkedListType* handle);
+
+            [DllImport(DllName, EntryPoint = "eg_linked_list_append",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Append(
+                LinkedListHandle handle,
+                [MarshalAs(UnmanagedType.LPStr)] string key,
+                [MarshalAs(UnmanagedType.LPStr)] string value);
+
+            [DllImport(DllName, EntryPoint = "eg_linked_list_delete_last",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status DeleteLast(LinkedListHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_linked_list_get_count",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern ulong GetCount(
+                LinkedListHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_linked_list_get_element_at",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetElementAt(
+                LinkedListHandle handle,
+                ulong position,
+                out IntPtr key,
+                out IntPtr value);
+
+            [DllImport(DllName, EntryPoint = "eg_linked_list_get_value_at",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetValueAt(
+                LinkedListHandle handle,
+                ulong position,
+                out IntPtr value);
+        }
+
+        #endregion
+
         #region Group
 
         internal static unsafe class ElementModP
@@ -1936,6 +2001,13 @@ namespace ElectionGuard
                 CiphertextElectionContextHandle handle,
                 out ElementModQ.ElementModQHandle crypto_extended_base_hash);
 
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_election_context_get_extended_data",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetExtendedData(
+                CiphertextElectionContextHandle handle,
+                out LinkedList.LinkedListHandle extended_data);
+
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Make(
@@ -1946,6 +2018,17 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle manifest_hash,
                 out CiphertextElectionContextHandle handle);
 
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_with_extended_data",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Make(
+                ulong number_of_guardians,
+                ulong quorum,
+                ElementModP.ElementModPHandle elgamal_public_key,
+                ElementModQ.ElementModQHandle commitment_hash,
+                ElementModQ.ElementModQHandle manifest_hash,
+                LinkedList.LinkedListHandle extended_data,
+                out CiphertextElectionContextHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_from_hex",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Make(
@@ -1954,6 +2037,17 @@ namespace ElectionGuard
                 [MarshalAs(UnmanagedType.LPStr)] string hex_elgamal_public_key,
                 [MarshalAs(UnmanagedType.LPStr)] string hex_commitment_hash,
                 [MarshalAs(UnmanagedType.LPStr)] string hex_manifest_hash,
+                out CiphertextElectionContextHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_from_hex",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Make(
+                ulong number_of_guardians,
+                ulong quorum,
+                [MarshalAs(UnmanagedType.LPStr)] string hex_elgamal_public_key,
+                [MarshalAs(UnmanagedType.LPStr)] string hex_commitment_hash,
+                [MarshalAs(UnmanagedType.LPStr)] string hex_manifest_hash,
+                LinkedList.LinkedListHandle extended_data,
                 out CiphertextElectionContextHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_from_json",

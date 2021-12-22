@@ -6,6 +6,7 @@
 #include <electionguard/election.hpp>
 #include <electionguard/elgamal.hpp>
 #include <electionguard/manifest.hpp>
+#include <unordered_map>
 
 using namespace electionguard;
 using namespace electionguard::tools::generators;
@@ -31,4 +32,26 @@ TEST_CASE("Can serialize CiphertextElectionContext")
     // TODO: validate against manifest->getManifestHash()
     CHECK(fromJson->getManifestHash()->toHex() == context->getManifestHash()->toHex());
     CHECK(fromBson->getManifestHash()->toHex() == context->getManifestHash()->toHex());
+}
+
+TEST_CASE("Assign ExtraData to CiphertextElectionContext")
+{
+    // Arrange
+    auto key = "ballot_base_uri";
+    auto value = "http://something.vote/";
+    unordered_map<string, string> extendedData({{key, value}});
+
+    // Act
+    auto context = CiphertextElectionContext::make(
+      3UL, 2UL, TWO_MOD_P().clone(), TWO_MOD_Q().clone(), TWO_MOD_Q().clone(), extendedData);
+
+    auto cached = context->getExtendedData();
+    auto resolved = cached.find(key);
+
+    // Assert
+    if (resolved == cached.end()) {
+        FAIL(resolved);
+    } else {
+        CHECK(resolved->second == value);
+    }
 }
