@@ -93,6 +93,8 @@ eg_electionguard_status_t eg_linked_list_delete_last(eg_linked_list_t *handle)
     }
 
     handle->count--;
+    free(to_remove->key);
+    free(to_remove->value);
     free(to_remove);
     return ELECTIONGUARD_STATUS_SUCCESS;
 }

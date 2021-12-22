@@ -43,7 +43,7 @@ TEST_CASE("Assign ExtraData to CiphertextElectionContext")
 
     // Act
     auto context = CiphertextElectionContext::make(
-      3UL, 2UL, TWO_MOD_P().clone(), TWO_MOD_Q().clone(), TWO_MOD_Q().clone(), move(extendedData));
+      3UL, 2UL, TWO_MOD_P().clone(), TWO_MOD_Q().clone(), TWO_MOD_Q().clone(), extendedData);
 
     auto cached = context->getExtendedData();
     auto resolved = cached.find(key);

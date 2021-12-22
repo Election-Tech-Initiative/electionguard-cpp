@@ -16,7 +16,7 @@ bool test_collections(void)
 
 bool test_can_create_linked_list(void)
 {
-    printf("\n -------- test_can_create_lined_list --------- \n");
+    printf("\n -------- test_can_create_linked_list --------- \n");
 
     // Arrange
 
