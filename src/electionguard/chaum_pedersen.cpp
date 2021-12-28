@@ -141,13 +141,29 @@ namespace electionguard
     unique_ptr<DisjunctiveChaumPedersenProof>
     DisjunctiveChaumPedersenProof::make(const ElGamalCiphertext &message, const ElementModQ &r,
                                         const ElementModP &k, const ElementModQ &q,
+                                        uint64_t plaintext)
+    {
+        if (plaintext > 1) {
+            throw invalid_argument(
+              "DisjunctiveChaumPedersenProof::make:: only supports plaintexts of 0 or 1");
+        }
+        Log::trace("DisjunctiveChaumPedersenProof: making proof without seed.");
+        if (plaintext == 1) {
+            return make_one(message, r, k, q);
+        }
+        return make_zero(message, r, k, q);
+    }
+
+    unique_ptr<DisjunctiveChaumPedersenProof>
+    DisjunctiveChaumPedersenProof::make(const ElGamalCiphertext &message, const ElementModQ &r,
+                                        const ElementModP &k, const ElementModQ &q,
                                         const ElementModQ &seed, uint64_t plaintext)
     {
         if (plaintext > 1) {
             throw invalid_argument(
               "DisjunctiveChaumPedersenProof::make:: only supports plaintexts of 0 or 1");
         }
-        Log::trace("DisjunctiveChaumPedersenProof: making proof.");
+        Log::trace("DisjunctiveChaumPedersenProof: making proof with seed.");
         if (plaintext == 1) {
             return make_one(message, r, k, q, seed);
         }
@@ -196,6 +212,7 @@ namespace electionguard
         // 𝑔^𝑣 mod 𝑝 = 𝑎 ⋅ 𝛼^𝑐 mod 𝑝
         auto consistent_gv0 = (*g_pow_p(v0) == *mul_mod_p(a0, *pow_mod_p(*alpha, c0)));
 
+        // 𝑔^𝑣 mod 𝑝 = 𝑎 ⋅ 𝛼^𝑐 mod 𝑝
         auto consistent_gv1 = (*g_pow_p(v1) == *mul_mod_p(a1, *pow_mod_p(*alpha, c1)));
 
         // 𝐾^𝑣 mod 𝑝 = 𝑏 ⋅ 𝛽^𝑐 mod 𝑝
@@ -266,6 +283,39 @@ namespace electionguard
 
     unique_ptr<DisjunctiveChaumPedersenProof>
     DisjunctiveChaumPedersenProof::make_zero(const ElGamalCiphertext &message, const ElementModQ &r,
+                                             const ElementModP &k, const ElementModQ &q)
+    {
+        auto *alpha = message.getPad();
+        auto *beta = message.getData();
+
+        // Pick three random numbers in Q.
+        auto u = rand_q();
+        auto v = rand_q();
+        auto w = rand_q();
+
+        // Compute the NIZKP
+        auto a0 = g_pow_p(*u);                                // 𝑔^𝑢 mod 𝑝
+        auto b0 = pow_mod_p(k, *u);                           // 𝐾^𝑢 mod 𝑝
+        auto a1 = g_pow_p(*v);                                // 𝑔^v mod 𝑝
+        auto b1 = mul_mod_p(*g_pow_p(*w), *pow_mod_p(k, *v)); // g^w⋅K^v mod p
+
+        // Compute the challenge
+        auto c = hash_elems(
+          {&const_cast<ElementModQ &>(q), alpha, beta, a0.get(), b0.get(), a1.get(), b1.get()});
+
+        //c_1 = w so we dont assign a new var for it
+        auto c0 = sub_mod_q(*c, *w);           // c_0=(c-w) mod q
+        auto v0 = a_plus_bc_mod_q(*u, *c0, r); // v_0=(u+c_0⋅R) mod q
+        auto v1 = a_plus_bc_mod_q(*v, *w, r);  // v_1=(v+c_1⋅R) mod q
+
+        Log::debug("make: a1->get", a1->toHex());
+
+        return make_unique<DisjunctiveChaumPedersenProof>(
+          move(a0), move(b0), move(a1), move(b1), move(c0), move(w), move(c), move(v0), move(v1));
+    }
+
+    unique_ptr<DisjunctiveChaumPedersenProof>
+    DisjunctiveChaumPedersenProof::make_zero(const ElGamalCiphertext &message, const ElementModQ &r,
                                              const ElementModP &k, const ElementModQ &q,
                                              const ElementModQ &seed)
     {
@@ -282,13 +332,48 @@ namespace electionguard
         auto a0 = g_pow_p(*u0);      //𝑔^𝑢 mod 𝑝
         auto b0 = pow_mod_p(k, *u0); // 𝐾^𝑢 mod 𝑝
         auto q_min_c1 = sub_from_q(*c1);
-        auto a1 = mul_mod_p(*g_pow_p(*v1), *pow_mod_p(*alpha, *q_min_c1));
-        auto b1 = mul_mod_p(
-          {pow_mod_p(k, *v1).get(), g_pow_p(*c1).get(), pow_mod_p(*beta, *q_min_c1).get()});
+        auto a1 =
+          mul_mod_p(*g_pow_p(*v1), *pow_mod_p(*alpha, *q_min_c1)); // g^(v_1) α^(q-c_1) mod p
+        auto b1 =
+          mul_mod_p({pow_mod_p(k, *v1).get(), g_pow_p(*c1).get(),
+                     pow_mod_p(*beta, *q_min_c1).get()}); // K^(v_1) g^(c_1) β^(q-c_1)  mod p
+
+        // Compute the challenge
         auto c = hash_elems(
           {&const_cast<ElementModQ &>(q), alpha, beta, a0.get(), b0.get(), a1.get(), b1.get()});
-        auto c0 = sub_mod_q(*c, *c1);
-        auto v0 = a_plus_bc_mod_q(*u0, *c0, r);
+
+        auto c0 = sub_mod_q(*c, *c1);           // c_0=(c-c_1) mod q
+        auto v0 = a_plus_bc_mod_q(*u0, *c0, r); // v_0=(u_0+c_0⋅R) mod q
+
+        return make_unique<DisjunctiveChaumPedersenProof>(
+          move(a0), move(b0), move(a1), move(b1), move(c0), move(c1), move(c), move(v0), move(v1));
+    }
+
+    unique_ptr<DisjunctiveChaumPedersenProof>
+    DisjunctiveChaumPedersenProof::make_one(const ElGamalCiphertext &message, const ElementModQ &r,
+                                            const ElementModP &k, const ElementModQ &q)
+    {
+        auto *alpha = message.getPad();
+        auto *beta = message.getData();
+
+        // Pick three random numbers in Q.
+        auto u = rand_q();
+        auto v = rand_q();
+        auto w = rand_q();
+
+        auto a0 = g_pow_p(*v);                                // 𝑔^v mod 𝑝
+        auto b0 = mul_mod_p(*g_pow_p(*w), *pow_mod_p(k, *v)); // g^w⋅K^v  mod p
+        auto a1 = g_pow_p(*u);                                // g^u  mod p
+        auto b1 = pow_mod_p(k, *u);                           // K^u  mod p
+
+        // Compute challenge
+        auto c = hash_elems(
+          {&const_cast<ElementModQ &>(q), alpha, beta, a0.get(), b0.get(), a1.get(), b1.get()});
+
+        auto c0 = sub_mod_q(Q(), *w);          // c_0=(q-w)  mod q
+        auto c1 = add_mod_q(*c, *w);           // c_1=(c+w)  mod q
+        auto v0 = a_plus_bc_mod_q(*v, *c0, r); // v_0=(v+c_0⋅R)  mod q
+        auto v1 = a_plus_bc_mod_q(*u, *c1, r); // v_1=(u+c_1⋅R)  mod q
 
         return make_unique<DisjunctiveChaumPedersenProof>(
           move(a0), move(b0), move(a1), move(b1), move(c0), move(c1), move(c), move(v0), move(v1));

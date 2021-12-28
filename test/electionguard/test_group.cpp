@@ -180,9 +180,9 @@ TEST_CASE("add_mod_q ((MAX_256 - 1) + (MAX_256 - 1)) % Q = 376")
 
 #pragma endregion
 
-#pragma region a_minus_b_mod_q
+#pragma region sub_mod_q
 
-TEST_CASE("a_minus_b_mod_q (2 - 1) % Q == 1 and (1 - 1) & Q == 0")
+TEST_CASE("sub_mod_q (2 - 1) % Q == 1 and (1 - 1) & Q == 0")
 {
     // Arrange
     auto one = ElementModQ::fromUint64(1);
@@ -200,7 +200,7 @@ TEST_CASE("a_minus_b_mod_q (2 - 1) % Q == 1 and (1 - 1) & Q == 0")
     CHECK(result0->toHex() == zero->toHex());
 }
 
-TEST_CASE("a_minus_b_mod_q:  (Q - Q) % Q == 0")
+TEST_CASE("sub_mod_q:  (Q - Q) % Q == 0")
 {
     // Arrange
     const auto &q = Q();
@@ -214,7 +214,7 @@ TEST_CASE("a_minus_b_mod_q:  (Q - Q) % Q == 0")
     CHECK(result->toHex() == residue->toHex());
 }
 
-TEST_CASE("a_minus_b_mod_q:  (0 - Q) % Q == 0")
+TEST_CASE("sub_mod_q:  (0 - Q) % Q == 0")
 {
     // Arrange
     string expectedHex("00");
@@ -231,7 +231,7 @@ TEST_CASE("a_minus_b_mod_q:  (0 - Q) % Q == 0")
 
 #ifdef USE_STANDARD_PRIMES
 
-TEST_CASE("a_minus_b_mod_q:  (Q - MAX_256) % Q == (Q - 189)")
+TEST_CASE("sub_mod_q:  (Q - MAX_256) % Q == (Q - 189)")
 {
     // Arrange
     string expectedHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE86");
@@ -250,7 +250,7 @@ TEST_CASE("a_minus_b_mod_q:  (Q - MAX_256) % Q == (Q - 189)")
     CHECK(result->toHex() == residue->toHex());
 }
 
-TEST_CASE("a_minus_b_mod_q:  ((Q + 1) - MAX_256)) % Q == (Q - 188)")
+TEST_CASE("sub_mod_q:  ((Q + 1) - MAX_256)) % Q == (Q - 188)")
 {
     // Arrange
     string expectedHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE87");
@@ -269,7 +269,7 @@ TEST_CASE("a_minus_b_mod_q:  ((Q + 1) - MAX_256)) % Q == (Q - 188)")
     CHECK(result->toHex() == residue->toHex());
 }
 
-TEST_CASE("a_minus_b_mod_q:  (Q - (MAX_256 - 1)) % Q == (Q - 188)")
+TEST_CASE("sub_mod_q:  (Q - (MAX_256 - 1)) % Q == (Q - 188)")
 {
     // Arrange
     string expectedHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE87");
@@ -288,7 +288,7 @@ TEST_CASE("a_minus_b_mod_q:  (Q - (MAX_256 - 1)) % Q == (Q - 188)")
     CHECK(result->toHex() == residue->toHex());
 }
 
-TEST_CASE("a_minus_b_mod_q:  ((Q + 1) - (MAX_256 - 1)) % Q == (Q - 187)")
+TEST_CASE("sub_mod_q:  ((Q + 1) - (MAX_256 - 1)) % Q == (Q - 187)")
 {
     // Arrange
     string expectedHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE88");
@@ -307,9 +307,22 @@ TEST_CASE("a_minus_b_mod_q:  ((Q + 1) - (MAX_256 - 1)) % Q == (Q - 187)")
     CHECK(result->toHex() == residue->toHex());
 }
 
+TEST_CASE("sub_mod_q:  (Q - 5) % Q == (Q - 5)")
+{
+    //Arrange
+    string expectedHex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF3E");
+    auto five = ElementModQ::fromUint64(5UL);
+
+    // Act
+    auto result = sub_mod_q(Q(), *five);
+
+    // Assert
+    CHECK(result->toHex() == expectedHex);
+}
+
 #endif
 
-TEST_CASE("a_minus_b_mod_q:  (1 - Q) % Q == 1")
+TEST_CASE("sub_mod_q:  (1 - Q) % Q == 1")
 {
     // Arrange
     string expectedHex("01");
@@ -324,7 +337,7 @@ TEST_CASE("a_minus_b_mod_q:  (1 - Q) % Q == 1")
     CHECK(result->toHex() == one->toHex());
 }
 
-TEST_CASE("a_minus_b_mod_q:  (1 - 2) % Q == (Q - 1)")
+TEST_CASE("sub_mod_q:  (1 - 2) % Q == (Q - 1)")
 {
     // Arange
     auto one = ElementModQ::fromUint64(1UL);
@@ -340,12 +353,12 @@ TEST_CASE("a_minus_b_mod_q:  (1 - 2) % Q == (Q - 1)")
     CHECK(result->toHex() == expected->toHex());
 }
 
-TEST_CASE("a_minus_b_mod_q:  (10 - 15) % Q == (Q - 5)")
+TEST_CASE("sub_mod_q:  (10 - 15) % Q == (Q - 5)")
 {
     //Arrange
+    auto five = ElementModQ::fromUint64(5UL);
     auto ten = ElementModQ::fromUint64(10UL);
     auto fifteen = ElementModQ::fromUint64(15UL);
-    auto five = ElementModQ::fromUint64(5UL);
 
     // Act
     auto expected = sub_mod_q(Q(), *five);

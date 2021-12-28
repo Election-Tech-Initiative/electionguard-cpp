@@ -7,6 +7,7 @@
 #include <electionguard/election.hpp>
 #include <electionguard/encrypt.hpp>
 #include <electionguard/manifest.hpp>
+#include <electionguard/nonces.hpp>
 
 using namespace electionguard;
 using namespace electionguard::tools::generators;
@@ -83,12 +84,13 @@ class EncryptBallotFixture : public benchmark::Fixture
   public:
     void SetUp(const ::benchmark::State &state)
     {
-        keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
-        manifest = ManifestGenerator::getJeffersonCountryManifest_multipleBallotStyle_fromFile();
+        nonces = make_unique<Nonces>(TWO_MOD_Q(), "encrypt-ballot-benchmark");
+        keypair = ElGamalKeyPair::fromSecret(*nonces->get(0));
+        manifest = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
         internal = make_unique<InternalManifest>(*manifest);
         context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
         device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
-        ballot = BallotGenerator::getSimpleBallotFromFile();
+        ballot = BallotGenerator::getFakeBallot(*internal);
 
         nonce = rand_q();
         ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash(),
@@ -97,6 +99,7 @@ class EncryptBallotFixture : public benchmark::Fixture
 
     void TearDown(const ::benchmark::State &state) {}
 
+    unique_ptr<Nonces> nonces;
     unique_ptr<ElGamalKeyPair> keypair;
     unique_ptr<Manifest> manifest;
     unique_ptr<InternalManifest> internal;
@@ -107,7 +110,7 @@ class EncryptBallotFixture : public benchmark::Fixture
     unique_ptr<CiphertextBallot> ciphertext;
 };
 
-BENCHMARK_DEFINE_F(EncryptBallotFixture, encryptBallot)(benchmark::State &state)
+BENCHMARK_DEFINE_F(EncryptBallotFixture, encryptBallot_Full_NoProofCheck)(benchmark::State &state)
 {
     for (auto _ : state) {
         auto result = encryptBallot(*ballot, *internal, *context, *device->getHash(),
@@ -115,6 +118,41 @@ BENCHMARK_DEFINE_F(EncryptBallotFixture, encryptBallot)(benchmark::State &state)
     }
 }
 
-BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptBallot)->Unit(benchmark::kMillisecond);
+BENCHMARK_DEFINE_F(EncryptBallotFixture, encryptBallot_Full_WithProofCheck)(benchmark::State &state)
+{
+    // also generates the nonce internally
+    for (auto _ : state) {
+        auto result =
+          encryptBallot(*ballot, *internal, *context, *device->getHash(), nullptr, 0ULL, true);
+    }
+}
+
+BENCHMARK_DEFINE_F(EncryptBallotFixture, encryptBallot_Compact_NoProofCheck)
+(benchmark::State &state)
+{
+    for (auto _ : state) {
+        auto result = encryptCompactBallot(*ballot, *internal, *context, *device->getHash(),
+                                           make_unique<ElementModQ>(*nonce), 0ULL, false);
+    }
+}
+
+BENCHMARK_DEFINE_F(EncryptBallotFixture, encryptBallot_Compact_WithProofCheck)
+(benchmark::State &state)
+{
+    // also generates the nonce internally
+    for (auto _ : state) {
+        auto result = encryptCompactBallot(*ballot, *internal, *context, *device->getHash(),
+                                           nullptr, 0ULL, true);
+    }
+}
+
+BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptBallot_Full_NoProofCheck)
+  ->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptBallot_Full_WithProofCheck)
+  ->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptBallot_Compact_NoProofCheck)
+  ->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptBallot_Compact_WithProofCheck)
+  ->Unit(benchmark::kMillisecond);
 
 #pragma endregion
