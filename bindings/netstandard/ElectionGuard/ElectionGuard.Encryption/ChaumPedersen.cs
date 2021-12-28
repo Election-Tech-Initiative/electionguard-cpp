@@ -192,6 +192,36 @@ namespace ElectionGuard
         /// <Summary>
         /// make function for a `DisjunctiveChaumPedersenProof`
         ///
+        /// This overload does not accept a seed value and calculates
+        /// proofs independent of the original encryption. (faster performance)
+        /// <param name="message"> The ciphertext message</param>
+        /// <param name="r"> The nonce used creating the ElGamal ciphertext</param>
+        /// <param name="k"> The public key of the election</param>
+        /// <param name="q"> A value used when generating the challenge,
+        ///          usually the election extended base hash (𝑄')</param>
+        /// <param name="plaintext">The constant value to prove, zero or one</param>
+        /// <returns>A unique pointer</returns>
+        /// </Summary>
+        unsafe public DisjunctiveChaumPedersenProof(
+            ElGamalCiphertext message,
+            ElementModQ r,
+            ElementModP k,
+            ElementModQ q,
+            ulong plaintext)
+        {
+            var status = NativeInterface.DisjunctiveChaumPedersenProof.Make(
+                message.Handle, r.Handle, k.Handle, q.Handle, plaintext, out Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                Console.WriteLine($"DisjunctiveChaumPedersenProof Error Make: {status}");
+            }
+        }
+
+        /// <Summary>
+        /// make function for a `DisjunctiveChaumPedersenProof`
+        ///
+        /// This overload accepts a seed value and calculates
+        /// proofs deterministically based on the seed. (slower, but reproduceable proofs)
         /// <param name="message"> The ciphertext message</param>
         /// <param name="r"> The nonce used creating the ElGamal ciphertext</param>
         /// <param name="k"> The public key of the election</param>

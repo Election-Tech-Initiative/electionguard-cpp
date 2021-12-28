@@ -554,6 +554,16 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle r,
                 ElementModP.ElementModPHandle k,
                 ElementModQ.ElementModQHandle q,
+                ulong plaintext,
+                out DisjunctiveChaumPedersenProofHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_disjunctive_chaum_pedersen_proof_make_deterministic",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Make(
+                ElGamalCiphertext.ElGamalCiphertextHandle message,
+                ElementModQ.ElementModQHandle r,
+                ElementModP.ElementModPHandle k,
+                ElementModQ.ElementModQHandle q,
                 ElementModQ.ElementModQHandle seed,
                 ulong plaintext,
                 out DisjunctiveChaumPedersenProofHandle handle);
