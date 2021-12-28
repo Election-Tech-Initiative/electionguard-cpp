@@ -9,17 +9,22 @@ namespace ElectionGuard.Encryption.Tests.Utils
 {
     public class ManifestGenerator
     {
+        const string TEST_SPEC_VERSION = "0.95.0";
+        const string TEST_USE_SAMPLE = "hamilton-general";
+
         /// <summary>
         /// A test manifest that is loaded from a json file
         /// </summary>
         public static Manifest GetJeffersonCountyManifest_FromFile()
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "data", "election_manifest_jefferson_county.json");
+            var path = Path.Combine(
+                AppContext.BaseDirectory, "data", "election_manifest_jefferson_county.json");
             var text = File.ReadAllText(path);
             return new Manifest(text);
         }
 
-        public static Manifest GetManifestFromFile(string version, string sample)
+        public static Manifest GetManifestFromFile(
+            string version = TEST_SPEC_VERSION, string sample = TEST_USE_SAMPLE)
         {
             var path = Path.Combine(version, "sample", sample, "manifest.json");
             return GetManifestFromFile(path);

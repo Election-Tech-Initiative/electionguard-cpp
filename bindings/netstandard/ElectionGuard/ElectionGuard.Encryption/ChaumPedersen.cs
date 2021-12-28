@@ -211,10 +211,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.DisjunctiveChaumPedersenProof.Make(
                 message.Handle, r.Handle, k.Handle, q.Handle, plaintext, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"DisjunctiveChaumPedersenProof Error Make: {status}");
-            }
+            status.ThrowIfError();
         }
 
         /// <Summary>
@@ -241,10 +238,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.DisjunctiveChaumPedersenProof.Make(
                 message.Handle, r.Handle, k.Handle, q.Handle, seed.Handle, plaintext, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"DisjunctiveChaumPedersenProof Error Make: {status}");
-            }
+            status.ThrowIfError();
         }
 
         /// <Summary>
@@ -386,10 +380,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.ConstantChaumPedersenProof.Make(
                 message.Handle, r.Handle, k.Handle, seed.Handle, hashHeader.Handle, constant, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"ConstantChaumPedersenProof Error Make: {status}");
-            }
+            status.ThrowIfError();
         }
 
         /// <Summary>
