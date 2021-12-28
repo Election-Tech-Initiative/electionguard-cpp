@@ -248,7 +248,22 @@ namespace electionguard
 
         /// <summary>
         /// Constructs a `CipherTextBallotSelection` object. Most of the parameters here match up to fields
-        /// in the class, but this helper function will optionally compute a Chaum-Pedersen proof if the
+        /// in the class, but this helper function will compute a Chaum-Pedersen proof
+        /// using the faster non-deterministic method. Likewise, if a crypto_hash is not provided,
+        /// it will be derived from the other fields.
+        ///</summary>
+        static std::unique_ptr<CiphertextBallotSelection>
+        make(const std::string &objectId, uint64_t sequenceOrder,
+             const ElementModQ &descriptionHash, std::unique_ptr<ElGamalCiphertext> ciphertext,
+             const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
+             uint64_t plaintext, bool isPlaceholder = false, bool computeProof = true,
+             std::unique_ptr<ElementModQ> nonce = nullptr,
+             std::unique_ptr<ElementModQ> cryptoHash = nullptr,
+             std::unique_ptr<ElGamalCiphertext> extendedData = nullptr);
+
+        /// <summary>
+        /// Constructs a `CipherTextBallotSelection` object. Most of the parameters here match up to fields
+        /// in the class, but this helper function will compute a Chaum-Pedersen proof if the
         /// given nonce isn't `None`. Likewise, if a crypto_hash is not provided, it will be derived from
         /// the other fields.
         ///</summary>
