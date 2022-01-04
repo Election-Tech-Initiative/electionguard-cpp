@@ -9,12 +9,11 @@ namespace ElectionGuard.Encrypt.Tests
     [TestFixture]
     public class TestManifest
     {
-        string TEST_SPEC_VERSION = "0.95.0";
-        string TEST_USE_SAMPLE = "hamilton-general";
+
         [Test]
         public void Test_Can_Serialize_Sample_manifest()
         {
-            var subject = ManifestGenerator.GetManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
+            var subject = ManifestGenerator.GetManifestFromFile();
             Assert.That(subject.IsValid);
         }
 
@@ -49,7 +48,7 @@ namespace ElectionGuard.Encrypt.Tests
         public void Test_Can_Construct_InternalManifest_From_Sample_Manifest()
         {
             // Get a simple manifest that shows the bare minimum data required
-            var manifest = ManifestGenerator.GetManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
+            var manifest = ManifestGenerator.GetManifestFromFile();
             var internalManifest = new InternalManifest(manifest);
 
             Assert.That(manifest.CryptoHash().ToHex() == internalManifest.ManifestHash.ToHex());

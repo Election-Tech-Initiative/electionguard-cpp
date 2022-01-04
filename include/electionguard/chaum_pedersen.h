@@ -115,6 +115,27 @@ EG_API eg_electionguard_status_t eg_disjunctive_chaum_pedersen_proof_get_one_res
 /**
  * make function for a `DisjunctiveChaumPedersenProof`
  *
+ * This overload does not accept a seed value and calculates
+ * proofs independent of the original encryption. (faster performance)
+ * @param[in] in_message The ciphertext message
+ * @param[in] in_r The nonce used creating the ElGamal ciphertext
+ * @param[in] in_k The public key of the election
+ * @param[in] in_q A value used when generating the challenge,
+ *                 usually the election extended base hash (𝑄')
+ * @param[in] in_plaintext Zero or one
+ * @param[out] out_handle A handle to an `eg_disjunctive_chaum_pedersen_proof_t`. 
+ *                        Caller is responsible for lifecycle.
+ */
+EG_API eg_electionguard_status_t eg_disjunctive_chaum_pedersen_proof_make(
+  eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, eg_element_mod_p_t *in_k,
+  eg_element_mod_q_t *in_q, uint64_t in_plaintext,
+  eg_disjunctive_chaum_pedersen_proof_t **out_handle);
+
+/**
+ * make function for a `DisjunctiveChaumPedersenProof`
+ *
+ * This overload accepts a seed value and calculates
+ * proofs deterministically based on the seed. (slower, but reproduceable proofs)
  * @param[in] in_message The ciphertext message
  * @param[in] in_r The nonce used creating the ElGamal ciphertext
  * @param[in] in_k The public key of the election
@@ -122,9 +143,10 @@ EG_API eg_electionguard_status_t eg_disjunctive_chaum_pedersen_proof_get_one_res
  *                 usually the election extended base hash (𝑄')
  * @param[in] in_seed Used to generate other random values here
  * @param[in] in_plaintext Zero or one
- * @param[out] out_handle A handle to an `eg_disjunctive_chaum_pedersen_proof_t`. Caller is responsible for lifecycle.
+ * @param[out] out_handle A handle to an `eg_disjunctive_chaum_pedersen_proof_t`. 
+ *                        Caller is responsible for lifecycle.
  */
-EG_API eg_electionguard_status_t eg_disjunctive_chaum_pedersen_proof_make(
+EG_API eg_electionguard_status_t eg_disjunctive_chaum_pedersen_proof_make_deterministic(
   eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, eg_element_mod_p_t *in_k,
   eg_element_mod_q_t *in_q, eg_element_mod_q_t *in_seed, uint64_t in_plaintext,
   eg_disjunctive_chaum_pedersen_proof_t **out_handle);

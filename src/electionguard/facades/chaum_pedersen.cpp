@@ -110,7 +110,32 @@ eg_disjunctive_chaum_pedersen_proof_get_one_response(eg_disjunctive_chaum_peders
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_electionguard_status_t eg_disjunctive_chaum_pedersen_proof_make(
+eg_electionguard_status_t
+eg_disjunctive_chaum_pedersen_proof_make(eg_elgamal_ciphertext_t *in_message,
+                                         eg_element_mod_q_t *in_r, eg_element_mod_p_t *in_k,
+                                         eg_element_mod_q_t *in_q, uint64_t in_plaintext,
+                                         eg_disjunctive_chaum_pedersen_proof_t **out_handle)
+{
+    if (in_message == nullptr || in_r == nullptr || in_k == nullptr || in_q == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto *message = AS_TYPE(ElGamalCiphertext, in_message);
+    auto *r = AS_TYPE(ElementModQ, in_r);
+    auto *k = AS_TYPE(ElementModP, in_k);
+    auto *q = AS_TYPE(ElementModQ, in_q);
+
+    try {
+        auto proof = DisjunctiveChaumPedersenProof::make(*message, *r, *k, *q, in_plaintext);
+        *out_handle = AS_TYPE(eg_disjunctive_chaum_pedersen_proof_t, proof.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_disjunctive_chaum_pedersen_proof_make", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_disjunctive_chaum_pedersen_proof_make_deterministic(
   eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, eg_element_mod_p_t *in_k,
   eg_element_mod_q_t *in_q, eg_element_mod_q_t *in_seed, uint64_t in_plaintext,
   eg_disjunctive_chaum_pedersen_proof_t **out_handle)
@@ -131,7 +156,7 @@ eg_electionguard_status_t eg_disjunctive_chaum_pedersen_proof_make(
         *out_handle = AS_TYPE(eg_disjunctive_chaum_pedersen_proof_t, proof.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_disjunctive_chaum_pedersen_proof_make", e);
+        Log::error(":eg_disjunctive_chaum_pedersen_proof_make_deterministic", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }

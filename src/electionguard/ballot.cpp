@@ -263,6 +263,32 @@ namespace electionguard
     unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make(
       const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
       unique_ptr<ElGamalCiphertext> ciphertext, const ElementModP &elgamalPublicKey,
+      const ElementModQ &cryptoExtendedBaseHash, uint64_t plaintext,
+      bool isPlaceholder /* = false */, bool computeProof /* = true */,
+      unique_ptr<ElementModQ> nonce /* = nullptr */,
+      unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
+      unique_ptr<ElGamalCiphertext> extendedData /* = nullptr */)
+    {
+        if (cryptoHash == nullptr) {
+            auto crypto_hash = makeCryptoHash(objectId, descriptionHash, *ciphertext);
+            cryptoHash = move(crypto_hash);
+        }
+
+        unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr;
+        if (computeProof) {
+            // always make a proof using the faster, non-deterministic method
+            proof = DisjunctiveChaumPedersenProof::make(*ciphertext, *nonce, elgamalPublicKey,
+                                                        cryptoExtendedBaseHash, plaintext);
+        }
+
+        return make_unique<CiphertextBallotSelection>(
+          objectId, sequenceOrder, descriptionHash, move(ciphertext), isPlaceholder, move(nonce),
+          move(cryptoHash), move(proof), move(extendedData));
+    }
+
+    unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make(
+      const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
+      unique_ptr<ElGamalCiphertext> ciphertext, const ElementModP &elgamalPublicKey,
       const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &proofSeed, uint64_t plaintext,
       bool isPlaceholder /* = false */, unique_ptr<ElementModQ> nonce /* = nullptr */,
       unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
@@ -273,7 +299,9 @@ namespace electionguard
             auto crypto_hash = makeCryptoHash(objectId, descriptionHash, *ciphertext);
             cryptoHash = move(crypto_hash);
         }
-        if (proof == nullptr) {
+        // if no proof is provided and there is a nonce
+        // then make a proof using the deterministic method
+        if (proof == nullptr && nonce != nullptr) {
             proof = DisjunctiveChaumPedersenProof::make(
               *ciphertext, *nonce, elgamalPublicKey, cryptoExtendedBaseHash, proofSeed, plaintext);
         }

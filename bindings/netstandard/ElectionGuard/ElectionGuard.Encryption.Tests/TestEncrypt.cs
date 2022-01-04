@@ -15,14 +15,14 @@ namespace ElectionGuard.Encrypt.Tests
         {
             // Configure the election context
             var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
-            var manifest = new Manifest(manifest_json);
+            var manifest = ManifestGenerator.GetManifestFromFile();
             var internalManifest = new InternalManifest(manifest);
             var context = new CiphertextElectionContext(
                 1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
             var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
             var mediator = new EncryptionMediator(internalManifest, context, device);
 
-            var ballot = new PlaintextBallot(plaintext_json);
+            var ballot = BallotGenerator.GetFakeBallot(internalManifest);
 
             // Act
             var ciphertext = mediator.Encrypt(ballot);
@@ -58,7 +58,7 @@ namespace ElectionGuard.Encrypt.Tests
         {
             // Configure the election context
             var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
-            var manifest = ManifestGenerator.GetJeffersonCountyManifest_Minimal();
+            var manifest = ManifestGenerator.GetManifestFromFile();
             var internalManifest = new InternalManifest(manifest);
             var context = new CiphertextElectionContext(
                 1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
@@ -80,7 +80,7 @@ namespace ElectionGuard.Encrypt.Tests
         {
             // Configure the election context
             var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
-            var manifest = ManifestGenerator.GetJeffersonCountyManifest_Minimal();
+            var manifest = ManifestGenerator.GetManifestFromFile();
             var internalManifest = new InternalManifest(manifest);
             var context = new CiphertextElectionContext(
                 1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
@@ -98,17 +98,14 @@ namespace ElectionGuard.Encrypt.Tests
         {
             // Arrange
             var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
-            var manifest = new Manifest(manifest_json);
-
-            // TODO: load from file
-            //var manifest = ManifestGenerator.GetJeffersonCountyManifest();
+            var manifest = ManifestGenerator.GetManifestFromFile();
             var internalManifest = new InternalManifest(manifest);
             var context = new CiphertextElectionContext(
                 1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
             var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
             var mediator = new EncryptionMediator(internalManifest, context, device);
 
-            var ballot = new PlaintextBallot(plaintext_json);
+            var ballot = BallotGenerator.GetFakeBallot(internalManifest);
 
             // Act
             var compact = mediator.CompactEncrypt(ballot);
@@ -122,7 +119,6 @@ namespace ElectionGuard.Encrypt.Tests
 
             // Assert
             Assert.That(compact.ObjectId == fromMsgpack.ObjectId);
-
         }
     }
 }

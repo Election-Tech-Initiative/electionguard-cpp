@@ -242,7 +242,6 @@ namespace electionguard
         auto nonceSequence =
           make_unique<Nonces>(*descriptionHash, &const_cast<ElementModQ &>(nonceSeed));
         auto selectionNonce = nonceSequence->get(description.getSequenceOrder());
-        auto proofNonce = nonceSequence->next();
 
         Log::trace("encryptSelection: for " + description.getObjectId() + " hash: ",
                    descriptionHash->toHex());
@@ -257,8 +256,8 @@ namespace electionguard
 
         auto encrypted = CiphertextBallotSelection::make(
           selection.getObjectId(), description.getSequenceOrder(), *descriptionHash,
-          move(ciphertext), elgamalPublicKey, cryptoExtendedBaseHash, *proofNonce,
-          selection.getVote(), isPlaceholder, move(selectionNonce));
+          move(ciphertext), elgamalPublicKey, cryptoExtendedBaseHash, selection.getVote(),
+          isPlaceholder, true, move(selectionNonce));
 
         if (encrypted == nullptr || encrypted->getProof() == nullptr) {
             throw runtime_error("encryptSelection:: Error constructing encrypted selection");
