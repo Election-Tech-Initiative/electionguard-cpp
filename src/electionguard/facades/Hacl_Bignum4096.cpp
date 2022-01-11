@@ -27,13 +27,17 @@ namespace hacl
         return Hacl_Bignum4096_mod(n, a, res);
     }
 
-    bool Bignum4096::modExp(uint64_t *n, uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res)
+    bool Bignum4096::modExp(uint64_t *n, uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res,
+                            bool useConstTime /* = true */)
     {
         if (bBits <= 0) {
             Log::trace("Bignum4096::modExp:: bbits <= 0");
             return false;
         }
-        return Hacl_Bignum4096_mod_exp_consttime(n, a, bBits, b, res);
+        if (useConstTime) {
+            return Hacl_Bignum4096_mod_exp_consttime(n, a, bBits, b, res);
+        }
+        return Hacl_Bignum4096_mod_exp_vartime(n, a, bBits, b, res);
     }
 
     uint64_t *Bignum4096::fromBytes(uint32_t len, uint8_t *bytes)

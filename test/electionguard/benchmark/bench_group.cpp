@@ -115,25 +115,43 @@ BENCHMARK_REGISTER_F(GroupElementFixture, mul_mod_p)->Unit(benchmark::kMilliseco
 // as the large array operation violates
 // the exponentiation constraints
 
-BENCHMARK_DEFINE_F(GroupElementFixture, pow_mod_p)(benchmark::State &state)
+BENCHMARK_DEFINE_F(GroupElementFixture, pow_mod_p_with_q)(benchmark::State &state)
+{
+    for (auto _ : state) {
+        auto exp = pow_mod_p(*p1, *q2);
+    }
+}
+
+BENCHMARK_REGISTER_F(GroupElementFixture, pow_mod_p_with_q)->Unit(benchmark::kMillisecond);
+
+BENCHMARK_DEFINE_F(GroupElementFixture, pow_mod_p_with_p)(benchmark::State &state)
 {
     for (auto _ : state) {
         auto exp = pow_mod_p(*p1, *p2);
     }
 }
 
-BENCHMARK_REGISTER_F(GroupElementFixture, pow_mod_p)->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(GroupElementFixture, pow_mod_p_with_p)->Unit(benchmark::kMillisecond);
 
 #endif
 
-BENCHMARK_DEFINE_F(GroupElementFixture, g_pow_p)(benchmark::State &state)
+BENCHMARK_DEFINE_F(GroupElementFixture, g_pow_p_with_q)(benchmark::State &state)
+{
+    for (auto _ : state) {
+        auto exp = g_pow_p(*q2);
+    }
+}
+
+BENCHMARK_REGISTER_F(GroupElementFixture, g_pow_p_with_q)->Unit(benchmark::kMillisecond);
+
+BENCHMARK_DEFINE_F(GroupElementFixture, g_pow_p_with_p)(benchmark::State &state)
 {
     for (auto _ : state) {
         auto exp = g_pow_p(*p2);
     }
 }
 
-BENCHMARK_REGISTER_F(GroupElementFixture, g_pow_p)->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(GroupElementFixture, g_pow_p_with_p)->Unit(benchmark::kMillisecond);
 
 BENCHMARK_DEFINE_F(GroupElementFixture, add_mod_q)(benchmark::State &state)
 {

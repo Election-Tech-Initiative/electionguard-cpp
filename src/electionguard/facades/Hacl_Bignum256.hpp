@@ -19,7 +19,8 @@ namespace hacl
 
         static bool mod(uint64_t *n, uint64_t *a, uint64_t *res);
 
-        static bool modExp(uint64_t *n, uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res);
+        static bool modExp(uint64_t *n, uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res,
+                           bool useConstTime = false);
 
         static uint64_t *fromBytes(uint32_t len, uint8_t *bytes);
 

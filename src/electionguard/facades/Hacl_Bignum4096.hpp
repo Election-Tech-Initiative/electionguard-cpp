@@ -17,9 +17,21 @@ namespace hacl
 
         static void mul(uint64_t *a, uint64_t *b, uint64_t *res);
 
+        /// <ummary>
+        /// Write `a mod n` in `res`.
+        ///
+        ///  The argument a is meant to be a 8192-bit bignum, i.e. uint64_t[128].
+        ///  The argument n and the outparam res are meant to be 4096-bit bignums, i.e. uint64_t[64].
+        ///
+        ///  The function returns false if any of the following preconditions are violated,
+        ///  true otherwise.
+        ///  • 1 < n
+        ///  • n % 2 = 1
+        /// </summary>
         static bool mod(uint64_t *n, uint64_t *a, uint64_t *res);
 
-        static bool modExp(uint64_t *n, uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res);
+        static bool modExp(uint64_t *n, uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res,
+                           bool useConstTime = false);
 
         static uint64_t *fromBytes(uint32_t len, uint8_t *bytes);
 
