@@ -1664,7 +1664,7 @@ namespace ElectionGuard
                 out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"ContestDescription Error Status: {status}");
+                Console.WriteLine($"ContestDescriptionWithPlaceholders Error Status: {status}");
             }
         }
 
@@ -1697,7 +1697,7 @@ namespace ElectionGuard
                 out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"ContestDescription Error Status: {status}");
+                Console.WriteLine($"ContestDescriptionWithPlaceholders Error Status: {status}");
             }
         }
 
@@ -1732,7 +1732,7 @@ namespace ElectionGuard
                 out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"ContestDescription Error Status: {status}");
+                Console.WriteLine($"ContestDescriptionWithPlaceholders Error Status: {status}");
             }
         }
 
