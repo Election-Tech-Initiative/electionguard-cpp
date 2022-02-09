@@ -61,6 +61,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/log.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/log.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/lookup_table.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/manifest.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp

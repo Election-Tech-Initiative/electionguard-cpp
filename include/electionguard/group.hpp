@@ -205,6 +205,11 @@ namespace electionguard
     EG_API std::unique_ptr<ElementModP> mul_mod_p(const std::vector<ElementModPOrQ> &elems);
 
     /// <summary>
+    /// computes element mod p
+    /// </summary>
+    EG_API std::unique_ptr<ElementModP> mod_p(const ElementModP &element);
+
+    /// <summary>
     /// Computes b^e mod p.
     /// </summary>
     EG_API std::unique_ptr<ElementModP> pow_mod_p(const ElementModP &base,
@@ -252,6 +257,11 @@ namespace electionguard
     /// Computes (Q - a) mod q.
     /// </summary>
     EG_API std::unique_ptr<ElementModQ> sub_from_q(const ElementModQ &a);
+
+    /// <summary>
+    /// Generate random number between 0 and P
+    /// </summary>
+    EG_API std::unique_ptr<ElementModP> rand_p();
 
     /// <summary>
     /// Generate random number between 0 and Q

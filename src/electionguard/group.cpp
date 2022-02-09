@@ -7,8 +7,11 @@
 #include "facades/Hacl_Bignum256.hpp"
 #include "facades/Hacl_Bignum4096.hpp"
 #include "log.hpp"
+#include "lookup_table.hpp"
 #include "random.hpp"
+#include "utils.hpp"
 
+#include <cmath>
 #include <cstdint>
 #include <iomanip>
 #include <iostream>
@@ -17,8 +20,11 @@
 #include <stdexcept>
 #include <vector>
 
+using electionguard::generator_table;
 using hacl::Bignum256;
 using hacl::Bignum4096;
+using hacl::CONTEXT_P;
+using hacl::CONTEXT_Q;
 using std::copy;
 using std::get;
 using std::holds_alternative;
@@ -30,32 +36,6 @@ using std::reference_wrapper;
 using std::runtime_error;
 using std::to_string;
 using std::unique_ptr;
-
-#pragma region UtilityHelpers
-
-bool isMax(const uint64_t (&array)[MAX_Q_LEN_DOUBLE])
-{
-    const uint64_t max = 0xffffffffffffffff;
-    for (uint32_t i = 0; i < MAX_Q_LEN; i++) {
-        if (array[i] != max) {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool isMax(const uint64_t (&array)[MAX_P_LEN_DOUBLE])
-{
-    const uint64_t max = 0xffffffffffffffff;
-    for (uint32_t i = 0; i < MAX_P_LEN; i++) {
-        if (array[i] != max) {
-            return false;
-        }
-    }
-    return true;
-}
-
-#pragma endregion
 
 namespace electionguard
 {
@@ -551,12 +531,15 @@ namespace electionguard
         }
 
         uint64_t modResult[MAX_P_LEN] = {};
-        bool success = Bignum4096::mod(p.get(), static_cast<uint64_t *>(addResult),
-                                       static_cast<uint64_t *>(modResult));
-        if (!success) {
-            throw runtime_error(" add_mod_p mod operation failed");
-        }
-        return make_unique<ElementModP>(modResult);
+        CONTEXT_P().mod(static_cast<uint64_t *>(addResult), static_cast<uint64_t *>(modResult));
+        return make_unique<ElementModP>(modResult, true);
+    }
+
+    std::unique_ptr<ElementModP> mod_p(const ElementModP &element)
+    {
+        uint64_t modResult[MAX_P_LEN] = {};
+        CONTEXT_P().mod(element.get(), static_cast<uint64_t *>(modResult));
+        return make_unique<ElementModP>(modResult, true);
     }
 
     unique_ptr<ElementModP> mul_mod_p(const ElementModP &lhs, const ElementModP &rhs)
@@ -566,12 +549,8 @@ namespace electionguard
         Bignum4096::mul(const_cast<ElementModP &>(lhs).get(), const_cast<ElementModP &>(rhs).get(),
                         static_cast<uint64_t *>(mulResult));
         uint64_t modResult[MAX_P_LEN] = {};
-        bool success = Bignum4096::mod(p.get(), static_cast<uint64_t *>(mulResult),
-                                       static_cast<uint64_t *>(modResult));
-        if (!success) {
-            throw runtime_error(" mul_mod_p mod operation failed");
-        }
-        return make_unique<ElementModP>(modResult);
+        CONTEXT_P().mod(static_cast<uint64_t *>(mulResult), static_cast<uint64_t *>(modResult));
+        return make_unique<ElementModP>(modResult, true);
     }
 
     unique_ptr<ElementModP> mul_mod_p(const vector<ElementModPOrQ> &elems)
@@ -595,19 +574,13 @@ namespace electionguard
 
     unique_ptr<ElementModP> pow_mod_p(const ElementModP &base, const ElementModP &exponent)
     {
-        const auto &p = P();
-
         // HACL's input constraints require the exponent to be greater than zero
         if (const_cast<ElementModP &>(exponent) == ZERO_MOD_P()) {
             return ElementModP::fromUint64(1UL);
         }
 
         uint64_t result[MAX_P_LEN] = {};
-        bool success = Bignum4096::modExp(p.get(), base.get(), MAX_P_SIZE, exponent.get(),
-                                          static_cast<uint64_t *>(result));
-        if (!success) {
-            throw runtime_error("pow_mod_p: mod operation failed");
-        }
+        CONTEXT_P().modExp(base.get(), MAX_P_SIZE, exponent.get(), static_cast<uint64_t *>(result));
         return make_unique<ElementModP>(result, true);
     }
 
@@ -623,7 +596,8 @@ namespace electionguard
 
     unique_ptr<ElementModP> g_pow_p(const ElementModQ &exponent)
     {
-        return pow_mod_p(G(), exponent);
+        auto result = generator_table.pow_mod_p(exponent.get(), MAX_Q_LEN);
+        return make_unique<ElementModP>(result, true);
     }
 
 #pragma endregion
@@ -679,12 +653,8 @@ namespace electionguard
         }
 
         uint64_t result[MAX_Q_LEN] = {};
-        bool modSuccess = Bignum256::mod(q.get(), static_cast<uint64_t *>(addResult),
-                                         static_cast<uint64_t *>(result));
-        if (!modSuccess) {
-            throw runtime_error("add_mod_q mod operation failed");
-        }
-        return make_unique<ElementModQ>(result);
+        CONTEXT_Q().mod(static_cast<uint64_t *>(addResult), static_cast<uint64_t *>(result));
+        return make_unique<ElementModQ>(result, true);
     }
 
     unique_ptr<ElementModQ> add_mod_q(const vector<reference_wrapper<ElementModQ>> &elements)
@@ -693,7 +663,7 @@ namespace electionguard
             throw invalid_argument("must have one or more elements");
         }
 
-        auto result = ElementModQ::fromUint64(0UL);
+        auto result = ElementModQ::fromUint64(0UL, true);
         for (auto element : elements) {
             auto sum = add_mod_q(*result, element.get());
             result.swap(sum);
@@ -740,12 +710,9 @@ namespace electionguard
         }
 
         uint64_t resModQ[MAX_Q_LEN] = {};
-        bool modSuccess = Bignum256::mod(q.get(), static_cast<uint64_t *>(subResult),
-                                         static_cast<uint64_t *>(resModQ));
-        if (!modSuccess) {
-            throw runtime_error(" a_minus_b_mod_q mod operation failed");
-        }
-        return make_unique<ElementModQ>(resModQ);
+        CONTEXT_Q().mod(static_cast<uint64_t *>(subResult), static_cast<uint64_t *>(resModQ));
+
+        return make_unique<ElementModQ>(resModQ, true);
     }
 
     unique_ptr<ElementModQ> a_plus_bc_mod_q(const ElementModQ &a, const ElementModQ &b,
@@ -782,7 +749,7 @@ namespace electionguard
         uint64_t result[MAX_Q_LEN] = {};
         memcpy(static_cast<uint64_t *>(result), resModQ, MAX_Q_SIZE);
 
-        return make_unique<ElementModQ>(result);
+        return make_unique<ElementModQ>(result, true);
     }
 
     unique_ptr<ElementModQ> sub_from_q(const ElementModQ &a)
@@ -793,6 +760,23 @@ namespace electionguard
         // TODO: python version doesn't perform % Q on results,
         // but we still need to handle the overflow values between (Q, MAX_256]
         return make_unique<ElementModQ>(result, true);
+    }
+
+    unique_ptr<ElementModP> rand_p()
+    {
+        auto bytes = Random::getBytes();
+
+        auto *bigNum = Bignum4096::fromBytes(MAX_P_SIZE, const_cast<uint8_t *>(bytes.data()));
+        if (bigNum == nullptr) {
+            throw bad_alloc();
+        }
+
+        uint64_t element[MAX_P_LEN] = {0};
+        memcpy(static_cast<uint64_t *>(element), bigNum, MAX_P_SIZE);
+        free(bigNum);
+
+        auto random_p = make_unique<ElementModP>(element, true);
+        return add_mod_p(*random_p, ZERO_MOD_P());
     }
 
     unique_ptr<ElementModQ> rand_q()

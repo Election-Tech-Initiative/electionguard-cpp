@@ -1,11 +1,23 @@
+#include "../../../src/electionguard/convert.hpp"
+#include "../../../src/electionguard/facades/Hacl_Bignum256.hpp"
+#include "../../../src/electionguard/facades/Hacl_Bignum4096.hpp"
+#include "../../../src/electionguard/log.hpp"
+#include "../../../src/electionguard/utils.hpp"
+#include "../utils/byte_logger.hpp"
 #include "../utils/constants.hpp"
 
+#include <algorithm>
 #include <benchmark/benchmark.h>
+#include <cmath>
 #include <electionguard/constants.h>
 #include <electionguard/group.hpp>
+#include <exception>
+#include <iostream>
+#include <string>
 
 using namespace electionguard;
 using namespace std;
+using namespace hacl;
 
 class GroupElementFixture : public benchmark::Fixture
 {
@@ -93,8 +105,10 @@ BENCHMARK_REGISTER_F(GroupElementFixture, add_mod_p)->Unit(benchmark::kMilliseco
 
 BENCHMARK_DEFINE_F(GroupElementFixture, add_mod_p_large)(benchmark::State &state)
 {
+    auto rand_p1 = rand_p();
+    auto rand_p2 = rand_p();
     for (auto _ : state) {
-        auto sum1 = add_mod_p(*p1, *p2);
+        auto sum1 = add_mod_p(*rand_p1, *rand_p2);
     }
 }
 
@@ -102,8 +116,10 @@ BENCHMARK_REGISTER_F(GroupElementFixture, add_mod_p_large)->Unit(benchmark::kMil
 
 BENCHMARK_DEFINE_F(GroupElementFixture, mul_mod_p)(benchmark::State &state)
 {
+    auto rand_p1 = rand_p();
+    auto rand_p2 = rand_p();
     for (auto _ : state) {
-        auto prod = mul_mod_p(*p1, *p2);
+        auto prod = mul_mod_p(*rand_p1, *rand_p2);
     }
 }
 
@@ -117,8 +133,10 @@ BENCHMARK_REGISTER_F(GroupElementFixture, mul_mod_p)->Unit(benchmark::kMilliseco
 
 BENCHMARK_DEFINE_F(GroupElementFixture, pow_mod_p_with_q)(benchmark::State &state)
 {
+    auto rand_p1 = rand_p();
+    auto rand_q1 = rand_q();
     for (auto _ : state) {
-        auto exp = pow_mod_p(*p1, *q2);
+        auto exp = pow_mod_p(*rand_p1, *rand_q1);
     }
 }
 
@@ -126,8 +144,10 @@ BENCHMARK_REGISTER_F(GroupElementFixture, pow_mod_p_with_q)->Unit(benchmark::kMi
 
 BENCHMARK_DEFINE_F(GroupElementFixture, pow_mod_p_with_p)(benchmark::State &state)
 {
+    auto rand_p1 = rand_p();
+    auto rand_p2 = rand_p();
     for (auto _ : state) {
-        auto exp = pow_mod_p(*p1, *p2);
+        auto exp = pow_mod_p(*rand_p1, *rand_p2);
     }
 }
 

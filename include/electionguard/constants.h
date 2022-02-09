@@ -11,6 +11,11 @@ enum MAX_IDENIFIER_LENGTH { MAX_IDENIFIER_LENGTH = 256 };
 enum MAX_P_LEN { MAX_P_LEN = 64 };
 enum MAX_Q_LEN { MAX_Q_LEN = 4 };
 
+// values used for fixed-base exponentiation tables
+static const uint64_t LUT_WINDOW_SIZE = 8;
+static const uint64_t LUT_ORDER_BITS = 256;
+static const uint64_t LUT_TABLE_LENGTH = 32;
+
 static const uint8_t MAX_P_LEN_DOUBLE = 128;
 static const uint8_t MAX_Q_LEN_DOUBLE = 8;
 
