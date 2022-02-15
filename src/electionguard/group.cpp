@@ -121,6 +121,9 @@ namespace electionguard
                 throw out_of_range("Value for ElementModP is greater than allowed");
             }
             isFixedBase = fixedBase;
+            if (fixedBase) {
+                Log::debug("IS FIXED BASE BY VECTOR");
+            }
             copy(begin(array), end(array), begin(data));
         };
 
@@ -131,6 +134,9 @@ namespace electionguard
                 throw out_of_range("Value for ElementModP is greater than allowed");
             }
             isFixedBase = fixedBase;
+            if (fixedBase) {
+                Log::debug("IS FIXED BASE BY ARRAY");
+            }
             copy(begin(elem), end(elem), begin(data));
         };
 
@@ -196,6 +202,8 @@ namespace electionguard
     // Property Getters
 
     uint64_t *ElementModP::get() const { return static_cast<uint64_t *>(pimpl->data); }
+
+    uint64_t (&ElementModP::getref() const)[MAX_P_LEN] { return pimpl->data; }
 
     uint64_t ElementModP::length() const { return MAX_P_LEN; }
 
@@ -597,6 +605,23 @@ namespace electionguard
         return make_unique<ElementModP>(result, true);
     }
 
+    const auto public_key_table = LookupTableType(
+      ElementModP::fromHex(
+        "C67EE92DF4986149C9377327817538867ED14C7E08E8B0428000D0CD7B8E520036A227C53C431D03F8612D4AB0"
+        "AC15289D78091D98D0B14AB3DD52E334325905FC88915C898489512CA8CAAAC1A201F567324F61E23D753686D3"
+        "D36AD3ED8FC9BED6F8F4E2CF227CC5C6154334DD2B572782F884F5A918F57EA66C30C329D4DFABA8B331AEA931"
+        "BE8429ECD81C00F12087736AFB5928AF8F24264C4131527E044713A2F20A350FF137C31B4AC554A91E07CF433A"
+        "C7712CA0C597B8D1A2F6A8E5DBB0578C8FFB09C7232751486317B28607422F7FDA2FE776920708BD29CB058D45"
+        "5230608DB711FF1D6CD21E1FADAB676F165CF2E9BD2D29734E2EB939E256EFC9C4C26C02F84D5EE573B6C872BC"
+        "C6764885A8071F9A5F670EC4BC74155DB20B11531FA7C434595749FF717119219F04CB7F8C81861F73426EF384"
+        "B08661C9FD748B06B69C74E547036FB79A6B92937A33EFCBE8344A94BBEFC47588DE5558FF15073F1D270212C7"
+        "50F2D6A67F759E247EEC1CC91B3D71FDCE17BE700EF8D1A24DED0803F5FA45E2D6C643C08D016210774F430045"
+        "94CF15BF5AF222AC9CCFFCF1635EB2F63C5B4E57DC8AC89A42527859D718432CC102BB1610220CB9E8EFB3317D"
+        "AA4FDA846F79E715945515C632AB58ACC1E631E1B7C918992460B67652AA63F6830C057009F14C60D80F8C49BF"
+        "C3A10A86BB5233DDCECE70ED3B579C26EC")
+        ->get(),
+      MAX_P_LEN);
+
     unique_ptr<ElementModP> pow_mod_p(const ElementModP &base, const ElementModQ &exponent)
     {
         // HACL's input constraints require the exponent to be greater than zero
@@ -605,19 +630,16 @@ namespace electionguard
         }
 
         // check if we have a lookup table initialized for this element
-        if (const_cast<ElementModP &>(base) != G() && base.isFixedBase()) {
-            Log::debug("\n ENTER \n");
-            auto hex = base.toHex();
-            auto public_key_table = publicKeyTable(hex, base.get());
+        if (base.isFixedBase()) {
+            auto result = public_key_table.pow_mod_p(exponent.get(), MAX_Q_LEN);
 
-            // static auto public_key_table =
-            //   LookupTable<LUT_WINDOW_SIZE, LUT_ORDER_BITS, LUT_TABLE_LENGTH>(base.get(), MAX_P_LEN);
+            // auto hex = base.toHex();
+            // auto exp_ptr = exponent.get();
+            // auto result = LookupTableContext::pow_mod_p(hex, base.getref(), exp_ptr, MAX_Q_LEN);
 
-            auto result = public_key_table->pow_mod_p(exponent.get(), MAX_Q_LEN);
-
-            Log::debug("\n\n HEREEEEEEEEEEEEEEEE \n\n");
-            Log::debug("", bignum_to_hex_string(result));
             return make_unique<ElementModP>(result, true);
+
+            //return pow_mod_p(base, *exponent.toElementModP());
         }
 
         // if none exists, execute the modular exponentiation directly

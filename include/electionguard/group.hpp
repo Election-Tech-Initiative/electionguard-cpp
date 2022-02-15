@@ -12,6 +12,7 @@
 
 namespace electionguard
 {
+    typedef uint64_t array4096[MAX_P_LEN];
     /// <summary>
     /// An element of the larger `mod p` space, i.e., in [0, P), where P is a 4096-bit prime.
     /// </summary>
@@ -41,6 +42,8 @@ namespace electionguard
         /// <returns> a pointer to the first limb. </returns>
         /// </Summary>
         uint64_t *get() const;
+
+        uint64_t (&getref() const)[MAX_P_LEN];
 
         uint64_t length() const;
 
