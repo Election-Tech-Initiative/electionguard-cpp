@@ -308,6 +308,18 @@ namespace ElectionGuard
             internal static extern Status ToHex(
                 ElementModQHandle handle, out IntPtr out_hex);
 
+            [DllImport(DllName, EntryPoint = "eg_element_mod_q_from_hex",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status FromHex(
+                [MarshalAs(UnmanagedType.LPStr)] string hex,
+                out ElementModQHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_q_from_hex_unchecked",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status FromHexUnchecked(
+                [MarshalAs(UnmanagedType.LPStr)] string hex,
+                out ElementModQHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_rand_q_new",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Random(out ElementModQHandle handle);

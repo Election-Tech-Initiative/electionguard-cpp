@@ -20,8 +20,10 @@ namespace electionguard
       public:
         ElementModP(const ElementModP &other);
         ElementModP(ElementModP &&other);
-        ElementModP(const std::vector<uint64_t> &elem, bool unchecked = false);
-        ElementModP(const uint64_t (&elem)[MAX_P_LEN], bool unchecked = false);
+        ElementModP(const std::vector<uint64_t> &elem, bool unchecked = false,
+                    bool fixedBase = false);
+        ElementModP(const uint64_t (&elem)[MAX_P_LEN], bool unchecked = false,
+                    bool fixedBase = false);
         ~ElementModP();
 
         ElementModP &operator=(ElementModP other);
@@ -39,6 +41,10 @@ namespace electionguard
         /// <returns> a pointer to the first limb. </returns>
         /// </Summary>
         uint64_t *get() const;
+
+        uint64_t length() const;
+
+        bool isFixedBase() const;
 
         /// <Summary>
         /// Validates that the element is actually within the bounds of [0,P).
@@ -64,6 +70,8 @@ namespace electionguard
         /// clone the object by making a deep copy
         /// </Summary>
         std::unique_ptr<ElementModP> clone() const;
+
+        void setIsFixedBase(bool fixedBase) const;
 
         /// <summary>
         /// Converts the binary value stored by the hex string in Big Endian format
@@ -113,6 +121,8 @@ namespace electionguard
         /// <returns> a pointer to the first limb</returns>
         /// </Summary>
         uint64_t *get() const;
+
+        uint64_t length() const;
 
         /// <Summary>
         /// Validates that the element is actually within the bounds of [0,Q).

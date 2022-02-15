@@ -50,7 +50,7 @@ namespace electionguard
 
     const ElementModP &G()
     {
-        static ElementModP instance{G_ARRAY_REVERSE, true};
+        static ElementModP instance{G_ARRAY_REVERSE, true, true};
         return instance;
     }
 
@@ -110,8 +110,9 @@ namespace electionguard
     struct ElementModP::Impl {
 
         uint64_t data[MAX_P_LEN] = {};
+        bool isFixedBase = false;
 
-        Impl(const vector<uint64_t> &elem, bool unchecked)
+        Impl(const vector<uint64_t> &elem, bool unchecked, bool fixedBase)
         {
             uint64_t array[MAX_P_LEN] = {};
             copy(elem.begin(), elem.end(), static_cast<uint64_t *>(array));
@@ -119,15 +120,17 @@ namespace electionguard
                                                    static_cast<uint64_t *>(array)) > 0) {
                 throw out_of_range("Value for ElementModP is greater than allowed");
             }
+            isFixedBase = fixedBase;
             copy(begin(array), end(array), begin(data));
         };
 
-        Impl(const uint64_t (&elem)[MAX_P_LEN], bool unchecked)
+        Impl(const uint64_t (&elem)[MAX_P_LEN], bool unchecked, bool fixedBase)
         {
             if (!unchecked && Bignum4096::lessThan(const_cast<uint64_t *>(P().get()),
                                                    const_cast<uint64_t *>(elem)) > 0) {
                 throw out_of_range("Value for ElementModP is greater than allowed");
             }
+            isFixedBase = fixedBase;
             copy(begin(elem), end(elem), begin(data));
         };
 
@@ -135,7 +138,7 @@ namespace electionguard
 
         [[nodiscard]] unique_ptr<ElementModP::Impl> clone() const
         {
-            return make_unique<ElementModP::Impl>(data, true);
+            return make_unique<ElementModP::Impl>(data, true, isFixedBase);
         }
 
         bool operator==(const Impl &other)
@@ -162,13 +165,15 @@ namespace electionguard
 
     ElementModP::ElementModP(const ElementModP &other) : pimpl(other.pimpl->clone()) {}
 
-    ElementModP::ElementModP(const vector<uint64_t> &elem, bool unchecked /* = false */)
-        : pimpl(new Impl(elem, unchecked))
+    ElementModP::ElementModP(const vector<uint64_t> &elem, bool unchecked /* = false */,
+                             bool fixedBase /* = false */)
+        : pimpl(new Impl(elem, unchecked, fixedBase))
     {
     }
 
-    ElementModP::ElementModP(const uint64_t (&elem)[MAX_P_LEN], bool unchecked /* = false */)
-        : pimpl(new Impl(elem, unchecked))
+    ElementModP::ElementModP(const uint64_t (&elem)[MAX_P_LEN], bool unchecked /* = false */,
+                             bool fixedBase /* = false */)
+        : pimpl(new Impl(elem, unchecked, fixedBase))
     {
     }
 
@@ -191,6 +196,10 @@ namespace electionguard
     // Property Getters
 
     uint64_t *ElementModP::get() const { return static_cast<uint64_t *>(pimpl->data); }
+
+    uint64_t ElementModP::length() const { return MAX_P_LEN; }
+
+    bool ElementModP::isFixedBase() const { return pimpl->isFixedBase; }
 
     bool ElementModP::isInBounds() const
     {
@@ -224,8 +233,10 @@ namespace electionguard
 
     std::unique_ptr<ElementModP> ElementModP::clone() const
     {
-        return make_unique<ElementModP>(pimpl->data);
+        return make_unique<ElementModP>(pimpl->data, true, pimpl->isFixedBase);
     }
+
+    void ElementModP::setIsFixedBase(bool fixedBase) const { pimpl->isFixedBase = fixedBase; }
 
     // Static Methods
 
@@ -334,6 +345,8 @@ namespace electionguard
     // Property Getters
 
     uint64_t *ElementModQ::get() const { return static_cast<uint64_t *>(pimpl->data); }
+
+    uint64_t ElementModQ::length() const { return MAX_Q_LEN; }
 
     bool ElementModQ::isInBounds() const
     {
@@ -586,6 +599,28 @@ namespace electionguard
 
     unique_ptr<ElementModP> pow_mod_p(const ElementModP &base, const ElementModQ &exponent)
     {
+        // HACL's input constraints require the exponent to be greater than zero
+        if (const_cast<ElementModQ &>(exponent) == ZERO_MOD_Q()) {
+            return ElementModP::fromUint64(1UL);
+        }
+
+        // check if we have a lookup table initialized for this element
+        if (const_cast<ElementModP &>(base) != G() && base.isFixedBase()) {
+            Log::debug("\n ENTER \n");
+            auto hex = base.toHex();
+            auto public_key_table = publicKeyTable(hex, base.get());
+
+            // static auto public_key_table =
+            //   LookupTable<LUT_WINDOW_SIZE, LUT_ORDER_BITS, LUT_TABLE_LENGTH>(base.get(), MAX_P_LEN);
+
+            auto result = public_key_table->pow_mod_p(exponent.get(), MAX_Q_LEN);
+
+            Log::debug("\n\n HEREEEEEEEEEEEEEEEE \n\n");
+            Log::debug("", bignum_to_hex_string(result));
+            return make_unique<ElementModP>(result, true);
+        }
+
+        // if none exists, execute the modular exponentiation directly
         return pow_mod_p(base, *exponent.toElementModP());
     }
 

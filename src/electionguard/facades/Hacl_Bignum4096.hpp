@@ -5,6 +5,7 @@
 #include "electionguard/export.h"
 
 #include <cstdint>
+#include <memory>
 
 namespace hacl
 {
@@ -54,7 +55,15 @@ namespace hacl
                     bool useConstTime = false) const;
 
       private:
-        Hacl_Bignum_MontArithmetic_bn_mont_ctx_u64 *context;
+        struct handle_destructor {
+            void operator()(Hacl_Bignum_MontArithmetic_bn_mont_ctx_u64 *handle) const
+            {
+                Hacl_Bignum4096_mont_ctx_free(handle);
+            }
+        };
+        typedef std::unique_ptr<Hacl_Bignum_MontArithmetic_bn_mont_ctx_u64, handle_destructor>
+          HaclBignumContext4096;
+        HaclBignumContext4096 context;
     };
 
     /// <summary>

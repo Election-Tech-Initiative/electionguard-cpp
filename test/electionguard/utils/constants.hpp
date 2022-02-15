@@ -2,6 +2,7 @@
 #define __ELECTIONGUARD_CPP_TEST_UTILS_CONSTANTS_HPP_INCLUDED__
 
 #include <electionguard/constants.h>
+#include <string>
 
 // some useful test values
 
@@ -82,5 +83,13 @@ const uint64_t LARGE_Q_ARRAY_1[MAX_Q_LEN] = {0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFF
 // just another large array
 const uint64_t LARGE_Q_ARRAY_2[MAX_Q_LEN] = {0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
                                              0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFF39};
+
+// a fixed nonce useful for testing
+const std::string a_fixed_nonce =
+  "4BD3231DC17E9E84F5B0A5D2C4160C6A2299EDAE184C291E17709913B8F9CB40";
+
+// a fixed secret useful for testing
+const std::string a_fixed_secret =
+  "A9FA69F9686810ED82DAF9020FE80DFE0FC0FDCBF7FA55B93C811F0BA2650101";
 
 #endif /* __ELECTIONGUARD_CPP_TEST_UTILS_CONSTANTS_HPP_INCLUDED__ */

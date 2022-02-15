@@ -159,6 +159,9 @@ namespace electionguard
 
         auto cryptoExtendedBaseHash = hash_elems({cryptoBaseHash.get(), commitmentHash.get()});
 
+        // ensure the elgamal public key instance is set as a fixed base
+        elGamalPublicKey->setIsFixedBase(true);
+
         return make_unique<CiphertextElectionContext>(
           numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
           move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash));
@@ -175,6 +178,9 @@ namespace electionguard
 
         auto cryptoExtendedBaseHash = hash_elems({cryptoBaseHash.get(), commitmentHash.get()});
 
+        // ensure the elgamal public key instance is set as a fixed base
+        elGamalPublicKey->setIsFixedBase(true);
+
         return make_unique<CiphertextElectionContext>(
           numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
           move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
@@ -189,6 +195,9 @@ namespace electionguard
         auto commitmentHash = ElementModQ::fromHex(commitmentHashInHex);
         auto manifestHash = ElementModQ::fromHex(manifestHashInHex);
 
+        // ensure the elgamal public key instance is set as a fixed base
+        elGamalPublicKey->setIsFixedBase(true);
+
         return make(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
                     move(manifestHash));
     }
@@ -201,6 +210,9 @@ namespace electionguard
         auto elGamalPublicKey = ElementModP::fromHex(elGamalPublicKeyInHex);
         auto commitmentHash = ElementModQ::fromHex(commitmentHashInHex);
         auto manifestHash = ElementModQ::fromHex(manifestHashInHex);
+
+        // ensure the elgamal public key instance is set as a fixed base
+        elGamalPublicKey->setIsFixedBase(true);
 
         return make(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
                     move(manifestHash), move(extendedData));

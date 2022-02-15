@@ -142,6 +142,18 @@ BENCHMARK_DEFINE_F(GroupElementFixture, pow_mod_p_with_q)(benchmark::State &stat
 
 BENCHMARK_REGISTER_F(GroupElementFixture, pow_mod_p_with_q)->Unit(benchmark::kMillisecond);
 
+BENCHMARK_DEFINE_F(GroupElementFixture, pow_mod_p_fixed_base)(benchmark::State &state)
+{
+    auto rand_p1 = rand_p();
+    rand_p1->setIsFixedBase(true);
+    auto rand_q1 = rand_q();
+    for (auto _ : state) {
+        auto exp = pow_mod_p(*rand_p1, *rand_q1);
+    }
+}
+
+BENCHMARK_REGISTER_F(GroupElementFixture, pow_mod_p_fixed_base)->Unit(benchmark::kMillisecond);
+
 BENCHMARK_DEFINE_F(GroupElementFixture, pow_mod_p_with_p)(benchmark::State &state)
 {
     auto rand_p1 = rand_p();

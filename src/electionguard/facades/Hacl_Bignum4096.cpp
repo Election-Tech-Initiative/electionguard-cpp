@@ -7,8 +7,12 @@ using electionguard::Log;
 
 namespace hacl
 {
-    Bignum4096::Bignum4096(uint64_t *elem) { context = Hacl_Bignum4096_mont_ctx_init(elem); }
-    Bignum4096::~Bignum4096() { Hacl_Bignum4096_mont_ctx_free(context); }
+    Bignum4096::Bignum4096(uint64_t *elem)
+    {
+        HaclBignumContext4096 ctx{Hacl_Bignum4096_mont_ctx_init(elem)};
+        context = std::move(ctx);
+    }
+    Bignum4096::~Bignum4096() {}
 
     uint64_t Bignum4096::add(uint64_t *a, uint64_t *b, uint64_t *res)
     {
@@ -60,7 +64,7 @@ namespace hacl
 
     void Bignum4096::mod(uint64_t *a, uint64_t *res) const
     {
-        Hacl_Bignum4096_mod_precomp(context, a, res);
+        Hacl_Bignum4096_mod_precomp(context.get(), a, res);
     }
 
     void Bignum4096::modExp(uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res,
@@ -71,9 +75,9 @@ namespace hacl
             return throw;
         }
         if (useConstTime) {
-            return Hacl_Bignum4096_mod_exp_consttime_precomp(context, a, bBits, b, res);
+            return Hacl_Bignum4096_mod_exp_consttime_precomp(context.get(), a, bBits, b, res);
         }
-        return Hacl_Bignum4096_mod_exp_vartime_precomp(context, a, bBits, b, res);
+        return Hacl_Bignum4096_mod_exp_vartime_precomp(context.get(), a, bBits, b, res);
     }
 
     const Bignum4096 &CONTEXT_P()

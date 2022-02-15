@@ -2,6 +2,7 @@
 #include "generators/ballot.hpp"
 #include "generators/election.hpp"
 #include "generators/manifest.hpp"
+#include "utils/constants.hpp"
 
 #include <doctest/doctest.h>
 #include <electionguard/ballot.hpp>
@@ -18,7 +19,7 @@ TEST_CASE("Encrypt simple selection succeeds")
     // Arrange
     const auto *candidateId = "some-candidate-id";
     const auto *selectionId = "some-selection-object-id";
-    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
     auto nonce = rand_q();
     auto metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
     auto hashContext = metadata->crypto_hash();
@@ -41,7 +42,7 @@ TEST_CASE("Encrypt simple selection malformed data fails")
     // Arrange
     const auto *candidateId = "some-candidate-id";
     const auto *selectionId = "some-selection-object-id";
-    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
     auto nonce = rand_q();
     auto metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
     auto hashContext = metadata->crypto_hash();
@@ -74,7 +75,9 @@ TEST_CASE("Encrypt simple selection malformed data fails")
 TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
           "InternalManifest succeeds")
 {
-    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
+    auto init = pow_mod_p(*keypair->getPublicKey(), *ElementModQ::fromUint64(1));
     auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
     auto internal = make_unique<InternalManifest>(*manifest);
     auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
@@ -84,7 +87,7 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
 
     // Act
     auto plaintext = BallotGenerator::getFakeBallot(*internal);
-    Log::debug(plaintext->toJson());
+    // Log::debug(plaintext->toJson());
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert
@@ -94,7 +97,8 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
 
 TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
 {
-    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
     auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
     auto internal = make_unique<InternalManifest>(*manifest);
     auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
@@ -104,7 +108,7 @@ TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
 
     // Act
     auto plaintext = BallotGenerator::getFakeBallot(*internal, 0UL);
-    Log::debug(plaintext->toJson());
+    // Log::debug(plaintext->toJson());
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert
@@ -114,7 +118,8 @@ TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
 
 TEST_CASE("Encrypt PlaintextBallot overvote fails")
 {
-    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    // Arrange
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
     auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
     auto internal = make_unique<InternalManifest>(*manifest);
     auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
@@ -124,13 +129,16 @@ TEST_CASE("Encrypt PlaintextBallot overvote fails")
 
     // Act
     auto plaintext = BallotGenerator::getFakeBallot(*internal, 2UL);
-    Log::debug(plaintext->toJson());
+    // Log::debug(plaintext->toJson());
+
+    // Assert
     CHECK_THROWS_AS(mediator->encrypt(*plaintext), std::exception);
 }
 
 TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds")
 {
-    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
     auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
     auto internal = make_unique<InternalManifest>(*manifest);
     auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
@@ -165,7 +173,9 @@ TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds")
 
 TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeeds")
 {
-    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    // Arrange
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
     auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
     auto internal = make_unique<InternalManifest>(*manifest);
     auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
@@ -183,7 +193,8 @@ TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeed
 TEST_CASE("Encrypt simple ballot from file with mediator succeeds")
 {
     // Arrange
-    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
     auto manifest = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
     auto internal = make_unique<InternalManifest>(*manifest);
     auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
@@ -203,7 +214,8 @@ TEST_CASE("Encrypt simple ballot from file with mediator succeeds")
 TEST_CASE("Encrypt simple ballot from file succeeds")
 {
     // Arrange
-    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
     auto manifest = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
     auto internal = make_unique<InternalManifest>(*manifest);
     auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
@@ -216,7 +228,7 @@ TEST_CASE("Encrypt simple ballot from file succeeds")
     auto ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash(),
                                     make_unique<ElementModQ>(TWO_MOD_Q()));
 
-    Log::debug(ciphertext->toJson());
+    //Log::debug(ciphertext->toJson());
 
     // Assert
     CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
@@ -226,7 +238,8 @@ TEST_CASE("Encrypt simple ballot from file succeeds")
 TEST_CASE("Encrypt simple ballot from file submitted is valid")
 {
     // Arrange
-    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
     auto manifest = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
     auto internal = make_unique<InternalManifest>(*manifest);
     auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
@@ -239,7 +252,7 @@ TEST_CASE("Encrypt simple ballot from file submitted is valid")
     auto submitted = SubmittedBallot::from(*ciphertext, BallotBoxState::cast);
     auto serialized = submitted->toJson();
 
-    Log::debug(serialized);
+    //Log::debug(serialized);
     auto deserialized = SubmittedBallot::fromJson(serialized);
 
     // Assert

@@ -2,6 +2,7 @@
 #include "generators/ballot.hpp"
 #include "generators/election.hpp"
 #include "generators/manifest.hpp"
+#include "utils/constants.hpp"
 
 #include <doctest/doctest.h>
 #include <electionguard/ballot.hpp>
@@ -14,6 +15,7 @@ using namespace std;
 
 struct TestEncryptFixture {
 
+    unique_ptr<ElementModQ> secret;
     unique_ptr<ElGamalKeyPair> keypair;
     unique_ptr<Manifest> manifest;
     unique_ptr<InternalManifest> internal;
@@ -24,7 +26,8 @@ struct TestEncryptFixture {
     unique_ptr<CompactCiphertextBallot> compactCiphertext;
 
     TestEncryptFixture()
-        : keypair(ElGamalKeyPair::fromSecret(TWO_MOD_Q())),
+        : secret(ElementModQ::fromHex(a_fixed_secret)),
+          keypair(ElGamalKeyPair::fromSecret(*secret)),
           manifest(ManifestGenerator::getJeffersonCountyManifest_Minimal()),
           internal(make_unique<InternalManifest>(*manifest)),
           context(ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey())),

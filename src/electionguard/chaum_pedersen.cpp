@@ -308,8 +308,6 @@ namespace electionguard
         auto v0 = a_plus_bc_mod_q(*u, *c0, r); // v_0=(u+c_0⋅R) mod q
         auto v1 = a_plus_bc_mod_q(*v, *w, r);  // v_1=(v+c_1⋅R) mod q
 
-        Log::debug("make: a1->get", a1->toHex());
-
         return make_unique<DisjunctiveChaumPedersenProof>(
           move(a0), move(b0), move(a1), move(b1), move(c0), move(w), move(c), move(v0), move(v1));
     }

@@ -18,7 +18,8 @@ namespace ElectionGuard.Bench
             Stopwatch sw = new Stopwatch();
             sw.Start();
             // Configure the election context
-            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
+            var secret = new ElementModQ("A9FA69F9686810ED82DAF9020FE80DFE0FC0FDCBF7FA55B93C811F0BA2650101");
+            var keypair = ElGamalKeyPair.FromSecret(secret);
             var description = new Manifest(manifest_json);
             var manifest = new InternalManifest(description);
             var context = new CiphertextElectionContext(
@@ -42,7 +43,7 @@ namespace ElectionGuard.Bench
             //var fromBson = CiphertextBallot.FromBson(bson);
 
             sw.Stop();
-            Console.WriteLine("Elapsed={0}", sw.Elapsed);
+            Console.WriteLine("Bench_Encrypt_Ballot_Simple Elapsed={0}", sw.Elapsed);
             return true;
         }
     }
