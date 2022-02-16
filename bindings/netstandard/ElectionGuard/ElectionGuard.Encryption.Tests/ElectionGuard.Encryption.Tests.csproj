@@ -26,6 +26,9 @@
     <None Name="Windows MSVC x64" Visible="false" Include="$(ElectionGuardLibs)\msvc\x64\src\$(Configuration)\*.dll*">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
     </None>
+    <None Name="Non Windows x64" Visible="false" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.dll*">
+      <CopyToOutputDirectory Condition="'$(OS)' != 'Windows_NT'">Always</CopyToOutputDirectory>
+    </None>
     <None Name="MacOS" Visible="false" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.dylib" CopyToOutputDirectory="Always" />
     <None Name="Linux" Visible="false" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.so" CopyToOutputDirectory="Always" />
   </ItemGroup>
