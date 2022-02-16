@@ -2,8 +2,11 @@
 #define __ELECTIONGUARD_CPP_LOOKUP_TABLE_HPP_INCLUDED__
 
 #include "async.hpp"
+#include "facades/Hacl_Bignum256.hpp"
+#include "facades/Hacl_Bignum4096.hpp"
 #include "utils.hpp"
 
+#include <array>
 #include <cstdint>
 #include <electionguard/constants.h>
 #include <electionguard/export.h>
