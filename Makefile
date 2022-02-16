@@ -58,7 +58,7 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	choco install wget
 	choco install unzip
 endif
-	wget -O cmake/CPM.cmake https://github.com/TheLartians/CPM.cmake/releases/latest/download/CPM.cmake
+	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.35.0/CPM.cmake
 	wget -O sample-data-container.zip https://github.com/microsoft/electionguard/releases/download/v0.95.0/sample-data.zip
 	unzip -o sample-data-container.zip
 	unzip -o sample-data.zip
