@@ -24,7 +24,7 @@ CPMAddPackage(
 CPMAddPackage(
   NAME spdlog
   GITHUB_REPOSITORY gabime/spdlog
-  VERSION 1.9.1
+  VERSION 1.9.2
   OPTIONS "SPDLOG_INSTALL ON"
 )
 
