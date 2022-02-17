@@ -1,5 +1,4 @@
 #include "../../../src/electionguard/facades/Hacl_Bignum4096.hpp"
-#include "../../../src/kremlin/Hacl_Bignum4096.h"
 #include "../utils/constants.hpp"
 
 #include <benchmark/benchmark.h>
@@ -71,15 +70,10 @@ BENCHMARK_DEFINE_F(HaclBignum4096Fixture, pow_mod_p_var_time_mont)(benchmark::St
     auto g = G().get();
     auto e = rand_q()->toElementModP()->get();
 
-    auto context = Hacl_Bignum4096_mont_ctx_init(p);
-
     uint64_t result[MAX_P_LEN] = {};
     for (auto _ : state) {
-        Hacl_Bignum4096_mod_exp_vartime_precomp(context, g, MAX_P_SIZE, e,
-                                                static_cast<uint64_t *>(result));
+        CONTEXT_P().modExp(g, MAX_P_SIZE, e, static_cast<uint64_t *>(result), false);
     }
-
-    Hacl_Bignum4096_mont_ctx_free(context);
 }
 
 BENCHMARK_REGISTER_F(HaclBignum4096Fixture, pow_mod_p_var_time_mont)->Unit(benchmark::kMillisecond);
@@ -90,15 +84,10 @@ BENCHMARK_DEFINE_F(HaclBignum4096Fixture, pow_mod_p_const_time_mont)(benchmark::
     auto g = G().get();
     auto e = rand_q()->toElementModP()->get();
 
-    auto context = Hacl_Bignum4096_mont_ctx_init(p);
-
     uint64_t result[MAX_P_LEN] = {};
     for (auto _ : state) {
-        Hacl_Bignum4096_mod_exp_consttime_precomp(context, g, MAX_P_SIZE, e,
-                                                  static_cast<uint64_t *>(result));
+        CONTEXT_P().modExp(g, MAX_P_SIZE, e, static_cast<uint64_t *>(result), true);
     }
-
-    Hacl_Bignum4096_mont_ctx_free(context);
 }
 
 BENCHMARK_REGISTER_F(HaclBignum4096Fixture, pow_mod_p_const_time_mont)
