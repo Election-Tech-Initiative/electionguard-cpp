@@ -26,7 +26,7 @@ namespace ElectionGuard.Encryption.Tests.Utils
         public static Manifest GetManifestFromFile(
             string version = TEST_SPEC_VERSION, string sample = TEST_USE_SAMPLE)
         {
-            var path = Path.Combine(version, "sample", sample, "manifest.json");
+            var path = Path.Combine(version, "sample", sample, "election_record", "manifest.json");
             return GetManifestFromFile(path);
         }
 
