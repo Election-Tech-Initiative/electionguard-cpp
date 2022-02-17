@@ -69,7 +69,7 @@ namespace hacl
     /// <summary>
     /// A Bignum4096 instance initialized with the large prime montgomery context
     /// </summary>
-    const Bignum4096 &CONTEXT_P();
+    const EG_INTERNAL_API Bignum4096 &CONTEXT_P();
 } // namespace hacl
 
 #endif /* __FACADES__Hacl_Bignum256_H_INCLUDED__ */

@@ -51,7 +51,7 @@ namespace hacl
     /// <summary>
     /// A Bignum256 instance initialized with the small prime montgomery context
     /// </summary>
-    const Bignum256 &CONTEXT_Q();
+    const EG_INTERNAL_API Bignum256 &CONTEXT_Q();
 } // namespace hacl
 
 #endif /* __FACADES__Hacl_Bignum256_H_INCLUDED__ */
