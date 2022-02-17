@@ -34,6 +34,6 @@
   </ItemGroup>
 
   <ItemGroup Label="Json Test Data">
-    <Content Include="..\..\..\..\data\**\*.*" Visible="false" LinkBase="data\" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\..\data\**" Visible="false" LinkBase="data\" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
