@@ -43,7 +43,7 @@ namespace electionguard
         /// </Summary>
         uint64_t *get() const;
 
-        uint64_t (&getref() const)[MAX_P_LEN];
+        uint64_t (&ref() const)[MAX_P_LEN];
 
         uint64_t length() const;
 
@@ -124,6 +124,8 @@ namespace electionguard
         /// <returns> a pointer to the first limb</returns>
         /// </Summary>
         uint64_t *get() const;
+
+        uint64_t (&ref() const)[MAX_Q_LEN];
 
         uint64_t length() const;
 

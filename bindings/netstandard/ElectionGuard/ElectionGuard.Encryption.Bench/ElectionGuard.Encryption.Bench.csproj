@@ -28,6 +28,6 @@
     <None Name="Linux" Visible="false" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.so" CopyToOutputDirectory="Always" />
   </ItemGroup>
   <ItemGroup Label="Json Test Data">
-    <Content Include="..\..\..\..\data\**" LinkBase="data\" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\..\data\**\*.*" Visible="false" LinkBase="data\" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

@@ -20,7 +20,6 @@
 #include <stdexcept>
 #include <vector>
 
-using electionguard::generator_table;
 using hacl::Bignum256;
 using hacl::Bignum4096;
 using hacl::CONTEXT_P;
@@ -109,8 +108,9 @@ namespace electionguard
 
     struct ElementModP::Impl {
 
-        uint64_t data[MAX_P_LEN] = {};
         bool isFixedBase = false;
+        uint64_t data[MAX_P_LEN] = {};
+        string hexRepresentation;
 
         Impl(const vector<uint64_t> &elem, bool unchecked, bool fixedBase)
         {
@@ -121,9 +121,6 @@ namespace electionguard
                 throw out_of_range("Value for ElementModP is greater than allowed");
             }
             isFixedBase = fixedBase;
-            if (fixedBase) {
-                Log::debug("IS FIXED BASE BY VECTOR");
-            }
             copy(begin(array), end(array), begin(data));
         };
 
@@ -134,9 +131,6 @@ namespace electionguard
                 throw out_of_range("Value for ElementModP is greater than allowed");
             }
             isFixedBase = fixedBase;
-            if (fixedBase) {
-                Log::debug("IS FIXED BASE BY ARRAY");
-            }
             copy(begin(elem), end(elem), begin(data));
         };
 
@@ -203,7 +197,7 @@ namespace electionguard
 
     uint64_t *ElementModP::get() const { return static_cast<uint64_t *>(pimpl->data); }
 
-    uint64_t (&ElementModP::getref() const)[MAX_P_LEN] { return pimpl->data; }
+    uint64_t (&ElementModP::ref() const)[MAX_P_LEN] { return pimpl->data; }
 
     uint64_t ElementModP::length() const { return MAX_P_LEN; }
 
@@ -231,12 +225,17 @@ namespace electionguard
 
     string ElementModP::toHex() const
     {
+        if (!pimpl->hexRepresentation.empty()) {
+            return pimpl->hexRepresentation;
+        }
+
         // Returned bytes array from Hacl needs to be pre-allocated to 512 bytes
         uint8_t byteResult[MAX_P_SIZE] = {};
         // Use Hacl to convert the bignum to byte array
         Bignum4096::toBytes(static_cast<uint64_t *>(pimpl->data),
                             static_cast<uint8_t *>(byteResult));
-        return bytes_to_hex(byteResult);
+        pimpl->hexRepresentation = bytes_to_hex(byteResult);
+        return pimpl->hexRepresentation;
     }
 
     std::unique_ptr<ElementModP> ElementModP::clone() const
@@ -353,6 +352,8 @@ namespace electionguard
     // Property Getters
 
     uint64_t *ElementModQ::get() const { return static_cast<uint64_t *>(pimpl->data); }
+
+    uint64_t (&ElementModQ::ref() const)[MAX_Q_LEN] { return pimpl->data; }
 
     uint64_t ElementModQ::length() const { return MAX_Q_LEN; }
 
@@ -605,23 +606,6 @@ namespace electionguard
         return make_unique<ElementModP>(result, true);
     }
 
-    const auto public_key_table = LookupTableType(
-      ElementModP::fromHex(
-        "C67EE92DF4986149C9377327817538867ED14C7E08E8B0428000D0CD7B8E520036A227C53C431D03F8612D4AB0"
-        "AC15289D78091D98D0B14AB3DD52E334325905FC88915C898489512CA8CAAAC1A201F567324F61E23D753686D3"
-        "D36AD3ED8FC9BED6F8F4E2CF227CC5C6154334DD2B572782F884F5A918F57EA66C30C329D4DFABA8B331AEA931"
-        "BE8429ECD81C00F12087736AFB5928AF8F24264C4131527E044713A2F20A350FF137C31B4AC554A91E07CF433A"
-        "C7712CA0C597B8D1A2F6A8E5DBB0578C8FFB09C7232751486317B28607422F7FDA2FE776920708BD29CB058D45"
-        "5230608DB711FF1D6CD21E1FADAB676F165CF2E9BD2D29734E2EB939E256EFC9C4C26C02F84D5EE573B6C872BC"
-        "C6764885A8071F9A5F670EC4BC74155DB20B11531FA7C434595749FF717119219F04CB7F8C81861F73426EF384"
-        "B08661C9FD748B06B69C74E547036FB79A6B92937A33EFCBE8344A94BBEFC47588DE5558FF15073F1D270212C7"
-        "50F2D6A67F759E247EEC1CC91B3D71FDCE17BE700EF8D1A24DED0803F5FA45E2D6C643C08D016210774F430045"
-        "94CF15BF5AF222AC9CCFFCF1635EB2F63C5B4E57DC8AC89A42527859D718432CC102BB1610220CB9E8EFB3317D"
-        "AA4FDA846F79E715945515C632AB58ACC1E631E1B7C918992460B67652AA63F6830C057009F14C60D80F8C49BF"
-        "C3A10A86BB5233DDCECE70ED3B579C26EC")
-        ->get(),
-      MAX_P_LEN);
-
     unique_ptr<ElementModP> pow_mod_p(const ElementModP &base, const ElementModQ &exponent)
     {
         // HACL's input constraints require the exponent to be greater than zero
@@ -631,15 +615,12 @@ namespace electionguard
 
         // check if we have a lookup table initialized for this element
         if (base.isFixedBase()) {
-            auto result = public_key_table.pow_mod_p(exponent.get(), MAX_Q_LEN);
-
-            // auto hex = base.toHex();
-            // auto exp_ptr = exponent.get();
-            // auto result = LookupTableContext::pow_mod_p(hex, base.getref(), exp_ptr, MAX_Q_LEN);
+            // TODO: use a smaller key
+            auto hex = base.toHex();
+            auto exp_ptr = exponent.get();
+            auto result = LookupTableContext::pow_mod_p(hex, base.ref(), exponent.ref());
 
             return make_unique<ElementModP>(result, true);
-
-            //return pow_mod_p(base, *exponent.toElementModP());
         }
 
         // if none exists, execute the modular exponentiation directly
@@ -653,8 +634,7 @@ namespace electionguard
 
     unique_ptr<ElementModP> g_pow_p(const ElementModQ &exponent)
     {
-        auto result = generator_table.pow_mod_p(exponent.get(), MAX_Q_LEN);
-        return make_unique<ElementModP>(result, true);
+        return pow_mod_p(G(), exponent);
     }
 
 #pragma endregion

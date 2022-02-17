@@ -90,6 +90,10 @@ eg_element_mod_q_constant_two_mod_q(eg_element_mod_q_t **out_constant_ref);
 
 // TODO: ISSUE #129: finish implementation
 
+EG_API eg_electionguard_status_t eg_element_mod_q_pow_mod_p(eg_element_mod_p_t *base,
+                                                            eg_element_mod_q_t *exponent,
+                                                            eg_element_mod_p_t **out_handle);
+
 EG_API eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle);
 
 #endif

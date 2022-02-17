@@ -17,7 +17,9 @@
 using hacl::Bignum256;
 using hacl::Bignum4096;
 using hacl::CONTEXT_P;
+using std::begin;
 using std::copy;
+using std::end;
 using std::unique_ptr;
 
 namespace electionguard
@@ -44,17 +46,12 @@ namespace electionguard
         typedef std::array<std::array<uint64_t[MAX_P_LEN], OrderBits>, TableLength> FixedBaseTable;
 
       public:
-        constexpr LookupTable(uint64_t *base, uint64_t len)
-        {
-            _lookupTable = generateTable(base, len);
-        }
-
-        explicit LookupTable(uint64_t *base) { _lookupTable = generateTable(base, MAX_P_LEN); }
+        explicit LookupTable(uint64_t *base) { generateTable(base, MAX_P_LEN); }
 
         /// <summary>
-        /// calcuate a fixed based table.
+        /// calcuate pow_mod_p using the precomputed fixed base.
         /// </summary>
-        std::vector<uint64_t> pow_mod_p(uint64_t *exponent, uint64_t length) const
+        std::vector<uint64_t> pow_mod_p(uint64_t (&exponent)[MAX_Q_LEN]) const
         {
             uint64_t result[MAX_P_LEN] = {1UL};
             uint8_t exponentBytes[MAX_Q_SIZE] = {};
@@ -85,14 +82,13 @@ namespace electionguard
         }
 
       protected:
-        FixedBaseTable generateTable(uint64_t *base, uint64_t len)
+        void generateTable(uint64_t *base, uint64_t len)
         {
             // checking for power of two ensures the table is uniform
             if (!isPowerOfTwo(WindowSize)) {
                 throw;
             }
 
-            FixedBaseTable result{};
             uint64_t row_base[MAX_P_LEN] = {};
             uint64_t running_base[MAX_P_LEN] = {};
 
@@ -104,13 +100,11 @@ namespace electionguard
             for (uint64_t i = 0; i < TableLength; i++) {
                 // iterate over each b-bit and compute the table values
                 for (uint64_t j = 1; j < OrderBits; j++) {
-                    copy(begin(running_base), end(running_base), begin(result[i][j]));
+                    copy(begin(running_base), end(running_base), begin(_lookupTable[i][j]));
                     mul_mod_p(running_base, row_base, running_base);
                 }
                 copy(begin(running_base), end(running_base), begin(row_base));
             }
-
-            return result;
         }
 
         void mul_mod_p(uint64_t *lhs, uint64_t *rhs, uint64_t *res) const
@@ -121,14 +115,14 @@ namespace electionguard
         }
 
       private:
-        FixedBaseTable _lookupTable;
+        FixedBaseTable _lookupTable = {};
     };
 
     typedef LookupTable<LUT_WINDOW_SIZE, LUT_ORDER_BITS, LUT_TABLE_LENGTH> LookupTableType;
 
-    const auto generator_table =
-      LookupTableType(const_cast<uint64_t *>(G_ARRAY_REVERSE), MAX_P_LEN);
-
+    /// <summary>
+    /// A singleton context for a collection of fixed base lookup tables.
+    /// </summary>
     class EG_INTERNAL_API LookupTableContext
     {
       public:
@@ -142,62 +136,41 @@ namespace electionguard
         ~LookupTableContext() {}
 
       public:
-        // static LookupTableContext *getInstance()
-        // {
-        //     LookupTableContext *sin = _instance.load();
-        //     if (!sin) {
-        //         task_lock.wait();
-        //         sin = _instance.load();
-        //         if (!sin) {
-        //             sin = new LookupTableContext();
-        //             _instance.store(sin);
-        //         }
-        //     }
-        //     // volatile int dummy{};
-        //     return sin;
-        // }
         static LookupTableContext &getInstance()
         {
             static LookupTableContext instance;
             return instance;
         }
 
-        LookupTableType *publicKeyTable(const string key, uint64_t (&publicKey)[MAX_P_LEN])
-        {
-            Log::debug("- publicKeyTable ENTER", key);
-
-            auto const iter = key_map.find(key);
-            if (iter != key_map.end()) {
-                Log::debug("- publicKeyTable return existing");
-                return key_map[key].get();
-            }
-
-            Log::debug("- publicKeyTable make new - key", key);
-
-            LookupTableContext::key_map.emplace(
-              std::pair(key, new LookupTableType(static_cast<uint64_t *>(publicKey))));
-            return key_map[key].get();
-        }
-
-        static std::vector<uint64_t> pow_mod_p(string key, uint64_t (&publicKey)[MAX_P_LEN],
-                                               uint64_t *exponent, uint64_t length)
+        /// <summary>
+        /// calcuate pow_mod_p using the provided fixed base.
+        /// </summary>
+        static std::vector<uint64_t> pow_mod_p(string key, uint64_t (&base)[MAX_P_LEN],
+                                               uint64_t (&exponent)[MAX_Q_LEN])
         {
             LookupTableType *public_key_table = NULL;
             {
-                Log::debug("- pow_mod_p ENTER");
-                task_lock.wait();
-                Log::debug("- pow_mod_p CONTINUE");
-                public_key_table = getInstance().publicKeyTable(key, publicKey);
+                getInstance().task_lock.wait();
+                public_key_table = getInstance().getBaseLookupTable(key, base);
             }
-            return public_key_table->pow_mod_p(exponent, MAX_Q_LEN);
+            return public_key_table->pow_mod_p(exponent);
         }
 
       private:
-        static AsyncSemaphore task_lock;
+        AsyncSemaphore task_lock;
         std::map<string, std::unique_ptr<LookupTableType>> key_map;
-    };
 
-    AsyncSemaphore LookupTableContext::task_lock;
+        LookupTableType *getBaseLookupTable(const string key, uint64_t (&base)[MAX_P_LEN])
+        {
+            auto const iter = key_map.find(key);
+            if (iter != key_map.end()) {
+                return key_map[key].get();
+            }
+
+            key_map.emplace(std::pair(key, new LookupTableType(static_cast<uint64_t *>(base))));
+            return key_map[key].get();
+        }
+    };
 
 } // namespace electionguard
 

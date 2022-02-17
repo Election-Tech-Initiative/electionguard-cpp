@@ -147,6 +147,7 @@ BENCHMARK_DEFINE_F(GroupElementFixture, pow_mod_p_fixed_base)(benchmark::State &
     auto rand_p1 = rand_p();
     rand_p1->setIsFixedBase(true);
     auto rand_q1 = rand_q();
+    auto warmup = pow_mod_p(*rand_p1, *rand_q1);
     for (auto _ : state) {
         auto exp = pow_mod_p(*rand_p1, *rand_q1);
     }
@@ -169,6 +170,7 @@ BENCHMARK_REGISTER_F(GroupElementFixture, pow_mod_p_with_p)->Unit(benchmark::kMi
 
 BENCHMARK_DEFINE_F(GroupElementFixture, g_pow_p_with_q)(benchmark::State &state)
 {
+    auto warmup = g_pow_p(*q2);
     for (auto _ : state) {
         auto exp = g_pow_p(*q2);
     }

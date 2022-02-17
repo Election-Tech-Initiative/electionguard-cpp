@@ -136,6 +136,7 @@ add_executable(${CTEST_PROJECT_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt_compact.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_group.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_manifest.c
 )
