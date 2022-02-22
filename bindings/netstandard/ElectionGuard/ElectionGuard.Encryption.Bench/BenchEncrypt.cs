@@ -4,47 +4,80 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ElectionGuard.Encryption.Utils;
 
-namespace ElectionGuard.Bench
+namespace ElectionGuard.Encryption.Bench
 {
 
-    public static class BenchEncrypt
+    public class BenchEncrypt : Fixture
     {
-        static readonly string plaintext_json = "{\"object_id\":\"some-external-id-string-123\",\"style_id\":\"some-ballot-style-id\",\"contests\":[{\"object_id\":\"some-referendum-contest-object-id\",\"ballot_selections\":[{\"object_id\":\"some-candidate-id-1\",\"vote\":1}]}]}";
-        static readonly string manifest_json = "{\"ballot_styles\":[{\"geopolitical_unit_ids\":[\"some-geopoltical-unit-id\"],\"object_id\":\"some-ballot-style-id\"}],\"candidates\":[{\"object_id\":\"some-candidate-id-1\"},{\"object_id\":\"some-candidate-id-2\"},{\"object_id\":\"some-candidate-id-3\"}],\"contests\":[{\"ballot_selections\":[{\"candidate_id\":\"some-candidate-id-1\",\"object_id\":\"some-object-id-affirmative\",\"sequence_order\":0},{\"candidate_id\":\"some-candidate-id-2\",\"object_id\":\"some-object-id-negative\",\"sequence_order\":1}],\"electoral_district_id\":\"some-geopoltical-unit-id\",\"name\":\"some-referendum-contest-name\",\"number_elected\":1,\"object_id\":\"some-referendum-contest-object-id\",\"sequence_order\":0,\"vote_variation\":\"one_of_m\"},{\"ballot_selections\":[{\"candidate_id\":\"some-candidate-id-1\",\"object_id\":\"some-object-id-candidate-1\",\"sequence_order\":0},{\"candidate_id\":\"some-candidate-id-2\",\"object_id\":\"some-object-id-candidate-2\",\"sequence_order\":1},{\"candidate_id\":\"some-candidate-id-3\",\"object_id\":\"some-object-id-candidate-3\",\"sequence_order\":2}],\"electoral_district_id\":\"some-geopoltical-unit-id\",\"name\":\"some-candidate-contest-name\",\"number_elected\":2,\"object_id\":\"some-candidate-contest-object-id\",\"sequence_order\":1,\"vote_variation\":\"one_of_m\"}],\"election_scope_id\":\"some-scope-id\",\"end_date\":\"2021-02-04T13:30:10Z\",\"geopolitical_units\":[{\"name\":\"some-gp-unit-name\",\"object_id\":\"some-geopoltical-unit-id\",\"type\":\"unknown\"}],\"parties\":[{\"object_id\":\"some-party-id-1\"},{\"object_id\":\"some-party-id-2\"}],\"start_date\":\"2021-02-04T13:30:10Z\",\"type\":\"unknown\"}";
+        ElementModQ nonce;
+        ElGamalKeyPair keypair;
+        Manifest manifest;
+        InternalManifest internalManifest;
+        CiphertextElectionContext context;
+        EncryptionDevice device;
+        EncryptionMediator mediator;
+        PlaintextBallot ballot;
 
-        public static bool Bench_Encrypt_Ballot_Simple()
+        public BenchEncrypt()
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            // Configure the election context
             var secret = new ElementModQ("A9FA69F9686810ED82DAF9020FE80DFE0FC0FDCBF7FA55B93C811F0BA2650101");
-            var keypair = ElGamalKeyPair.FromSecret(secret);
-            var description = new Manifest(manifest_json);
-            var manifest = new InternalManifest(description);
-            var context = new CiphertextElectionContext(
-                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, manifest.ManifestHash);
-            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
-            var mediator = new EncryptionMediator(manifest, context, device);
+            nonce = new ElementModQ("4BD3231DC17E9E84F5B0A5D2C4160C6A2299EDAE184C291E17709913B8F9CB40");
+            keypair = ElGamalKeyPair.FromSecret(secret);
+            manifest = ManifestGenerator.GetManifestFromFile();
+            internalManifest = new InternalManifest(manifest);
+            context = new CiphertextElectionContext(
+                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
+            device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
+            mediator = new EncryptionMediator(internalManifest, context, device);
 
-            var ballot = new PlaintextBallot(plaintext_json);
+            ballot = BallotGenerator.GetFakeBallot(internalManifest);
+            //Console.WriteLine(ballot.ToJson());
+        }
 
-            // Act
-            var ciphertext = mediator.Encrypt(ballot, verifyProofs: false);
+        public override void Run()
+        {
+            Bench_Encrypt_BallotFull_NoProofCheck();
+            Bench_Encrypt_BallotFull_WithProofCheck();
+            Bench_Encrypt_Ballot_Compact_NoProofCheck();
+            // TODO: Bench_Encrypt_Ballot_Compact_WithProofCheck();
+        }
 
-            // TODO:
+        public void Bench_Encrypt_BallotFull_NoProofCheck()
+        {
+            Console.WriteLine("Bench_Encrypt_BallotFull_NoProofCheck");
+            Run(() =>
+            {
+                var ciphertext = Encrypt.Ballot(ballot, internalManifest, context, device.GetHash(), nonce, false);
+            });
+        }
 
-            // json serialization
-            //var json = ciphertext.ToJson();
-            //var fromJson = new CiphertextBallot(json);
+        public void Bench_Encrypt_BallotFull_WithProofCheck()
+        {
+            Console.WriteLine("Bench_Encrypt_BallotFull_WithProofCheck");
+            Run(() =>
+            {
+                var ciphertext = Encrypt.Ballot(ballot, internalManifest, context, device.GetHash(), nonce, true);
+            });
+        }
 
-            // binary serialization
-            //var bson = ciphertext.Bson;
-            //var fromBson = CiphertextBallot.FromBson(bson);
+        public void Bench_Encrypt_Ballot_Compact_NoProofCheck()
+        {
+            Console.WriteLine("Bench_Encrypt_Ballot_Compact_NoProofCheck");
+            Run(() =>
+            {
+                var ciphertext = Encrypt.CompactBallot(ballot, internalManifest, context, device.GetHash(), nonce, false);
+            });
+        }
 
-            sw.Stop();
-            Console.WriteLine("Bench_Encrypt_Ballot_Simple Elapsed={0}", sw.Elapsed);
-            return true;
+        public void Bench_Encrypt_Ballot_Compact_WithProofCheck()
+        {
+            Console.WriteLine("Bench_Encrypt_Ballot_Compact_WithProofCheck");
+            Run(() =>
+            {
+                var ciphertext = Encrypt.CompactBallot(ballot, internalManifest, context, device.GetHash(), nonce, true);
+            });
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-using ElectionGuard.Encryption.Tests.Utils;
+using ElectionGuard.Encryption.Utils;
 using NUnit.Framework;
 
 namespace ElectionGuard.Encrypt.Tests

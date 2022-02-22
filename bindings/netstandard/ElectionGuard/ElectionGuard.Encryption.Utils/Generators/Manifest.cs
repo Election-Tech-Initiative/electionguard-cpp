@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ElectionGuard.Encryption.Tests.Utils
+namespace ElectionGuard.Encryption.Utils
 {
     public class ManifestGenerator
     {

@@ -177,8 +177,8 @@ endif
 
 	@echo 🖥️ BUILD NETSTANDARD
 	cd ./bindings/netstandard/ElectionGuard && dotnet restore
-	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
 	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /property:Platform=x86
+	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /property:Platform=x64
 
 clean:
 	@echo 🗑️ Cleaning Output Directory
@@ -316,11 +316,14 @@ endif
 
 bench-netstandard: build-netstandard
 	@echo 🧪 BENCHMARK
-ifeq ($(OPERATING_SYSTEM),Windows)
-
-else
-	dotnet ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net5.0/ElectionGuard.Encryption.Bench.dll
-endif
+	@echo net 5.0 x86
+	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x86/$(TARGET)/net5.0/ElectionGuard.Encryption.Bench
+	@echo net 4.8 x86
+	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x86/$(TARGET)/net48/ElectionGuard.Encryption.Bench
+	@echo net 5.0 x64
+	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net5.0/ElectionGuard.Encryption.Bench
+	@echo net 4.8 x64
+	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net48/ElectionGuard.Encryption.Bench
 
 # Test
 test:

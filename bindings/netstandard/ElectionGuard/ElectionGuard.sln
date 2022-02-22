@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Encryption.Bench", "ElectionGuard.Encryption.Bench\ElectionGuard.Encryption.Bench.csproj", "{06B6E480-D964-4351-8FF3-E62F652B8D4C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Encryption.Utils", "ElectionGuard.Encryption.Utils\ElectionGuard.Encryption.Utils.csproj", "{6AC780D0-1862-4680-8B47-AD6CCF97B66C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -46,6 +48,14 @@ Global
 		{06B6E480-D964-4351-8FF3-E62F652B8D4C}.Release|x64.Build.0 = Release|x64
 		{06B6E480-D964-4351-8FF3-E62F652B8D4C}.Release|x86.ActiveCfg = Release|x86
 		{06B6E480-D964-4351-8FF3-E62F652B8D4C}.Release|x86.Build.0 = Release|x86
+		{6AC780D0-1862-4680-8B47-AD6CCF97B66C}.Debug|x64.ActiveCfg = Debug|x64
+		{6AC780D0-1862-4680-8B47-AD6CCF97B66C}.Debug|x64.Build.0 = Debug|x64
+		{6AC780D0-1862-4680-8B47-AD6CCF97B66C}.Debug|x86.ActiveCfg = Debug|x86
+		{6AC780D0-1862-4680-8B47-AD6CCF97B66C}.Debug|x86.Build.0 = Debug|x86
+		{6AC780D0-1862-4680-8B47-AD6CCF97B66C}.Release|x64.ActiveCfg = Release|x64
+		{6AC780D0-1862-4680-8B47-AD6CCF97B66C}.Release|x64.Build.0 = Release|x64
+		{6AC780D0-1862-4680-8B47-AD6CCF97B66C}.Release|x86.ActiveCfg = Release|x86
+		{6AC780D0-1862-4680-8B47-AD6CCF97B66C}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
