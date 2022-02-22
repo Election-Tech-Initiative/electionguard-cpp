@@ -12,7 +12,7 @@ namespace ElectionGuard.Encryption.Tests.Utils
         const string TEST_SPEC_VERSION = "0.95.0";
         const string TEST_USE_SAMPLE = "hamilton-general";
         // Test data was moved to the solution level and needed to be offset here
-        const string TEST_OFFSET = @"..\..\..\..\..\..\..\..";
+        const string TEST_OFFSET = @"../../../../../../../..";
 
         /// <summary>
         /// A test manifest that is loaded from a json file
