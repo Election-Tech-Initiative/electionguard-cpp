@@ -48,8 +48,7 @@ namespace ElectionGuard
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"ExtendedData Error Value: {status}");
-                    return null;
+                    throw new ElectionGuardException("ExtendedData Error", status);
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
@@ -79,7 +78,7 @@ namespace ElectionGuard
                 value, length, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"ExtendedData Error Status: {status}");
+                throw new ElectionGuardException("ExtendedData Error", status);
             }
         }
 
@@ -128,8 +127,7 @@ namespace ElectionGuard
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"PlaintextBallotSelection Error ObjectId: {status}");
-                    return null;
+                    throw new ElectionGuardException("PlaintextBallotSelection Error", status);
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
@@ -168,8 +166,7 @@ namespace ElectionGuard
                     Handle, out NativeExtendedData value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"PlaintextBallotSelection Error ExtendedData: {status}");
-                    return null;
+                    throw new ElectionGuardException("PlaintextBallotSelection Error ExtendedData", status);
                 }
                 return new ExtendedData(value);
             }
@@ -189,7 +186,7 @@ namespace ElectionGuard
                 objectId, vote, isPlaceholder, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"PlaintextBallotSelection Error Status: {status}");
+                throw new ElectionGuardException("PlaintextBallotSelection Ctor Error", status);
             }
         }
 
@@ -201,7 +198,7 @@ namespace ElectionGuard
                 extendedData, (ulong)extendedData.Length, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"PlaintextBallotSelection Error Status: {status}");
+                throw new ElectionGuardException("PlaintextBallotSelection Ctor Error", status);
             }
         }
 
@@ -266,8 +263,7 @@ namespace ElectionGuard
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallotSelection Error ObjectId: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallotSelection Error ObjectId", status);
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
@@ -295,8 +291,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallotSelection Error DescriptionHash: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallotSelection Error DescriptionHash", status);
                 }
                 return new ElementModQ(value);
             }
@@ -324,8 +319,7 @@ namespace ElectionGuard
                     Handle, out NativeElGamalCiphertext value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallotSelection Error Ciphertext: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallotSelection Error Ciphertext", status);
                 }
                 return new ElGamalCiphertext(value);
             }
@@ -342,8 +336,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallotSelection Error CryptoHash: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallotSelection Error CryptoHash", status);
                 }
                 return new ElementModQ(value);
             }
@@ -360,8 +353,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallotSelection Error Nonce: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallotSelection Error Nonce", status);
                 }
                 return new ElementModQ(value);
             }
@@ -379,8 +371,7 @@ namespace ElectionGuard
                     Handle, out NativeDisjunctiveChaumPedersenProof value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallotSelection Error Proof: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallotSelection Error Proof", status);
                 }
                 return new DisjunctiveChaumPedersenProof(value);
             }
@@ -409,8 +400,7 @@ namespace ElectionGuard
                     Handle, encryptionSeed.Handle, out NativeElementModQ cryptoHash);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallotSelection Error CryptoHashWith: {status}");
-                return null;
+                throw new ElectionGuardException("CiphertextBallotSelection Error CryptoHashWith", status);
             }
             return new ElementModQ(cryptoHash);
         }
@@ -465,8 +455,7 @@ namespace ElectionGuard
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"PlaintextBallotContest Error ObjectId: {status}");
-                    return null;
+                    throw new ElectionGuardException("PlaintextBallotContest Error ObjectId", status);
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
@@ -506,7 +495,7 @@ namespace ElectionGuard
                 objectId, selectionPointers, (ulong)selectionPointers.LongLength, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"PlaintextBallotContest Error Status: {status}");
+                throw new ElectionGuardException("PlaintextBallotContest Error Ctor", status);
             }
         }
 
@@ -519,8 +508,7 @@ namespace ElectionGuard
                 Handle, index, out NativePlaintextBallotSelection value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"PlaintextBallotContest Error GetSelectionAt: {status}");
-                return null;
+                throw new ElectionGuardException("PlaintextBallotContest Error GetSelectionAt", status);
             }
             return new PlaintextBallotSelection(value);
         }
@@ -586,8 +574,7 @@ namespace ElectionGuard
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallotContest Error ObjectId: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallotContest Error ObjectId", status);
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
@@ -615,8 +602,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallotContest Error DescriptionHash: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallotContest Error DescriptionHash", status);
                 }
                 return new ElementModQ(value);
             }
@@ -645,8 +631,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallotContest Error CryptoHash: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallotContest Error CryptoHash", status);
                 }
                 return new ElementModQ(value);
             }
@@ -663,8 +648,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallotContest Error Nonce: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallotContest Error Nonce", status);
                 }
                 return new ElementModQ(value);
             }
@@ -682,8 +666,7 @@ namespace ElectionGuard
                     Handle, out NativeConstantChaumPedersenProof value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallotContest Error Proof: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallotContest Error Proof", status);
                 }
                 return new ConstantChaumPedersenProof(value);
             }
@@ -705,8 +688,7 @@ namespace ElectionGuard
                 Handle, index, out NativeCiphertextBallotSelection value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallotContest Error GetSelectionAt: {status}");
-                return null;
+                throw new ElectionGuardException("CiphertextBallotContest Error GetSelectionAt", status);
             }
             return new CiphertextBallotSelection(value);
         }
@@ -727,8 +709,7 @@ namespace ElectionGuard
                     Handle, encryptionSeed.Handle, out NativeElementModQ value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallotContest Error CryptoHashWith: {status}");
-                return null;
+                throw new ElectionGuardException("CiphertextBallotContest Error CryptoHashWith", status);
             }
             return new ElementModQ(value);
         }
@@ -743,8 +724,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallotContest Error AggregateNonce: {status}");
-                return null;
+                throw new ElectionGuardException("CiphertextBallotContest Error AggregateNonce", status);
             }
             return new ElementModQ(value);
         }
@@ -759,8 +739,7 @@ namespace ElectionGuard
                     Handle, out NativeElGamalCiphertext value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallotContest Error ElGamalAccumulate: {status}");
-                return null;
+                throw new ElectionGuardException("CiphertextBallotContest Error ElGamalAccumulate", status);
             }
             return new ElGamalCiphertext(value);
         }
@@ -825,8 +804,7 @@ namespace ElectionGuard
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"PlaintextBallot Error ObjectId: {status}");
-                    return null;
+                    throw new ElectionGuardException("PlaintextBallot Error ObjectId", status);
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
@@ -845,8 +823,7 @@ namespace ElectionGuard
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"PlaintextBallot Error StyleId: {status}");
-                    return null;
+                    throw new ElectionGuardException("PlaintextBallot Error StyleId", status);
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
@@ -868,7 +845,7 @@ namespace ElectionGuard
             var status = NativeInterface.PlaintextBallot.FromJson(json, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"PlaintextBallot Error Status: {status}");
+                throw new ElectionGuardException("PlaintextBallot Error Status", status);
             }
         }
 
@@ -881,7 +858,7 @@ namespace ElectionGuard
                     : NativeInterface.PlaintextBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"PlaintextBallot Error Binary Ctor: {status}");
+                    throw new ElectionGuardException("PlaintextBallot Error Binary Ctor", status);
                 }
             }
         }
@@ -900,7 +877,7 @@ namespace ElectionGuard
                 objectId, styleId, contestPointers, (ulong)contestPointers.LongLength, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"PlaintextBallot Error Status: {status}");
+                throw new ElectionGuardException("PlaintextBallot Error Status", status);
             }
         }
 
@@ -910,8 +887,7 @@ namespace ElectionGuard
                 Handle, index, out NativePlaintextBallotContest value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"PlaintextBallot Error GetContestAt: {status}");
-                return null;
+                throw new ElectionGuardException("PlaintextBallot Error GetContestAt", status);
             }
             return new PlaintextBallotContest(value);
         }
@@ -934,8 +910,7 @@ namespace ElectionGuard
                 Handle, out IntPtr pointer, out ulong size);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"PlaintextBallot Error ToJson: {status}");
-                return null;
+                throw new ElectionGuardException("PlaintextBallot Error ToJson", status);
             }
             var json = Marshal.PtrToStringAnsi(pointer);
             return json;
@@ -952,13 +927,12 @@ namespace ElectionGuard
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"PlaintextBallot Error ToBson: {status}");
-                return null;
+                throw new ElectionGuardException("PlaintextBallot Error ToBson", status);
             }
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"PlaintextBallot Error ToBson: size is too big");
+                throw new ElectionGuardException("PlaintextBallot Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -979,13 +953,12 @@ namespace ElectionGuard
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"PlaintextBallot Error ToMsgPack: {status}");
-                return null;
+                throw new ElectionGuardException("PlaintextBallot Error ToMsgPack", status);
             }
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"PlaintextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException("PlaintextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1020,7 +993,7 @@ namespace ElectionGuard
                 var status = NativeInterface.CompactPlaintextBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CompactPlaintextBallot Error Ctor: {status}");
+                    throw new ElectionGuardException("CompactPlaintextBallot Error Ctor", status);
                 }
             }
         }
@@ -1041,13 +1014,12 @@ namespace ElectionGuard
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CompactPlaintextBallot Error ToMsgPack: {status}");
-                return null;
+                throw new ElectionGuardException("CompactPlaintextBallot Error ToMsgPack", status);
             }
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"CompactPlaintextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException("CompactPlaintextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1095,8 +1067,7 @@ namespace ElectionGuard
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error ObjectId: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallot Error ObjectId", status);
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
@@ -1115,8 +1086,7 @@ namespace ElectionGuard
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error StyleId: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallot Error StyleId", status);
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
@@ -1133,8 +1103,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error ManifestHash: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallot Error ManifestHash", status);
                 }
                 return new ElementModQ(value);
             }
@@ -1153,8 +1122,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error BallotCodeSeed: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallot Error BallotCodeSeed", status);
                 }
                 return new ElementModQ(value);
             }
@@ -1184,8 +1152,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error BallotCode: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallot Error BallotCode", status);
                 }
                 return new ElementModQ(value);
             }
@@ -1205,8 +1172,7 @@ namespace ElectionGuard
                     Handle, out ulong value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error Timestamp: {status}");
-                    return 0;
+                    throw new ElectionGuardException("CiphertextBallot Error Timestamp", status);
                 }
                 return value;
             }
@@ -1223,8 +1189,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error Nonce: {status}");
-                    return null;
+                    throw new ElectionGuardException("CiphertextBallot Error Nonce", status);
                 }
                 return new ElementModQ(value);
             }
@@ -1235,7 +1200,7 @@ namespace ElectionGuard
             var status = NativeInterface.CiphertextBallot.FromJson(json, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallot Error JSON Ctor: {status}");
+                throw new ElectionGuardException("CiphertextBallot Error JSON Ctor", status);
             }
         }
 
@@ -1248,7 +1213,7 @@ namespace ElectionGuard
                     : NativeInterface.CiphertextBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CiphertextBallot Error Binary Ctor: {status}");
+                    throw new ElectionGuardException("CiphertextBallot Error Binary Ctor", status);
                 }
             }
         }
@@ -1267,8 +1232,7 @@ namespace ElectionGuard
                 Handle, index, out NativeCiphertextBallotContest value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallot Error GetContestAt: {status}");
-                return null;
+                throw new ElectionGuardException("CiphertextBallot Error GetContestAt", status);
             }
             return new CiphertextBallotContest(value);
         }
@@ -1303,8 +1267,7 @@ namespace ElectionGuard
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallot Error ToJson: {status}");
-                return null;
+                throw new ElectionGuardException("CiphertextBallot Error ToJson", status);
             }
             var json = Marshal.PtrToStringAnsi(pointer);
             return json;
@@ -1324,13 +1287,12 @@ namespace ElectionGuard
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallot Error ToBson: {status}");
-                return null;
+                throw new ElectionGuardException("CiphertextBallot Error ToBson", status);
             }
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"CiphertextBallot Error ToBson: size is too big");
+                throw new ElectionGuardException("CiphertextBallot Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1353,13 +1315,12 @@ namespace ElectionGuard
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CiphertextBallot Error ToMsgPack: {status}");
-                return null;
+                throw new ElectionGuardException("CiphertextBallot Error ToMsgPack", status);
             }
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"CiphertextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException("CiphertextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1407,8 +1368,7 @@ namespace ElectionGuard
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CompactCiphertextBallot Error ObjectId: {status}");
-                    return null;
+                    throw new ElectionGuardException("CompactCiphertextBallot Error ObjectId", status);
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
@@ -1421,7 +1381,7 @@ namespace ElectionGuard
                 var status = NativeInterface.CompactCiphertextBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CompactCiphertextBallot Error Ctor: {status}");
+                    throw new ElectionGuardException("CompactCiphertextBallot Error Ctor", status);
                 }
             }
         }
@@ -1442,13 +1402,12 @@ namespace ElectionGuard
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CompactCiphertextBallot Error ToMsgPack: {status}");
-                return null;
+                throw new ElectionGuardException("CompactCiphertextBallot Error ToMsgPack: {status}");
             }
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"CompactCiphertextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException("CompactCiphertextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1500,8 +1459,7 @@ namespace ElectionGuard
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"SubmittedBallot Error ObjectId: {status}");
-                    return null;
+                    throw new ElectionGuardException("SubmittedBallot Error ObjectId", status);
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
@@ -1520,8 +1478,7 @@ namespace ElectionGuard
                     Handle, out IntPtr value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"SubmittedBallot Error StyleId: {status}");
-                    return null;
+                    throw new ElectionGuardException("SubmittedBallot Error StyleId", status);
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
@@ -1538,8 +1495,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"SubmittedBallot Error ManifestHash: {status}");
-                    return null;
+                    throw new ElectionGuardException("SubmittedBallot Error ManifestHash", status);
                 }
                 return new ElementModQ(value);
             }
@@ -1558,8 +1514,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"SubmittedBallot Error BallotCodeSeed: {status}");
-                    return null;
+                    throw new ElectionGuardException("SubmittedBallot Error BallotCodeSeed", status);
                 }
                 return new ElementModQ(value);
             }
@@ -1589,8 +1544,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"SubmittedBallot Error BallotCode: {status}");
-                    return null;
+                    throw new ElectionGuardException("SubmittedBallot Error BallotCode", status);
                 }
                 return new ElementModQ(value);
             }
@@ -1610,8 +1564,7 @@ namespace ElectionGuard
                     Handle, out ulong value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"SubmittedBallot Error Timestamp: {status}");
-                    return 0;
+                    throw new ElectionGuardException("SubmittedBallot Error Timestamp", status);
                 }
                 return value;
             }
@@ -1630,7 +1583,7 @@ namespace ElectionGuard
                 ciphertext.Handle, state, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"SubmittedBallot Error Status: {status}");
+                throw new ElectionGuardException("SubmittedBallot Error Status", status);
             }
         }
 
@@ -1639,7 +1592,7 @@ namespace ElectionGuard
             var status = NativeInterface.SubmittedBallot.FromJson(json, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"SubmittedBallot Error JSON Ctor: {status}");
+                throw new ElectionGuardException("SubmittedBallot Error JSON Ctor", status);
             }
         }
 
@@ -1652,7 +1605,7 @@ namespace ElectionGuard
                     : NativeInterface.SubmittedBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"SubmittedBallot Error Binary Ctor: {status}");
+                    throw new ElectionGuardException("SubmittedBallot Error Binary Ctor", status);
                 }
             }
         }
@@ -1666,8 +1619,7 @@ namespace ElectionGuard
                 Handle, index, out NativeCiphertextBallotContest value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"SubmittedBallot Error GetContestAt: {status}");
-                return null;
+                throw new ElectionGuardException("SubmittedBallot Error GetContestAt", status);
             }
             return new CiphertextBallotContest(value);
         }
@@ -1698,8 +1650,7 @@ namespace ElectionGuard
                 Handle, out IntPtr pointer, out ulong size);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"SubmittedBallot Error ToJson: {status}");
-                return null;
+                throw new ElectionGuardException("SubmittedBallot Error ToJson", status);
             }
             var json = Marshal.PtrToStringAnsi(pointer);
             return json;
@@ -1716,13 +1667,12 @@ namespace ElectionGuard
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"SubmittedBallot Error ToBson: {status}");
-                return null;
+                throw new ElectionGuardException("SubmittedBallot Error ToBson", status);
             }
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"SubmittedBallot Error ToBson: size is too big");
+                throw new ElectionGuardException("SubmittedBallot Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1742,13 +1692,12 @@ namespace ElectionGuard
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"SubmittedBallot Error ToMsgPack: {status}");
-                return null;
+                throw new ElectionGuardException("SubmittedBallot Error ToMsgPack", status);
             }
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"SubmittedBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException("SubmittedBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];

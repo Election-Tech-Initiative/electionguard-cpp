@@ -23,8 +23,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModP value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"PublicKey Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("PublicKey Error Status", status);
                 }
                 return new ElementModP(value);
             }
@@ -41,8 +40,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"SecretKey Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("SecretKey Error Status", status);
                 }
                 return new ElementModQ(value);
             }
@@ -61,7 +59,7 @@ namespace ElectionGuard
                 secretKey.Handle, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"ElGamalKeyPair Error Status: {status}");
+                throw new ElectionGuardException("ElGamalKeyPair Error Status", status);
             }
         }
 
@@ -101,8 +99,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModP value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"Pad Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("Pad Error Status", status);
                 }
                 return new ElementModP(value);
             }
@@ -119,8 +116,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModP value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"Data Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("Data Error Status", status);
                 }
                 return new ElementModP(value);
             }
@@ -134,8 +130,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CryptoHash Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("CryptoHash Error Status", status);
                 }
                 return new ElementModQ(value);
             }
@@ -161,8 +156,7 @@ namespace ElectionGuard
                     Handle, secretKey.Handle, ref plaintext);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"Decrypt Error Status: {status}");
-                return null;
+                throw new ElectionGuardException("Decrypt Error Status", status);
             }
             return plaintext;
         }
@@ -194,8 +188,7 @@ namespace ElectionGuard
                     out NativeElGamalCiphertext ciphertext);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"Encrypt Error Status: {status}");
-                return null;
+                throw new ElectionGuardException("Encrypt Error Status", status);
             }
             return new ElGamalCiphertext(ciphertext);
         }

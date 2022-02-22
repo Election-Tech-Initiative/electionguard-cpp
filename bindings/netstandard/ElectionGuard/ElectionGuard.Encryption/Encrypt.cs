@@ -66,7 +66,7 @@ namespace ElectionGuard
                 manifest.Handle, context.Handle, device.Handle, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"EncryptionMediator New Error Status: {status}");
+                throw new ElectionGuardException("EncryptionMediator New Error Status", status);
             }
         }
 

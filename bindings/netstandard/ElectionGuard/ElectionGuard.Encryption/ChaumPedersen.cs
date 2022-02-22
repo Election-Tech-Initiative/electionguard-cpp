@@ -31,8 +31,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModP value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"ZeroPad Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("ZeroPad Error Status", status);
                 }
                 return new ElementModP(value);
             }
@@ -49,8 +48,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModP value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"ZeroData Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("ZeroPad Error Status", status);
                 }
                 return new ElementModP(value);
             }
@@ -67,8 +65,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModP value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"OnePad Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("OnePad Error Status", status);
                 }
                 return new ElementModP(value);
             }
@@ -85,8 +82,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModP value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"OneData Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("OneData Error Status", status);
                 }
                 return new ElementModP(value);
             }
@@ -103,8 +99,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"ZeroChallenge Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("ZeroChallenge Error Status", status);
                 }
                 return new ElementModQ(value);
             }
@@ -121,8 +116,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"OneChallenge Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("OneChallenge Error Status", status);
                 }
                 return new ElementModQ(value);
             }
@@ -139,8 +133,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"Challenge Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("Challenge Error Status", status);
                 }
                 return new ElementModQ(value);
             }
@@ -157,8 +150,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"ZeroResponse Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("ZeroResponse Error Status", status);
                 }
                 return new ElementModQ(value);
             }
@@ -175,8 +167,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"OneResponse Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("OneResponse Error Status", status);
                 }
                 return new ElementModQ(value);
             }
@@ -290,8 +281,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModP value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"Pad Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("Pad Error Status", status);
                 }
                 return new ElementModP(value);
             }
@@ -308,8 +298,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModP value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"Data Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("Data Error Status", status);
                 }
                 return new ElementModP(value);
             }
@@ -326,8 +315,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"Challenge Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("Challenge Error Status", status);
                 }
                 return new ElementModQ(value);
             }
@@ -344,8 +332,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"Response Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("Response Error Status", status);
                 }
                 return new ElementModQ(value);
             }

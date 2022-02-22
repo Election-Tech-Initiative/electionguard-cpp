@@ -33,8 +33,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModP value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"ElGamalPublicKey Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("ElGamalPublicKey Error Status", status);
                 }
                 return new ElementModP(value);
             }
@@ -52,8 +51,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CommitmentHash Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("CommitmentHash Error Status", status);
                 }
                 return new ElementModQ(value);
             }
@@ -70,8 +68,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"ManifestHash Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("ManifestHash Error Status", status);
                 }
                 return new ElementModQ(value);
             }
@@ -88,8 +85,7 @@ namespace ElectionGuard
                      Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CryptoBaseHash Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("CryptoBaseHash Error Status", status);
                 }
                 return new ElementModQ(value);
             }
@@ -106,8 +102,7 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"CryptoExtendedBaseHash Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("CryptoExtendedBaseHash Error Status", status);
                 }
                 return new ElementModQ(value);
             }
@@ -124,8 +119,7 @@ namespace ElectionGuard
                     Handle, out NativeLinkedList value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    Console.WriteLine($"GetExtendedData Error Status: {status}");
-                    return null;
+                    throw new ElectionGuardException("GetExtendedData Error Status", status);
                 }
                 return new LinkedList(value);
             }
