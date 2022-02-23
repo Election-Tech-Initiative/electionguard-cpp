@@ -21,11 +21,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.ElGamalKeyPair.GetPublicKey(
                     Handle, out NativeElementModP value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"PublicKey Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModP(value);
             }
         }
@@ -39,11 +35,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.ElGamalKeyPair.GetSecretKey(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"SecretKey Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -59,10 +51,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.ElGamalKeyPair.New(
                 secretKey.Handle, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"ElGamalKeyPair Error Status: {status}");
-            }
+            status.ThrowIfError();
         }
 
         /// <Summary>
@@ -73,7 +62,9 @@ namespace ElectionGuard
             return new ElGamalKeyPair(secretKey);
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -99,11 +90,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.ElGamalCiphertext.GetPad(
                     Handle, out NativeElementModP value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"Pad Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModP(value);
             }
         }
@@ -117,26 +104,21 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.ElGamalCiphertext.GetData(
                     Handle, out NativeElementModP value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"Data Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModP(value);
             }
         }
 
+        /// <summary>
+        /// Get the CryptoHash
+        /// </summary>
         public unsafe ElementModQ CryptoHash
         {
             get
             {
                 var status = NativeInterface.ElGamalCiphertext.GetCryptoHash(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CryptoHash Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -159,15 +141,13 @@ namespace ElectionGuard
             ulong plaintext = 0;
             var status = NativeInterface.ElGamalCiphertext.DecryptWithSecret(
                     Handle, secretKey.Handle, ref plaintext);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"Decrypt Error Status: {status}");
-                return null;
-            }
+            status.ThrowIfError();
             return plaintext;
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -176,6 +156,10 @@ namespace ElectionGuard
             Handle = null;
         }
     }
+
+    /// <summary>
+    /// ElGamal Functions
+    /// </summary>
     public static unsafe class Elgamal
     {
         /// <summary>
@@ -192,11 +176,7 @@ namespace ElectionGuard
             var status = NativeInterface.ElGamal.Encrypt(
                     plaintext, nonce.Handle, publicKey.Handle,
                     out NativeElGamalCiphertext ciphertext);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"Encrypt Error Status: {status}");
-                return null;
-            }
+            status.ThrowIfError();
             return new ElGamalCiphertext(ciphertext);
         }
     }

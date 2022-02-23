@@ -29,11 +29,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetZeroPad(
                     Handle, out NativeElementModP value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"ZeroPad Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModP(value);
             }
         }
@@ -47,11 +43,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetZeroData(
                     Handle, out NativeElementModP value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"ZeroData Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModP(value);
             }
         }
@@ -65,11 +57,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetOnePad(
                     Handle, out NativeElementModP value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"OnePad Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModP(value);
             }
         }
@@ -83,11 +71,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetOneData(
                     Handle, out NativeElementModP value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"OneData Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModP(value);
             }
         }
@@ -101,11 +85,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetZeroChallenge(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"ZeroChallenge Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -119,11 +99,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetOneChallenge(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"OneChallenge Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -137,11 +113,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetChallenge(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"Challenge Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -155,11 +127,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetZeroResponse(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"ZeroResponse Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -173,11 +141,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetOneResponse(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"OneResponse Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -256,7 +220,9 @@ namespace ElectionGuard
             );
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -288,11 +254,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.ConstantChaumPedersenProof.GetPad(
                     Handle, out NativeElementModP value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"Pad Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModP(value);
             }
         }
@@ -306,11 +268,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.ConstantChaumPedersenProof.GetData(
                     Handle, out NativeElementModP value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"Data Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModP(value);
             }
         }
@@ -324,11 +282,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.ConstantChaumPedersenProof.GetChallenge(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"Challenge Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -342,11 +296,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.ConstantChaumPedersenProof.GetResponse(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"Response Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -398,7 +348,9 @@ namespace ElectionGuard
             );
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
