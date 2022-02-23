@@ -373,7 +373,9 @@ endif
 test-netstandard: build-netstandard
 	@echo 🧪 TEST NETSTANDARD
 	dotnet test --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+ifeq ($(OPERATING_SYSTEM),Windows)
 	dotnet test --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /property:Platform=x86
+endif
 
 coverage:
 	@echo ✅ CHECK COVERAGE
