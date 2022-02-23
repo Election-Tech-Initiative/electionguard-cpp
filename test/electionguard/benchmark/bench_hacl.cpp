@@ -36,6 +36,40 @@ class HaclBignum4096Fixture : public benchmark::Fixture
     vector<uint64_t> p1_vector;
 };
 
+BENCHMARK_DEFINE_F(HaclBignum4096Fixture, mod_p)(benchmark::State &state)
+{
+    auto p = P().get();
+    auto g = G().get();
+    auto e = rand_q()->toElementModP()->get();
+
+    uint64_t mul_result[MAX_P_LEN_DOUBLE] = {};
+    Bignum4096::mul(p1->get(), p2->get(), mul_result);
+
+    uint64_t result[MAX_P_LEN] = {};
+    for (auto _ : state) {
+        Bignum4096::mod(p, mul_result, static_cast<uint64_t *>(result));
+    }
+}
+
+BENCHMARK_REGISTER_F(HaclBignum4096Fixture, mod_p)->Unit(benchmark::kMillisecond);
+
+BENCHMARK_DEFINE_F(HaclBignum4096Fixture, mod_p_mont)(benchmark::State &state)
+{
+    auto p = P().get();
+    auto g = G().get();
+    auto e = rand_q()->toElementModP()->get();
+
+    uint64_t mul_result[MAX_P_LEN_DOUBLE] = {};
+    Bignum4096::mul(p1->get(), p2->get(), mul_result);
+
+    uint64_t result[MAX_P_LEN] = {};
+    for (auto _ : state) {
+        CONTEXT_P().mod(mul_result, static_cast<uint64_t *>(result));
+    }
+}
+
+BENCHMARK_REGISTER_F(HaclBignum4096Fixture, mod_p_mont)->Unit(benchmark::kMillisecond);
+
 BENCHMARK_DEFINE_F(HaclBignum4096Fixture, pow_mod_p_var_time)(benchmark::State &state)
 {
     auto p = P().get();
