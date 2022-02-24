@@ -369,4 +369,34 @@ eg_electionguard_status_t eg_encrypt_compact_ballot(eg_plaintext_ballot_t *in_pl
     }
 }
 
+eg_electionguard_status_t eg_encrypt_compact_ballot_with_nonce(
+  eg_plaintext_ballot_t *in_plaintext, eg_internal_manifest_t *in_manifest,
+  eg_ciphertext_election_context_t *in_context, eg_element_mod_q_t *in_ballot_code_seed,
+  eg_element_mod_q_t *in_nonce, bool in_should_verify_proofs,
+  eg_compact_ciphertext_ballot_t **out_handle)
+{
+    try {
+        auto *plaintext = AS_TYPE(PlaintextBallot, in_plaintext);
+        auto *manifest = AS_TYPE(InternalManifest, in_manifest);
+        auto *context = AS_TYPE(CiphertextElectionContext, in_context);
+        auto *code_seed = AS_TYPE(ElementModQ, in_ballot_code_seed);
+        auto *nonce = AS_TYPE(ElementModQ, in_nonce);
+        unique_ptr<ElementModQ> nonce_ptr{nonce};
+
+        auto ciphertext = encryptCompactBallot(*plaintext, *manifest, *context, *code_seed,
+                                               move(nonce_ptr), 0, in_should_verify_proofs);
+        *out_handle = AS_TYPE(eg_compact_ciphertext_ballot_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const invalid_argument &e) {
+        Log::error(":eg_encrypt_compact_ballot_with_nonce", e);
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    } catch (const runtime_error &e) {
+        Log::error(":eg_encrypt_compact_ballot_with_nonce", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    } catch (const exception &e) {
+        Log::error(":eg_encrypt_compact_ballot_with_nonce", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 #pragma endregion

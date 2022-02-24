@@ -19,9 +19,9 @@ namespace electionguard::tools::generators
         static unique_ptr<CiphertextElectionContext>
         getFakeContext(const InternalManifest &manifest, const ElementModP &publicKey)
         {
-            auto context = CiphertextElectionContext::make(
-              1UL, 1UL, make_unique<ElementModP>(publicKey), make_unique<ElementModQ>(TWO_MOD_Q()),
-              make_unique<ElementModQ>(*manifest.getManifestHash()));
+            auto context =
+              CiphertextElectionContext::make(1UL, 1UL, publicKey.clone(), TWO_MOD_Q().clone(),
+                                              manifest.getManifestHash()->clone());
             return context;
         }
     };

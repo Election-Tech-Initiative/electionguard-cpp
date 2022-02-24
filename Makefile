@@ -1,6 +1,10 @@
 .PHONY: all build build-msvc build-android build-ios clean clean-netstandard environment format memcheck sanitize sanitize-asan sanitize-tsan test test-msvc test-netstandard
 
 .EXPORT_ALL_VARIABLES:
+ELECTIONGUARD_BINDING_DIR=$(realpath .)/bindings
+ELECTIONGUARD_BINDING_LIB_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption
+ELECTIONGUARD_BINDING_BENCH_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench
+ELECTIONGUARD_BINDING_TEST_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests
 ELECTIONGUARD_BUILD_DIR=$(realpath .)/build
 ELECTIONGUARD_BUILD_DIR_WIN=$(subst \c\,C:\,$(subst /,\,$(ELECTIONGUARD_BUILD_DIR)))
 ELECTIONGUARD_BUILD_APPS_DIR=$(ELECTIONGUARD_BUILD_DIR)/apps
@@ -58,7 +62,7 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	choco install wget
 	choco install unzip
 endif
-	wget -O cmake/CPM.cmake https://github.com/TheLartians/CPM.cmake/releases/latest/download/CPM.cmake
+	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.35.0/CPM.cmake
 	wget -O sample-data-container.zip https://github.com/microsoft/electionguard/releases/download/v0.95.0/sample-data.zip
 	unzip -o sample-data-container.zip
 	unzip -o sample-data.zip
@@ -171,9 +175,10 @@ else
 	make build
 endif
 
-	@echo 🖥️ BUILD NETSTANDARD  
-	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	@echo 🖥️ BUILD NETSTANDARD
+	cd ./bindings/netstandard/ElectionGuard && dotnet restore
 	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /property:Platform=x86
+	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /property:Platform=x64
 
 clean:
 	@echo 🗑️ Cleaning Output Directory
@@ -182,11 +187,22 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 else
 	if [ -d "$(ELECTIONGUARD_BUILD_DIR)" ]; then rm -rf $(ELECTIONGUARD_BUILD_DIR)/*; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_DIR); fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_APPS_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_APPS_DIR); fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_BINDING_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_BINDING_DIR); fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard" ]; then mkdir $(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard; fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/Debug" ]; then mkdir $(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/Debug; fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/Release" ]; then mkdir $(ELECTIONGUARD_BUILD_BINDING_DIR)/netstandard/Release; fi
+
+	if [ -d "$(ELECTIONGUARD_BINDING_LIB_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_LIB_DIR)/bin/*; fi
+	if [ ! -d "$(ELECTIONGUARD_BINDING_LIB_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_LIB_DIR)/bin; fi
+	if [ -d "$(ELECTIONGUARD_BINDING_LIB_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_LIB_DIR)/obj/*; fi
+	if [ ! -d "$(ELECTIONGUARD_BINDING_LIB_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_LIB_DIR)/obj; fi
+
+	if [ -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/*; fi
+	if [ ! -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin; fi
+	if [ -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_BENCH_DIR)/obj/*; fi
+	if [ ! -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_BENCH_DIR)/obj; fi
+
+	if [ -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_TEST_DIR)/bin/*; fi
+	if [ ! -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_TEST_DIR)/bin; fi
+	if [ -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_TEST_DIR)/obj/*; fi
+	if [ ! -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_TEST_DIR)/obj; fi
+
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR); fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/android" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/android; fi
@@ -300,11 +316,14 @@ endif
 
 bench-netstandard: build-netstandard
 	@echo 🧪 BENCHMARK
-ifeq ($(OPERATING_SYSTEM),Windows)
-
-else
-	dotnet ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net5.0/ElectionGuard.Encryption.Bench.dll
-endif
+	@echo net 5.0 x86
+	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x86/$(TARGET)/net5.0/ElectionGuard.Encryption.Bench
+	@echo net 4.8 x86
+	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x86/$(TARGET)/net48/ElectionGuard.Encryption.Bench
+	@echo net 5.0 x64
+	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net5.0/ElectionGuard.Encryption.Bench
+	@echo net 4.8 x64
+	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net48/ElectionGuard.Encryption.Bench
 
 # Test
 test:
@@ -354,7 +373,9 @@ endif
 test-netstandard: build-netstandard
 	@echo 🧪 TEST NETSTANDARD
 	dotnet test --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+ifeq ($(OPERATING_SYSTEM),Windows)
 	dotnet test --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /property:Platform=x86
+endif
 
 coverage:
 	@echo ✅ CHECK COVERAGE

@@ -30,7 +30,8 @@ namespace electionguard::tools::generators
         }
         static unique_ptr<Manifest> getManifestFromFile(const string &version, const string &sample)
         {
-            return getManifestFromFile(version + "/sample/" + sample + "/manifest.json");
+            return getManifestFromFile(version + "/sample/" + sample +
+                                       "/election_record/manifest.json");
         }
         static unique_ptr<Manifest> getManifestFromFile(const string &filePath)
         {

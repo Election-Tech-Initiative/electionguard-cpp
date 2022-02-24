@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using NUnit.Framework;
 
-using ElectionGuard.Encryption.Tests.Utils;
+using ElectionGuard.Encryption.Utils;
 
 namespace ElectionGuard.Encrypt.Tests
 {

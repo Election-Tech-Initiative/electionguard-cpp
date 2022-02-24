@@ -97,6 +97,8 @@
         "ballot.h": "c",
         "election.h": "c",
         "manifest.h": "c",
-        "__bits": "cpp"
+        "__bits": "cpp",
+        "__memory": "c",
+        "filesystem": "c"
     },
 }

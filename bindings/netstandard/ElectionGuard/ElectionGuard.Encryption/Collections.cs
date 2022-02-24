@@ -28,6 +28,9 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         unsafe public LinkedList()
         {
             var status = NativeInterface.LinkedList.New(out Handle);

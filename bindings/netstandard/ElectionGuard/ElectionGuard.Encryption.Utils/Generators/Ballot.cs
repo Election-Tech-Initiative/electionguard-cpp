@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ElectionGuard.Encryption;
 
-namespace ElectionGuard.Encryption.Tests.Utils
+namespace ElectionGuard.Encryption.Utils
 {
     public class BallotGenerator
     {

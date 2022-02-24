@@ -12,6 +12,7 @@
 
 namespace electionguard
 {
+    typedef uint64_t array4096[MAX_P_LEN];
     /// <summary>
     /// An element of the larger `mod p` space, i.e., in [0, P), where P is a 4096-bit prime.
     /// </summary>
@@ -20,8 +21,10 @@ namespace electionguard
       public:
         ElementModP(const ElementModP &other);
         ElementModP(ElementModP &&other);
-        ElementModP(const std::vector<uint64_t> &elem, bool unchecked = false);
-        ElementModP(const uint64_t (&elem)[MAX_P_LEN], bool unchecked = false);
+        ElementModP(const std::vector<uint64_t> &elem, bool unchecked = false,
+                    bool fixedBase = false);
+        ElementModP(const uint64_t (&elem)[MAX_P_LEN], bool unchecked = false,
+                    bool fixedBase = false);
         ~ElementModP();
 
         ElementModP &operator=(ElementModP other);
@@ -39,6 +42,12 @@ namespace electionguard
         /// <returns> a pointer to the first limb. </returns>
         /// </Summary>
         uint64_t *get() const;
+
+        uint64_t (&ref() const)[MAX_P_LEN];
+
+        uint64_t length() const;
+
+        bool isFixedBase() const;
 
         /// <Summary>
         /// Validates that the element is actually within the bounds of [0,P).
@@ -64,6 +73,8 @@ namespace electionguard
         /// clone the object by making a deep copy
         /// </Summary>
         std::unique_ptr<ElementModP> clone() const;
+
+        void setIsFixedBase(bool fixedBase) const;
 
         /// <summary>
         /// Converts the binary value stored by the hex string in Big Endian format
@@ -113,6 +124,10 @@ namespace electionguard
         /// <returns> a pointer to the first limb</returns>
         /// </Summary>
         uint64_t *get() const;
+
+        uint64_t (&ref() const)[MAX_Q_LEN];
+
+        uint64_t length() const;
 
         /// <Summary>
         /// Validates that the element is actually within the bounds of [0,Q).
@@ -205,6 +220,11 @@ namespace electionguard
     EG_API std::unique_ptr<ElementModP> mul_mod_p(const std::vector<ElementModPOrQ> &elems);
 
     /// <summary>
+    /// computes element mod p
+    /// </summary>
+    EG_API std::unique_ptr<ElementModP> mod_p(const ElementModP &element);
+
+    /// <summary>
     /// Computes b^e mod p.
     /// </summary>
     EG_API std::unique_ptr<ElementModP> pow_mod_p(const ElementModP &base,
@@ -252,6 +272,11 @@ namespace electionguard
     /// Computes (Q - a) mod q.
     /// </summary>
     EG_API std::unique_ptr<ElementModQ> sub_from_q(const ElementModQ &a);
+
+    /// <summary>
+    /// Generate random number between 0 and P
+    /// </summary>
+    EG_API std::unique_ptr<ElementModP> rand_p();
 
     /// <summary>
     /// Generate random number between 0 and Q

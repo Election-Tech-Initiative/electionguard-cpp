@@ -1,20 +1,24 @@
-﻿using ElectionGuard.Bench;
-using System;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ElectionGuard.Encryption.Bench
 {
     class Program
     {
+        static readonly List<Fixture> fixtures =
+        new List<Fixture>{
+            new BenchEncrypt(),
+            new BenchManifest()
+        };
+
         static void Main(string[] args)
         {
-            Console.WriteLine("benchmarking");
+            Console.WriteLine("------ benchmarking ------");
 
-            BenchEncrypt.Bench_Encrypt_Ballot_Simple();
-            BenchManifest.Bench_Can_Construct_Internationalized_Text();
-
-            Console.WriteLine("done! press any key to exit");
-
-            Console.ReadKey();
+            foreach(var fixture in fixtures)
+            {
+                fixture.Run();
+            }
         }
     }
 }

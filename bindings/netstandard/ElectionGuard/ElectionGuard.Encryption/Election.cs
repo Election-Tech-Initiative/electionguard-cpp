@@ -31,11 +31,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextElectionContext.GetElGamalPublicKey(
                     Handle, out NativeElementModP value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"ElGamalPublicKey Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModP(value);
             }
         }
@@ -50,11 +46,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextElectionContext.GetCommitmentHash(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CommitmentHash Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -68,11 +60,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextElectionContext.GetManifestHash(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"ManifestHash Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -86,11 +74,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextElectionContext.GetCryptoBaseHash(
                      Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CryptoBaseHash Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -104,11 +88,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextElectionContext.GetCryptoExtendedBaseHash(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CryptoExtendedBaseHash Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -122,17 +102,17 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextElectionContext.GetExtendedData(
                     Handle, out NativeLinkedList value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"GetExtendedData Error Status: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new LinkedList(value);
             }
         }
 
         internal unsafe NativeCiphertextElectionContext Handle;
 
+        /// <summary>
+        /// Makes a CiphertextElectionContext object.
+        /// </summary>
+        /// <param name="json">json representation</param>
         public unsafe CiphertextElectionContext(string json)
         {
             var status = NativeInterface.CiphertextElectionContext.FromJson(json, out Handle);
@@ -142,7 +122,7 @@ namespace ElectionGuard
         /// <summary>
         ///  Makes a CiphertextElectionContext object.
         ///
-        /// <param name="number_of_guardians"> The number of guardians necessary to generate the public key </param>
+        /// <param name="numberOfGuardians"> The number of guardians necessary to generate the public key </param>
         /// <param name="quorum"> The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians` </param>
         /// <param name="publicKey"> the public key of the election </param>
         /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
@@ -183,7 +163,9 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -192,9 +174,11 @@ namespace ElectionGuard
             Handle = null;
         }
 
+
         /// <Summary>
         /// Export the representation as JSON
         /// </Summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
         public unsafe string ToJson()
         {
             var status = NativeInterface.CiphertextElectionContext.ToJson(

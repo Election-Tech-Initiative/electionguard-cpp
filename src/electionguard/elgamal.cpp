@@ -55,13 +55,15 @@ namespace electionguard
 
     // Public Members
 
-    unique_ptr<ElGamalKeyPair> ElGamalKeyPair::fromSecret(const ElementModQ &secretKey)
+    unique_ptr<ElGamalKeyPair> ElGamalKeyPair::fromSecret(const ElementModQ &secretKey,
+                                                          bool isFixedBase /* = true */)
     {
         if (const_cast<ElementModQ &>(secretKey) < TWO_MOD_Q()) {
             throw invalid_argument("ElGamalKeyPair fromSecret secret key needs to be in [2,Q).");
         }
         auto privateKey = make_unique<ElementModQ>(secretKey);
         auto publicKey = g_pow_p(secretKey);
+        publicKey->setIsFixedBase(isFixedBase);
         return make_unique<ElGamalKeyPair>(move(privateKey), move(publicKey));
     }
 
@@ -206,11 +208,10 @@ namespace electionguard
             throw invalid_argument("elgamalEncrypt encryption requires a non-zero nonce");
         }
 
-        const auto nonce4096 = nonce.toElementModP();
         auto pad = g_pow_p(nonce);
         auto e = ElementModP::fromUint64(m);
         auto gpowp_m = g_pow_p(*e);
-        auto pubkey_pow_n = pow_mod_p(publicKey, *nonce4096);
+        auto pubkey_pow_n = pow_mod_p(publicKey, nonce);
         auto data = mul_mod_p(*gpowp_m, *pubkey_pow_n);
 
         Log::trace("Generated Encryption");

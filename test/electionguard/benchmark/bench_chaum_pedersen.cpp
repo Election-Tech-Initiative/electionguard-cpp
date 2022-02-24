@@ -28,7 +28,7 @@ class ChaumPedersenFixture : public benchmark::Fixture
   public:
     void SetUp(const ::benchmark::State &state)
     {
-        keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+        keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
 
         nonce = ONE_MOD_Q().clone();
         seed = TWO_MOD_Q().clone();

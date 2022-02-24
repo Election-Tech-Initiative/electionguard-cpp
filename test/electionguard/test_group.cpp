@@ -1,9 +1,12 @@
 #include "../../src/electionguard/convert.hpp"
 #include "../../src/electionguard/facades/Hacl_Bignum256.hpp"
 #include "../../src/electionguard/log.hpp"
+#include "../../src/electionguard/utils.hpp"
 #include "utils/byte_logger.hpp"
 #include "utils/constants.hpp"
 
+#include <algorithm>
+#include <cmath>
 #include <doctest/doctest.h>
 #include <electionguard/constants.h>
 #include <electionguard/group.hpp>
@@ -586,6 +589,20 @@ TEST_CASE("Test g_pow_p with 0, 1, and 2")
 
     CHECK((*result2 != *one));
     CHECK((*result2 != G()));
+}
+
+TEST_CASE("Test g_pow_p with random")
+{
+    // Arrange
+    auto g = G();
+    auto e = rand_q();
+
+    // Act
+    auto expected = pow_mod_p(g, *e->toElementModP());
+    auto actual = g_pow_p(*e);
+
+    // Assert
+    CHECK((*expected == *actual));
 }
 
 #pragma endregion

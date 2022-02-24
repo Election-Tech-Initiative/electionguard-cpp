@@ -18,6 +18,7 @@ using electionguard::Log;
 using electionguard::ONE_MOD_P;
 using electionguard::ONE_MOD_Q;
 using electionguard::P;
+using electionguard::pow_mod_p;
 using electionguard::Q;
 using electionguard::rand_q;
 using electionguard::TWO_MOD_P;
@@ -178,6 +179,34 @@ eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *handle, ch
     }
 }
 
+EG_API eg_electionguard_status_t eg_element_mod_q_from_hex(char *in_hex,
+                                                           eg_element_mod_q_t **out_handle)
+{
+    try {
+        auto element = ElementModQ::fromHex(string(in_hex), false);
+        *out_handle = AS_TYPE(eg_element_mod_q_t, element.release());
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_element_mod_q_from_hex", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+EG_API eg_electionguard_status_t
+eg_element_mod_q_from_hex_unchecked(char *in_hex, eg_element_mod_q_t **out_handle)
+{
+    try {
+        auto element = ElementModQ::fromHex(string(in_hex), true);
+        *out_handle = AS_TYPE(eg_element_mod_q_t, element.release());
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_element_mod_q_from_hex_unchecked", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 #pragma endregion
 
 #pragma region Group Constants
@@ -241,6 +270,23 @@ eg_electionguard_status_t eg_element_mod_q_constant_two_mod_q(eg_element_mod_q_t
 #pragma endregion
 
 #pragma region Group Math Functions
+
+eg_electionguard_status_t eg_element_mod_q_pow_mod_p(eg_element_mod_p_t *base,
+                                                     eg_element_mod_q_t *exponent,
+                                                     eg_element_mod_p_t **out_handle)
+{
+    try {
+        auto *b = AS_TYPE(ElementModP, base);
+        auto *e = AS_TYPE(ElementModQ, exponent);
+        auto result = pow_mod_p(*b, *e);
+
+        *out_handle = AS_TYPE(eg_element_mod_p_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_element_mod_q_pow_mod_p", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
 
 eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle)
 {

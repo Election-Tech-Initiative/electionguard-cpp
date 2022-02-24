@@ -36,7 +36,7 @@ namespace electionguard
         /// <Summary>
         /// Make an elgamal keypair from a secret.
         /// </Summary>
-        static std::unique_ptr<ElGamalKeyPair> fromSecret(const ElementModQ &secretKey);
+        static std::unique_ptr<ElGamalKeyPair> fromSecret(const ElementModQ &secretKey, bool isFixedBase = true);
 
       private:
         class Impl;
