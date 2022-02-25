@@ -18,8 +18,8 @@ include(../cmake/CPM.cmake)
 
 CPMAddPackage(
     NAME doctest
-    GITHUB_REPOSITORY onqtam/doctest
-    GIT_TAG 2.3.7
+    GITHUB_REPOSITORY doctest/doctest
+    GIT_TAG v2.4.8
 )
 
 CPMAddPackage(
@@ -79,6 +79,7 @@ add_executable(${CPP_BENCHMARK_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_elgamal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_encrypt.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_group.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_hacl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_hash.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_nonces.cpp
 )
@@ -135,6 +136,7 @@ add_executable(${CTEST_PROJECT_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt_compact.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_group.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.c
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_manifest.c
 )

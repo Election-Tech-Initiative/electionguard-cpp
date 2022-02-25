@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net48</TargetFrameworks>
@@ -7,9 +7,9 @@
     <!-- Project -->
     <RootNamespace>ElectionGuard.Encryption</RootNamespace>
     <AssemblyName>ElectionGuard.Encryption</AssemblyName>
-    <Version>0.1.5</Version>
-    <AssemblyVersion>0.1.5.0</AssemblyVersion>
-    <AssemblyFileVersion>0.1.5.0</AssemblyFileVersion>
+    <Version>0.1.6</Version>
+    <AssemblyVersion>0.1.6.0</AssemblyVersion>
+    <AssemblyFileVersion>0.1.6.0</AssemblyFileVersion>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -19,7 +19,7 @@
     <Title>ElectionGuard Encryption</Title>
     <Description>Open source implementation of ElectionGuard's ballot encryption.</Description>
     <Authors>Microsoft</Authors>
-    <PackageVersion>0.1.5</PackageVersion>
+    <PackageVersion>0.1.6</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/microsoft/electionguard-cpp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/microsoft/electionguard-cpp</RepositoryUrl>
@@ -74,7 +74,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>
-    <Content Name="Linux" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.so" Pack="true" PackagePath="runtimes\linux-x64\native" >
+    <Content Name="Linux" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.so" Pack="true" PackagePath="runtimes\linux-x64\native">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>

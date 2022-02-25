@@ -1,25 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFrameworks>net5.0;net48</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <Platforms>x64;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ElectionGuard.Encryption.Utils\ElectionGuard.Encryption.Utils.csproj" />
     <ProjectReference Include="..\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
   </ItemGroup>
-
   <PropertyGroup Label="Library Paths">
     <ElectionGuardLibs>..\..\..\..\build\libs</ElectionGuardLibs>
   </PropertyGroup>
   <ItemGroup Label="C++ Built Libraries">
-    <None Name="Windows x86" Visible="false" Include="$(ElectionGuardLibs)\msvc\Win32\src\$(Configuration)\*.dll*">
+    <None Name="Windows MSVC x86" Visible="false" Include="$(ElectionGuardLibs)\msvc\Win32\src\$(Configuration)\*.dll*">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
     </None>
-    <None Name="Windows x64" Visible="false" Include="$(ElectionGuardLibs)\msvc\x64\src\$(Configuration)\*.dll*">
+    <None Name="Windows MSVC x64" Visible="false" Include="$(ElectionGuardLibs)\msvc\x64\src\$(Configuration)\*.dll*">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
     </None>
     <None Name="Non Windows x64" Visible="false" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.dll*">

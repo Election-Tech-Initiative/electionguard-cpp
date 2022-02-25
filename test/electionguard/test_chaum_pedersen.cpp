@@ -46,7 +46,7 @@ TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
     // Arrange
     const auto &nonce = ONE_MOD_Q();
     const auto &seed = TWO_MOD_Q();
-    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
 
     auto firstMessage = elgamalEncrypt(0UL, nonce, *keypair->getPublicKey());
     auto secondMessage = elgamalEncrypt(1UL, nonce, *keypair->getPublicKey());
@@ -80,7 +80,7 @@ TEST_CASE("Constant CP Proof encryption of zero")
 {
     const auto &nonce = ONE_MOD_Q();
     const auto &seed = TWO_MOD_Q();
-    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
 
     auto message = elgamalEncrypt(0UL, nonce, *keypair->getPublicKey());
     auto proof = ConstantChaumPedersenProof::make(*message, nonce, *keypair->getPublicKey(), seed,
@@ -94,7 +94,7 @@ TEST_CASE("Constant CP Proof encryption of zero")
 
 TEST_CASE("Constant CP Proof encryption of one")
 {
-    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
     const auto &nonce = ONE_MOD_Q();
     const auto &seed = TWO_MOD_Q();
 

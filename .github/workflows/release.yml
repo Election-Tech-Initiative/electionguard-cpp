@@ -10,7 +10,7 @@ env:
 jobs:
   windows_build:
     name: Windows Build
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -64,7 +64,7 @@ jobs:
     name: MacOS Build
     runs-on: macos-latest
     env:
-      compiler_version: 12
+      compiler_version: 12.5.1
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2

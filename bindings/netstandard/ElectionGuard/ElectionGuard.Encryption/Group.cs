@@ -127,10 +127,19 @@ namespace ElectionGuard
             try
             {
                 NewNative(data);
-            } catch
+            }
+            catch
             {
                 Console.WriteLine("construction error");
             }
+        }
+
+        public ElementModQ(string hex, bool uncheckedInput = false)
+        {
+            var status = uncheckedInput ?
+                NativeInterface.ElementModQ.FromHexUnchecked(hex, out Handle)
+                : NativeInterface.ElementModQ.FromHex(hex, out Handle);
+            status.ThrowIfError();
         }
 
         unsafe internal ElementModQ(NaiveElementModQ handle)

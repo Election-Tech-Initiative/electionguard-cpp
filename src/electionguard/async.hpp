@@ -36,12 +36,16 @@ namespace electionguard
     ///                            mutex.wait();
     ///                            return doStuff();
     ///                        },
-    ///                        std::ref(task_lock)));
+    ///                        std::ref(task_lock));
     /// </summary>
     class EG_INTERNAL_API AsyncSemaphore
     {
       public:
-        explicit AsyncSemaphore(size_t count) : _count(count) {}
+        explicit AsyncSemaphore(
+          const std::uint_fast32_t &count = std::thread::hardware_concurrency())
+            : _count(count)
+        {
+        }
         AsyncSemaphore(const AsyncSemaphore &other) = delete;
         AsyncSemaphore(const AsyncSemaphore &&other) = delete;
 

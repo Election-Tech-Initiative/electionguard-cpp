@@ -290,6 +290,8 @@ namespace electionguard
         }
 
         // TODO: validate the description input
+        const auto elgamalPublicKey_ptr = &elgamalPublicKey;
+        const auto cryptoExtendedBaseHash_ptr = &cryptoExtendedBaseHash;
 
         // account for sequence id
         auto descriptionHash = description.crypto_hash();
@@ -324,13 +326,13 @@ namespace electionguard
 
                 // track the selection count so we can append the
                 // appropriate number of true placeholder votes
-                const auto &selectionRef = selection->get();
+                const auto slection_ptr = &selection->get();
                 selectionCount += selection->get().getVote();
 
                 tasks.push_back(Scheduler::submit([=] {
                     auto encrypted = encryptSelection(
-                      selection->get(), selectionDescription.get(), elgamalPublicKey,
-                      cryptoExtendedBaseHash, *sharedNonce.get(), false, shouldVerifyProofs);
+                      *slection_ptr, selectionDescription.get(), *elgamalPublicKey_ptr,
+                      *cryptoExtendedBaseHash_ptr, *sharedNonce.get(), false, shouldVerifyProofs);
                     return encrypted;
                 }));
 
@@ -355,9 +357,9 @@ namespace electionguard
 
             tasks.push_back(Scheduler::submit([=] {
                 auto placeholderSelection = selectionFrom(placeholder, true, selectPlaceholder);
-                auto encrypted = encryptSelection(*placeholderSelection, placeholder,
-                                                  elgamalPublicKey, cryptoExtendedBaseHash,
-                                                  *sharedNonce.get(), false, shouldVerifyProofs);
+                auto encrypted = encryptSelection(
+                  *placeholderSelection, placeholder, *elgamalPublicKey_ptr,
+                  *cryptoExtendedBaseHash_ptr, *sharedNonce.get(), false, shouldVerifyProofs);
                 return encrypted;
             }));
         }

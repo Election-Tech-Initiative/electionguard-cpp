@@ -23,6 +23,8 @@ namespace electionguard
         return reinterpret_cast<const char *>(&one) + sizeof(unsigned) - 1;
     }
 
+    inline bool isPowerOfTwo(uint64_t x) { return x && !(x & (x - 1)); }
+
     template <typename K, typename V>
     K findByValue(const map<K, const V> &collection, const V &value)
     {
@@ -34,20 +36,41 @@ namespace electionguard
         throw out_of_range("value not found");
     }
 
+    inline bool isMax(const uint64_t (&array)[MAX_Q_LEN_DOUBLE])
+    {
+        const uint64_t max = 0xffffffffffffffff;
+        for (uint32_t i = 0; i < MAX_Q_LEN; i++) {
+            if (array[i] != max) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    inline bool isMax(const uint64_t (&array)[MAX_P_LEN_DOUBLE])
+    {
+        const uint64_t max = 0xffffffffffffffff;
+        for (uint32_t i = 0; i < MAX_P_LEN; i++) {
+            if (array[i] != max) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     inline uint64_t getSystemTimestamp()
     {
         auto now = system_clock::now();
         auto ticks = now.time_since_epoch();
 
-#if defined(__GNUC__)        
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-conversion"
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wsign-conversion"
 #endif // __GNUC__
         return ticks.count() * system_clock::period::num / system_clock::period::den;
 #if defined(__GNUC__)
-#pragma GCC diagnostic pop
+#    pragma GCC diagnostic pop
 #endif // __GNUC__
-
     }
 
     /// <Summary>

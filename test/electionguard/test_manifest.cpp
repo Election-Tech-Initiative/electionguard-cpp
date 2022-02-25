@@ -24,7 +24,7 @@ TEST_CASE("Can serialize Sample Manifest")
     auto subject = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
     auto json = subject->toJson();
 
-    Log::debug(json);
+    // Log::debug(json);
 
     // Act
     auto result = Manifest::fromJson(json);
@@ -56,7 +56,7 @@ TEST_CASE("Can serialize InternalManifest")
     auto json = internal->toJson();
     auto bson = internal->toBson();
 
-    Log::debug(json);
+    // Log::debug(json);
 
     // Act
     auto fromJson = InternalManifest::fromJson(json);

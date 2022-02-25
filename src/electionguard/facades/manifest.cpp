@@ -834,7 +834,7 @@ eg_electionguard_status_t eg_candidate_new_with_party(char *in_object_id, char *
 {
     try {
         auto objectId = string(in_object_id);
-        auto partyId = string(in_object_id);
+        auto partyId = string(in_party_id);
 
         auto result = make_unique<Candidate>(objectId, partyId, in_is_write_in);
 

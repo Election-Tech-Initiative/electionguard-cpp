@@ -55,6 +55,12 @@ EG_API eg_electionguard_status_t eg_element_mod_q_get_data(eg_element_mod_q_t *h
 EG_API eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *handle,
                                                          char **out_hex);
 
+EG_API eg_electionguard_status_t eg_element_mod_q_from_hex(char *in_hex,
+                                                           eg_element_mod_q_t **out_handle);
+
+EG_API eg_electionguard_status_t
+eg_element_mod_q_from_hex_unchecked(char *in_hex, eg_element_mod_q_t **out_handle);
+
 // TODO: ISSUE #129: finish implementation
 
 #endif
@@ -83,6 +89,10 @@ eg_element_mod_q_constant_two_mod_q(eg_element_mod_q_t **out_constant_ref);
 #ifndef Group Math Functions
 
 // TODO: ISSUE #129: finish implementation
+
+EG_API eg_electionguard_status_t eg_element_mod_q_pow_mod_p(eg_element_mod_p_t *base,
+                                                            eg_element_mod_q_t *exponent,
+                                                            eg_element_mod_p_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle);
 

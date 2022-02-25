@@ -13,6 +13,7 @@ bool test_election(void);
 bool test_elgamal(void);
 bool test_encrypt_compact(void);
 bool test_encrypt(void);
+bool test_group(void);
 bool test_hash(void);
 bool test_manifest(void);
 
@@ -28,11 +29,12 @@ int main(void)
     bool elgamal = test_elgamal();
     bool encrypt_compact = test_encrypt_compact();
     bool encrypt = test_encrypt();
+    bool group = test_group();
     bool hash = test_hash();
     bool manifest = test_manifest();
 
     bool success = ballot_code && ballot && proofs && collections && election && elgamal &&
-                   encrypt_compact && encrypt && hash && manifest;
+                   encrypt_compact && encrypt && group && hash && manifest;
 
     if (success == true) {
         printf("\n ---------- C TEST STATUS SUCCESS! ---------- \n");

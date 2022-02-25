@@ -5,12 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ElectionGuard.Encryption.Tests.Utils
+namespace ElectionGuard.Encryption.Utils
 {
     public class ManifestGenerator
     {
         const string TEST_SPEC_VERSION = "0.95.0";
         const string TEST_USE_SAMPLE = "hamilton-general";
+        // Test data was moved to the solution level and needed to be offset here
+        const string TEST_OFFSET = @"../../../../../../../..";
 
         /// <summary>
         /// A test manifest that is loaded from a json file
@@ -18,7 +20,7 @@ namespace ElectionGuard.Encryption.Tests.Utils
         public static Manifest GetJeffersonCountyManifest_FromFile()
         {
             var path = Path.Combine(
-                AppContext.BaseDirectory, "data", "election_manifest_jefferson_county.json");
+                AppContext.BaseDirectory, TEST_OFFSET, "data", "election_manifest_jefferson_county.json");
             var text = File.ReadAllText(path);
             return new Manifest(text);
         }
@@ -26,13 +28,13 @@ namespace ElectionGuard.Encryption.Tests.Utils
         public static Manifest GetManifestFromFile(
             string version = TEST_SPEC_VERSION, string sample = TEST_USE_SAMPLE)
         {
-            var path = Path.Combine(version, "sample", sample, "manifest.json");
+            var path = Path.Combine(version, "sample", sample, "election_record", "manifest.json");
             return GetManifestFromFile(path);
         }
 
         public static Manifest GetManifestFromFile(string filepath)
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "data", filepath);
+            var path = Path.Combine(AppContext.BaseDirectory, TEST_OFFSET, "data", filepath);
             var text = File.ReadAllText(path);
             return new Manifest(text);
         }

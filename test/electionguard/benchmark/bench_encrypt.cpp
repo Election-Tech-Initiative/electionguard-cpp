@@ -1,6 +1,7 @@
 #include "../generators/ballot.hpp"
 #include "../generators/election.hpp"
 #include "../generators/manifest.hpp"
+#include "../utils/constants.hpp"
 
 #include <benchmark/benchmark.h>
 #include <electionguard/ballot.hpp>
@@ -22,13 +23,14 @@ class EncryptSelectionFixture : public benchmark::Fixture
     {
         const auto *candidateId = "some-candidate-id";
         const auto *selectionId = "some-selection-object-id";
-        keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q());
+        auto secret = ElementModQ::fromHex(a_fixed_secret);
+        keypair = ElGamalKeyPair::fromSecret(*secret);
 
         metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
         hashContext = metadata->crypto_hash();
         plaintext = BallotGenerator::selectionFrom(*metadata);
 
-        auto nonce = rand_q();
+        auto nonce = ElementModQ::fromHex(a_fixed_nonce);
         ciphertext = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
                                       *nonce, false, false);
     }
@@ -84,17 +86,18 @@ class EncryptBallotFixture : public benchmark::Fixture
   public:
     void SetUp(const ::benchmark::State &state)
     {
-        nonces = make_unique<Nonces>(TWO_MOD_Q(), "encrypt-ballot-benchmark");
-        keypair = ElGamalKeyPair::fromSecret(*nonces->get(0));
+        auto secret = ElementModQ::fromHex(a_fixed_secret);
+        nonce = ElementModQ::fromHex(a_fixed_nonce);
+        nonces = make_unique<Nonces>(*nonce, "encrypt-ballot-benchmark");
+        keypair = ElGamalKeyPair::fromSecret(*secret);
         manifest = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
         internal = make_unique<InternalManifest>(*manifest);
         context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
         device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
         ballot = BallotGenerator::getFakeBallot(*internal);
 
-        nonce = rand_q();
-        ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash(),
-                                   make_unique<ElementModQ>(*nonce), 0ULL, false);
+        ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash(), nonces->next(),
+                                   0ULL, false);
     }
 
     void TearDown(const ::benchmark::State &state) {}

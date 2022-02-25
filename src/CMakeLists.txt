@@ -24,7 +24,7 @@ CPMAddPackage(
 CPMAddPackage(
   NAME spdlog
   GITHUB_REPOSITORY gabime/spdlog
-  VERSION 1.9.1
+  VERSION 1.9.2
   OPTIONS "SPDLOG_INSTALL ON"
 )
 
@@ -61,6 +61,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/log.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/log.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/lookup_table.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/manifest.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp

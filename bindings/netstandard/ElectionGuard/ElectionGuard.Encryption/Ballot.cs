@@ -24,7 +24,14 @@ namespace ElectionGuard
     /// </summary>
     public enum BinarySerializationEncoding
     {
+        /// <summary>
+        /// BSON encoding
+        /// </summary>
         BSON,
+
+        /// <summary>
+        /// MessagePack encoding
+        /// </summary>
         MsgPack
     }
 
@@ -46,11 +53,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.ExtendedData.GetValue(
                     Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"ExtendedData Error Value: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return Marshal.PtrToStringAnsi(value);
             }
         }
@@ -73,17 +76,21 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Creates an ExtendedData object
+        /// </summary>
+        /// <param name="value">the string value</param>
+        /// <param name="length">the length of the string</param>
         public unsafe ExtendedData(string value, ulong length)
         {
             var status = NativeInterface.ExtendedData.New(
                 value, length, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"ExtendedData Error Status: {status}");
-            }
+            status.ThrowIfError();
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -126,11 +133,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.PlaintextBallotSelection.GetObjectId(
                     Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"PlaintextBallotSelection Error ObjectId: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return Marshal.PtrToStringAnsi(value);
             }
         }
@@ -166,11 +169,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.PlaintextBallotSelection.GetExtendedData(
                     Handle, out NativeExtendedData value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"PlaintextBallotSelection Error ExtendedData: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ExtendedData(value);
             }
         }
@@ -182,27 +181,34 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Create a PlaintextBallotSelection
+        /// </summary>
+        /// <param name="objectId"></param>
+        /// <param name="vote"></param>
+        /// <param name="isPlaceholder"></param>
         public unsafe PlaintextBallotSelection(
             string objectId, ulong vote, bool isPlaceholder = false)
         {
             var status = NativeInterface.PlaintextBallotSelection.New(
                 objectId, vote, isPlaceholder, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"PlaintextBallotSelection Error Status: {status}");
-            }
+            status.ThrowIfError();
         }
 
+        /// <summary>
+        /// Create a PlaintextBallotSelection
+        /// </summary>
+        /// <param name="objectId"></param>
+        /// <param name="vote"></param>
+        /// <param name="isPlaceholder"></param>
+        /// <param name="extendedData"></param>
         public unsafe PlaintextBallotSelection(
             string objectId, ulong vote, bool isPlaceholder, string extendedData)
         {
             var status = NativeInterface.PlaintextBallotSelection.New(
                 objectId, vote, isPlaceholder,
                 extendedData, (ulong)extendedData.Length, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"PlaintextBallotSelection Error Status: {status}");
-            }
+            status.ThrowIfError();
         }
 
         /// <summary>
@@ -215,7 +221,9 @@ namespace ElectionGuard
                 Handle, expectedObjectId);
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -264,11 +272,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallotSelection.GetObjectId(
                     Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallotSelection Error ObjectId: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return Marshal.PtrToStringAnsi(value);
             }
         }
@@ -293,11 +297,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallotSelection.GetDescriptionHash(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallotSelection Error DescriptionHash: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -322,11 +322,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallotSelection.GetCiphertext(
                     Handle, out NativeElGamalCiphertext value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallotSelection Error Ciphertext: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElGamalCiphertext(value);
             }
         }
@@ -340,11 +336,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallotSelection.GetCryptoHash(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallotSelection Error CryptoHash: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -358,11 +350,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallotSelection.GetNonce(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallotSelection Error Nonce: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -377,11 +365,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallotSelection.GetProof(
                     Handle, out NativeDisjunctiveChaumPedersenProof value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallotSelection Error Proof: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new DisjunctiveChaumPedersenProof(value);
             }
         }
@@ -407,11 +391,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.CiphertextBallotSelection.CryptoHashWith(
                     Handle, encryptionSeed.Handle, out NativeElementModQ cryptoHash);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CiphertextBallotSelection Error CryptoHashWith: {status}");
-                return null;
-            }
+            status.ThrowIfError();
             return new ElementModQ(cryptoHash);
         }
 
@@ -424,7 +404,7 @@ namespace ElectionGuard
         ///
         /// <param name="encryptionSeed">The hash of the SelectionDescription, or
         ///                         whatever `ElementModQ` was used to populate the `description_hash` field. </param>
-        /// <param name="elgamalPublicKey">The election public key</param>
+        /// <param name="elGamalPublicKey">The election public key</param>
         /// <param name="cryptoExtendedBaseHash">The extended base hash of the election</param>
         /// </summary>
         public unsafe bool IsValidEncryption(
@@ -437,7 +417,9 @@ namespace ElectionGuard
                 elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -451,6 +433,18 @@ namespace ElectionGuard
 
     #region PlaintextBallotContest
 
+    /// <summary>
+    /// A PlaintextBallotContest represents the selections made by a voter for a specific ContestDescription
+    ///
+    /// This class can be either a partial or a complete representation of a contest dataset.  Specifically,
+    /// a partial representation must include at a minimum the "affirmative" selections of a contest.
+    /// A complete representation of a ballot must include both affirmative and negative selections of
+    /// the contest, AND the placeholder selections necessary to satisfy the ConstantChaumPedersen proof
+    /// in the CiphertextBallotContest.
+    ///
+    /// Typically partial contests may be passed into Electionguard for memory constrained systems,
+    /// while complete contests are passed into ElectionGuard when running encryption on an existing dataset.
+    /// </summary>
     public class PlaintextBallotContest : DisposableBase
     {
         /// <Summary>
@@ -463,11 +457,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.PlaintextBallotContest.GetObjectId(
                     Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"PlaintextBallotContest Error ObjectId: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return Marshal.PtrToStringAnsi(value);
             }
         }
@@ -493,6 +483,11 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Create a PlaintextBallotContest
+        /// </summary>
+        /// <param name="objectId"></param>
+        /// <param name="selections"></param>
         public unsafe PlaintextBallotContest(string objectId, PlaintextBallotSelection[] selections)
         {
             IntPtr[] selectionPointers = new IntPtr[selections.Length];
@@ -504,10 +499,7 @@ namespace ElectionGuard
 
             var status = NativeInterface.PlaintextBallotContest.New(
                 objectId, selectionPointers, (ulong)selectionPointers.LongLength, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"PlaintextBallotContest Error Status: {status}");
-            }
+            status.ThrowIfError();
         }
 
         /// <Summary>
@@ -517,11 +509,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.PlaintextBallotContest.GetSelectionAtIndex(
                 Handle, index, out NativePlaintextBallotSelection value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"PlaintextBallotContest Error GetSelectionAt: {status}");
-                return null;
-            }
+            status.ThrowIfError();
             return new PlaintextBallotSelection(value);
         }
 
@@ -544,7 +532,9 @@ namespace ElectionGuard
                 votesAllowed);
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -584,11 +574,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallotContest.GetObjectId(
                     Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallotContest Error ObjectId: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return Marshal.PtrToStringAnsi(value);
             }
         }
@@ -613,11 +599,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallotContest.GetDescriptionHash(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallotContest Error DescriptionHash: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -643,11 +625,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallotContest.GetCryptoHash(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallotContest Error CryptoHash: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -661,11 +639,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallotContest.GetNonce(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallotContest Error Nonce: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -680,11 +654,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallotContest.GetProof(
                     Handle, out NativeConstantChaumPedersenProof value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallotContest Error Proof: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ConstantChaumPedersenProof(value);
             }
         }
@@ -703,11 +673,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.CiphertextBallotContest.GetSelectionAtIndex(
                 Handle, index, out NativeCiphertextBallotSelection value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CiphertextBallotContest Error GetSelectionAt: {status}");
-                return null;
-            }
+            status.ThrowIfError();
             return new CiphertextBallotSelection(value);
         }
 
@@ -725,11 +691,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.CiphertextBallotContest.CryptoHashWith(
                     Handle, encryptionSeed.Handle, out NativeElementModQ value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CiphertextBallotContest Error CryptoHashWith: {status}");
-                return null;
-            }
+            status.ThrowIfError();
             return new ElementModQ(value);
         }
 
@@ -741,11 +703,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.CiphertextBallotContest.AggregateNonce(
                     Handle, out NativeElementModQ value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CiphertextBallotContest Error AggregateNonce: {status}");
-                return null;
-            }
+            status.ThrowIfError();
             return new ElementModQ(value);
         }
 
@@ -757,11 +715,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.CiphertextBallotContest.ElGamalAccumulate(
                     Handle, out NativeElGamalCiphertext value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CiphertextBallotContest Error ElGamalAccumulate: {status}");
-                return null;
-            }
+            status.ThrowIfError();
             return new ElGamalCiphertext(value);
         }
 
@@ -786,7 +740,9 @@ namespace ElectionGuard
                 cryptoExtendedBaseHash.Handle);
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -823,11 +779,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.PlaintextBallot.GetObjectId(
                     Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"PlaintextBallot Error ObjectId: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return Marshal.PtrToStringAnsi(value);
             }
         }
@@ -843,15 +795,14 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.PlaintextBallot.GetStyleId(
                     Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"PlaintextBallot Error StyleId: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return Marshal.PtrToStringAnsi(value);
             }
         }
 
+        /// <summary>
+        /// The size of the Contests collection
+        /// </summary>
         public unsafe ulong ContestsSize
         {
             get
@@ -863,15 +814,21 @@ namespace ElectionGuard
 
         internal unsafe NativePlaintextBallot Handle;
 
+        /// <summary>
+        /// Create a Plaintext Ballot
+        /// </summary>
+        /// <param name="json">json representation</param>
         public unsafe PlaintextBallot(string json)
         {
             var status = NativeInterface.PlaintextBallot.FromJson(json, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"PlaintextBallot Error Status: {status}");
-            }
+            status.ThrowIfError();
         }
 
+        /// <summary>
+        /// Create a Plaintext Ballot
+        /// </summary>
+        /// <param name="data">binary representation</param>
+        /// <param name="encoding">the encoding type</param>
         public unsafe PlaintextBallot(byte[] data, BinarySerializationEncoding encoding)
         {
             fixed (byte* pointer = data)
@@ -879,13 +836,16 @@ namespace ElectionGuard
                 var status = encoding == BinarySerializationEncoding.BSON
                     ? NativeInterface.PlaintextBallot.FromBson(pointer, (ulong)data.Length, out Handle)
                     : NativeInterface.PlaintextBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"PlaintextBallot Error Binary Ctor: {status}");
-                }
+                status.ThrowIfError();
             }
         }
 
+        /// <summary>
+        /// Create a PlaintextBallot
+        /// </summary>
+        /// <param name="objectId"></param>
+        /// <param name="styleId"></param>
+        /// <param name="contests"></param>
         public unsafe PlaintextBallot(
             string objectId, string styleId, PlaintextBallotContest[] contests)
         {
@@ -898,25 +858,25 @@ namespace ElectionGuard
 
             var status = NativeInterface.PlaintextBallot.New(
                 objectId, styleId, contestPointers, (ulong)contestPointers.LongLength, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"PlaintextBallot Error Status: {status}");
-            }
+            status.ThrowIfError();
         }
 
+        /// <summary>
+        /// Get the contest at the specified index
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public unsafe PlaintextBallotContest GetContestAt(ulong index)
         {
             var status = NativeInterface.PlaintextBallot.GetContestAtIndex(
                 Handle, index, out NativePlaintextBallotContest value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"PlaintextBallot Error GetContestAt: {status}");
-                return null;
-            }
+            status.ThrowIfError();
             return new PlaintextBallotContest(value);
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -925,18 +885,16 @@ namespace ElectionGuard
             Handle = null;
         }
 
+
         /// <Summary>
         /// Export the ballot representation as JSON
         /// </Summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
         public unsafe string ToJson()
         {
             var status = NativeInterface.PlaintextBallot.ToJson(
                 Handle, out IntPtr pointer, out ulong size);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"PlaintextBallot Error ToJson: {status}");
-                return null;
-            }
+            status.ThrowIfError();
             var json = Marshal.PtrToStringAnsi(pointer);
             return json;
         }
@@ -949,12 +907,7 @@ namespace ElectionGuard
 
             var status = NativeInterface.PlaintextBallot.ToBson(
                 Handle, out IntPtr data, out ulong size);
-
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"PlaintextBallot Error ToBson: {status}");
-                return null;
-            }
+            status.ThrowIfError();
 
             if (size > int.MaxValue)
             {
@@ -976,12 +929,7 @@ namespace ElectionGuard
 
             var status = NativeInterface.PlaintextBallot.ToMsgPack(
                 Handle, out IntPtr data, out ulong size);
-
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"PlaintextBallot Error ToMsgPack: {status}");
-                return null;
-            }
+            status.ThrowIfError();
 
             if (size > int.MaxValue)
             {
@@ -1013,15 +961,16 @@ namespace ElectionGuard
     {
         internal unsafe NativeCompactPlaintextBallot Handle;
 
+        /// <summary>
+        /// Create a CompactPlaintextBallot
+        /// </summary>
+        /// <param name="data"></param>
         public unsafe CompactPlaintextBallot(byte[] data)
         {
             fixed (byte* pointer = data)
             {
                 var status = NativeInterface.CompactPlaintextBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CompactPlaintextBallot Error Ctor: {status}");
-                }
+                status.ThrowIfError();
             }
         }
 
@@ -1056,7 +1005,9 @@ namespace ElectionGuard
             return byteArray;
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -1078,7 +1029,6 @@ namespace ElectionGuard
     /// fields on `Ballotcontest` and `BallotSelection`, this value is sensitive.
     ///
     /// Don't make this directly. Use `make_ciphertext_ballot` instead.
-    /// <param name="object_id"> A unique Ballot ID that is relevant to the external system </param>
     /// </summary>
     public class CiphertextBallot : DisposableBase
     {
@@ -1093,11 +1043,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallot.GetObjectId(
                     Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallot Error ObjectId: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return Marshal.PtrToStringAnsi(value);
             }
         }
@@ -1113,11 +1059,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallot.GetStyleId(
                     Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallot Error StyleId: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return Marshal.PtrToStringAnsi(value);
             }
         }
@@ -1131,11 +1073,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallot.GetManifestHash(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallot Error ManifestHash: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -1151,11 +1089,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallot.GetBallotCodeSeed(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallot Error BallotCodeSeed: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -1182,11 +1116,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallot.GetBallotCode(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallot Error BallotCode: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -1203,11 +1133,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallot.GetTimestamp(
                     Handle, out ulong value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallot Error Timestamp: {status}");
-                    return 0;
-                }
+                status.ThrowIfError();
                 return value;
             }
         }
@@ -1221,24 +1147,26 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CiphertextBallot.GetNonce(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallot Error Nonce: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
 
+        /// <summary>
+        /// Create a CiphertextBallot
+        /// </summary>
+        /// <param name="json"></param>
         public unsafe CiphertextBallot(string json)
         {
             var status = NativeInterface.CiphertextBallot.FromJson(json, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CiphertextBallot Error JSON Ctor: {status}");
-            }
+            status.ThrowIfError();
         }
 
+        /// <summary>
+        /// Create a CiphertextBallot
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="encoding"></param>
         public unsafe CiphertextBallot(byte[] data, BinarySerializationEncoding encoding)
         {
             fixed (byte* pointer = data)
@@ -1246,10 +1174,7 @@ namespace ElectionGuard
                 var status = encoding == BinarySerializationEncoding.BSON
                     ? NativeInterface.CiphertextBallot.FromBson(pointer, (ulong)data.Length, out Handle)
                     : NativeInterface.CiphertextBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CiphertextBallot Error Binary Ctor: {status}");
-                }
+                status.ThrowIfError();
             }
         }
 
@@ -1265,11 +1190,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.CiphertextBallot.GetContestAtIndex(
                 Handle, index, out NativeCiphertextBallotContest value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CiphertextBallot Error GetContestAt: {status}");
-                return null;
-            }
+            status.ThrowIfError();
             return new CiphertextBallotContest(value);
         }
 
@@ -1290,9 +1211,11 @@ namespace ElectionGuard
                 Handle, manifestHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
         }
 
+
         /// <Summary>
         /// Export the ballot representation as JSON
         /// </Summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
         public unsafe string ToJson(bool withNonces = false)
         {
             var status = withNonces
@@ -1300,12 +1223,7 @@ namespace ElectionGuard
                 Handle, out IntPtr pointer, out ulong size)
                 : NativeInterface.CiphertextBallot.ToJson(
                 Handle, out pointer, out size);
-
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CiphertextBallot Error ToJson: {status}");
-                return null;
-            }
+            status.ThrowIfError();
             var json = Marshal.PtrToStringAnsi(pointer);
             return json;
         }
@@ -1322,11 +1240,7 @@ namespace ElectionGuard
                 : NativeInterface.CiphertextBallot.ToBson(
                 Handle, out data, out size);
 
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CiphertextBallot Error ToBson: {status}");
-                return null;
-            }
+            status.ThrowIfError();
 
             if (size > int.MaxValue)
             {
@@ -1350,12 +1264,7 @@ namespace ElectionGuard
                 Handle, out IntPtr data, out ulong size)
                 : NativeInterface.CiphertextBallot.ToMsgPack(
                 Handle, out data, out size);
-
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CiphertextBallot Error ToMsgPack: {status}");
-                return null;
-            }
+            status.ThrowIfError();
 
             if (size > int.MaxValue)
             {
@@ -1368,7 +1277,9 @@ namespace ElectionGuard
             return byteArray;
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -1405,24 +1316,21 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.CompactCiphertextBallot.GetObjectId(
                     Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CompactCiphertextBallot Error ObjectId: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return Marshal.PtrToStringAnsi(value);
             }
         }
 
+        /// <summary>
+        /// Create a CompactCiphertextBallot
+        /// </summary>
+        /// <param name="data"></param>
         public unsafe CompactCiphertextBallot(byte[] data)
         {
             fixed (byte* pointer = data)
             {
                 var status = NativeInterface.CompactCiphertextBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"CompactCiphertextBallot Error Ctor: {status}");
-                }
+                status.ThrowIfError();
             }
         }
 
@@ -1439,12 +1347,7 @@ namespace ElectionGuard
 
             var status = NativeInterface.CompactCiphertextBallot.ToMsgPack(
                 Handle, out IntPtr data, out ulong size);
-
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"CompactCiphertextBallot Error ToMsgPack: {status}");
-                return null;
-            }
+            status.ThrowIfError();
 
             if (size > int.MaxValue)
             {
@@ -1457,7 +1360,9 @@ namespace ElectionGuard
             return byteArray;
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -1483,7 +1388,9 @@ namespace ElectionGuard
     /// </summary>
     public class SubmittedBallot : DisposableBase
     {
-
+        /// <summary>
+        /// Get the BallotBoxState
+        /// </summary>
         public unsafe BallotBoxState State
         {
             get
@@ -1492,17 +1399,16 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Get the ObjectId
+        /// </summary>
         public unsafe string ObjectId
         {
             get
             {
                 var status = NativeInterface.SubmittedBallot.GetObjectId(
                     Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"SubmittedBallot Error ObjectId: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return Marshal.PtrToStringAnsi(value);
             }
         }
@@ -1518,11 +1424,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.SubmittedBallot.GetStyleId(
                     Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"SubmittedBallot Error StyleId: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return Marshal.PtrToStringAnsi(value);
             }
         }
@@ -1536,11 +1438,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.SubmittedBallot.GetManifestHash(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"SubmittedBallot Error ManifestHash: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -1556,11 +1454,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.SubmittedBallot.GetBallotCodeSeed(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"SubmittedBallot Error BallotCodeSeed: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -1587,11 +1481,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.SubmittedBallot.GetBallotCode(
                     Handle, out NativeElementModQ value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"SubmittedBallot Error BallotCode: {status}");
-                    return null;
-                }
+                status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
@@ -1608,11 +1498,7 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.SubmittedBallot.GetTimestamp(
                     Handle, out ulong value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"SubmittedBallot Error Timestamp: {status}");
-                    return 0;
-                }
+                status.ThrowIfError();
                 return value;
             }
         }
@@ -1624,25 +1510,33 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Create a SubmittedBallot
+        /// </summary>
+        /// <param name="ciphertext"></param>
+        /// <param name="state"></param>
         public unsafe SubmittedBallot(CiphertextBallot ciphertext, BallotBoxState state)
         {
             var status = NativeInterface.SubmittedBallot.From(
                 ciphertext.Handle, state, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"SubmittedBallot Error Status: {status}");
-            }
+            status.ThrowIfError();
         }
 
+        /// <summary>
+        /// Crate a SubmittedBallot
+        /// </summary>
+        /// <param name="json"></param>
         public unsafe SubmittedBallot(string json)
         {
             var status = NativeInterface.SubmittedBallot.FromJson(json, out Handle);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"SubmittedBallot Error JSON Ctor: {status}");
-            }
+            status.ThrowIfError();
         }
 
+        /// <summary>
+        /// Create a SubmittedBallot
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="encoding"></param>
         public unsafe SubmittedBallot(byte[] data, BinarySerializationEncoding encoding)
         {
             fixed (byte* pointer = data)
@@ -1650,10 +1544,7 @@ namespace ElectionGuard
                 var status = encoding == BinarySerializationEncoding.BSON
                     ? NativeInterface.SubmittedBallot.FromBson(pointer, (ulong)data.Length, out Handle)
                     : NativeInterface.SubmittedBallot.FromMsgPack(pointer, (ulong)data.Length, out Handle);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    Console.WriteLine($"SubmittedBallot Error Binary Ctor: {status}");
-                }
+                status.ThrowIfError();
             }
         }
 
@@ -1664,11 +1555,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.SubmittedBallot.GetContestAtIndex(
                 Handle, index, out NativeCiphertextBallotContest value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"SubmittedBallot Error GetContestAt: {status}");
-                return null;
-            }
+            status.ThrowIfError();
             return new CiphertextBallotContest(value);
         }
 
@@ -1696,11 +1583,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.SubmittedBallot.ToJson(
                 Handle, out IntPtr pointer, out ulong size);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"SubmittedBallot Error ToJson: {status}");
-                return null;
-            }
+            status.ThrowIfError();
             var json = Marshal.PtrToStringAnsi(pointer);
             return json;
         }
@@ -1713,12 +1596,7 @@ namespace ElectionGuard
 
             var status = NativeInterface.SubmittedBallot.ToBson(
                 Handle, out IntPtr data, out ulong size);
-
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"SubmittedBallot Error ToBson: {status}");
-                return null;
-            }
+            status.ThrowIfError();
 
             if (size > int.MaxValue)
             {
@@ -1740,11 +1618,7 @@ namespace ElectionGuard
             var status = NativeInterface.SubmittedBallot.ToMsgPack(
                 Handle, out IntPtr data, out ulong size);
 
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                Console.WriteLine($"SubmittedBallot Error ToMsgPack: {status}");
-                return null;
-            }
+            status.ThrowIfError();
 
             if (size > int.MaxValue)
             {
@@ -1757,7 +1631,9 @@ namespace ElectionGuard
             return byteArray;
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
