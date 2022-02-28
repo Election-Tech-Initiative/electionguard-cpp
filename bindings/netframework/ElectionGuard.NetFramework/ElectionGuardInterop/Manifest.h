@@ -878,6 +878,40 @@ namespace ElectionGuardInterop
               std::move(_selections));
         }
 
+        ContestDescription(String ^ objectId, String ^ electoralDistrictId, uint64_t sequenceOrder,
+                           VoteVariationType voteVariation, uint64_t numberElected,
+                           uint64_t votesAllowed, String ^ name,
+                           array<SelectionDescription ^> ^ selections,
+                           array<String ^> primaryPartyIds)
+            : ManagedInstance()
+        {
+            std::string _objectId;
+            std::string _electoralDistrictId;
+            std::string _name;
+
+            Utilities::MarshalString(objectId, _objectId);
+            Utilities::MarshalString(electoralDistrictId, _electoralDistrictId);
+            Utilities::MarshalString(name, _name);
+
+            std::vector<std::unique_ptr<electionguard::SelectionDescription>> _selections;
+            for each (auto item in selections) {
+                _selections.push_back(
+                  std::make_unique<electionguard::SelectionDescription>(*item->_instance));
+            }
+
+            std::vector<std::string> _partyIds;
+            for each (auto item in primaryPartyIds) {
+                std::string id;
+                Utilities::MarshalString(item, id);
+                _partyIds.push_back(id);
+            }
+
+            this->_instance = new electionguard::ContestDescription(
+              _objectId, _electoralDistrictId, sequenceOrder,
+              static_cast<electionguard::VoteVariationType>(voteVariation), numberElected, _name,
+              std::move(_selections), std::move(_partyIds));
+        }
+
         internal : ContestDescription(std::unique_ptr<electionguard::ContestDescription> other)
         {
             this->_instance = other.release();
@@ -1028,6 +1062,48 @@ namespace ElectionGuardInterop
               std::make_unique<electionguard::InternationalizedText>(*ballotTitle->_instance),
               std::make_unique<electionguard::InternationalizedText>(*ballotSubtitle->_instance),
               std::move(_selections), std::move(_placeholders));
+        }
+
+        ContestDescriptionWithPlaceholders(String ^ objectId, String ^ electoralDistrictId,
+                                           uint64_t sequenceOrder, VoteVariationType voteVariation,
+                                           uint64_t numberElected, uint64_t votesAllowed,
+                                           String ^ name, InternationalizedText ^ ballotTitle,
+                                           InternationalizedText ^ ballotSubtitle,
+                                           array<SelectionDescription ^> ^ selections,
+                                           array<SelectionDescription ^> ^ placeholderSelections)
+            : ManagedInstance()
+        {
+            std::string _objectId;
+            std::string _electoralDistrictId;
+            std::string _name;
+
+            Utilities::MarshalString(objectId, _objectId);
+            Utilities::MarshalString(electoralDistrictId, _electoralDistrictId);
+            Utilities::MarshalString(name, _name);
+
+            std::vector<std::unique_ptr<electionguard::SelectionDescription>> _selections;
+            for each (auto item in selections) {
+                _selections.push_back(
+                  std::make_unique<electionguard::SelectionDescription>(*item->_instance));
+            }
+
+            std::vector<std::unique_ptr<electionguard::SelectionDescription>> _placeholders;
+            for each (auto item in placeholderSelections) {
+                _placeholders.push_back(
+                  std::make_unique<electionguard::SelectionDescription>(*item->_instance));
+            }
+
+            std::vector<std::string> _partyIds;
+            for each (auto item in primaryPartyIds) {
+                std::string id;
+                Utilities::MarshalString(item, id);
+                _partyIds.push_back(id);
+            }
+
+            this->_instance = new electionguard::ContestDescriptionWithPlaceholders(
+              _objectId, _electoralDistrictId, sequenceOrder,
+              static_cast<electionguard::VoteVariationType>(voteVariation), numberElected, _name,
+              std::move(_selections), std::move(_partyIds), std::move(_placeholders));
         }
 
         internal : ContestDescriptionWithPlaceholders(
@@ -1199,8 +1275,7 @@ namespace ElectionGuardInterop
 
             this->_instance = new electionguard::Manifest(
               _electionScopeId, static_cast<electionguard::ElectionType>(type), nativeStartDate,
-              nativeEndDate,
-              std::move(_gpUnits), std::move(_parties), std::move(_candidates),
+              nativeEndDate, std::move(_gpUnits), std::move(_parties), std::move(_candidates),
               std::move(_contests), std::move(_ballotStyles));
         }
         Manifest(String ^ json) : ManagedInstance()
@@ -1325,7 +1400,7 @@ namespace ElectionGuardInterop
             return this->_instance->isValid();
         }
 
-          property array<Byte> ^
+        property array<Byte> ^
           Bson {
               array<Byte> ^ get() {
                   auto unmanaged = this->_instance->toBson();
