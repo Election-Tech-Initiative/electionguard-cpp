@@ -77,7 +77,9 @@ namespace ElectionGuard
             return Marshal.PtrToStringAnsi(value);
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 

@@ -16,16 +16,19 @@ namespace ElectionGuard
     /// The encryption device is a stateful container that represents abstract hardware
     /// authorized to participate in a specific election.
     ///
-    /// <param name="deviceUuid">a unique identifier tied to the device hardware</param>
-    /// <param name="sessionUuid">a unique identifier tied to the runtime session</param>
-    /// <param name="launchCode">a unique identifer tied to the election</param>
-    /// <param name="location">an arbitrary string meaningful to the external system
-    ///                        such as a friendly name, description, or some other value</param>
     /// </summary>
     public class EncryptionDevice : DisposableBase
     {
         internal unsafe NativeEncryptionDevice Handle;
 
+        /// <summary>
+        /// Create a new EncryptionDevice
+        /// </summary>
+        /// <param name="deviceUuid">a unique identifier tied to the device hardware</param>
+        /// <param name="sessionUuid">a unique identifier tied to the runtime session</param>
+        /// <param name="launchCode">a unique identifer tied to the election</param>
+        /// <param name="location">an arbitrary string meaningful to the external system
+        ///                        such as a friendly name, description, or some other value</param>
         public unsafe EncryptionDevice(
             ulong deviceUuid,
             ulong sessionUuid,
@@ -37,13 +40,20 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
+        /// <summary>
+        /// Get a new hash value
+        ///
+        /// <return>An `ElementModQ`</return>
+        /// </summary>
         public unsafe ElementModQ GetHash()
         {
             var status = NativeInterface.EncryptionDevice.GetHash(Handle, out NativeElementModQ value);
             return new ElementModQ(value);
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -66,6 +76,12 @@ namespace ElectionGuard
     {
         internal unsafe NativeEncryptionMediator Handle;
 
+        /// <summary>
+        /// Create an `EncryptionMediator` object
+        /// </summary>
+        /// <param name="manifest"></param>
+        /// <param name="context"></param>
+        /// <param name="device"></param>
         public unsafe EncryptionMediator(
             InternalManifest manifest,
             CiphertextElectionContext context,
@@ -122,7 +138,9 @@ namespace ElectionGuard
 
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -132,11 +150,17 @@ namespace ElectionGuard
         }
     }
 
+    /// <summary>
+    /// Metadata for encryption
+    ///
+    /// The encrypt object is used for encrypting ballots.
+    ///
+    /// </summary>
     public class Encrypt
     {
         /// <summary>
         /// Encrypt a specific `BallotSelection` in the context of a specific `BallotContest`
-        ///
+        /// </summary>
         /// <param name="plaintext">the selection in the valid input form</param>
         /// <param name="description">the `SelectionDescription` from the `ContestDescription`
         ///                           which defines this selection's structure</param>
@@ -145,10 +169,8 @@ namespace ElectionGuard
         /// <param name="nonceSeed">an `ElementModQ` used as a header to seed the `Nonce` generated
         ///                          for this selection. this value can be (or derived from) the
         ///                          Contest nonce, but no relationship is required</param>
-        /// <param name="isPlaceholder">specifies if this is a placeholder selection</param>
         /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
         /// <returns>A `CiphertextBallotSelection`</returns>
-        /// </summary>
         public static unsafe CiphertextBallotSelection Selection(
             PlaintextBallotSelection plaintext,
             SelectionDescription description,
@@ -173,6 +195,7 @@ namespace ElectionGuard
         /// It will fill missing selections for a contest with `False` values, and generate `placeholder`
         /// selections to represent the number of seats available for a given contest.  By adding `placeholder`
         /// votes
+        /// </summary>
         /// <param name="plaintext">the selection in the valid input form</param>
         /// <param name="description">the `ContestDescriptionWithPlaceholders` from the `ContestDescription`
         ///                           which defines this contest's structure</param>
@@ -183,7 +206,6 @@ namespace ElectionGuard
         ///                          Ballot nonce, but no relationship is required</param>
         /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
         /// <returns>A `CiphertextBallotContest`</returns>
-        /// </summary>
         public static unsafe CiphertextBallotContest Contest(
             PlaintextBallotContest plaintext,
             ContestDescription description,
@@ -211,7 +233,7 @@ namespace ElectionGuard
         ///
         /// This method also allows for ballots to exclude passing contests for which the voter made no selections.
         /// It will fill missing contests with `False` selections and generate `placeholder` selections that are marked `True`.
-        ///
+        /// </summary>
         /// <param name="ballot">the selection in the valid input form</param>
         /// <param name="internalManifest">the `InternalManifest` which defines this ballot's structure</param>
         /// <param name="context">all the cryptographic context for the election</param>
@@ -220,7 +242,6 @@ namespace ElectionGuard
         ///                     if this value is not provided, the secret generating mechanism of the OS provides its own</param>
         /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
         /// <returns>A `CiphertextBallot`</returns>
-        /// </summary>
         public static unsafe CiphertextBallot Ballot(
             PlaintextBallot ballot,
             InternalManifest internalManifest,
@@ -262,7 +283,7 @@ namespace ElectionGuard
         ///
         /// This version of the encrypt method returns a `compact` version of the ballot that includes a minimal representation
         /// of the plaintext ballot along with the crypto parameters that are required to expand the ballot
-        ///
+        /// </summary>
         /// <param name="ballot">the selection in the valid input form</param>
         /// <param name="internalManifest">the `InternalManifest` which defines this ballot's structure</param>
         /// <param name="context">all the cryptographic context for the election</param>
@@ -271,7 +292,6 @@ namespace ElectionGuard
         ///                     if this value is not provided, the secret generating mechanism of the OS provides its own</param>
         /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
         /// <returns>A `CiphertextBallot`</returns>
-        /// </summary>
         public static unsafe CompactCiphertextBallot CompactBallot(
             PlaintextBallot ballot,
             InternalManifest internalManifest,

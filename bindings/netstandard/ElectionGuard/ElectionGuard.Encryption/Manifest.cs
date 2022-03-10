@@ -71,6 +71,11 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Creating a new `AnnotatedString`
+        /// </summary>
+        /// <param name="annotation">annotation for new string</param>
+        /// <param name="value">string value</param>
         public unsafe AnnotatedString(string annotation, string value)
         {
             var status = NativeInterface.AnnotatedString.New(annotation, value, out Handle);
@@ -80,7 +85,9 @@ namespace ElectionGuard
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -160,6 +167,11 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Create a new `Language` object
+        /// </summary>
+        /// <param name="value">value to represent language</param>
+        /// <param name="language">string with language info</param>
         public unsafe Language(string value, string language)
         {
             var status = NativeInterface.Language.New(value, language, out Handle);
@@ -169,7 +181,9 @@ namespace ElectionGuard
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -225,6 +239,10 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Create an `InternationalizedText` object
+        /// </summary>
+        /// <param name="text">array of text for languages</param>
         public unsafe InternationalizedText(Language[] text)
         {
             IntPtr[] nativeText = new IntPtr[text.Length];
@@ -241,7 +259,9 @@ namespace ElectionGuard
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -250,6 +270,11 @@ namespace ElectionGuard
             Handle = null;
         }
 
+        /// <summary>
+        /// Gets text from array of languages
+        /// </summary>
+        /// <param name="index">index to use to get `Language`</param>
+        /// <returns>`Language` object</returns>
         public unsafe Language GetTextAt(ulong index)
         {
             var status = NativeInterface.InternationalizedText.GetTextAtIndex(
@@ -339,6 +364,10 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Create a `ContactInformation` object
+        /// </summary>
+        /// <param name="name">name of the contact</param>
         public unsafe ContactInformation(string name)
         {
             var status = NativeInterface.ContactInformation.New(name, out Handle);
@@ -348,7 +377,9 @@ namespace ElectionGuard
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -498,6 +529,12 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Create a `GeopoliticalUnit` object
+        /// </summary>
+        /// <param name="objectId">string to identify the unit</param>
+        /// <param name="name">name of the unit</param>
+        /// <param name="reportingUnitType">type of geopolitical unit</param>
         public unsafe GeopoliticalUnit(
             string objectId, string name, ReportingUnitType reportingUnitType)
         {
@@ -509,7 +546,9 @@ namespace ElectionGuard
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -601,6 +640,11 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Create a `BallotStyle` object
+        /// </summary>
+        /// <param name="objectId">string to identify the `BallotStyle`</param>
+        /// <param name="gpUnitIds">array of objectIds for the `GeopoliticalUnit` for this `BallotStyle`</param>
         public unsafe BallotStyle(string objectId, string[] gpUnitIds)
         {
             var status = NativeInterface.BallotStyle.New(objectId, gpUnitIds, (ulong)gpUnitIds.Length, out Handle);
@@ -610,7 +654,9 @@ namespace ElectionGuard
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -776,6 +822,10 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Create a `Party` object
+        /// </summary>
+        /// <param name="objectId">string to identify the object</param>
         public unsafe Party(string objectId)
         {
             var status = NativeInterface.Party.New(objectId, out Handle);
@@ -785,6 +835,14 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Create a `Party` object
+        /// </summary>
+        /// <param name="objectId">string to identify the object</param>
+        /// <param name="name">name of the party</param>
+        /// <param name="abbreviation">abbreviation for the object</param>
+        /// <param name="color">string for the name of the color used</param>
+        /// <param name="logoUri">string for the uri for the logo</param>
         public unsafe Party(
             string objectId, InternationalizedText name,
             string abbreviation, string color, string logoUri)
@@ -797,7 +855,9 @@ namespace ElectionGuard
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -936,6 +996,11 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Create a `Candidate` object
+        /// </summary>
+        /// <param name="objectId">string for the identity of the object</param>
+        /// <param name="isWriteIn">is the candidate a write in</param>
         public unsafe Candidate(string objectId, bool isWriteIn)
         {
             var status = NativeInterface.Candidate.New(objectId, isWriteIn, out Handle);
@@ -945,6 +1010,12 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Create a `Candidate` object
+        /// </summary>
+        /// <param name="objectId">string for the identity of the object</param>
+        /// <param name="partyId">string identifying the party for the candidate</param>
+        /// <param name="isWriteIn">is the candidate a write in</param>
         public unsafe Candidate(string objectId, string partyId, bool isWriteIn)
         {
             var status = NativeInterface.Candidate.New(
@@ -955,6 +1026,14 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Create a `Candidate` object
+        /// </summary>
+        /// <param name="objectId">string for the identity of the object</param>
+        /// <param name="name">name of the candidate</param>
+        /// <param name="partyId">string identifying the party for the candidate</param>
+        /// <param name="imageUri">string for uir for image of candidate</param>
+        /// <param name="isWriteIn">is the candidate a write in</param>
         public unsafe Candidate(
             string objectId, InternationalizedText name,
             string partyId, string imageUri, bool isWriteIn)
@@ -967,7 +1046,9 @@ namespace ElectionGuard
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -1070,6 +1151,12 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Create a `SelectionDescription` object
+        /// </summary>
+        /// <param name="objectId">string identifying the object</param>
+        /// <param name="candidateId">string identifying the candidate</param>
+        /// <param name="sequenceOrder">the number of the item for sequence order</param>
         public unsafe SelectionDescription(
             string objectId, string candidateId, ulong sequenceOrder)
         {
@@ -1081,7 +1168,9 @@ namespace ElectionGuard
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -1284,6 +1373,16 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Create a `ContestDescription` object
+        /// </summary>
+        /// <param name="objectId">string identifying object</param>
+        /// <param name="electoralDistrictId">string identifying electoral district</param>
+        /// <param name="sequenceOrder">the sequence order to show this in</param>
+        /// <param name="voteVariation">vote variation type</param>
+        /// <param name="numberElected">the number of elected</param>
+        /// <param name="name">string for name of the contest</param>
+        /// <param name="selections">array of `SelectionDescription`</param>
         public unsafe ContestDescription(
             string objectId, string electoralDistrictId, ulong sequenceOrder,
             VoteVariationType voteVariation, ulong numberElected, string name,
@@ -1306,6 +1405,19 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Create a `ContestDescription` object
+        /// </summary>
+        /// <param name="objectId">string identifying object</param>
+        /// <param name="electoralDistrictId">string identifying electoral district</param>
+        /// <param name="sequenceOrder">the sequence order to show this in</param>
+        /// <param name="voteVariation">vote variation type</param>
+        /// <param name="numberElected">number of elected</param>
+        /// <param name="votesAllowed">number of votes allowed</param>
+        /// <param name="name">string for name of the contest</param>
+        /// <param name="ballotTitle">international string for the ballot title</param>
+        /// <param name="ballotSubtitle">international string for the ballot title</param>
+        /// <param name="selections">array of `SelectionDescription`</param>
         public unsafe ContestDescription(
             string objectId, string electoralDistrictId, ulong sequenceOrder,
             VoteVariationType voteVariation, ulong numberElected, ulong votesAllowed,
@@ -1330,6 +1442,17 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Create a `ContestDescription` object
+        /// </summary>
+        /// <param name="objectId">string identifying object</param>
+        /// <param name="electoralDistrictId">string identifying electoral district</param>
+        /// <param name="sequenceOrder">the sequence order to show this in</param>
+        /// <param name="voteVariation">vote variation type</param>
+        /// <param name="numberElected">number of elected</param>
+        /// <param name="name">string for name of the contest</param>
+        /// <param name="selections">array of `SelectionDescription`</param>
+        /// <param name="primaryPartyIds">array of strings for `PartyIds`</param>
         public unsafe ContestDescription(
             string objectId, string electoralDistrictId, ulong sequenceOrder,
             VoteVariationType voteVariation, ulong numberElected, string name,
@@ -1353,6 +1476,20 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Create a `ContestDescription` object
+        /// </summary>
+        /// <param name="objectId">string identifying object</param>
+        /// <param name="electoralDistrictId">string identifying electoral district</param>
+        /// <param name="sequenceOrder">the sequence order to show this in</param>
+        /// <param name="voteVariation">vote variation type</param>
+        /// <param name="numberElected">number of elected</param>
+        /// <param name="votesAllowed">number of votes allowed</param>
+        /// <param name="name">string for name of the contest</param>
+        /// <param name="ballotTitle">international string for the ballot title</param>
+        /// <param name="ballotSubtitle">international string for the ballot title</param>
+        /// <param name="selections">array of `SelectionDescription`</param>
+        /// <param name="primaryPartyIds">array of strings for `PartyIds`</param>
         public unsafe ContestDescription(
             string objectId, string electoralDistrictId, ulong sequenceOrder,
             VoteVariationType voteVariation, ulong numberElected, ulong votesAllowed,
@@ -1378,7 +1515,9 @@ namespace ElectionGuard
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -1604,6 +1743,17 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Create a `ContestDescriptionWithPlaceholders` object
+        /// </summary>
+        /// <param name="objectId">string identifying object</param>
+        /// <param name="electoralDistrictId">string identifying electoral district</param>
+        /// <param name="sequenceOrder">the sequence order to show this in</param>
+        /// <param name="voteVariation">vote variation type</param>
+        /// <param name="numberElected">the number of elected</param>
+        /// <param name="name">string for name of the contest</param>
+        /// <param name="selections">array of `SelectionDescription`</param>
+        /// <param name="placeholders">array of `SelectionDescription` to use as placeholders</param>
         public unsafe ContestDescriptionWithPlaceholders(
             string objectId, string electoralDistrictId, ulong sequenceOrder,
             VoteVariationType voteVariation, ulong numberElected, string name,
@@ -1635,6 +1785,20 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Create a `ContestDescriptionWithPlaceholders` object
+        /// </summary>
+        /// <param name="objectId">string identifying object</param>
+        /// <param name="electoralDistrictId">string identifying electoral district</param>
+        /// <param name="sequenceOrder">the sequence order to show this in</param>
+        /// <param name="voteVariation">vote variation type</param>
+        /// <param name="numberElected">the number of elected</param>
+        /// <param name="votesAllowed">number of votes allowed</param>
+        /// <param name="name">string for name of the contest</param>
+        /// <param name="ballotTitle">international string for the ballot title</param>
+        /// <param name="ballotSubtitle">international string for the ballot title</param>
+        /// <param name="selections">array of `SelectionDescription`</param>
+        /// <param name="placeholders">array of `SelectionDescription` to use as placeholders</param>
         public unsafe ContestDescriptionWithPlaceholders(
             string objectId, string electoralDistrictId, ulong sequenceOrder,
             VoteVariationType voteVariation, ulong numberElected, ulong votesAllowed,
@@ -1668,6 +1832,18 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Create a `ContestDescriptionWithPlaceholders` object
+        /// </summary>
+        /// <param name="objectId">string identifying object</param>
+        /// <param name="electoralDistrictId">string identifying electoral district</param>
+        /// <param name="sequenceOrder">the sequence order to show this in</param>
+        /// <param name="voteVariation">vote variation type</param>
+        /// <param name="numberElected">the number of elected</param>
+        /// <param name="name">string for name of the contest</param>
+        /// <param name="selections">array of `SelectionDescription`</param>
+        /// <param name="primaryPartyIds">array of strings for `PartyIds`</param>
+        /// <param name="placeholders">array of `SelectionDescription` to use as placeholders</param>
         public unsafe ContestDescriptionWithPlaceholders(
             string objectId, string electoralDistrictId, ulong sequenceOrder,
             VoteVariationType voteVariation, ulong numberElected, string name,
@@ -1701,6 +1877,21 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Create a `ContestDescriptionWithPlaceholders` object
+        /// </summary>
+        /// <param name="objectId">string identifying object</param>
+        /// <param name="electoralDistrictId">string identifying electoral district</param>
+        /// <param name="sequenceOrder">the sequence order to show this in</param>
+        /// <param name="voteVariation">vote variation type</param>
+        /// <param name="numberElected">the number of elected</param>
+        /// <param name="votesAllowed">number of votes allowed</param>
+        /// <param name="name">string for name of the contest</param>
+        /// <param name="ballotTitle">international string for the ballot title</param>
+        /// <param name="ballotSubtitle">international string for the ballot title</param>
+        /// <param name="selections">array of `SelectionDescription`</param>
+        /// <param name="primaryPartyIds">array of strings for `PartyIds`</param>
+        /// <param name="placeholders">array of `SelectionDescription` to use as placeholders</param>
         public unsafe ContestDescriptionWithPlaceholders(
             string objectId, string electoralDistrictId, ulong sequenceOrder,
             VoteVariationType voteVariation, ulong numberElected, ulong votesAllowed,
@@ -1736,7 +1927,9 @@ namespace ElectionGuard
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -1966,6 +2159,10 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Creates a `Manifest` object
+        /// </summary>
+        /// <param name="json">string of json data describing the manifest</param>
         public unsafe Manifest(string json)
         {
             var status = NativeInterface.Manifest.FromJson(json, out Handle);
@@ -1975,6 +2172,11 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Creates a `Manifest` object
+        /// </summary>
+        /// <param name="data">byte array of data describing the manifest</param>
+        /// <param name="encoding">binary encoding for the data</param>
         public unsafe Manifest(byte[] data, BinarySerializationEncoding encoding)
         {
             fixed (byte* pointer = data)
@@ -1989,6 +2191,18 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Creates a `Manifest` object
+        /// </summary>
+        /// <param name="electionScopeId"></param>
+        /// <param name="electionType">election type</param>
+        /// <param name="startDate">start date for election</param>
+        /// <param name="endDate">end data for the election</param>
+        /// <param name="gpUnits">array of the `GeopoliticalUnit` for election</param>
+        /// <param name="parties">array of the `Party` for election</param>
+        /// <param name="candidates">array of the `Candidate` for election</param>
+        /// <param name="contests">array of the `ContestDescription` for election</param>
+        /// <param name="ballotStyles">array of the `BallotStyle` for election</param>
         public unsafe Manifest(
             string electionScopeId, ElectionType electionType,
             DateTime startDate, DateTime endDate,
@@ -2047,7 +2261,9 @@ namespace ElectionGuard
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -2287,6 +2503,10 @@ namespace ElectionGuard
 
         internal unsafe NativeInternalManifest Handle;
 
+        /// <summary>
+        /// Creates an `InternalManifest` object
+        /// </summary>
+        /// <param name="manifest">public manifest to copy</param>
         public unsafe InternalManifest(Manifest manifest)
         {
             var status = NativeInterface.InternalManifest.New(manifest.Handle, out Handle);
@@ -2296,6 +2516,10 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Creates an `InternalManifest` object
+        /// </summary>
+        /// <param name="json">string of json data describing the manifest</param>
         public unsafe InternalManifest(string json)
         {
             var status = NativeInterface.InternalManifest.FromJson(json, out Handle);
@@ -2305,6 +2529,11 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Creates an `InternalManifest` object
+        /// </summary>
+        /// <param name="data">byte array of data describing the manifest</param>
+        /// <param name="encoding">binary encoding for the data</param>
         public unsafe InternalManifest(byte[] data, BinarySerializationEncoding encoding)
         {
             fixed (byte* pointer = data)
@@ -2319,7 +2548,9 @@ namespace ElectionGuard
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 

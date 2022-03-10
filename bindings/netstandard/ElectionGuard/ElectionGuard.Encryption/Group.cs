@@ -11,6 +11,9 @@ namespace ElectionGuard
     /// </summary>
     public class ElementModP : DisposableBase
     {
+        /// <summary>
+        /// Number of 64-bit ints that make up the 4096-bit prime
+        /// </summary>
         public static readonly ulong MAX_SIZE = 64;
 
         /// <Summary>
@@ -19,6 +22,10 @@ namespace ElectionGuard
         public ulong[] Data { get { return GetNative(); } internal set { NewNative(value); } }
         internal unsafe NaiveElementModP Handle;
 
+        /// <summary>
+        /// Creates a `ElementModP` object
+        /// </summary>
+        /// <param name="data">the data used to initialize the `ElementModP`</param>
         public ElementModP(ulong[] data)
         {
             try
@@ -36,7 +43,9 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -114,6 +123,9 @@ namespace ElectionGuard
     /// </summary>
     public class ElementModQ : DisposableBase
     {
+        /// <summary>
+        /// Number of 64-bit ints that make up the 256-bit prime
+        /// </summary>
         public static readonly ulong MAX_SIZE = 4;
 
         /// <Summary>
@@ -122,6 +134,10 @@ namespace ElectionGuard
         public ulong[] Data { get { return GetNative(); } internal set { NewNative(value); } }
         internal unsafe NaiveElementModQ Handle;
 
+        /// <summary>
+        /// Create a `ElementModQ`
+        /// </summary>
+        /// <param name="data">data used to initialize the `ElementModQ`</param>
         public ElementModQ(ulong[] data)
         {
             try
@@ -134,6 +150,11 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Create a `ElementModQ`
+        /// </summary>
+        /// <param name="hex">string representing the hex bytes of the initializationd data</param>
+        /// <param name="uncheckedInput">if data is checked or not</param>
         public ElementModQ(string hex, bool uncheckedInput = false)
         {
             var status = uncheckedInput ?
@@ -161,7 +182,9 @@ namespace ElectionGuard
             return value;
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
@@ -220,8 +243,14 @@ namespace ElectionGuard
         }
     }
 
+    /// <summary>
+    /// Static class of constant values used in the encryption system
+    /// </summary>
     public static class Constants
     {
+        /// <summary>
+        /// G in Hacl_Bignum4096 format
+        /// </summary>
         public unsafe static ElementModP G
         {
             get
@@ -235,6 +264,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Max P value in Hacl_Bignum4096 format
+        /// </summary>
         public unsafe static ElementModP P
         {
             get
@@ -248,6 +280,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// zero as data for `ElementModP`
+        /// </summary>
         public unsafe static ElementModP ZERO_MOD_P
         {
             get
@@ -261,6 +296,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// one as data for `ElementModP`
+        /// </summary>
         public unsafe static ElementModP ONE_MOD_P
         {
             get
@@ -274,6 +312,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// two as data for `ElementModP`
+        /// </summary>
         public unsafe static ElementModP TWO_MOD_P
         {
             get
@@ -287,6 +328,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Max Q value in Hacl_Bignum256 format
+        /// </summary>
         public unsafe static ElementModQ Q
         {
             get
@@ -300,6 +344,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// zero as data for `ElementModQ`
+        /// </summary>
         public unsafe static ElementModQ ZERO_MOD_Q
         {
             get
@@ -313,6 +360,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// one as data for `ElementModQ`
+        /// </summary>
         public unsafe static ElementModQ ONE_MOD_Q
         {
             get
@@ -326,6 +376,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// two as data for `ElementModQ`
+        /// </summary>
         public unsafe static ElementModQ TWO_MOD_Q
         {
             get
