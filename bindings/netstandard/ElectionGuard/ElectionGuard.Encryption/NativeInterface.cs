@@ -76,13 +76,37 @@ namespace ElectionGuard
     /// </Summary>
     public enum ElectionType
     {
+        /// <summary>
+        /// an unknown value
+        /// </summary>
         unknown = 0,
+        /// <summary>
+        /// An election that's typically held on the national day for elections.
+        /// </summary>
         general = 1,
+        /// <summary>
+        /// A primary election that's for a specific party, where voter eligibility for this contest is based on registration.
+        /// </summary>
         partisanPrimaryClosed = 2,
+        /// <summary>
+        /// A primary election that's for a specific party, where voters declare their desired party or choose in private
+        /// </summary>
         partisanPrimaryOpen = 3,
+        /// <summary>
+        /// A primary election without a specified type, such as a nonpartisan primary.
+        /// </summary>
         primary = 4,
+        /// <summary>
+        /// An election to decide a prior contest that ended with no candidate receiving a majority of the votes
+        /// </summary>
         runoff = 5,
+        /// <summary>
+        /// An election held out of sequence for special circumstances, such as to fill a vacated office.
+        /// </summary>
         special = 6,
+        /// <summary>
+        /// The election is a type that isn't listed in this enumeration. If used, include the item's custom type in an OtherType element.
+        /// </summary>
         other = 7
     };
 
@@ -92,34 +116,127 @@ namespace ElectionGuard
     /// </Summary>
     public enum ReportingUnitType
     {
+        /// <summary>
+        /// an unknown value
+        /// </summary>
         unknown = 0,
+        /// <summary>
+        /// Used to report batches of ballots that might cross precinct boundaries.
+        /// </summary>
         ballotBatch = 1,
+        /// <summary>
+        /// Used for a ballot-style area that's generally composed of precincts.
+        /// </summary>
         ballotStyleArea = 2,
+        /// <summary>
+        /// Used as a synonym for a county.
+        /// </summary>
         borough = 3,
+        /// <summary>
+        /// Used for a city that reports results or for the district that encompasses it.
+        /// </summary>
         city = 4,
+        /// <summary>
+        /// Used for city council districts.
+        /// </summary>
         cityCouncil = 5,
+        /// <summary>
+        /// Used for one or more precincts that have been combined for the purposes of reporting. 
+        /// If the term ward is used interchangeably with combined precinct, use combined-precinct 
+        /// for the ReportingUnitType.
+        /// </summary>
         combinedPrecinct = 6,
+        /// <summary>
+        /// Used for national legislative body districts.
+        /// </summary>
         congressional = 7,
+        /// <summary>
+        /// Used for a country.
+        /// </summary>
         country = 8,
+        /// <summary>
+        /// Used for a county or for the district that encompasses it. 
+        /// Synonymous with borough and parish in some localities.
+        /// </summary>
         county = 9,
+        /// <summary>
+        /// Used for county council districts.
+        /// </summary>
         countyCouncil = 10,
+        /// <summary>
+        /// Used for a dropbox for absentee ballots.
+        /// </summary>
         dropBox = 11,
+        /// <summary>
+        /// Used for judicial districts.
+        /// </summary>
         judicial = 12,
+        /// <summary>
+        /// Used as applicable for various units such as towns, 
+        /// townships, villages that report votes, or for the district 
+        /// that encompasses them.
+        /// </summary>
         municipality = 13,
+        /// <summary>
+        /// Used for a polling place.
+        /// </summary>
         polling_place = 14,
+        /// <summary>
+        /// Used if the terms for ward or district are used interchangeably with precinct.
+        /// </summary>
         precinct = 15,
+        /// <summary>
+        /// Used for a school district.
+        /// </summary>
         school = 16,
+        /// <summary>
+        /// Used for a special district.
+        /// </summary>
         special = 17,
+        /// <summary>
+        /// Used for splits of precincts.
+        /// </summary>
         splitPrecinct = 18,
+        /// <summary>
+        /// Used for a state or for the district that encompasses it.
+        /// </summary>
         state = 19,
+        /// <summary>
+        /// Used for a state house or assembly district.
+        /// </summary>
         stateHouse = 20,
+        /// <summary>
+        /// Used for a state senate district.
+        /// </summary>
         stateSenate = 21,
+        /// <summary>
+        /// Used for type of municipality that reports votes or for the district that encompasses it.
+        /// </summary>
         township = 22,
+        /// <summary>
+        /// Used for a utility district.
+        /// </summary>
         utility = 23,
+        /// <summary>
+        /// Used for a type of municipality that reports votes or for the district that encompasses it.
+        /// </summary>
         village = 24,
+        /// <summary>
+        /// Used for a vote center.
+        /// </summary>
         voteCenter = 25,
+        /// <summary>
+        /// Used for combinations or groupings of precincts or other units.
+        /// </summary>
         ward = 26,
+        /// <summary>
+        /// Used for a water district.
+        /// </summary>
         water = 27,
+        /// <summary>
+        /// Used for other types of reporting units that aren't included in this enumeration. 
+        /// If used, provide the item's custom type in an OtherType element.
+        /// </summary>
         other = 28,
     };
 
@@ -129,18 +246,65 @@ namespace ElectionGuard
     /// </Summary>
     public enum VoteVariationType
     {
+        /// <summary>
+        /// an unknown value
+        /// </summary>
         unknown = 0,
+        /// <summary>
+        /// Each voter can select up to one option.
+        /// </summary>
         one_of_m = 1,
+        /// <summary>
+        /// Approval voting, where each voter can select as many options as desired.
+        /// </summary>
         approval = 2,
+        /// <summary>
+        /// Borda count, where each voter can rank the options, and the rankings are assigned point values.
+        /// </summary>
         borda = 3,
+        /// <summary>
+        /// Cumulative voting, where each voter can distribute their vote to up to N options.
+        /// </summary>
         cumulative = 4,
+        /// <summary>
+        /// A 1-of-m method where the winner needs more than 50% of the vote to be elected.
+        /// </summary>
         majority = 5,
+        /// <summary>
+        /// A method where each voter can select up to N options.
+        /// </summary>
         n_of_m = 6,
+        /// <summary>
+        /// A 1-of-m method where the option with the most votes is elected, regardless of 
+        /// whether the option has more than 50% of the vote.
+        /// </summary>
         plurality = 7,
+        /// <summary>
+        /// A proportional representation method, which is any system that elects winners 
+        /// in proportion to the total vote. For the single transferable vote (STV) method, 
+        /// use rcv instead.
+        /// </summary>
         proportional = 8,
+        /// <summary>
+        /// Range voting, where each voter can select a score for each option.
+        /// </summary>
         range = 9,
+        /// <summary>
+        /// Ranked choice voting (RCV), where each voter can rank the options, and the 
+        /// ballots are counted in rounds. Also known as instant-runoff voting (IRV) and 
+        /// the single transferable vote (STV).
+        /// </summary>
         rcv = 10,
+        /// <summary>
+        /// A 1-of-m method where the winner needs more than some predetermined fraction 
+        /// of the vote to be elected, and where the fraction is more than 50%. For example, 
+        /// the winner might need three-fifths or two-thirds of the vote.
+        /// </summary>
         super_majority = 11,
+        /// <summary>
+        /// The vote variation is a type that isn't included in this enumeration. 
+        /// If used, provide the item's custom type in an OtherType element.
+        /// </summary>
         other = 12
     };
 
