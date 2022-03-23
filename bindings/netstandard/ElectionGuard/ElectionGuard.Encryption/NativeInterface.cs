@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using System.Runtime.ConstrainedExecution;
 
 namespace ElectionGuard
 {
-    internal enum Status
+    public enum Status
     {
         ELECTIONGUARD_STATUS_SUCCESS = 0,
         ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT,
