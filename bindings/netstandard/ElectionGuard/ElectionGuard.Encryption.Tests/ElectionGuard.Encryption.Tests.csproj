@@ -18,19 +18,20 @@
   </ItemGroup>
 
   <PropertyGroup Label="Library Paths">
+    <MsvcTarget>Release</MsvcTarget>
     <ElectionGuardLibs>..\..\..\..\build\libs</ElectionGuardLibs>
   </PropertyGroup>
   <ItemGroup Label="C++ Built Libraries">
-    <None Name="Windows MSVC x86" Visible="false" Include="$(ElectionGuardLibs)\msvc\Win32\src\$(Configuration)\*.dll*">
+    <None Name="Windows MSVC x86" Visible="false" Include="$(ElectionGuardLibs)\msvc\Win32\src\$(MsvcTarget)\*.dll*">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
     </None>
-    <None Name="Windows MSVC x64" Visible="false" Include="$(ElectionGuardLibs)\msvc\x64\src\$(Configuration)\*.dll*">
+    <None Name="Windows MSVC x64" Visible="false" Include="$(ElectionGuardLibs)\msvc\x64\src\$(MsvcTarget)\*.dll*">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
     </None>
-    <None Name="Non Windows x64" Visible="false" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.dll*">
+    <None Name="Non Windows x64" Visible="false" Include="$(ElectionGuardLibs)\x86_64\$(MsvcTarget)\src\*.dll*">
       <CopyToOutputDirectory Condition="'$(OS)' != 'Windows_NT'">Always</CopyToOutputDirectory>
     </None>
-    <None Name="MacOS" Visible="false" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.dylib" CopyToOutputDirectory="Always" />
-    <None Name="Linux" Visible="false" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.so" CopyToOutputDirectory="Always" />
+    <None Name="MacOS" Visible="false" Include="$(ElectionGuardLibs)\x86_64\$(MsvcTarget)\src\*.dylib" CopyToOutputDirectory="Always" />
+    <None Name="Linux" Visible="false" Include="$(ElectionGuardLibs)\x86_64\$(MsvcTarget)\src\*.so" CopyToOutputDirectory="Always" />
   </ItemGroup>
 </Project>
