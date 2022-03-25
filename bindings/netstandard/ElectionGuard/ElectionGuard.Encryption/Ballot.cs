@@ -911,7 +911,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"PlaintextBallot Error ToBson: size is too big");
+                throw new ElectionGuardException($"PlaintextBallot Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -933,7 +933,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"PlaintextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException($"PlaintextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -995,7 +995,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"CompactPlaintextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException($"CompactPlaintextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1243,7 +1243,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"CiphertextBallot Error ToBson: size is too big");
+                throw new ElectionGuardException($"CiphertextBallot Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1267,7 +1267,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"CiphertextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException($"CiphertextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1350,7 +1350,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"CompactCiphertextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException($"CompactCiphertextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1599,7 +1599,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"SubmittedBallot Error ToBson: size is too big");
+                throw new ElectionGuardException($"SubmittedBallot Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1621,7 +1621,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"SubmittedBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException($"SubmittedBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
