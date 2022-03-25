@@ -1156,7 +1156,6 @@ namespace ElectionGuard
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"CryptoHash Error Status: {status}");
-                return null;
             }
             return new ElementModQ(value);
         }
@@ -1190,7 +1189,6 @@ namespace ElectionGuard
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"ContestDescription Error ObjectId: {status}");
-                    return null;
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
@@ -1628,7 +1626,6 @@ namespace ElectionGuard
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error Name: {status}");
-                    return null;
                 }
                 return Marshal.PtrToStringAnsi(value);
             }
@@ -2368,7 +2365,6 @@ namespace ElectionGuard
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"Manifest Error ToMsgPack: {status}");
-                return null;
             }
 
             if (size > int.MaxValue)
@@ -2511,7 +2507,6 @@ namespace ElectionGuard
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"InternalManifest Error GetGeopoliticalUnitAtIndex: {status}");
-                return null;
             }
             return new GeopoliticalUnit(value);
         }
@@ -2526,7 +2521,6 @@ namespace ElectionGuard
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"InternalManifest Error GetContestAtIndex: {status}");
-                return null;
             }
             return new ContestDescription(value);
         }
@@ -2541,7 +2535,6 @@ namespace ElectionGuard
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"InternalManifest Error GetContestAtIndex: {status}");
-                return null;
             }
             return new BallotStyle(value);
         }
