@@ -2204,7 +2204,7 @@ namespace ElectionGuard
                 [MarshalAs(UnmanagedType.LPStr)] string hex_manifest_hash,
                 out CiphertextElectionContextHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_from_hex",
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_from_hex_with_extended_data",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Make(
                 ulong number_of_guardians,

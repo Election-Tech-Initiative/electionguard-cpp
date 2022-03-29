@@ -29,7 +29,7 @@ TEST_CASE("Can serialize CiphertextElectionContext")
     auto fromBson = CiphertextElectionContext::fromBson(bson);
 
     // Assert
-    // TODO: validate against manifest->getManifestHash()
+    // validate against manifest->getManifestHash()
     CHECK(fromJson->getManifestHash()->toHex() == context->getManifestHash()->toHex());
     CHECK(fromBson->getManifestHash()->toHex() == context->getManifestHash()->toHex());
 }
@@ -54,4 +54,29 @@ TEST_CASE("Assign ExtraData to CiphertextElectionContext")
     } else {
         CHECK(resolved->second == value);
     }
+}
+
+TEST_CASE("Assign ExtraData to CiphertextElectionContextand Serialize")
+{
+    // Arrange
+    auto key = "uri";
+    auto value = "http://something.vote/";
+    unordered_map<string, string> extendedData({{key, value}});
+
+    // Act
+    auto context = CiphertextElectionContext::make(
+      3UL, 2UL, TWO_MOD_P().clone(), TWO_MOD_Q().clone(), TWO_MOD_Q().clone(), extendedData);
+
+    auto json = context->toJson();
+    auto bson = context->toBson();
+
+    Log::debug(json);
+
+    // Act
+    auto fromJson = CiphertextElectionContext::fromJson(json);
+    auto fromBson = CiphertextElectionContext::fromBson(bson);
+
+    // Assert
+    CHECK(fromJson->getExtendedData().at("uri") == context->getExtendedData().at("uri"));
+    CHECK(fromBson->getExtendedData().at("uri") == context->getExtendedData().at("uri"));
 }
