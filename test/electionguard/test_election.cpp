@@ -55,3 +55,31 @@ TEST_CASE("Assign ExtraData to CiphertextElectionContext")
         CHECK(resolved->second == value);
     }
 }
+
+TEST_CASE("Assign ExtraData to CiphertextElectionContextand Serialize")
+{
+    // Arrange
+    auto key = "ballot_base_uri";
+    auto value = "http://something.vote/";
+    unordered_map<string, string> extendedData({{key, value}});
+
+    // Act
+    auto context = CiphertextElectionContext::make(
+      3UL, 2UL, TWO_MOD_P().clone(), TWO_MOD_Q().clone(), TWO_MOD_Q().clone(), extendedData);
+
+    auto json = context->toJson();
+    auto bson = context->toBson();
+
+    Log::debug(json);
+
+    // Act
+    auto fromJson = CiphertextElectionContext::fromJson(json);
+    auto fromBson = CiphertextElectionContext::fromBson(bson);
+
+    // Assert
+    // TODO: validate against manifest->getManifestHash()
+    CHECK(fromJson->getExtendedData().at("ballot_base_uri") ==
+          context->getExtendedData().at("ballot_base_uri"));
+    CHECK(fromBson->getExtendedData().at("ballot_base_uri") ==
+          context->getExtendedData().at("ballot_base_uri"));
+}
