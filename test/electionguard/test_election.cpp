@@ -29,7 +29,7 @@ TEST_CASE("Can serialize CiphertextElectionContext")
     auto fromBson = CiphertextElectionContext::fromBson(bson);
 
     // Assert
-    // TODO: validate against manifest->getManifestHash()
+    // validate against manifest->getManifestHash()
     CHECK(fromJson->getManifestHash()->toHex() == context->getManifestHash()->toHex());
     CHECK(fromBson->getManifestHash()->toHex() == context->getManifestHash()->toHex());
 }
@@ -59,7 +59,7 @@ TEST_CASE("Assign ExtraData to CiphertextElectionContext")
 TEST_CASE("Assign ExtraData to CiphertextElectionContextand Serialize")
 {
     // Arrange
-    auto key = "ballot_base_uri";
+    auto key = "uri";
     auto value = "http://something.vote/";
     unordered_map<string, string> extendedData({{key, value}});
 
@@ -77,9 +77,6 @@ TEST_CASE("Assign ExtraData to CiphertextElectionContextand Serialize")
     auto fromBson = CiphertextElectionContext::fromBson(bson);
 
     // Assert
-    // TODO: validate against manifest->getManifestHash()
-    CHECK(fromJson->getExtendedData().at("ballot_base_uri") ==
-          context->getExtendedData().at("ballot_base_uri"));
-    CHECK(fromBson->getExtendedData().at("ballot_base_uri") ==
-          context->getExtendedData().at("ballot_base_uri"));
+    CHECK(fromJson->getExtendedData().at("uri") == context->getExtendedData().at("uri"));
+    CHECK(fromBson->getExtendedData().at("uri") == context->getExtendedData().at("uri"));
 }
