@@ -5,7 +5,7 @@
     <Platforms>x64;x86</Platforms>
 
     <!-- Project -->
-    <RootNamespace>ElectionGuard.Encryption</RootNamespace>
+    <RootNamespace>ElectionGuard</RootNamespace>
     <AssemblyName>ElectionGuard.Encryption</AssemblyName>
     <Version>0.1.6</Version>
     <AssemblyVersion>0.1.6.0</AssemblyVersion>
