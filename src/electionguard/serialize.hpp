@@ -14,6 +14,7 @@
 #include <cstring>
 #include <memory>
 #include <nlohmann/json.hpp>
+#include <unordered_map>
 
 using std::make_unique;
 using std::reference_wrapper;
@@ -720,6 +721,11 @@ namespace electionguard
           private:
             static json fromObject(const electionguard::CiphertextElectionContext &serializable)
             {
+                json extendedData;
+                for (auto &[key, value] : serializable.getExtendedData()) {
+                    extendedData.emplace(key, value);
+                }
+
                 json j = {
                   {"crypto_base_hash", serializable.getCryptoBaseHash()->toHex()},
                   {"crypto_extended_base_hash", serializable.getCryptoExtendedBaseHash()->toHex()},
@@ -729,6 +735,10 @@ namespace electionguard
                   {"number_of_guardians", serializable.getNumberOfGuardians()},
                   {"quorum", serializable.getQuorum()},
                 };
+                if (serializable.getExtendedData().size() > 0) {
+                    j["extended_data"] = extendedData;
+                }
+
                 return j;
             }
             static unique_ptr<electionguard::CiphertextElectionContext> toObject(json j)
@@ -746,6 +756,19 @@ namespace electionguard
                 auto cryptoBaseHash = ElementModQ::fromHex(crypto_base_hash);
                 auto cryptoExtendedBaseHash = ElementModQ::fromHex(crypto_extended_base_hash);
                 auto elGamalPublicKey = ElementModP::fromHex(elgamal_public_key);
+
+                if (j.contains("extended_data") && !j["extended_data"].is_null()) {
+                    std::unordered_map<string, string> extendedDataMap;
+
+                    for (auto &[key, value] : j["extended_data"].items()) {
+                        extendedDataMap.emplace(key, value);
+                    }
+
+                    return make_unique<CiphertextElectionContext>(
+                      number_of_guardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+                      move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
+                      move(extendedDataMap));
+                }
 
                 return make_unique<CiphertextElectionContext>(
                   number_of_guardians, quorum, move(elGamalPublicKey), move(commitmentHash),
