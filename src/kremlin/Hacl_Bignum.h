@@ -95,7 +95,11 @@ uint32_t Hacl_Bignum_ModInvLimb_mod_inv_uint32(uint32_t n0);
 uint64_t Hacl_Bignum_ModInvLimb_mod_inv_uint64(uint64_t n0);
 
 //*********************************************************************************
-// functions below have been added to get Hacl_GenericField64 to run
+// functions below have been pulled from a version of Hacl_Bignum from
+// the Hacl-star repo and specifically the gcc-compatible distribution.
+// These functions are dependencies needed by Hacl_GenericField64 which
+// has code to support conversions of big numbers to and from Montgomery
+// form.
 //*********************************************************************************
 
 void Hacl_Bignum_bn_add_mod_n_u64(uint32_t len1, uint64_t *n, uint64_t *a, uint64_t *b,

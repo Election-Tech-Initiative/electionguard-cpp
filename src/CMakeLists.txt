@@ -80,6 +80,8 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.h
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096_32.c
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096_32.h
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_GenericField64.c
+    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_GenericField64.h
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Hash.c
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Hash.h
     ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_HMAC_DRBG.c
