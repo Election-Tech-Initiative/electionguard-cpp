@@ -94,6 +94,36 @@ uint32_t Hacl_Bignum_ModInvLimb_mod_inv_uint32(uint32_t n0);
 
 uint64_t Hacl_Bignum_ModInvLimb_mod_inv_uint64(uint64_t n0);
 
+//*********************************************************************************
+// functions below have been added to get Hacl_GenericField64 to run
+//*********************************************************************************
+
+void Hacl_Bignum_bn_add_mod_n_u64(uint32_t len1, uint64_t *n, uint64_t *a, uint64_t *b,
+                                  uint64_t *res);
+
+void Hacl_Bignum_bn_sub_mod_n_u64(uint32_t len1, uint64_t *n, uint64_t *a, uint64_t *b,
+                                  uint64_t *res);
+
+void Hacl_Bignum_Montgomery_bn_mont_reduction_u64(uint32_t len, uint64_t *n, uint64_t nInv,
+                                                  uint64_t *c, uint64_t *res);
+
+void Hacl_Bignum_Montgomery_bn_to_mont_u64(uint32_t len, uint64_t *n, uint64_t nInv, uint64_t *r2,
+                                           uint64_t *a, uint64_t *aM);
+
+void Hacl_Bignum_Montgomery_bn_from_mont_u64(uint32_t len, uint64_t *n, uint64_t nInv_u64,
+                                             uint64_t *aM, uint64_t *a);
+
+uint64_t Hacl_Bignum_Montgomery_bn_check_modulus_u64(uint32_t len, uint64_t *n);
+
+void Hacl_Bignum_Montgomery_bn_precomp_r2_mod_n_u64(uint32_t len, uint32_t nBits, uint64_t *n,
+                                                    uint64_t *res);
+
+void Hacl_Bignum_Montgomery_bn_mont_mul_u64(uint32_t len, uint64_t *n, uint64_t nInv_u64,
+                                            uint64_t *aM, uint64_t *bM, uint64_t *resM);
+
+void Hacl_Bignum_Montgomery_bn_mont_sqr_u64(uint32_t len, uint64_t *n, uint64_t nInv_u64,
+                                            uint64_t *aM, uint64_t *resM);
+
 #if defined(__cplusplus)
 }
 #endif
