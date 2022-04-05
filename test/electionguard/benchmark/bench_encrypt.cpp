@@ -93,11 +93,14 @@ class EncryptBallotFixture : public benchmark::Fixture
         manifest = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
         internal = make_unique<InternalManifest>(*manifest);
         context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
+        contextJson = ElectionGenerator::getJsonContext();
         device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
         ballot = BallotGenerator::getFakeBallot(*internal);
 
         ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash(), nonces->next(),
                                    0ULL, false);
+        ciphertext = encryptBallot(*ballot, *internal, *contextJson, *device->getHash(),
+                                   nonces->next(), 0ULL, false);
     }
 
     void TearDown(const ::benchmark::State &state) {}
@@ -107,11 +110,21 @@ class EncryptBallotFixture : public benchmark::Fixture
     unique_ptr<Manifest> manifest;
     unique_ptr<InternalManifest> internal;
     unique_ptr<CiphertextElectionContext> context;
+    unique_ptr<CiphertextElectionContext> contextJson;
     unique_ptr<EncryptionDevice> device;
     unique_ptr<ElementModQ> nonce;
     unique_ptr<PlaintextBallot> ballot;
     unique_ptr<CiphertextBallot> ciphertext;
 };
+
+BENCHMARK_DEFINE_F(EncryptBallotFixture, encryptBallot_Full_FromJSON)(benchmark::State &state)
+{
+    // setup to test the encrypting of ballots with a context generated from json
+    for (auto _ : state) {
+        auto result = encryptBallot(*ballot, *internal, *contextJson, *device->getHash(),
+                                    make_unique<ElementModQ>(*nonce), 0ULL, false);
+    }
+}
 
 BENCHMARK_DEFINE_F(EncryptBallotFixture, encryptBallot_Full_NoProofCheck)(benchmark::State &state)
 {
@@ -149,6 +162,8 @@ BENCHMARK_DEFINE_F(EncryptBallotFixture, encryptBallot_Compact_WithProofCheck)
     }
 }
 
+BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptBallot_Full_FromJSON)
+  ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptBallot_Full_NoProofCheck)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptBallot_Full_WithProofCheck)
