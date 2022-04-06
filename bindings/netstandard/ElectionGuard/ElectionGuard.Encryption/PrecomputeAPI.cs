@@ -14,19 +14,19 @@ namespace ElectionGuard
         /// <summary>
         /// The precompute has not been started.
         /// </summary>
-        NotStarted,
+        NotStarted = 0,
         /// <summary>
         /// The precompute is currently running
         /// </summary>
-        Running,
+        Running = 1,
         /// <summary>
         /// The user stopped the precompute
         /// </summary>
-        UserStopped,
+        UserStopped = 2,
         /// <summary>
         /// The precompute finished
         /// </summary>
-        Completed,
+        Completed = 3,
     }
 
     /// <summary>
@@ -153,7 +153,7 @@ namespace ElectionGuard
             cancelToken = token;
             currentStatus.CurrentState = PrecomputeState.Running;
             delay = maxexp;
-            workerThread = new Thread(workerMethod);
+            workerThread = new Thread(WorkerMethod);
             workerThread.Start();
         }
 
@@ -169,7 +169,10 @@ namespace ElectionGuard
             }
         }
 
-        private void workerMethod()
+        /// <summary>
+        /// Dummy method to be used for the stubbing out until the exponentiation code is complete
+        /// </summary>
+        private void WorkerMethod()
         {
             double progress = 0;
             if (cancelTokenSource == null)

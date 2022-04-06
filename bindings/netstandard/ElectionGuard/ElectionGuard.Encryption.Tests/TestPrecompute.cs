@@ -18,7 +18,7 @@ namespace ElectionGuard.Encryption.Tests
 
             var status = precompute.GetStatus();
 
-            Assert.That(status.CurrentState == PrecomputeState.NotStarted);
+            Assert.AreEqual(PrecomputeState.NotStarted, status.CurrentState);
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace ElectionGuard.Encryption.Tests
             var status = precompute.GetStatus();
             precompute.StopPrecompute();
 
-            Assert.That(status.CurrentState == PrecomputeState.Running);
+            Assert.AreEqual(PrecomputeState.Running, status.CurrentState);
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace ElectionGuard.Encryption.Tests
 
             var status = precompute.GetStatus();
 
-            Assert.That(status.CurrentState == PrecomputeState.UserStopped);
+            Assert.AreEqual(PrecomputeState.UserStopped, status.CurrentState);
         }
 
     }
