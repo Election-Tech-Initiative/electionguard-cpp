@@ -162,6 +162,22 @@ BENCHMARK_DEFINE_F(EncryptBallotFixture, encryptBallot_Compact_WithProofCheck)
     }
 }
 
+BENCHMARK_DEFINE_F(EncryptBallotFixture, encryptContests_Full_FromJSON)(benchmark::State &state)
+{
+    // setup to test the encrypting of ballots with a context generated from json
+    for (auto _ : state) {
+        auto result = encryptContests(*ballot, *internal, *contextJson, *nonce, false);
+    }
+}
+
+BENCHMARK_DEFINE_F(EncryptBallotFixture, encryptContests_Full_NoProofCheck)(benchmark::State &state)
+{
+    // setup to test the encrypting of ballots with a context generated from json
+    for (auto _ : state) {
+        auto result = encryptContests(*ballot, *internal, *context, *nonce, false);
+    }
+}
+
 BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptBallot_Full_FromJSON)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptBallot_Full_NoProofCheck)
@@ -171,6 +187,10 @@ BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptBallot_Full_WithProofCheck)
 BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptBallot_Compact_NoProofCheck)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptBallot_Compact_WithProofCheck)
+  ->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptContests_Full_FromJSON)
+  ->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(EncryptBallotFixture, encryptContests_Full_NoProofCheck)
   ->Unit(benchmark::kMillisecond);
 
 #pragma endregion
