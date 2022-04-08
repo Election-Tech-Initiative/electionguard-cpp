@@ -292,14 +292,14 @@ endif
 bench:
 	@echo 🧪 BENCHMARK
 ifeq ($(OPERATING_SYSTEM),Windows)
-	echo "Benchmark is currently only supported on Linux & Mac"
-	# cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) -G "MSYS Makefiles" \
-	# 	-DCMAKE_BUILD_TYPE=$(TARGET) \
-	# 	-DBUILD_SHARED_LIBS=ON \
-	# 	-DEXPORT_INTERNALS=ON \
-	# 	-DCAN_USE_VECTOR_INTRINSICS=ON \
-	# 	-DOPTION_ENABLE_TESTS=ON \
-	# 	-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) -G "MSYS Makefiles" \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DBUILD_SHARED_LIBS=ON \
+		-DEXPORT_INTERNALS=ON \
+		-DCAN_USE_VECTOR_INTRINSICS=ON \
+		-DUSE_TEST_PRIMES=OFF \
+		-DOPTION_ENABLE_TESTS=ON \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
@@ -312,6 +312,7 @@ else
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
+	pwsh -Command "xcopy 'build\libs\x86_64\$(TARGET)\_deps\benchmark-build\src\libbenchmark.dll' 'build\libs\x86_64\$(TARGET)\test' /Q /Y;  $$null"
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardBenchmark
 
 bench-netstandard: build-netstandard
