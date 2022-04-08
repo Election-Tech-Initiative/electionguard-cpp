@@ -3,6 +3,7 @@
 #include "electionguard/ballot_code.hpp"
 #include "electionguard/election_object_base.hpp"
 #include "electionguard/hash.hpp"
+#include "electionguard/precompute_buffers.hpp"
 #include "log.hpp"
 #include "serialize.hpp"
 #include "utils.hpp"
@@ -308,6 +309,42 @@ namespace electionguard
         return make_unique<CiphertextBallotSelection>(
           objectId, sequenceOrder, descriptionHash, move(ciphertext), isPlaceholder, move(nonce),
           move(cryptoHash), move(proof), move(extendedData));
+    }
+
+    unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make_with_precomputed(
+      const std::string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
+      unique_ptr<ElGamalCiphertext> ciphertext, const ElementModP &elgamalPublicKey,
+      const ElementModQ &cryptoExtendedBaseHash, uint64_t plaintext,
+      unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
+      bool isPlaceholder /* = false */, bool computeProof /* = true */,
+      unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
+      unique_ptr<ElGamalCiphertext> extendedData /* = nullptr */)
+    {
+        unique_ptr<CiphertextBallotSelection> result = NULL;
+
+        if (cryptoHash == nullptr) {
+            auto crypto_hash = makeCryptoHash(objectId, descriptionHash, *ciphertext);
+            cryptoHash = move(crypto_hash);
+        }
+
+        // need to make sure we use the nonce used in precomputed values
+        auto nonce = precomputedTwoTriplesAndAQuad->get_triple1()->get_rho();
+
+        unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr;
+        if (computeProof) {
+            // always make a proof using the faster, non-deterministic method
+            proof = DisjunctiveChaumPedersenProof::make_with_precomputed(*ciphertext,
+                                                    move(precomputedTwoTriplesAndAQuad),
+                                                    elgamalPublicKey,
+                                                    cryptoExtendedBaseHash, plaintext);
+        }
+
+        return make_unique<CiphertextBallotSelection>(
+          objectId, sequenceOrder, descriptionHash, move(ciphertext), isPlaceholder,
+          move(nonce),
+          move(cryptoHash), move(proof), move(extendedData));
+
+        return result;
     }
 
     unique_ptr<ElementModQ>
