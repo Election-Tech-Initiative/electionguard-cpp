@@ -3,20 +3,20 @@ using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
+    using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotHandle;
+    using NativeCiphertextBallotContest = NativeInterface.CiphertextBallotContest.CiphertextBallotContestHandle;
+    using NativeCiphertextBallotSelection = NativeInterface.CiphertextBallotSelection.CiphertextBallotSelectionHandle;
+    using NativeCompactCiphertextBallot = NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle;
+    using NativeCompactPlaintextBallot = NativeInterface.CompactPlaintextBallot.CompactPlaintextBallotHandle;
+    using NativeConstantChaumPedersenProof = NativeInterface.ConstantChaumPedersenProof.ConstantChaumPedersenProofHandle;
+    using NativeDisjunctiveChaumPedersenProof = NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle;
     // Declare native types for convenience
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
     using NativeElGamalCiphertext = NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
-    using NativeDisjunctiveChaumPedersenProof = NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle;
-    using NativeConstantChaumPedersenProof = NativeInterface.ConstantChaumPedersenProof.ConstantChaumPedersenProofHandle;
     using NativeExtendedData = NativeInterface.ExtendedData.ExtendedDataHandle;
-    using NativePlaintextBallotSelection = NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle;
-    using NativeCiphertextBallotSelection = NativeInterface.CiphertextBallotSelection.CiphertextBallotSelectionHandle;
-    using NativePlaintextBallotContest = NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle;
-    using NativeCiphertextBallotContest = NativeInterface.CiphertextBallotContest.CiphertextBallotContestHandle;
     using NativePlaintextBallot = NativeInterface.PlaintextBallot.PlaintextBallotHandle;
-    using NativeCompactPlaintextBallot = NativeInterface.CompactPlaintextBallot.CompactPlaintextBallotHandle;
-    using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotHandle;
-    using NativeCompactCiphertextBallot = NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle;
+    using NativePlaintextBallotContest = NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle;
+    using NativePlaintextBallotSelection = NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle;
     using NativeSubmittedBallot = NativeInterface.SubmittedBallot.SubmittedBallotHandle;
 
     /// <summary>
@@ -911,7 +911,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"PlaintextBallot Error ToBson: size is too big");
+                throw new ElectionGuardException($"PlaintextBallot Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -933,7 +933,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"PlaintextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException($"PlaintextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -990,13 +990,12 @@ namespace ElectionGuard
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                Console.WriteLine($"CompactPlaintextBallot Error ToMsgPack: {status}");
-                return null;
+                throw new ElectionGuardException($"CompactPlaintextBallot Error ToMsgPack: {status}");
             }
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"CompactPlaintextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException($"CompactPlaintextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1244,7 +1243,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"CiphertextBallot Error ToBson: size is too big");
+                throw new ElectionGuardException($"CiphertextBallot Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1268,7 +1267,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"CiphertextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException($"CiphertextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1351,7 +1350,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"CompactCiphertextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException($"CompactCiphertextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1600,7 +1599,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"SubmittedBallot Error ToBson: size is too big");
+                throw new ElectionGuardException($"SubmittedBallot Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1622,7 +1621,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                Console.WriteLine($"SubmittedBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException($"SubmittedBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];

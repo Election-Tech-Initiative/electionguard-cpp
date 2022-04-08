@@ -65,8 +65,7 @@ namespace ElectionGuard
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{nameof(T)} ERROR ReleaseHandle: {ex.Message}");
-                return false;
+                throw new ElectionGuardException($"{nameof(T)} ERROR ReleaseHandle: {ex.Message}", ex);
             }
         }
     }

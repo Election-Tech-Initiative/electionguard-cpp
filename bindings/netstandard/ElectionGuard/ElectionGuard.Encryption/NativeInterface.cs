@@ -1,10 +1,10 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
 using System.Runtime.ConstrainedExecution;
+using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
-    internal enum Status
+    public enum Status
     {
         ELECTIONGUARD_STATUS_SUCCESS = 0,
         ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT,
@@ -330,8 +330,7 @@ namespace ElectionGuard
                     var status = LinkedList.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"LinkedList Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"LinkedList Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -395,8 +394,7 @@ namespace ElectionGuard
                     var status = ElementModP.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"ElementModP Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"ElementModP Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -441,8 +439,7 @@ namespace ElectionGuard
                     var status = ElementModQ.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"ElementModQ Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"ElementModQ Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -546,8 +543,7 @@ namespace ElectionGuard
                     var status = ElGamalKeyPair.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"ElGamalKeyPair Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"ElGamalKeyPair Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -591,8 +587,7 @@ namespace ElectionGuard
                     var status = ElGamalCiphertext.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"ElGamalCiphertext Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"ElGamalCiphertext Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -658,8 +653,7 @@ namespace ElectionGuard
                     var status = DisjunctiveChaumPedersenProof.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"DisjunctiveChaumPedersenProof Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"DisjunctiveChaumPedersenProof Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -768,8 +762,7 @@ namespace ElectionGuard
                     var status = ConstantChaumPedersenProof.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"ConstantChaumPedersenProof Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"ConstantChaumPedersenProof Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -843,8 +836,7 @@ namespace ElectionGuard
                     var status = AnnotatedString.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"AnnotatedString Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"AnnotatedString Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -897,8 +889,7 @@ namespace ElectionGuard
                     var status = Language.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"Language Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"Language Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -952,8 +943,7 @@ namespace ElectionGuard
                     var status = InternationalizedText.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"InternationalizedText Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"InternationalizedText Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -1008,8 +998,7 @@ namespace ElectionGuard
                     var status = ContactInformation.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"ContactInformation Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"ContactInformation Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -1093,8 +1082,7 @@ namespace ElectionGuard
                     var status = GeopoliticalUnit.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"GeopoliticalUnit Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"GeopoliticalUnit Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -1161,8 +1149,7 @@ namespace ElectionGuard
                     var status = BallotStyle.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"BallotStyle Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"BallotStyle Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -1241,8 +1228,7 @@ namespace ElectionGuard
                     var status = Party.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"Party Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"Party Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -1318,8 +1304,7 @@ namespace ElectionGuard
                     var status = Candidate.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"Candidate Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"Candidate Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -1404,8 +1389,7 @@ namespace ElectionGuard
                     var status = SelectionDescription.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"SelectionDescription Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"SelectionDescription Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -1463,8 +1447,7 @@ namespace ElectionGuard
                     var status = ContestDescription.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"ContestDescription Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"ContestDescription Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -1626,8 +1609,7 @@ namespace ElectionGuard
                     var status = ContestDescriptionWithPlaceholders.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"ContestDescriptionWithPlaceholders Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -1840,8 +1822,7 @@ namespace ElectionGuard
                     var status = Manifest.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"Manifest Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"Manifest Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -2029,8 +2010,7 @@ namespace ElectionGuard
                     var status = InternalManifest.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"InternalManifest Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"InternalManifest Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -2141,8 +2121,7 @@ namespace ElectionGuard
                     var status = CiphertextElectionContext.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"CiphertextElectionContext Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"CiphertextElectionContext Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -2225,7 +2204,7 @@ namespace ElectionGuard
                 [MarshalAs(UnmanagedType.LPStr)] string hex_manifest_hash,
                 out CiphertextElectionContextHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_from_hex",
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_from_hex_with_extended_data",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Make(
                 ulong number_of_guardians,
@@ -2276,8 +2255,7 @@ namespace ElectionGuard
                     var status = ExtendedData.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"ExtendedData Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"ExtendedData Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -2323,8 +2301,7 @@ namespace ElectionGuard
                     var status = PlaintextBallotSelection.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"PlaintextBallotSelection Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"PlaintextBallotSelection Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -2396,8 +2373,7 @@ namespace ElectionGuard
                     var status = CiphertextBallotSelection.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"CiphertextBallotSelection Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"CiphertextBallotSelection Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -2493,8 +2469,7 @@ namespace ElectionGuard
                     var status = PlaintextBallotContest.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"PlaintextBallotContest Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"PlaintextBallotContest Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -2555,8 +2530,7 @@ namespace ElectionGuard
                     var status = CiphertextBallotContest.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"CiphertextBallotContest Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"CiphertextBallotContest Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -2671,8 +2645,7 @@ namespace ElectionGuard
                     var status = PlaintextBallot.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"PlaintextBallot Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"PlaintextBallot Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -2763,8 +2736,7 @@ namespace ElectionGuard
                     var status = CompactPlaintextBallot.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"CompactPlaintextBallot Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"CompactPlaintextBallot Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -2804,8 +2776,7 @@ namespace ElectionGuard
                     var status = CiphertextBallot.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"CiphertextBallot Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"CiphertextBallot Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -2949,8 +2920,7 @@ namespace ElectionGuard
                     var status = CompactCiphertextBallot.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"CompactCiphertextBallot Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"CompactCiphertextBallot Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -3000,8 +2970,7 @@ namespace ElectionGuard
                     var status = SubmittedBallot.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"SubmittedBallot Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"SubmittedBallot Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -3144,8 +3113,7 @@ namespace ElectionGuard
                     var status = EncryptionDevice.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"EncryptionDevice Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"EncryptionDevice Error Free: {status}", status);
                     }
                     return true;
                 }
@@ -3186,8 +3154,7 @@ namespace ElectionGuard
                     var status = EncryptionMediator.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                     {
-                        Console.WriteLine($"EncryptionMediator Error Free: {status}");
-                        return false;
+                        throw new ElectionGuardException($"EncryptionMediator Error Free: {status}", status);
                     }
                     return true;
                 }
