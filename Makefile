@@ -314,6 +314,7 @@ endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	pwsh -Command "xcopy 'build\libs\x86_64\$(TARGET)\_deps\benchmark-build\src\libbenchmark.dll' 'build\libs\x86_64\$(TARGET)\test' /Q /Y;  $$null"
+endif
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardBenchmark
 
 bench-netstandard: build-netstandard
