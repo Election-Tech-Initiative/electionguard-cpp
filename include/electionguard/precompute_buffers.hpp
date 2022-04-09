@@ -209,11 +209,37 @@ namespace electionguard
             return instance;
         }
 
-        // TEMPORARILY THE PUBLIC KEY IS PASSED IN BUT WE MAY CHANGE THIS TO 
-        // A CiphertextElectionContext
+        /// <summary>
+        /// The populate method populates the precomputations queues with
+        /// values used by encryptSelection. The function is stopped by calling
+        /// stop_populate. Pre-computed values are currently computed by generating
+        /// two triples and a quad. We do this because two triples and a quad
+        /// are need for an encryptSelection.The triple queue is twice the size of 
+        /// the quad queue. We use two different queues in case we need to
+        /// make the stop more granular at some point, in other words currently
+        /// if we call stop it will finish the two triples and a quad before
+        /// stopping. If we want it to stop more granularly (for example after
+        /// each queue item then we can do that but it makes the code a bit
+        /// more complicated). In anticipation of possibly needing this we
+        /// use two queues.
+        ///
+        /// <param name="elgamalPublicKey">the elgamal public key for the election</param>
+        /// <param name="size_of_queue">by default the quad queue size is 500, so
+        ///                             1000 triples, if the caller wants the
+        ///                             queue size to be different then this
+        ///                             parameter is used</param>
+        /// <returns>void</returns>
+        /// </summary>
+        /// 
         static void
-        populate(const ElementModP &elgamalPublicKey); //const CiphertextElectionContext &context);
+        populate(const ElementModP &elgamalPublicKey, uint32_t size_of_queue = 0);
 
+        /// <summary>
+        /// The stop_populate method stops the population of the
+        /// precomputations queues started by the populate method.
+        /// <returns>void</returns>
+        /// </summary>
+        /// 
         static void stop_populate();
         
         static std::unique_ptr<TwoTriplesAndAQuadruple> getTwoTriplesAndAQuadruple();

@@ -158,18 +158,22 @@ namespace electionguard
         unique_ptr<ElementModQ> cryptoHash;
         unique_ptr<DisjunctiveChaumPedersenProof> proof;
         unique_ptr<ElGamalCiphertext> extendedData;
+        bool using_precomputed_values = false;
 
         Impl(string objectId, uint64_t sequenceOrder, unique_ptr<ElementModQ> descriptionHash,
              unique_ptr<ElGamalCiphertext> ciphertext, bool isPlaceholder,
              unique_ptr<ElementModQ> nonce, unique_ptr<ElementModQ> cryptoHash,
              unique_ptr<DisjunctiveChaumPedersenProof> proof,
-             unique_ptr<ElGamalCiphertext> extendedData)
+             unique_ptr<ElGamalCiphertext> extendedData,
+             bool using_precomputed_values)
             : objectId(move(objectId)), sequenceOrder(sequenceOrder),
               descriptionHash(move(descriptionHash)), ciphertext(move(ciphertext)),
               nonce(move(nonce)), cryptoHash(move(cryptoHash)), proof(move(proof)),
-              extendedData(move(extendedData))
+              extendedData(move(extendedData)),
+              using_precomputed_values(using_precomputed_values)
         {
             this->isPlaceholder = isPlaceholder;
+            this->using_precomputed_values = using_precomputed_values;
         }
 
         [[nodiscard]] unique_ptr<CiphertextBallotSelection::Impl> clone() const
@@ -184,7 +188,7 @@ namespace electionguard
 
             return make_unique<CiphertextBallotSelection::Impl>(
               objectId, sequenceOrder, move(_descriptionHash), move(_ciphertext), isPlaceholder,
-              move(_nonce), move(_cryptoHash), move(_proof), move(_extendedData));
+              move(_nonce), move(_cryptoHash), move(_proof), move(_extendedData), using_precomputed_values);
         }
 
         [[nodiscard]] unique_ptr<ElementModQ>
@@ -205,10 +209,10 @@ namespace electionguard
       const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
       unique_ptr<ElGamalCiphertext> ciphertext, bool isPlaceholder, unique_ptr<ElementModQ> nonce,
       unique_ptr<ElementModQ> cryptoHash, unique_ptr<DisjunctiveChaumPedersenProof> proof,
-      unique_ptr<ElGamalCiphertext> extendedData)
+      unique_ptr<ElGamalCiphertext> extendedData, bool using_precomputed_values)
         : pimpl(new Impl(objectId, sequenceOrder, make_unique<ElementModQ>(descriptionHash),
                          move(ciphertext), isPlaceholder, move(nonce), move(cryptoHash),
-                         move(proof), move(extendedData)))
+                         move(proof), move(extendedData), using_precomputed_values))
 
     {
     }
@@ -251,6 +255,11 @@ namespace electionguard
         return pimpl->proof.get();
     }
 
+    bool CiphertextBallotSelection::get_using_precomputed_values() const
+    {
+        return pimpl->using_precomputed_values;
+    }
+
     // Interface Overrides
 
     unique_ptr<ElementModQ>
@@ -284,7 +293,7 @@ namespace electionguard
 
         return make_unique<CiphertextBallotSelection>(
           objectId, sequenceOrder, descriptionHash, move(ciphertext), isPlaceholder, move(nonce),
-          move(cryptoHash), move(proof), move(extendedData));
+          move(cryptoHash), move(proof), move(extendedData), false);
     }
 
     unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make(
@@ -308,7 +317,7 @@ namespace electionguard
         }
         return make_unique<CiphertextBallotSelection>(
           objectId, sequenceOrder, descriptionHash, move(ciphertext), isPlaceholder, move(nonce),
-          move(cryptoHash), move(proof), move(extendedData));
+          move(cryptoHash), move(proof), move(extendedData), false);
     }
 
     unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make_with_precomputed(
@@ -342,7 +351,7 @@ namespace electionguard
         return make_unique<CiphertextBallotSelection>(
           objectId, sequenceOrder, descriptionHash, move(ciphertext), isPlaceholder,
           move(nonce),
-          move(cryptoHash), move(proof), move(extendedData));
+          move(cryptoHash), move(proof), move(extendedData), true);
 
         return result;
     }

@@ -128,13 +128,24 @@ namespace electionguard
     }
     
     void PrecomputeBufferContext::populate(
-      const ElementModP &elgamalPublicKey) //const CiphertextElectionContext &context)
-    {          
+      const ElementModP &elgamalPublicKey,
+      uint32_t size_of_queue /* = 0 */)
+    {       
+        // default size of quadruple_queue will be 500
+        uint32_t max = 500;
+        if (size_of_queue != 0) {
+            max = size_of_queue;
+        }
+
         getInstance().populate_OK = true;
 
-        // TODO - this will be an infinite loop
+        // This loop goes through until the queues are full but can be stopped
+        // between generations of two triples and a quad. By full it means
+        // we check how many quads are in the queue, to start with we will
+        // try 500 and see how that works. If the vendor wanted to pass the
+        // queue size in we could use that.
         // for now we just go through the loop once
-        for (int i = 0; i < 1; i++) {
+        do {
             // TODO - Can we tolerate not returning until we have finished
             // generating two triples and a quadruple?
             // If not we can get more elaborate with the populate_OK checking
@@ -165,7 +176,7 @@ namespace electionguard
             } else {
                 return;
             }
-        }
+        } while (getInstance().quadruple_queue.size() < max);
     }
 
     void PrecomputeBufferContext::stop_populate()

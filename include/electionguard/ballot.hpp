@@ -173,7 +173,8 @@ namespace electionguard
                                   std::unique_ptr<ElementModQ> nonce,
                                   std::unique_ptr<ElementModQ> cryptoHash,
                                   std::unique_ptr<DisjunctiveChaumPedersenProof> proof,
-                                  std::unique_ptr<ElGamalCiphertext> extendedData = nullptr);
+                                  std::unique_ptr<ElGamalCiphertext> extendedData = nullptr,
+                                  bool using_precomputed_values = false);
         ~CiphertextBallotSelection();
 
         CiphertextBallotSelection &operator=(CiphertextBallotSelection other);
@@ -220,6 +221,12 @@ namespace electionguard
         /// and was encrypted using the `nonce`
         /// </summary>
         DisjunctiveChaumPedersenProof *getProof() const;
+
+        /// <summary>
+        /// The using_precomputed_values indicates if the encryptSelection used
+        /// values from the precomuted buffers
+        /// </summary>
+        bool get_using_precomputed_values() const;
 
         /// <summary>
         /// Given an encrypted BallotSelection, generates a hash, suitable for rolling up
@@ -320,6 +327,8 @@ namespace electionguard
         class Impl;
 #pragma warning(suppress : 4251)
         std::unique_ptr<Impl> pimpl;
+
+        bool using_precomputed_values = false;
 
         /// set the hash of the encrypted values.
         /// used when reconstrcuting objects from cache

@@ -252,7 +252,7 @@ namespace electionguard
                    descriptionHash->toHex());
 
         //*****************TEMPORARY******************************
-        PrecomputeBufferContext::populate(elgamalPublicKey);
+        //PrecomputeBufferContext::populate(elgamalPublicKey);
         //********************************************************
         // this function runs off to look in the precomputed values buffer and if
         // it finds what it needs the the returned class will contain those values
@@ -299,9 +299,9 @@ namespace electionguard
         }
 
         // optionally, skip the verification step
-        if (!shouldVerifyProofs) {
-            return encrypted;
-        }
+        //if (!shouldVerifyProofs) {
+        //    return encrypted;
+        //}
 
         // verify the selection.
         if (encrypted->isValidEncryption(*descriptionHash, elgamalPublicKey,
