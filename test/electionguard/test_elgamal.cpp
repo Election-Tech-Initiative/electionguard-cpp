@@ -6,6 +6,7 @@
 #include <electionguard/constants.h>
 #include <electionguard/elgamal.hpp>
 #include <electionguard/group.hpp>
+#include <electionguard/precompute_buffers.hpp>
 
 using namespace electionguard;
 using namespace std;
@@ -45,6 +46,84 @@ TEST_CASE("elgamalEncrypt simple encrypt 0, with nonce 1 then publickey is g_pow
     CHECK((0UL == decrypted));
 }
 
+TEST_CASE("elgamalEncrypt simple encrypt 0, with real nonce")
+{
+    unique_ptr<ElementModQ> nonce = rand_q();
+    const auto &secret = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(secret, false);
+    auto *publicKey = keypair->getPublicKey();
+
+    CHECK((*publicKey < P()));
+
+    auto cipherText = elgamalEncrypt(0UL, *nonce, *publicKey);
+
+    auto decrypted = cipherText->decrypt(secret);
+    CHECK((0UL == decrypted));
+}
+
+TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_precomputed")
+{
+    const auto &secret = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(secret, false);
+    auto *publicKey = keypair->getPublicKey();
+
+    CHECK((*publicKey < P()));
+
+    // cause a two triples and a quad to be populated
+    PrecomputeBufferContext::populate(*keypair->getPublicKey(), 1);
+
+    // this function runs off to look in the precomputed values buffer and if
+    // it finds what it needs the the returned class will contain those values
+    auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+
+    CHECK(precomputedTwoTriplesAndAQuad != nullptr);
+    CHECK(precomputedTwoTriplesAndAQuad->isPopulated() == true);
+
+    auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
+
+    auto cipherText1 = elgamalEncrypt(0UL, *triple1->get_rho(), *publicKey);
+    auto cipherText2 =
+      elgamalEncrypt_with_precomputed(0UL, *triple1->get_g_to_rho(), *triple1->get_pubkey_to_rho());
+
+    CHECK((*cipherText1->getPad() == *cipherText2->getPad()));
+    CHECK((*cipherText1->getData() == *cipherText2->getData()));
+
+    auto decrypted1 = cipherText1->decrypt(secret);
+    CHECK((0UL == decrypted1));
+    auto decrypted2 = cipherText2->decrypt(secret);
+    CHECK((0UL == decrypted2));
+}
+
+TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0")
+{
+    const auto &secret = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(secret, false);
+    auto *publicKey = keypair->getPublicKey();
+
+    CHECK((*publicKey < P()));
+
+    // cause a two triples and a quad to be populated
+    PrecomputeBufferContext::populate(*keypair->getPublicKey(), 1);
+
+    // this function runs off to look in the precomputed values buffer and if
+    // it finds what it needs the the returned class will contain those values
+    auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+
+    CHECK(precomputedTwoTriplesAndAQuad != nullptr);
+    CHECK(precomputedTwoTriplesAndAQuad->isPopulated() == true);
+
+    auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
+    CHECK(triple1 != nullptr);
+
+    auto cipherText =
+      elgamalEncrypt_with_precomputed(0UL, *triple1->get_g_to_rho(),
+                                      *triple1->get_pubkey_to_rho());
+
+    auto decrypted = cipherText->decrypt(secret);
+    CHECK((0UL == decrypted));
+}
+
+
 TEST_CASE("elgamalEncrypt simple encrypt 1 decrypts with secret")
 {
     const auto &nonce = ONE_MOD_Q();
@@ -78,3 +157,28 @@ TEST_CASE("elgamalEncrypt encrypt 1 decrypts with secret")
     auto decrypted = cipherText->decrypt(*secret);
     CHECK(1UL == decrypted);
 }
+
+TEST_CASE("elgamalEncrypt_with_precomputed encrypt 1, decrypts with secret")
+{
+    //auto nonce = ElementModQ::fromHex(a_fixed_nonce);
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
+    auto *publicKey = keypair->getPublicKey();
+
+    CHECK((*publicKey < P()));
+
+    // cause a two triples and a quad to be populated
+    PrecomputeBufferContext::populate(*keypair->getPublicKey(), 1);
+
+    // this function runs off to look in the precomputed values buffer and if
+    // it finds what it needs the the returned class will contain those values
+    auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+    auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
+
+    auto cipherText =
+      elgamalEncrypt_with_precomputed(1UL, *triple1->get_g_to_rho(), *triple1->get_pubkey_to_rho());
+
+    auto decrypted = cipherText->decrypt(*secret);
+    CHECK(1UL == decrypted);
+}
+

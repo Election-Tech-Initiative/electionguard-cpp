@@ -132,9 +132,8 @@ namespace electionguard
       uint32_t size_of_queue /* = 0 */)
     {       
         // default size of quadruple_queue will be 500
-        uint32_t max = 500;
         if (size_of_queue != 0) {
-            max = size_of_queue;
+            getInstance().max = size_of_queue;
         }
 
         getInstance().populate_OK = true;
@@ -176,14 +175,24 @@ namespace electionguard
             } else {
                 return;
             }
-        } while (getInstance().quadruple_queue.size() < max);
+        } while (getInstance().quadruple_queue.size() < getInstance().max);
     }
 
     void PrecomputeBufferContext::stop_populate()
     {
         getInstance().populate_OK = false;
     }
-        
+
+    uint32_t PrecomputeBufferContext::get_max_queue_size()
+    {
+        return getInstance().max;
+    }
+
+    uint32_t PrecomputeBufferContext::get_current_queue_size()
+    {
+        return getInstance().quadruple_queue.size();
+    }
+      
     std::unique_ptr<TwoTriplesAndAQuadruple> PrecomputeBufferContext::getTwoTriplesAndAQuadruple()
     {
         unique_ptr<TwoTriplesAndAQuadruple> result = make_unique<TwoTriplesAndAQuadruple>();
@@ -212,7 +221,7 @@ namespace electionguard
         }
         getInstance().queue_lock.unlock();
 
-        return move(result);
+        return result;
     }
 } // namespace electionguard
 

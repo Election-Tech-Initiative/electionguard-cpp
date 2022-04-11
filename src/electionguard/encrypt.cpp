@@ -251,11 +251,8 @@ namespace electionguard
         Log::trace("encryptSelection: for " + description.getObjectId() + " hash: ",
                    descriptionHash->toHex());
 
-        //*****************TEMPORARY******************************
-        //PrecomputeBufferContext::populate(elgamalPublicKey);
-        //********************************************************
-        // this function runs off to look in the precomputed values buffer and if
-        // it finds what it needs the the returned class will contain those values
+        // this method runs off to look in the precomputed values buffer and if
+        // it finds what it needs then the returned class will contain those values
         precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
@@ -273,9 +270,13 @@ namespace electionguard
                 throw runtime_error("encryptSelection:: Error generating ciphertext");
             }
 
+            // note that there the public key and the selection nonce are not needed
+            // because the precomputation values are being used so a selection nonce
+            // was generated when precomputing and the public key was used in the
+            // precomputation
             encrypted = CiphertextBallotSelection::make_with_precomputed(
               selection.getObjectId(), description.getSequenceOrder(), *descriptionHash,
-              move(ciphertext), elgamalPublicKey, cryptoExtendedBaseHash, selection.getVote(),
+              move(ciphertext), cryptoExtendedBaseHash, selection.getVote(),
               move(precomputedTwoTriplesAndAQuad),
               isPlaceholder, true);
         } else {
@@ -299,9 +300,9 @@ namespace electionguard
         }
 
         // optionally, skip the verification step
-        //if (!shouldVerifyProofs) {
-        //    return encrypted;
-        //}
+        if (!shouldVerifyProofs) {
+            return encrypted;
+        }
 
         // verify the selection.
         if (encrypted->isValidEncryption(*descriptionHash, elgamalPublicKey,

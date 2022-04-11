@@ -133,7 +133,6 @@ namespace electionguard
         static std::unique_ptr<DisjunctiveChaumPedersenProof>
         make_with_precomputed(const ElGamalCiphertext &message,
                             std::unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-                            const ElementModP &k,
                             const ElementModQ &q, uint64_t plaintext);
 
         /// <Summary>
@@ -159,7 +158,6 @@ namespace electionguard
         static std::unique_ptr<DisjunctiveChaumPedersenProof>
         make_zero_with_precomputed(const ElGamalCiphertext &message, 
                   std::unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-                  const ElementModP &k,
                   const ElementModQ &q);
 
         static std::unique_ptr<DisjunctiveChaumPedersenProof>
@@ -172,7 +170,6 @@ namespace electionguard
         static std::unique_ptr<DisjunctiveChaumPedersenProof>
         make_one_with_precomputed(const ElGamalCiphertext &message, 
                  std::unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-                 const ElementModP &k,
                  const ElementModQ &q);
 
       private:

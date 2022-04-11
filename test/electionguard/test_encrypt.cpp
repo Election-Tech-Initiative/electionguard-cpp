@@ -37,6 +37,38 @@ TEST_CASE("Encrypt simple selection succeeds")
                                       ONE_MOD_Q()) == true);
 }
 
+TEST_CASE("Encrypt simple selection using precomputed values succeeds")
+{
+    // Arrange
+    const auto *candidateId = "some-candidate-id";
+    const auto *selectionId = "some-selection-object-id";
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
+    auto nonce = rand_q();
+    auto metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
+    auto hashContext = metadata->crypto_hash();
+    auto plaintext = BallotGenerator::selectionFrom(*metadata);
+
+    // cause a two triples and a quad to be populated 
+    PrecomputeBufferContext::populate(*keypair->getPublicKey(), 1);
+
+    uint32_t max_precomputed_queue_size = PrecomputeBufferContext::get_max_queue_size();
+    uint32_t current_precomputed_queue_size = PrecomputeBufferContext::get_current_queue_size();
+
+    CHECK(1 == max_precomputed_queue_size);
+    CHECK(1 == current_precomputed_queue_size);
+
+    // and this ecryptSelection will use the precomputed values
+    auto result = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
+                                   *nonce, false, true);
+
+    // Assert
+    CHECK(result != nullptr);
+    CHECK(result->getCiphertext() != nullptr);
+    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
+    CHECK(result->getProof()->isValid(*result->getCiphertext(), *keypair->getPublicKey(),
+                                      ONE_MOD_Q()) == true);
+}
+
 TEST_CASE("Encrypt simple selection malformed data fails")
 {
     // Arrange
@@ -261,4 +293,37 @@ TEST_CASE("Encrypt simple ballot from file submitted is valid")
                                        *context->getCryptoExtendedBaseHash()) == true);
     CHECK(deserialized->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
                                           *context->getCryptoExtendedBaseHash()) == true);
+}
+
+TEST_CASE("Encrypt simple ballot from file succeeds with precomputed values")
+{
+    // Arrange
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
+    auto manifest = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
+
+    auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
+
+    auto ballot = BallotGenerator::getFakeBallot(*internal);
+
+    // cause a two triples and a quad to be populated
+    PrecomputeBufferContext::populate(*keypair->getPublicKey(), 50);
+    PrecomputeBufferContext::stop_populate();
+    uint32_t max_precomputed_queue_size = PrecomputeBufferContext::get_max_queue_size();
+    uint32_t current_precomputed_queue_size = PrecomputeBufferContext::get_current_queue_size();
+
+    CHECK(50 == max_precomputed_queue_size);
+    CHECK(50 == current_precomputed_queue_size);
+
+    // Act
+    auto ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash(),
+                                    make_unique<ElementModQ>(TWO_MOD_Q()));
+
+    //Log::debug(ciphertext->toJson());
+
+    // Assert
+    CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
+                                        *context->getCryptoExtendedBaseHash()) == true);
 }

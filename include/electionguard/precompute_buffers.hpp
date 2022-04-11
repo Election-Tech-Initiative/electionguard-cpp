@@ -224,8 +224,8 @@ namespace electionguard
         /// use two queues.
         ///
         /// <param name="elgamalPublicKey">the elgamal public key for the election</param>
-        /// <param name="size_of_queue">by default the quad queue size is 500, so
-        ///                             1000 triples, if the caller wants the
+        /// <param name="size_of_queue">by default the quad queue size is 5000, so
+        ///                             10000 triples, if the caller wants the
         ///                             queue size to be different then this
         ///                             parameter is used</param>
         /// <returns>void</returns>
@@ -241,11 +241,26 @@ namespace electionguard
         /// </summary>
         /// 
         static void stop_populate();
-        
+
+        /// <summary>
+        /// Get the currently set maximum queue size for the number
+        /// of quadruples to generate. The number of triples in
+        /// the triple_queue will be twice this.
+        /// <returns>uint32_t</returns>
+        /// </summary>
+        static uint32_t get_max_queue_size();
+     
+        /// <summary>
+        /// Get the current number of quadruples in the quadruple_queue,
+        /// the number of triples in the triple_queue will be twice this.
+        /// <returns>uint32_t</returns>
+        /// </summary>
+        static uint32_t get_current_queue_size();
+
         static std::unique_ptr<TwoTriplesAndAQuadruple> getTwoTriplesAndAQuadruple();
 
       private:
-        //AsyncSemaphore queue_lock;
+        uint32_t max = 5000;
         std::mutex queue_lock;
         bool populate_OK = false;
         std::queue<TripleEntry *> triple_queue;

@@ -174,7 +174,7 @@ namespace electionguard
     unique_ptr<DisjunctiveChaumPedersenProof>
     DisjunctiveChaumPedersenProof::make_with_precomputed(const ElGamalCiphertext &message,
                                     unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-                                    const ElementModP &k, const ElementModQ &q,
+                                    const ElementModQ &q,
                                     uint64_t plaintext)
     {
         unique_ptr<DisjunctiveChaumPedersenProof> result;
@@ -185,9 +185,9 @@ namespace electionguard
         }
         Log::trace("DisjunctiveChaumPedersenProof: making proof without seed.");
         if (plaintext == 1) {
-            return make_one_with_precomputed(message, move(precomputedTwoTriplesAndAQuad), k, q);
+            return make_one_with_precomputed(message, move(precomputedTwoTriplesAndAQuad), q);
         }
-        return make_zero_with_precomputed(message, move(precomputedTwoTriplesAndAQuad), k, q);
+        return make_zero_with_precomputed(message, move(precomputedTwoTriplesAndAQuad), q);
 
         return result;
     }
@@ -372,7 +372,6 @@ namespace electionguard
     unique_ptr<DisjunctiveChaumPedersenProof>
     DisjunctiveChaumPedersenProof::make_zero_with_precomputed(const ElGamalCiphertext &message,
                                     unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-                                    const ElementModP &k,
                                     const ElementModQ &q)
     {
         auto *alpha = message.getPad();
@@ -469,7 +468,7 @@ namespace electionguard
     unique_ptr<DisjunctiveChaumPedersenProof>
     DisjunctiveChaumPedersenProof::make_one_with_precomputed(const ElGamalCiphertext &message,
                                     unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-                                    const ElementModP &k, const ElementModQ &q)
+                                    const ElementModQ &q)
     {
         unique_ptr<DisjunctiveChaumPedersenProof> result;
         

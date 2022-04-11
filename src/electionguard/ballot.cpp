@@ -158,22 +158,18 @@ namespace electionguard
         unique_ptr<ElementModQ> cryptoHash;
         unique_ptr<DisjunctiveChaumPedersenProof> proof;
         unique_ptr<ElGamalCiphertext> extendedData;
-        bool using_precomputed_values = false;
 
         Impl(string objectId, uint64_t sequenceOrder, unique_ptr<ElementModQ> descriptionHash,
              unique_ptr<ElGamalCiphertext> ciphertext, bool isPlaceholder,
              unique_ptr<ElementModQ> nonce, unique_ptr<ElementModQ> cryptoHash,
              unique_ptr<DisjunctiveChaumPedersenProof> proof,
-             unique_ptr<ElGamalCiphertext> extendedData,
-             bool using_precomputed_values)
+             unique_ptr<ElGamalCiphertext> extendedData)
             : objectId(move(objectId)), sequenceOrder(sequenceOrder),
               descriptionHash(move(descriptionHash)), ciphertext(move(ciphertext)),
               nonce(move(nonce)), cryptoHash(move(cryptoHash)), proof(move(proof)),
-              extendedData(move(extendedData)),
-              using_precomputed_values(using_precomputed_values)
+              extendedData(move(extendedData))
         {
             this->isPlaceholder = isPlaceholder;
-            this->using_precomputed_values = using_precomputed_values;
         }
 
         [[nodiscard]] unique_ptr<CiphertextBallotSelection::Impl> clone() const
@@ -188,7 +184,7 @@ namespace electionguard
 
             return make_unique<CiphertextBallotSelection::Impl>(
               objectId, sequenceOrder, move(_descriptionHash), move(_ciphertext), isPlaceholder,
-              move(_nonce), move(_cryptoHash), move(_proof), move(_extendedData), using_precomputed_values);
+              move(_nonce), move(_cryptoHash), move(_proof), move(_extendedData));
         }
 
         [[nodiscard]] unique_ptr<ElementModQ>
@@ -209,10 +205,10 @@ namespace electionguard
       const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
       unique_ptr<ElGamalCiphertext> ciphertext, bool isPlaceholder, unique_ptr<ElementModQ> nonce,
       unique_ptr<ElementModQ> cryptoHash, unique_ptr<DisjunctiveChaumPedersenProof> proof,
-      unique_ptr<ElGamalCiphertext> extendedData, bool using_precomputed_values)
+      unique_ptr<ElGamalCiphertext> extendedData)
         : pimpl(new Impl(objectId, sequenceOrder, make_unique<ElementModQ>(descriptionHash),
                          move(ciphertext), isPlaceholder, move(nonce), move(cryptoHash),
-                         move(proof), move(extendedData), using_precomputed_values))
+                         move(proof), move(extendedData)))
 
     {
     }
@@ -255,11 +251,6 @@ namespace electionguard
         return pimpl->proof.get();
     }
 
-    bool CiphertextBallotSelection::get_using_precomputed_values() const
-    {
-        return pimpl->using_precomputed_values;
-    }
-
     // Interface Overrides
 
     unique_ptr<ElementModQ>
@@ -293,7 +284,7 @@ namespace electionguard
 
         return make_unique<CiphertextBallotSelection>(
           objectId, sequenceOrder, descriptionHash, move(ciphertext), isPlaceholder, move(nonce),
-          move(cryptoHash), move(proof), move(extendedData), false);
+          move(cryptoHash), move(proof), move(extendedData));
     }
 
     unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make(
@@ -317,12 +308,12 @@ namespace electionguard
         }
         return make_unique<CiphertextBallotSelection>(
           objectId, sequenceOrder, descriptionHash, move(ciphertext), isPlaceholder, move(nonce),
-          move(cryptoHash), move(proof), move(extendedData), false);
+          move(cryptoHash), move(proof), move(extendedData));
     }
 
     unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make_with_precomputed(
       const std::string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
-      unique_ptr<ElGamalCiphertext> ciphertext, const ElementModP &elgamalPublicKey,
+      unique_ptr<ElGamalCiphertext> ciphertext,
       const ElementModQ &cryptoExtendedBaseHash, uint64_t plaintext,
       unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
       bool isPlaceholder /* = false */, bool computeProof /* = true */,
@@ -344,14 +335,13 @@ namespace electionguard
             // always make a proof using the faster, non-deterministic method
             proof = DisjunctiveChaumPedersenProof::make_with_precomputed(*ciphertext,
                                                     move(precomputedTwoTriplesAndAQuad),
-                                                    elgamalPublicKey,
                                                     cryptoExtendedBaseHash, plaintext);
         }
 
         return make_unique<CiphertextBallotSelection>(
           objectId, sequenceOrder, descriptionHash, move(ciphertext), isPlaceholder,
           move(nonce),
-          move(cryptoHash), move(proof), move(extendedData), true);
+          move(cryptoHash), move(proof), move(extendedData));
 
         return result;
     }
