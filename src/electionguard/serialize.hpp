@@ -757,6 +757,9 @@ namespace electionguard
                 auto cryptoExtendedBaseHash = ElementModQ::fromHex(crypto_extended_base_hash);
                 auto elGamalPublicKey = ElementModP::fromHex(elgamal_public_key);
 
+                // ensure the elgamal public key instance is set as a fixed base
+                elGamalPublicKey->setIsFixedBase(true);
+
                 if (j.contains("extended_data") && !j["extended_data"].is_null()) {
                     std::unordered_map<string, string> extendedDataMap;
 
