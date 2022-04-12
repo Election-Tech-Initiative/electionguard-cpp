@@ -257,7 +257,20 @@ namespace electionguard
         /// </summary>
         static uint32_t get_current_queue_size();
 
+        /// <summary>
+        /// Get the next two triples and a quadruple from the queues.
+        /// This method is called by encryptSelection in order to get
+        /// the precomputed values to encrypt the selection and make a
+        /// proof for it.
+        /// <returns>std::unique_ptr<TwoTriplesAndAQuadruple></returns>
+        /// </summary>
         static std::unique_ptr<TwoTriplesAndAQuadruple> getTwoTriplesAndAQuadruple();
+
+        /// <summary>
+        /// Empty the precomputed values queues.
+        /// <returns>void</returns>
+        /// </summary>
+        static void empty_queues();
 
       private:
         uint32_t max = 5000;

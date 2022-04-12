@@ -223,5 +223,18 @@ namespace electionguard
 
         return result;
     }
+
+    void PrecomputeBufferContext::empty_queues()
+    { 
+        getInstance().queue_lock.lock();
+        uint32_t size = getInstance().quadruple_queue.size();
+        for (int i = 0; i < (int)size; i++) {
+            getInstance().triple_queue.pop();
+            getInstance().triple_queue.pop();
+            getInstance().quadruple_queue.pop();
+        }
+        getInstance().queue_lock.unlock();
+    }
+
 } // namespace electionguard
 
