@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace ElectionGuard
 {
+    using NativePrecomputeBuffers = NativeInterface.PrecomputeBuffers;
+
+
     /// <summary>
     /// States that the precompute process can be in.
     /// </summary>
@@ -66,8 +69,16 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="maxexp">The max exponentiation to be calculated</param>
         /// <param name="token">CancelationToken that can be used to start the process</param>
-        /// <returns></returns>
+        [Obsolete]
         void StartPrecomputeAsync(long maxexp, CancellationToken token);
+
+        /// <summary>
+        /// Starts the precompute process by creating a new thread to run the process
+        /// </summary>
+        /// <param name="publicKey">The max exponentiation to be calculated</param>
+        /// <param name="token">CancelationToken that can be used to start the process</param>
+        /// <param name="buffers">The maximum number of buffers to precompute</param>
+        void StartPrecomputeAsync(ElementModP publicKey, CancellationToken token, int buffers);
 
         /// <summary>
         /// Stops the precompute process
@@ -105,7 +116,8 @@ namespace ElectionGuard
             CurrentState = PrecomputeState.NotStarted
         };
         private Thread workerThread;
-        private long delay = 2;
+        private int max_buffers = 0;    // zero will say to run to a default number of runs
+        private ElementModP elgamalPublicKey;
 
         /// <summary>
         /// Event handler that will give back progress to the calling code
@@ -147,13 +159,30 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="maxexp">The max exponentiation to be calculated</param>
         /// <param name="token">CancelationToken that can be used to start the process</param>
+        [Obsolete]
         public void StartPrecomputeAsync(long maxexp, CancellationToken token)
         {
             cancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
             cancelToken = token;
             currentStatus.CurrentState = PrecomputeState.Running;
-            delay = maxexp;
+        }
+
+        /// <summary>
+        /// Starts the precompute process by creating a new thread to run the process
+        /// </summary>
+        /// <param name="publicKey">The max exponentiation to be calculated</param>
+        /// <param name="token">CancelationToken that can be used to start the process</param>
+        /// <param name="buffers">The maximum number of buffers to precompute</param>
+        public void StartPrecomputeAsync(ElementModP publicKey, CancellationToken token, int buffers = 0)
+        {
+            cancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
+            cancelToken = token;
+            currentStatus.CurrentState = PrecomputeState.Running;
+            max_buffers = buffers;
+            elgamalPublicKey = publicKey;
+
             workerThread = new Thread(WorkerMethod);
+            workerThread.Name = "Precompute Worker Thread";
             workerThread.Start();
         }
 
@@ -164,6 +193,7 @@ namespace ElectionGuard
         {
             if (currentStatus.CurrentState == PrecomputeState.Running)
             {
+                NativePrecomputeBuffers.Stop();
                 currentStatus.CurrentState = PrecomputeState.UserStopped;
                 cancelTokenSource?.Cancel();
             }
@@ -174,35 +204,19 @@ namespace ElectionGuard
         /// </summary>
         private void WorkerMethod()
         {
-            double progress = 0;
             if (cancelTokenSource == null)
             {
                 cancelTokenSource = new CancellationTokenSource();
             }
-            while (!cancelToken.IsCancellationRequested)
-            {
-                Thread.Sleep((int)delay * 1000);
 
-                if (cancelToken.IsCancellationRequested)
-                {
-                    currentStatus.CurrentState = PrecomputeState.UserStopped;
-                    OnCompletedEvent();
-                    return;
-                }
+            NativePrecomputeBuffers.Populate(elgamalPublicKey.Handle, max_buffers);
 
-                progress += 10;
-                currentStatus.Percentage = progress;
-                if (progress == 100)
-                {
-                    currentStatus.CurrentState = PrecomputeState.Completed;
-                    OnCompletedEvent();
-                    return;
-                }
-                else
-                {
-                    OnProgressEvent();
-                }
-            }
+            if (cancelToken.IsCancellationRequested)
+                currentStatus.CurrentState = PrecomputeState.UserStopped;
+            else
+                currentStatus.CurrentState = PrecomputeState.Completed;
+
+            OnCompletedEvent();
         }
 
     }

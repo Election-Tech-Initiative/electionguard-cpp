@@ -28,6 +28,7 @@ using electionguard::Log;
 using electionguard::PlaintextBallot;
 using electionguard::PlaintextBallotContest;
 using electionguard::PlaintextBallotSelection;
+using electionguard::PrecomputeBufferContext;
 using electionguard::SelectionDescription;
 
 using std::invalid_argument;
@@ -396,6 +397,36 @@ eg_electionguard_status_t eg_encrypt_compact_ballot_with_nonce(
     } catch (const exception &e) {
         Log::error(":eg_encrypt_compact_ballot_with_nonce", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+#pragma endregion
+
+#pragma region Precompute
+
+EG_API eg_electionguard_status_t eg_precompute_populate(eg_element_mod_p_t *in_public_key,
+                                                        int max_buffers)
+{
+
+    try {
+        auto *public_key = AS_TYPE(ElementModP, in_public_key);
+        PrecomputeBufferContext::populate(*public_key, max_buffers);
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const std::exception &e) {
+        Log::error(":eg_precompute_populate", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_precompute_stop()
+{
+
+    try {
+        PrecomputeBufferContext::stop_populate();
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const std::exception &e) {
+        Log::error(":eg_precompute_stop", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     }
 }
 

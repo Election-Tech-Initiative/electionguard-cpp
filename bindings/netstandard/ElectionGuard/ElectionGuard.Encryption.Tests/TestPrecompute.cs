@@ -25,10 +25,11 @@ namespace ElectionGuard.Encryption.Tests
         public void Test_Precompute_Status_Running()
         {
             Precompute precompute = new Precompute();
+            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
 
             CancellationTokenSource cts = new CancellationTokenSource();
 
-            precompute.StartPrecomputeAsync(1, cts.Token);
+            precompute.StartPrecomputeAsync(keypair.PublicKey, cts.Token);
             var status = precompute.GetStatus();
             precompute.StopPrecompute();
 
@@ -39,10 +40,11 @@ namespace ElectionGuard.Encryption.Tests
         public void Test_Precompute_Status_Stopped()
         {
             Precompute precompute = new Precompute();
+            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
 
             CancellationTokenSource cts = new CancellationTokenSource();
 
-            precompute.StartPrecomputeAsync(1, cts.Token);
+            precompute.StartPrecomputeAsync(keypair.PublicKey, cts.Token);
             precompute.StopPrecompute();
             Thread.Sleep(1000);
 
