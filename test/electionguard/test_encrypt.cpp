@@ -50,6 +50,7 @@ TEST_CASE("Encrypt simple selection using precomputed values succeeds")
 
     // cause a two triples and a quad to be populated 
     PrecomputeBufferContext::populate(*keypair->getPublicKey(), 1);
+    PrecomputeBufferContext::stop_populate();
 
     uint32_t max_precomputed_queue_size = PrecomputeBufferContext::get_max_queue_size();
     uint32_t current_precomputed_queue_size = PrecomputeBufferContext::get_current_queue_size();

@@ -135,6 +135,7 @@ TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
 
     // cause a two triples and a quad to be populated
     PrecomputeBufferContext::populate(*keypair->getPublicKey(), 4);
+    PrecomputeBufferContext::stop_populate();
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
@@ -202,6 +203,7 @@ TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values")
 
     // cause a two triples and a quad to be populated
     PrecomputeBufferContext::populate(*keypair->getPublicKey(), 2);
+    PrecomputeBufferContext::stop_populate();
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
@@ -239,6 +241,7 @@ TEST_CASE("Disjunctive CP Proof encryption of one with precomputed values")
 
     // cause a two triples and a quad to be populated
     PrecomputeBufferContext::populate(*keypair->getPublicKey(), 2);
+    PrecomputeBufferContext::stop_populate();
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values

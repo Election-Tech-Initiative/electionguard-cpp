@@ -71,6 +71,7 @@ TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_pre
 
     // cause a two triples and a quad to be populated
     PrecomputeBufferContext::populate(*keypair->getPublicKey(), 1);
+    PrecomputeBufferContext::stop_populate();
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
@@ -104,6 +105,7 @@ TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0")
 
     // cause a two triples and a quad to be populated
     PrecomputeBufferContext::populate(*keypair->getPublicKey(), 1);
+    PrecomputeBufferContext::stop_populate();
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
@@ -169,6 +171,7 @@ TEST_CASE("elgamalEncrypt_with_precomputed encrypt 1, decrypts with secret")
 
     // cause a two triples and a quad to be populated
     PrecomputeBufferContext::populate(*keypair->getPublicKey(), 1);
+    PrecomputeBufferContext::stop_populate();
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values

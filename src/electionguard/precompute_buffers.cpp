@@ -148,9 +148,8 @@ namespace electionguard
             // TODO - Can we tolerate not returning until we have finished
             // generating two triples and a quadruple?
             // If not we can get more elaborate with the populate_OK checking
+            getInstance().queue_lock.lock();
             if (getInstance().populate_OK) {
-                getInstance().queue_lock.lock();
-
                 unique_ptr<Triple> triple1;
                 unique_ptr<Triple> triple2;
                 unique_ptr<Quadruple> quad;
@@ -170,9 +169,9 @@ namespace electionguard
                 QuadrupleEntry *quad_entry = new QuadrupleEntry();
                 quad_entry->set(move(quad));
                 getInstance().quadruple_queue.push(quad_entry);
-
                 getInstance().queue_lock.unlock();
             } else {
+                getInstance().queue_lock.unlock();
                 return;
             }
         } while (getInstance().quadruple_queue.size() < getInstance().max);
@@ -180,7 +179,9 @@ namespace electionguard
 
     void PrecomputeBufferContext::stop_populate()
     {
+        getInstance().queue_lock.lock();
         getInstance().populate_OK = false;
+        getInstance().queue_lock.unlock();
     }
 
     uint32_t PrecomputeBufferContext::get_max_queue_size()
