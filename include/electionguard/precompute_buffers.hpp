@@ -1,7 +1,6 @@
 #ifndef __ELECTIONGUARD_CPP_PRECOMPUTE_BUFFERS_HPP_INCLUDED__
 #define __ELECTIONGUARD_CPP_PRECOMPUTE_BUFFERS_HPP_INCLUDED__
 
-#include "..\..\src\electionguard\async.hpp"
 #include "electionguard/group.hpp"
 
 
@@ -12,12 +11,15 @@
 #include <iomanip>
 #include <iostream>
 #include <memory>
+#include <mutex>
+#include <queue>
 
 using std::begin;
 using std::copy;
 using std::end;
 using std::unique_ptr;
 using std::make_unique;
+using std::mutex;
 
 namespace electionguard
 {
