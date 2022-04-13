@@ -41,7 +41,7 @@ class ElGamalEncryptPrecomputedFixture : public benchmark::Fixture
 
 BENCHMARK_DEFINE_F(ElGamalEncryptPrecomputedFixture, ElGamalEncryptPrecomputed)(benchmark::State &state)
 {
-    for (auto _ : state) {
+    while (state.KeepRunning()) {
         auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
@@ -94,7 +94,7 @@ class ChaumPedersenPrecomputedFixture : public benchmark::Fixture
 
         // create precomputed entries that will be used by the selection
         // encryptions, on teardown the rest will be removed.
-        PrecomputeBufferContext::populate(*keypair->getPublicKey(), 50);
+        PrecomputeBufferContext::populate(*keypair->getPublicKey(), 150);
 
         message = elgamalEncrypt(1UL, *nonce, *keypair->getPublicKey());
         auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
@@ -159,7 +159,6 @@ BENCHMARK_DEFINE_F(ChaumPedersenPrecomputedFixture, disjunctiveChaumPedersenPrec
 (benchmark::State & state)
 {
     while (state.KeepRunning()) {
-
         auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
@@ -174,6 +173,90 @@ BENCHMARK_REGISTER_F(ChaumPedersenPrecomputedFixture, disjunctiveChaumPedersenPr
   ->Unit(benchmark::kMillisecond);
 
 #pragma endregion
+
+#pragma region ciphertextBallotSelectionPrecomputed
+
+class CiphertextBallotSelectionPrecomputedFixture : public benchmark::Fixture
+{
+  public:
+    void SetUp(const ::benchmark::State &state)
+    {
+        const auto *candidateId = "some-candidate-id";
+        const auto *selectionId = "some-selection-object-id";
+        auto secret = ElementModQ::fromHex(a_fixed_secret);
+        keypair = ElGamalKeyPair::fromSecret(*secret);
+
+        description = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
+        descriptionHash = description->crypto_hash();
+
+        auto nonce = ElementModQ::fromHex(a_fixed_nonce);
+
+        // cause precomputed entries that will be used by the selection
+        // encryptions, that should be more than enough and on teardown
+        // the rest will be removed.
+        PrecomputeBufferContext::populate(*keypair->getPublicKey(), 50);
+
+        auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+
+        // check if we found the precomputed values needed
+        if (precomputedTwoTriplesAndAQuad->isPopulated()) {
+            auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
+            auto g_to_rho = triple1->get_g_to_rho();
+            auto pubkeyToRho = triple1->get_pubkey_to_rho();
+
+            // Generate the encryption using precomputed values
+            ciphertext = elgamalEncrypt_with_precomputed(1UL,
+                                                             *g_to_rho, *pubkeyToRho);
+
+            auto encrypted = CiphertextBallotSelection::make_with_precomputed(
+                                    selectionId, description->getSequenceOrder(), *descriptionHash,
+                                    move(ciphertext), ONE_MOD_Q(), 1UL,
+                                    move(precomputedTwoTriplesAndAQuad),
+                                    false, true);
+        }
+    }
+
+    void TearDown(const ::benchmark::State &state) { PrecomputeBufferContext::empty_queues(); }
+
+    unique_ptr<SelectionDescription> description;
+    unique_ptr<ElementModQ> descriptionHash;
+    unique_ptr<ElGamalKeyPair> keypair;
+    unique_ptr<ElGamalCiphertext> ciphertext;
+};
+
+BENCHMARK_DEFINE_F(CiphertextBallotSelectionPrecomputedFixture,
+                   ciphertextBallotSelectionPrecomputed)
+(benchmark::State &state)
+{
+    const auto *selectionId = "some-selection-object-id";
+
+    while (state.KeepRunningBatch(50)) {
+        auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+
+        // check if we found the precomputed values needed
+        if (precomputedTwoTriplesAndAQuad->isPopulated()) {
+            auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
+            auto g_to_rho = triple1->get_g_to_rho();
+            auto pubkeyToRho = triple1->get_pubkey_to_rho();
+
+            // Generate the encryption using precomputed values
+            auto localciphertext = elgamalEncrypt_with_precomputed(1UL,
+                                                             *g_to_rho, *pubkeyToRho);
+
+            auto encrypted = CiphertextBallotSelection::make_with_precomputed(
+                                    selectionId, description->getSequenceOrder(), *descriptionHash,
+                                    move(localciphertext), ONE_MOD_Q(), 1UL,
+                                    move(precomputedTwoTriplesAndAQuad),
+                                    false, true);
+        }
+    }
+}
+
+BENCHMARK_REGISTER_F(CiphertextBallotSelectionPrecomputedFixture,
+                     ciphertextBallotSelectionPrecomputed)
+  ->Unit(benchmark::kMillisecond);
+
+#pragma endregion // ciphertextBallotSelectionPrecomputed
 
 #pragma region encryptSelectionPrecomputed
 
@@ -215,7 +298,7 @@ class EncryptSelectionPrecomputedFixture : public benchmark::Fixture
 
 BENCHMARK_DEFINE_F(EncryptSelectionPrecomputedFixture, encryptSelectionPrecomputed)(benchmark::State &state)
 {
-    for (auto _ : state) {
+    while (state.KeepRunningBatch(50)) {
         auto nonce = rand_q();
         encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(), *nonce,
                          false, false);
@@ -286,7 +369,7 @@ class EncryptBallotPrecomputeFixture : public benchmark::Fixture
 
         // precomputed entries that will be used by the selection
         // encryptions, on teardown the rest will be removed.
-        PrecomputeBufferContext::populate(*keypair->getPublicKey(), 500);
+        PrecomputeBufferContext::populate(*keypair->getPublicKey(), 2000);
     }
 
     void TearDown(const ::benchmark::State &state)
@@ -308,9 +391,9 @@ class EncryptBallotPrecomputeFixture : public benchmark::Fixture
 
 BENCHMARK_DEFINE_F(EncryptBallotPrecomputeFixture, encryptBallotPrecompute_Full_NoProofCheck)(benchmark::State &state)
 {
-    for (auto _ : state) {
+    while (state.KeepRunning()) {
         auto result = encryptBallot(*ballot, *internal, *context, *device->getHash(),
-                                    make_unique<ElementModQ>(*nonce), 0ULL, false);
+                                    make_unique<ElementModQ>(*nonce), 0UL, false);
     }
 }
 
