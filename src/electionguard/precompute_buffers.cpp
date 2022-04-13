@@ -131,9 +131,11 @@ namespace electionguard
       const ElementModP &elgamalPublicKey,
       uint32_t size_of_queue /* = 0 */)
     {       
-        // default size of quadruple_queue will be 500
+        // default size of quadruple_queue will be 5000
         if (size_of_queue != 0) {
             getInstance().max = size_of_queue;
+        } else {
+            getInstance().max = 5000;
         }
 
         getInstance().populate_OK = true;
