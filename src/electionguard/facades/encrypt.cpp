@@ -430,4 +430,17 @@ EG_API eg_electionguard_status_t eg_precompute_stop()
     }
 }
 
+EG_API eg_electionguard_status_t eg_precompute_status(int *out_count, int *out_queue_size)
+{
+
+    try {
+        *out_count = PrecomputeBufferContext::get_current_queue_size();
+        *out_queue_size = PrecomputeBufferContext::get_max_queue_size();
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const std::exception &e) {
+        Log::error(":eg_precompute_stop", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
 #pragma endregion

@@ -3314,6 +3314,9 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_precompute_stop")]
             internal static extern Status Stop();
+
+            [DllImport(DllName, EntryPoint = "eg_precompute_status")]
+            internal static extern Status Status(out int count, out int queue_size);
         }
 
         #endregion

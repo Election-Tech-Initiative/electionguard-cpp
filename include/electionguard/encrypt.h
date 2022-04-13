@@ -259,6 +259,8 @@ EG_API eg_electionguard_status_t eg_precompute_populate(eg_element_mod_p_t *in_p
 
 EG_API eg_electionguard_status_t eg_precompute_stop();
 
+EG_API eg_electionguard_status_t eg_precompute_status(int *out_count, int *out_queue_size);
+
 #endif
 
 #ifdef __cplusplus
