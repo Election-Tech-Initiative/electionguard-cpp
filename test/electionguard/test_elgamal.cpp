@@ -82,9 +82,9 @@ TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_pre
 
     auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
 
-    auto cipherText1 = elgamalEncrypt(0UL, *triple1->get_rho(), *publicKey);
+    auto cipherText1 = elgamalEncrypt(0UL, *triple1->get_exp(), *publicKey);
     auto cipherText2 =
-      elgamalEncrypt_with_precomputed(0UL, *triple1->get_g_to_rho(), *triple1->get_pubkey_to_rho());
+      elgamalEncrypt_with_precomputed(0UL, *triple1->get_g_to_exp(), *triple1->get_pubkey_to_exp());
 
     CHECK((*cipherText1->getPad() == *cipherText2->getPad()));
     CHECK((*cipherText1->getData() == *cipherText2->getData()));
@@ -118,8 +118,8 @@ TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0")
     CHECK(triple1 != nullptr);
 
     auto cipherText =
-      elgamalEncrypt_with_precomputed(0UL, *triple1->get_g_to_rho(),
-                                      *triple1->get_pubkey_to_rho());
+      elgamalEncrypt_with_precomputed(0UL, *triple1->get_g_to_exp(),
+                                      *triple1->get_pubkey_to_exp());
 
     auto decrypted = cipherText->decrypt(secret);
     CHECK((0UL == decrypted));
@@ -179,7 +179,7 @@ TEST_CASE("elgamalEncrypt_with_precomputed encrypt 1, decrypts with secret")
     auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
 
     auto cipherText =
-      elgamalEncrypt_with_precomputed(1UL, *triple1->get_g_to_rho(), *triple1->get_pubkey_to_rho());
+      elgamalEncrypt_with_precomputed(1UL, *triple1->get_g_to_exp(), *triple1->get_pubkey_to_exp());
 
     auto decrypted = cipherText->decrypt(*secret);
     CHECK(1UL == decrypted);

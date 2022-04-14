@@ -47,9 +47,9 @@ BENCHMARK_DEFINE_F(ElGamalEncryptPrecomputedFixture, ElGamalEncryptPrecomputed)(
         // check if we found the precomputed values needed
         if (precomputedTwoTriplesAndAQuad->isPopulated()) {
             auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
-            auto g_to_rho = triple1->get_g_to_rho();
-            auto pubkey_to_rho = triple1->get_pubkey_to_rho();
-            elgamalEncrypt_with_precomputed(1UL, *g_to_rho, *pubkey_to_rho);
+            auto g_to_exp = triple1->get_g_to_exp();
+            auto pubkey_to_exp = triple1->get_pubkey_to_exp();
+            elgamalEncrypt_with_precomputed(1UL, *g_to_exp, *pubkey_to_exp);
         }
     }
 }
@@ -201,12 +201,11 @@ class CiphertextBallotSelectionPrecomputedFixture : public benchmark::Fixture
         // check if we found the precomputed values needed
         if (precomputedTwoTriplesAndAQuad->isPopulated()) {
             auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
-            auto g_to_rho = triple1->get_g_to_rho();
-            auto pubkeyToRho = triple1->get_pubkey_to_rho();
+            auto g_to_exp = triple1->get_g_to_exp();
+            auto pubkey_to_exp = triple1->get_pubkey_to_exp();
 
             // Generate the encryption using precomputed values
-            ciphertext = elgamalEncrypt_with_precomputed(1UL,
-                                                             *g_to_rho, *pubkeyToRho);
+            ciphertext = elgamalEncrypt_with_precomputed(1UL, *g_to_exp, *pubkey_to_exp);
 
             auto encrypted = CiphertextBallotSelection::make_with_precomputed(
                                     selectionId, description->getSequenceOrder(), *descriptionHash,
@@ -236,12 +235,11 @@ BENCHMARK_DEFINE_F(CiphertextBallotSelectionPrecomputedFixture,
         // check if we found the precomputed values needed
         if (precomputedTwoTriplesAndAQuad->isPopulated()) {
             auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
-            auto g_to_rho = triple1->get_g_to_rho();
-            auto pubkeyToRho = triple1->get_pubkey_to_rho();
+            auto g_to_exp = triple1->get_g_to_exp();
+            auto pubkey_to_exp = triple1->get_pubkey_to_exp();
 
             // Generate the encryption using precomputed values
-            auto localciphertext = elgamalEncrypt_with_precomputed(1UL,
-                                                             *g_to_rho, *pubkeyToRho);
+            auto localciphertext = elgamalEncrypt_with_precomputed(1UL, *g_to_exp, *pubkey_to_exp);
 
             auto encrypted = CiphertextBallotSelection::make_with_precomputed(
                                     selectionId, description->getSequenceOrder(), *descriptionHash,

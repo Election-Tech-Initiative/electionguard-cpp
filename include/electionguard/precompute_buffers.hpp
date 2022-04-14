@@ -3,7 +3,6 @@
 
 #include "electionguard/group.hpp"
 
-
 #include <array>
 #include <cstdint>
 #include <electionguard/constants.h>
@@ -24,48 +23,57 @@ using std::mutex;
 namespace electionguard
 {
     /// <summary>
+    /// This object holds the Triple for the entries in the precomputed triple_queue
+    /// The three items contained in this object are a random exponent (exp),
+    /// g ^ exp mod p (g_to_exp) and K ^ exp mod p (pubkey_to_exp - where K is
+    /// the public key).
     /// </summary>
     class EG_INTERNAL_API Triple
     {
-      unique_ptr<ElementModQ> rho;
-      unique_ptr<ElementModP> g_to_rho;
-      unique_ptr<ElementModP> pubkey_to_rho;
+      unique_ptr<ElementModQ> exp;
+      unique_ptr<ElementModP> g_to_exp;
+      unique_ptr<ElementModP> pubkey_to_exp;
 
       public:
       explicit Triple(const ElementModP &publicKey) { generateTriple(publicKey); }
       Triple() { }
+      Triple(unique_ptr<ElementModQ> exp, unique_ptr<ElementModP> g_to_exp,
+                unique_ptr<ElementModP> pubkey_to_exp);
 
-      unique_ptr<ElementModQ> get_rho()
+      unique_ptr<ElementModQ> get_exp()
       {
-          unique_ptr<ElementModQ> new_rho = make_unique<ElementModQ>(*rho);
-          return move(new_rho);
+          return exp->clone();
       }
 
-      unique_ptr<ElementModP> get_g_to_rho()
+      unique_ptr<ElementModP> get_g_to_exp()
       {
-          unique_ptr<ElementModP> new_g_to_rho = make_unique<ElementModP>(*g_to_rho);
-          return move(new_g_to_rho);
+          return g_to_exp->clone();
       }
 
-      unique_ptr<ElementModP> get_pubkey_to_rho()
+      unique_ptr<ElementModP> get_pubkey_to_exp()
       {
-          unique_ptr<ElementModP> new_pubkey_to_rho = make_unique<ElementModP>(*pubkey_to_rho);
-          return move(new_pubkey_to_rho);
+          return pubkey_to_exp->clone();
       }
 
-      void set(unique_ptr<ElementModQ> in_rho,
-               unique_ptr<ElementModP> in_g_to_rho,
-               unique_ptr<ElementModP> in_pubkey_to_rho);
+      unique_ptr<Triple> clone();
+
     protected:
         void generateTriple(const ElementModP &publicKey);
     };
-    
+
+    /// <summary>
+    /// This object holds the Quadruple for the entries in the precomputed
+    /// quadruple_queue. The four items contained in this object are the
+    /// first random exponent (exp1), the second random exponent (exp2)
+    /// g ^ exp1 mod p (g_to_exp1) and (g ^ exp2 mod p) * (K ^ exp mod p)
+    /// (g_to_exp2 mult_by_pubkey_to_exp1 - where K is the public key).
+    /// </summary>    
     class EG_INTERNAL_API Quadruple
     {
-        unique_ptr<ElementModQ> sigma;
-        unique_ptr<ElementModQ> rho;
-        unique_ptr<ElementModP> g_to_rho;
-        unique_ptr<ElementModP> g_to_sigma_mult_by_pubkey_to_rho;
+        unique_ptr<ElementModQ> exp1;
+        unique_ptr<ElementModQ> exp2;
+        unique_ptr<ElementModP> g_to_exp1;
+        unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1;
 
       public:
         explicit Quadruple(const ElementModP &publicKey)
@@ -73,81 +81,85 @@ namespace electionguard
             generateQuadruple(publicKey);
         }
         Quadruple() {};
+        Quadruple(unique_ptr<ElementModQ> exp1, unique_ptr<ElementModQ> exp2,
+                  unique_ptr<ElementModP> g_to_exp1,
+                  unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1);
 
-        unique_ptr<ElementModQ> get_sigma()
+        unique_ptr<ElementModQ> get_exp1()
         {
-            unique_ptr<ElementModQ> new_sigma = make_unique<ElementModQ>(*sigma);
-            return move(new_sigma);
+            return exp1->clone();
         }
 
-        unique_ptr<ElementModQ> get_rho()
+        unique_ptr<ElementModQ> get_exp2()
         {
-            unique_ptr<ElementModQ> new_rho = make_unique<ElementModQ>(*rho);
-            return move(new_rho);
+            return exp2->clone();
         }
 
-        unique_ptr<ElementModP> get_g_to_rho()
+        unique_ptr<ElementModP> get_g_to_exp1()
         {
-            unique_ptr<ElementModP> new_g_to_rho = make_unique<ElementModP>(*g_to_rho);
-            return move(new_g_to_rho);
+            return g_to_exp1->clone();
         }
 
-        unique_ptr<ElementModP> get_g_to_sigma_mult_by_pubkey_to_rho()
+        unique_ptr<ElementModP> get_g_to_exp2_mult_by_pubkey_to_exp1()
         {
-            unique_ptr<ElementModP> new_g_to_sigma_mult_by_pubkey_to_rho =
-              make_unique<ElementModP>(*g_to_sigma_mult_by_pubkey_to_rho);
-            return move(new_g_to_sigma_mult_by_pubkey_to_rho);
+            return g_to_exp2_mult_by_pubkey_to_exp1->clone();
         }
 
-        void set(unique_ptr<ElementModQ> in_rho, unique_ptr<ElementModQ> in_sigma,
-                 unique_ptr<ElementModP> in_g_to_rho,
-                 unique_ptr<ElementModP> in_g_to_sigma_mult_by_pubkey_to_rho);
+        unique_ptr<Quadruple> clone();
 
       protected:
         void generateQuadruple(const ElementModP &publicKey);
     };
-
+    
     class EG_INTERNAL_API TripleEntry
     {
       public:
-        explicit TripleEntry() {}
+        TripleEntry(unique_ptr<ElementModQ> exp, unique_ptr<ElementModP> g_to_exp,
+                    unique_ptr<ElementModP> pubkey_to_exp);
 
-        uint64_t *get_rho() { return rho; }
-        uint64_t *get_g_to_rho() { return g_to_rho; }
-        uint64_t *get_pubkey_to_rho() { return pubkey_to_rho; }
+        uint64_t *get_exp() { return exp; }
+        uint64_t *get_g_to_exp() { return g_to_exp; }
+        uint64_t *get_pubkey_to_exp() { return pubkey_to_exp; }
 
-        void set(unique_ptr<Triple> triple);
         unique_ptr<Triple> get_triple();
 
       private:
-        uint64_t rho[MAX_Q_LEN];
-        uint64_t g_to_rho[MAX_P_LEN];
-        uint64_t pubkey_to_rho[MAX_P_LEN];
+        uint64_t exp[MAX_Q_LEN];
+        uint64_t g_to_exp[MAX_P_LEN];
+        uint64_t pubkey_to_exp[MAX_P_LEN];
     };
     
     class EG_INTERNAL_API QuadrupleEntry
     {
       public:
-        explicit QuadrupleEntry() {}
+        explicit QuadrupleEntry(unique_ptr<ElementModQ> exp1, unique_ptr<ElementModQ> exp2,
+                                unique_ptr<ElementModP> g_to_exp1,
+                                unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1);
 
-        uint64_t *get_rho() { return rho; }
-        uint64_t *get_sigma() { return sigma; }
-        uint64_t *get_g_to_rho() { return g_to_rho; }
-        uint64_t *get_g_to_sigma_mult_by_pubkey_to_rho()
+        uint64_t *get_exp1() { return exp1; }
+        uint64_t *get_exp2() { return exp2; }
+        uint64_t *get_g_to_exp1() { return g_to_exp1; }
+        uint64_t *get_g_to_exp2_mult_by_pubkey_to_exp1()
         {
-            return g_to_sigma_mult_by_pubkey_to_rho;
+            return g_to_exp2_mult_by_pubkey_to_exp1;
         }
 
-        void set(unique_ptr<Quadruple> quadruple);
         unique_ptr<Quadruple> get_quadruple();
 
       private:
-        uint64_t rho[MAX_Q_LEN];
-        uint64_t sigma[MAX_Q_LEN];
-        uint64_t g_to_rho[MAX_P_LEN];
-        uint64_t g_to_sigma_mult_by_pubkey_to_rho[MAX_P_LEN];
+        uint64_t exp1[MAX_Q_LEN];
+        uint64_t exp2[MAX_Q_LEN];
+        uint64_t g_to_exp1[MAX_P_LEN];
+        uint64_t g_to_exp2_mult_by_pubkey_to_exp1[MAX_P_LEN];
     };
-    
+
+    /// <summary>
+    /// This object holds the two Triples and a Quadruple of precomputed
+    /// values that are used to speed up encryption of a selection.
+    /// Since the values are precomputed it removes all the exponentiations
+    /// from the ElGamal encryption of the selection as well as the
+    /// computation of the Chaum Pedersen proof.
+    /// </summary>    
     class EG_INTERNAL_API TwoTriplesAndAQuadruple
     {
         unique_ptr<Triple> triple1;
@@ -157,29 +169,22 @@ namespace electionguard
 
       public:
         explicit TwoTriplesAndAQuadruple() { populated = false; }
+        TwoTriplesAndAQuadruple(unique_ptr<Triple> in_triple1, unique_ptr<Triple> in_triple2,
+                                unique_ptr<Quadruple> in_quad);
 
         unique_ptr<Triple> get_triple1()
         {
-            unique_ptr<Triple> new_triple1 = make_unique<Triple>();
-            new_triple1->set(triple1->get_rho(), triple1->get_g_to_rho(),
-                triple1->get_pubkey_to_rho());
-            return move(new_triple1);
+            return triple1->clone();
         }
 
         unique_ptr<Triple> get_triple2()
         {
-            unique_ptr<Triple> new_triple2 = make_unique<Triple>();
-            new_triple2->set(triple2->get_rho(), triple2->get_g_to_rho(),
-                triple2->get_pubkey_to_rho());
-            return move(new_triple2);
+            return triple2->clone();
         }
 
         unique_ptr<Quadruple> get_quad()
         {
-            unique_ptr<Quadruple> new_quad = make_unique<Quadruple>();
-            new_quad->set(quad->get_rho(), quad->get_sigma(), quad->get_g_to_rho(),
-                          quad->get_g_to_sigma_mult_by_pubkey_to_rho());
-            return move(new_quad);
+            return quad->clone();
         }
 
         bool isPopulated()
@@ -187,8 +192,7 @@ namespace electionguard
             return populated;
         }
 
-        void set(unique_ptr<Triple> in_triple1, unique_ptr<Triple> in_triple2,
-                 unique_ptr<Quadruple> in_quad);
+        unique_ptr<TwoTriplesAndAQuadruple> clone();
     };
     
     /// <summary>

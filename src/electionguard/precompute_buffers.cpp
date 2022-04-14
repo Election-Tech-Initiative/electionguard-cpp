@@ -22,109 +22,110 @@ using std::end;
 
 namespace electionguard
 {
+    Triple::Triple(unique_ptr<ElementModQ> exp, unique_ptr<ElementModP> g_to_exp,
+                   unique_ptr<ElementModP> pubkey_to_exp)
+    {
+        this->exp = move(exp);
+        this->g_to_exp = move(g_to_exp);
+        this->pubkey_to_exp = move(pubkey_to_exp);
+    }
+
     void Triple::generateTriple(const ElementModP &publicKey)
     {
         // generate a random rho
-        rho = rand_q();
-        g_to_rho = g_pow_p(*rho);
-        pubkey_to_rho = pow_mod_p(publicKey, *rho);
+        exp = rand_q();
+        g_to_exp = g_pow_p(*exp);
+        pubkey_to_exp = pow_mod_p(publicKey, *exp);
     }
 
-    void Triple::set(unique_ptr<ElementModQ> in_rho, unique_ptr<ElementModP> in_g_to_rho,
-                     unique_ptr<ElementModP> in_pubkey_to_rho)
+    unique_ptr<Triple> Triple::clone()
     {
-        rho = move(in_rho);
-        g_to_rho = move(in_g_to_rho);
-        pubkey_to_rho = move(in_pubkey_to_rho);
+        return make_unique<Triple>(exp->clone(), g_to_exp->clone(),
+                                   pubkey_to_exp->clone());
+    }
+
+    Quadruple::Quadruple(unique_ptr<ElementModQ> exp1, unique_ptr<ElementModQ> exp2,
+                         unique_ptr<ElementModP> g_to_exp1,
+                         unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1)
+    {
+        this->exp1 = move(exp1);
+        this->exp2 = move(exp2);
+        this->g_to_exp1 = move(g_to_exp1);
+        this->g_to_exp2_mult_by_pubkey_to_exp1 = move(g_to_exp2_mult_by_pubkey_to_exp1);
     }
 
     void Quadruple::generateQuadruple(const ElementModP &publicKey)
     {
         // generate a random sigma and rho
-        sigma = rand_q();
-        rho = rand_q();
-        g_to_rho = g_pow_p(*rho);
-        g_to_sigma_mult_by_pubkey_to_rho = mul_mod_p(*g_pow_p(*sigma), *pow_mod_p(publicKey, *rho));
+        exp1 = rand_q();
+        exp2 = rand_q();
+        g_to_exp1 = g_pow_p(*exp1);
+        g_to_exp2_mult_by_pubkey_to_exp1 = mul_mod_p(*g_pow_p(*exp2), *pow_mod_p(publicKey, *exp1));
     }
 
-    void Quadruple::set(unique_ptr<ElementModQ> in_rho, unique_ptr<ElementModQ> in_sigma,
-                        unique_ptr<ElementModP> in_g_to_rho,
-                        unique_ptr<ElementModP> in_g_to_sigma_mult_by_pubkey_to_rho)
+    unique_ptr<Quadruple> Quadruple::clone()
     {
-        rho = move(in_rho);
-        sigma = move(in_sigma);
-        g_to_rho = move(in_g_to_rho);
-        g_to_sigma_mult_by_pubkey_to_rho = move(in_g_to_sigma_mult_by_pubkey_to_rho);
+        return make_unique<Quadruple>(exp1->clone(), exp2->clone(), g_to_exp1->clone(),
+                                   g_to_exp2_mult_by_pubkey_to_exp1->clone());
     }
 
-    void TripleEntry::set(unique_ptr<Triple> triple)
+    TripleEntry::TripleEntry(unique_ptr<ElementModQ> exp, unique_ptr<ElementModP> g_to_exp,
+                             unique_ptr<ElementModP> pubkey_to_exp)
     {
-        unique_ptr<ElementModQ> p_rho = triple->get_rho();
-        unique_ptr<ElementModP> p_g_to_rho = triple->get_g_to_rho();
-        unique_ptr<ElementModP> p_pubkey_to_rho = triple->get_pubkey_to_rho();
-        uint64_t *p_rho_u64 = p_rho->get();
-        uint64_t *p_g_to_rho_u64 = p_g_to_rho->get();
-        uint64_t *p_pubkey_to_rho_u64 = p_pubkey_to_rho->get();
-        copy(p_rho_u64, p_rho_u64 + MAX_Q_LEN, rho);
-        copy(p_g_to_rho_u64, p_g_to_rho_u64 + MAX_P_LEN, g_to_rho);
-        copy(p_pubkey_to_rho_u64, p_pubkey_to_rho_u64 + MAX_P_LEN, pubkey_to_rho);
+        copy(exp->get(), exp->get() + MAX_Q_LEN, this->exp);
+        copy(g_to_exp->get(), g_to_exp->get() + MAX_P_LEN, this->g_to_exp);
+        copy(pubkey_to_exp->get(), pubkey_to_exp->get() + MAX_P_LEN, this->pubkey_to_exp);
     }
 
     unique_ptr<Triple> TripleEntry::get_triple()
     {
-        unique_ptr<Triple> result = make_unique<Triple>();
-        
-        unique_ptr<ElementModQ> temp_rho = make_unique<ElementModQ>(rho);
-        unique_ptr<ElementModP> temp_g_to_rho = make_unique<ElementModP>(g_to_rho);
-        unique_ptr<ElementModP> temp_pubkey_to_rho = make_unique<ElementModP>(pubkey_to_rho);
+        unique_ptr<ElementModQ> temp_exp = make_unique<ElementModQ>(exp);
+        unique_ptr<ElementModP> temp_g_to_exp = make_unique<ElementModP>(g_to_exp);
+        unique_ptr<ElementModP> temp_pubkey_to_exp = make_unique<ElementModP>(pubkey_to_exp);
 
-        result->set(move(temp_rho), move(temp_g_to_rho), move(temp_pubkey_to_rho));
-        
-        return result;
-    }
-    
-    void QuadrupleEntry::set(unique_ptr<Quadruple> quadruple)
-    { 
-        unique_ptr<ElementModQ> p_sigma = quadruple->get_sigma();
-        unique_ptr<ElementModQ> p_rho = quadruple->get_rho();
-        unique_ptr<ElementModP> p_g_to_rho = quadruple->get_g_to_rho();
-        unique_ptr<ElementModP> p_g_to_sigma_mult_by_pubkey_to_rho =
-          quadruple->get_g_to_sigma_mult_by_pubkey_to_rho();
-        uint64_t *p_sigma_u64 = p_sigma->get();
-        uint64_t *p_rho_u64 = p_rho->get();
-        uint64_t *p_g_to_rho_u64 = p_g_to_rho->get();
-        uint64_t *p_g_to_sigma_mult_by_pubkey_to_rho_u64 = p_g_to_sigma_mult_by_pubkey_to_rho->get();
-        copy(p_sigma_u64, p_sigma_u64 + MAX_Q_LEN, sigma);
-        copy(p_rho_u64, p_rho_u64 + MAX_Q_LEN, rho);
-        copy(p_g_to_rho_u64, p_g_to_rho_u64 + MAX_P_LEN, g_to_rho);
-        copy(p_g_to_sigma_mult_by_pubkey_to_rho_u64,
-             p_g_to_sigma_mult_by_pubkey_to_rho_u64 + MAX_P_LEN, g_to_sigma_mult_by_pubkey_to_rho);
-    }
-    
-    unique_ptr<Quadruple> QuadrupleEntry::get_quadruple()
-    {
-        unique_ptr<Quadruple> result = make_unique<Quadruple>();
-
-        unique_ptr<ElementModQ> temp_rho = make_unique<ElementModQ>(rho);
-        unique_ptr<ElementModQ> temp_sigma = make_unique<ElementModQ>(sigma);
-        unique_ptr<ElementModP> temp_g_to_rho = make_unique<ElementModP>(g_to_rho);
-        unique_ptr<ElementModP> temp_g_to_sigma_mult_by_pubkey_to_rho =
-          make_unique<ElementModP>(g_to_sigma_mult_by_pubkey_to_rho);
-
-        result->set(move(temp_rho), move(temp_sigma), move(temp_g_to_rho),
-                    move(temp_g_to_sigma_mult_by_pubkey_to_rho));
-
-        return result;
+        return make_unique<Triple>(move(temp_exp), move(temp_g_to_exp), move(temp_pubkey_to_exp));
     }
  
-    void TwoTriplesAndAQuadruple::set(unique_ptr<Triple> in_triple1,
-                                      unique_ptr<Triple> in_triple2,
-                                      unique_ptr<Quadruple> in_quad)
+    QuadrupleEntry::QuadrupleEntry(unique_ptr<ElementModQ> exp1, unique_ptr<ElementModQ> exp2,
+                                   unique_ptr<ElementModP> g_to_exp1,
+                                   unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1)
     {
-        triple1 = move(in_triple1);
-        triple2 = move(in_triple2);
-        quad = move(in_quad);
+        copy(exp1->get(), exp1->get() + MAX_Q_LEN, this->exp1);
+        copy(exp2->get(), exp2->get() + MAX_Q_LEN, this->exp2);
+        copy(g_to_exp1->get(), g_to_exp1->get() + MAX_P_LEN,
+             this->g_to_exp1);
+        copy(g_to_exp2_mult_by_pubkey_to_exp1->get(),
+             g_to_exp2_mult_by_pubkey_to_exp1->get() + MAX_P_LEN,
+             this->g_to_exp2_mult_by_pubkey_to_exp1);
+    }
+
+    unique_ptr<Quadruple> QuadrupleEntry::get_quadruple()
+    {
+        unique_ptr<ElementModQ> temp_exp1 = make_unique<ElementModQ>(exp1);
+        unique_ptr<ElementModQ> temp_exp2 = make_unique<ElementModQ>(exp2);
+        unique_ptr<ElementModP> temp_g_to_exp1 = make_unique<ElementModP>(g_to_exp1);
+        unique_ptr<ElementModP> temp_g_to_exp2_mult_by_pubkey_to_exp1 =
+          make_unique<ElementModP>(g_to_exp2_mult_by_pubkey_to_exp1);
+
+        return make_unique<Quadruple>(move(temp_exp1), move(temp_exp2), move(temp_g_to_exp1),
+                                 move(temp_g_to_exp2_mult_by_pubkey_to_exp1));
+    }
+    
+    TwoTriplesAndAQuadruple::TwoTriplesAndAQuadruple(unique_ptr<Triple> triple1,
+                                                     unique_ptr<Triple> triple2,
+                                                     unique_ptr<Quadruple> quad)
+    {
+        this->triple1 = move(triple1);
+        this->triple2 = move(triple2);
+        this->quad = move(quad);
         populated = true;
+    }
+
+    unique_ptr<TwoTriplesAndAQuadruple> TwoTriplesAndAQuadruple::clone()
+    {
+        return make_unique<TwoTriplesAndAQuadruple>(triple1->clone(),
+                                                    triple2->clone(),
+                                                    quad->clone());
     }
     
     void PrecomputeBufferContext::populate(
@@ -152,24 +153,24 @@ namespace electionguard
             // If not we can get more elaborate with the populate_OK checking
             getInstance().queue_lock.lock();
             if (getInstance().populate_OK) {
-                unique_ptr<Triple> triple1;
-                unique_ptr<Triple> triple2;
-                unique_ptr<Quadruple> quad;
-
                 // generate two triples and a quadruple
-                triple1 = make_unique<Triple>(elgamalPublicKey);
-                TripleEntry *triple_entry1 = new TripleEntry();
-                triple_entry1->set(move(triple1));
+                // 
+                // these constuctors will generate the precomputed values
+                unique_ptr<Triple> triple1 = make_unique<Triple>(elgamalPublicKey);
+                unique_ptr<Triple> triple2 = make_unique<Triple>(elgamalPublicKey);
+                unique_ptr<Quadruple> quad = make_unique<Quadruple>(elgamalPublicKey);
+
+                TripleEntry *triple_entry1 = new TripleEntry(triple1->get_exp(),
+                    triple1->get_g_to_exp(), triple1->get_pubkey_to_exp());
                 getInstance().triple_queue.push(triple_entry1);
                
-                triple2 = make_unique<Triple>(elgamalPublicKey);
-                TripleEntry *triple_entry2 = new TripleEntry();
-                triple_entry2->set(move(triple2));
+                TripleEntry *triple_entry2 = new TripleEntry(
+                  triple2->get_exp(), triple2->get_g_to_exp(), triple2->get_pubkey_to_exp());
                 getInstance().triple_queue.push(triple_entry2);
 
-                quad = make_unique<Quadruple>(elgamalPublicKey);
-                QuadrupleEntry *quad_entry = new QuadrupleEntry();
-                quad_entry->set(move(quad));
+                QuadrupleEntry *quad_entry = new QuadrupleEntry(quad->get_exp1(),
+                    quad->get_exp2(), quad->get_g_to_exp1(),
+                    quad->get_g_to_exp2_mult_by_pubkey_to_exp1());
                 getInstance().quadruple_queue.push(quad_entry);
                 getInstance().queue_lock.unlock();
             } else {
@@ -220,7 +221,9 @@ namespace electionguard
             delete quadruple_entry;
             getInstance().quadruple_queue.pop();
             
-            result->set(move(triple1), move(triple2), move(quad));
+            result = make_unique<TwoTriplesAndAQuadruple>(move(triple1),
+                                                          move(triple2),
+                                                          move(quad));
         }
         getInstance().queue_lock.unlock();
 

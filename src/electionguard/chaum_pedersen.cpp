@@ -382,17 +382,17 @@ namespace electionguard
 
         // Get our values from the precomputed values.
         auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
-        auto r = triple1->get_rho();
+        auto r = triple1->get_exp();
         auto triple2 = precomputedTwoTriplesAndAQuad->get_triple2();
         auto quad = precomputedTwoTriplesAndAQuad->get_quad();
-        auto u = triple2->get_rho();
-        auto v = quad->get_rho();
-        auto w = quad->get_sigma();
+        auto u = triple2->get_exp();
+        auto v = quad->get_exp1();
+        auto w = quad->get_exp2();
         
-        auto a0 = triple2->get_g_to_rho();                      // 𝑔^𝑢 mod 𝑝
-        auto b0 = triple2->get_pubkey_to_rho();                 // 𝐾^𝑢 mod 𝑝
-        auto a1 = quad->get_g_to_rho();                         // 𝑔^v mod 𝑝
-        auto b1 = quad->get_g_to_sigma_mult_by_pubkey_to_rho(); // g^w⋅K^v mod p
+        auto a0 = triple2->get_g_to_exp();                      // 𝑔^𝑢 mod 𝑝
+        auto b0 = triple2->get_pubkey_to_exp();                 // 𝐾^𝑢 mod 𝑝
+        auto a1 = quad->get_g_to_exp1();                        // 𝑔^v mod 𝑝
+        auto b1 = quad->get_g_to_exp2_mult_by_pubkey_to_exp1();  // g^w⋅K^v mod p
  
         // Compute the challenge
         auto c = hash_elems(
@@ -480,17 +480,17 @@ namespace electionguard
 
         // Get our values from the precomputed values.
         auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
-        auto r = triple1->get_rho();
+        auto r = triple1->get_exp();
         auto triple2 = precomputedTwoTriplesAndAQuad->get_triple2();
         auto quad = precomputedTwoTriplesAndAQuad->get_quad();
-        auto u = triple2->get_rho();
-        auto v = quad->get_rho();
-        auto w = quad->get_sigma();
+        auto u = triple2->get_exp();
+        auto v = quad->get_exp1();
+        auto w = quad->get_exp2();
 
-        auto a0 = quad->get_g_to_rho(); // 𝑔^v mod 𝑝
-        auto b0 = quad->get_g_to_sigma_mult_by_pubkey_to_rho(); // g^w⋅K^v mod p
-        auto a1 = triple2->get_g_to_rho(); // 𝑔^𝑢 mod 𝑝
-        auto b1 = triple2->get_pubkey_to_rho(); // 𝐾^𝑢 mod 𝑝
+        auto a0 = quad->get_g_to_exp1();                        // 𝑔^v mod 𝑝
+        auto b0 = quad->get_g_to_exp2_mult_by_pubkey_to_exp1(); // g^w⋅K^v mod p
+        auto a1 = triple2->get_g_to_exp();                      // 𝑔^𝑢 mod 𝑝
+        auto b1 = triple2->get_pubkey_to_exp();                 // 𝐾^𝑢 mod 𝑝
 
         // Compute challenge
         auto c = hash_elems(

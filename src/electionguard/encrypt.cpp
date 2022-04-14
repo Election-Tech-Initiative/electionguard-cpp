@@ -257,13 +257,16 @@ namespace electionguard
 
         // check if we found the precomputed values needed
         if (precomputedTwoTriplesAndAQuad->isPopulated()) {
+
+            Log::debug("****************** USING PRECOMPUTED ***********************");
+
             auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
-            auto g_to_rho = triple1->get_g_to_rho();
-            auto pubkeyToRho = triple1->get_pubkey_to_rho();
+            auto g_to_exp = triple1->get_g_to_exp();
+            auto pubkey_to_exp = triple1->get_pubkey_to_exp();
 
             // Generate the encryption using precomputed values
             ciphertext = elgamalEncrypt_with_precomputed(selection.getVote(),
-                                                         *g_to_rho, *pubkeyToRho);
+                                                         *g_to_exp, *pubkey_to_exp);
             if (ciphertext == nullptr) {
                 throw runtime_error("encryptSelection:: Error generating ciphertext");
             }
