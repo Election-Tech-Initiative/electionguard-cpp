@@ -40,6 +40,13 @@ namespace electionguard
       Triple(unique_ptr<ElementModQ> exp, unique_ptr<ElementModP> g_to_exp,
                 unique_ptr<ElementModP> pubkey_to_exp);
 
+      Triple(const Triple &triple);
+      Triple(Triple &&);
+      ~Triple();
+
+      Triple &operator=(const Triple &triple);
+      Triple &operator=(Triple &&);
+
       unique_ptr<ElementModQ> get_exp()
       {
           return exp->clone();
@@ -84,6 +91,12 @@ namespace electionguard
         Quadruple(unique_ptr<ElementModQ> exp1, unique_ptr<ElementModQ> exp2,
                   unique_ptr<ElementModP> g_to_exp1,
                   unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1);
+        Quadruple(const Quadruple &quadruple);
+        Quadruple(Quadruple &&);
+        ~Quadruple();
+
+        Quadruple &operator=(const Quadruple &quadruple);
+        Quadruple &operator=(Quadruple &&);
 
         unique_ptr<ElementModQ> get_exp1()
         {
@@ -116,6 +129,12 @@ namespace electionguard
       public:
         TripleEntry(unique_ptr<ElementModQ> exp, unique_ptr<ElementModP> g_to_exp,
                     unique_ptr<ElementModP> pubkey_to_exp);
+        TripleEntry(const TripleEntry &triple_entry);
+        TripleEntry(TripleEntry &&);
+        ~TripleEntry();
+
+        TripleEntry &operator=(const TripleEntry &triple_entry);
+        TripleEntry &operator=(TripleEntry &&);
 
         uint64_t *get_exp() { return exp; }
         uint64_t *get_g_to_exp() { return g_to_exp; }
@@ -135,6 +154,12 @@ namespace electionguard
         explicit QuadrupleEntry(unique_ptr<ElementModQ> exp1, unique_ptr<ElementModQ> exp2,
                                 unique_ptr<ElementModP> g_to_exp1,
                                 unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1);
+        QuadrupleEntry(const QuadrupleEntry &quadruple_entry);
+        QuadrupleEntry(QuadrupleEntry &&);
+        ~QuadrupleEntry();
+
+        QuadrupleEntry &operator=(const QuadrupleEntry &quad_entry);
+        QuadrupleEntry &operator=(QuadrupleEntry &&);
 
         uint64_t *get_exp1() { return exp1; }
         uint64_t *get_exp2() { return exp2; }
@@ -171,6 +196,12 @@ namespace electionguard
         explicit TwoTriplesAndAQuadruple() { populated = false; }
         TwoTriplesAndAQuadruple(unique_ptr<Triple> in_triple1, unique_ptr<Triple> in_triple2,
                                 unique_ptr<Quadruple> in_quad);
+        TwoTriplesAndAQuadruple(const TwoTriplesAndAQuadruple &other);
+        TwoTriplesAndAQuadruple(TwoTriplesAndAQuadruple &&);
+        ~TwoTriplesAndAQuadruple();
+
+        TwoTriplesAndAQuadruple &operator=(const TwoTriplesAndAQuadruple &other);
+        TwoTriplesAndAQuadruple &operator=(TwoTriplesAndAQuadruple &&);
 
         unique_ptr<Triple> get_triple1()
         {
@@ -203,6 +234,8 @@ namespace electionguard
       public:
         PrecomputeBufferContext(const PrecomputeBufferContext &) = delete;
         PrecomputeBufferContext(PrecomputeBufferContext &&) = delete;
+        PrecomputeBufferContext &operator=(const PrecomputeBufferContext &) = delete;
+        PrecomputeBufferContext &operator=(PrecomputeBufferContext &&) = delete;
 
       private:
         PrecomputeBufferContext() {}

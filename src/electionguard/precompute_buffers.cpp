@@ -1,5 +1,6 @@
 #include "async.hpp"
 #include "utils.hpp"
+#include "../kremlin/Lib_Memzero0.h"
 #include "electionguard/group.hpp"
 #include <electionguard/precompute_buffers.hpp>
 
@@ -30,6 +31,38 @@ namespace electionguard
         this->pubkey_to_exp = move(pubkey_to_exp);
     }
 
+    Triple::Triple(const Triple &triple)
+    {
+        this->exp = triple.exp->clone();
+        this->g_to_exp = triple.g_to_exp->clone();
+        this->pubkey_to_exp = triple.pubkey_to_exp->clone();
+    }
+    
+    Triple::Triple(Triple &&triple)
+    {
+        this->exp = move(triple.exp);
+        this->g_to_exp = move(triple.g_to_exp);
+        this->pubkey_to_exp = move(triple.pubkey_to_exp);
+    }
+    
+    Triple::~Triple() = default;
+ 
+    Triple &Triple::operator=(const Triple &triple)
+    {
+        this->exp = triple.exp->clone();
+        this->g_to_exp = triple.g_to_exp->clone();
+        this->pubkey_to_exp = triple.pubkey_to_exp->clone();
+        return *this;
+    }
+    
+    Triple &Triple::operator=(Triple &&triple)
+    {
+        this->exp = move(triple.exp);
+        this->g_to_exp = move(triple.g_to_exp);
+        this->pubkey_to_exp = move(triple.pubkey_to_exp);
+        return *this;
+    }
+
     void Triple::generateTriple(const ElementModP &publicKey)
     {
         // generate a random rho
@@ -54,6 +87,45 @@ namespace electionguard
         this->g_to_exp2_mult_by_pubkey_to_exp1 = move(g_to_exp2_mult_by_pubkey_to_exp1);
     }
 
+    Quadruple::Quadruple(const Quadruple &quadruple)
+    {
+        this->exp1 = quadruple.exp1->clone();
+        this->exp2 = quadruple.exp2->clone();
+        this->g_to_exp1 = quadruple.g_to_exp1->clone();
+        this->g_to_exp2_mult_by_pubkey_to_exp1 =
+          quadruple.g_to_exp2_mult_by_pubkey_to_exp1->clone();
+    }
+
+    Quadruple::Quadruple(Quadruple &&quadruple)
+    {
+        this->exp1 = move(quadruple.exp1);
+        this->exp2 = move(quadruple.exp2);
+        this->g_to_exp1 = move(quadruple.g_to_exp1);
+        this->g_to_exp2_mult_by_pubkey_to_exp1 = move(quadruple.g_to_exp2_mult_by_pubkey_to_exp1);
+    }
+
+    Quadruple::~Quadruple() = default;
+
+    Quadruple &Quadruple::operator=(const Quadruple &quadruple)
+    {
+        this->exp1 = quadruple.exp1->clone();
+        this->exp2 = quadruple.exp2->clone();
+        this->g_to_exp1 = quadruple.g_to_exp1->clone();
+        this->g_to_exp2_mult_by_pubkey_to_exp1 =
+          quadruple.g_to_exp2_mult_by_pubkey_to_exp1->clone();
+        return *this;
+    }
+
+    Quadruple &Quadruple::operator=(Quadruple &&quadruple)
+    {
+        this->exp1 = move(quadruple.exp1);
+        this->exp2 = move(quadruple.exp2);
+        this->g_to_exp1 = move(quadruple.g_to_exp1);
+        this->g_to_exp2_mult_by_pubkey_to_exp1 =
+          move(quadruple.g_to_exp2_mult_by_pubkey_to_exp1);
+        return *this;
+    }
+ 
     void Quadruple::generateQuadruple(const ElementModP &publicKey)
     {
         // generate a random sigma and rho
@@ -67,6 +139,54 @@ namespace electionguard
     {
         return make_unique<Quadruple>(exp1->clone(), exp2->clone(), g_to_exp1->clone(),
                                    g_to_exp2_mult_by_pubkey_to_exp1->clone());
+    }
+
+    TripleEntry::TripleEntry(const TripleEntry &triple_entry)
+    {
+        copy(triple_entry.exp, triple_entry.exp + MAX_Q_LEN, this->exp);
+        copy(triple_entry.g_to_exp, triple_entry.g_to_exp + MAX_P_LEN, this->g_to_exp);
+        copy(triple_entry.pubkey_to_exp, triple_entry.pubkey_to_exp + MAX_P_LEN,
+             this->pubkey_to_exp);
+    }
+
+    TripleEntry::TripleEntry(TripleEntry &&triple_entry)
+    {
+        copy(triple_entry.exp, triple_entry.exp + MAX_Q_LEN, this->exp);
+        copy(triple_entry.g_to_exp, triple_entry.g_to_exp + MAX_P_LEN, this->g_to_exp);
+        copy(triple_entry.pubkey_to_exp, triple_entry.pubkey_to_exp + MAX_P_LEN,
+             this->pubkey_to_exp);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(triple_entry.exp), MAX_Q_LEN);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(triple_entry.g_to_exp), MAX_P_LEN);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(triple_entry.pubkey_to_exp), MAX_P_LEN);
+    }
+
+    TripleEntry::~TripleEntry()
+    {
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(exp), MAX_Q_LEN);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(g_to_exp), MAX_P_LEN);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(pubkey_to_exp), MAX_P_LEN);
+    }
+
+    TripleEntry &TripleEntry::operator=(const TripleEntry &triple_entry)
+    {
+        copy(triple_entry.exp, triple_entry.exp + MAX_Q_LEN, this->exp);
+        copy(triple_entry.g_to_exp, triple_entry.g_to_exp + MAX_P_LEN, this->g_to_exp);
+        copy(triple_entry.pubkey_to_exp, triple_entry.pubkey_to_exp + MAX_P_LEN,
+             this->pubkey_to_exp);
+        return *this;
+    }
+
+    TripleEntry &TripleEntry::operator=(TripleEntry &&triple_entry)
+    {
+        copy(triple_entry.exp, triple_entry.exp + MAX_Q_LEN, this->exp);
+        copy(triple_entry.g_to_exp, triple_entry.g_to_exp + MAX_P_LEN, this->g_to_exp);
+        copy(triple_entry.pubkey_to_exp, triple_entry.pubkey_to_exp + MAX_P_LEN,
+             this->pubkey_to_exp);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(triple_entry.exp), MAX_Q_LEN);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(triple_entry.g_to_exp), MAX_P_LEN);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(triple_entry.pubkey_to_exp), MAX_P_LEN);
+
+        return *this;
     }
 
     TripleEntry::TripleEntry(unique_ptr<ElementModQ> exp, unique_ptr<ElementModP> g_to_exp,
@@ -99,6 +219,66 @@ namespace electionguard
              this->g_to_exp2_mult_by_pubkey_to_exp1);
     }
 
+    QuadrupleEntry::QuadrupleEntry(const QuadrupleEntry &quadruple_entry)
+    {
+        copy(quadruple_entry.exp1, quadruple_entry.exp1 + MAX_Q_LEN, this->exp1);
+        copy(quadruple_entry.exp2, quadruple_entry.exp2 + MAX_Q_LEN, this->exp2);
+        copy(quadruple_entry.g_to_exp1, quadruple_entry.g_to_exp1 + MAX_P_LEN, this->g_to_exp1);
+        copy(quadruple_entry.g_to_exp2_mult_by_pubkey_to_exp1,
+             quadruple_entry.g_to_exp2_mult_by_pubkey_to_exp1 + MAX_P_LEN,
+             this->g_to_exp2_mult_by_pubkey_to_exp1);
+    }
+
+    QuadrupleEntry::QuadrupleEntry(QuadrupleEntry &&quadruple_entry)
+    {
+        copy(quadruple_entry.exp1, quadruple_entry.exp1 + MAX_Q_LEN, this->exp1);
+        copy(quadruple_entry.exp2, quadruple_entry.exp2 + MAX_Q_LEN, this->exp2);
+        copy(quadruple_entry.g_to_exp1, quadruple_entry.g_to_exp1 + MAX_P_LEN, this->g_to_exp1);
+        copy(quadruple_entry.g_to_exp2_mult_by_pubkey_to_exp1,
+             quadruple_entry.g_to_exp2_mult_by_pubkey_to_exp1 + MAX_P_LEN,
+             this->g_to_exp2_mult_by_pubkey_to_exp1);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(quadruple_entry.exp1), MAX_Q_LEN);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(quadruple_entry.exp2), MAX_Q_LEN);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(quadruple_entry.g_to_exp1), MAX_P_LEN);
+        Lib_Memzero0_memzero(
+          static_cast<uint64_t *>(quadruple_entry.g_to_exp2_mult_by_pubkey_to_exp1), MAX_P_LEN);
+    }
+
+    QuadrupleEntry::~QuadrupleEntry()
+    {
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(exp1), MAX_Q_LEN);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(exp2), MAX_Q_LEN);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(g_to_exp1), MAX_P_LEN);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(g_to_exp2_mult_by_pubkey_to_exp1), MAX_P_LEN);
+    }
+
+    QuadrupleEntry &QuadrupleEntry::operator=(const QuadrupleEntry &quadruple_entry)
+    {
+        copy(quadruple_entry.exp1, quadruple_entry.exp1 + MAX_Q_LEN, this->exp1);
+        copy(quadruple_entry.exp2, quadruple_entry.exp2 + MAX_Q_LEN, this->exp2);
+        copy(quadruple_entry.g_to_exp1, quadruple_entry.g_to_exp1 + MAX_P_LEN, this->g_to_exp1);
+        copy(quadruple_entry.g_to_exp2_mult_by_pubkey_to_exp1,
+             quadruple_entry.g_to_exp2_mult_by_pubkey_to_exp1 + MAX_P_LEN,
+             this->g_to_exp2_mult_by_pubkey_to_exp1);
+        return *this;
+    }
+
+    QuadrupleEntry &QuadrupleEntry::operator=(QuadrupleEntry &&quadruple_entry)
+    {
+        copy(quadruple_entry.exp1, quadruple_entry.exp1 + MAX_Q_LEN, this->exp1);
+        copy(quadruple_entry.exp2, quadruple_entry.exp2 + MAX_Q_LEN, this->exp2);
+        copy(quadruple_entry.g_to_exp1, quadruple_entry.g_to_exp1 + MAX_P_LEN, this->g_to_exp1);
+        copy(quadruple_entry.g_to_exp2_mult_by_pubkey_to_exp1,
+             quadruple_entry.g_to_exp2_mult_by_pubkey_to_exp1 + MAX_P_LEN,
+             this->g_to_exp2_mult_by_pubkey_to_exp1);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(quadruple_entry.exp1), MAX_Q_LEN);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(quadruple_entry.exp2), MAX_Q_LEN);
+        Lib_Memzero0_memzero(static_cast<uint64_t *>(quadruple_entry.g_to_exp1), MAX_P_LEN);
+        Lib_Memzero0_memzero(
+          static_cast<uint64_t *>(quadruple_entry.g_to_exp2_mult_by_pubkey_to_exp1), MAX_P_LEN);
+        return *this;
+    }
+
     unique_ptr<Quadruple> QuadrupleEntry::get_quadruple()
     {
         unique_ptr<ElementModQ> temp_exp1 = make_unique<ElementModQ>(exp1);
@@ -119,6 +299,39 @@ namespace electionguard
         this->triple2 = move(triple2);
         this->quad = move(quad);
         populated = true;
+    }
+
+    TwoTriplesAndAQuadruple::TwoTriplesAndAQuadruple(const TwoTriplesAndAQuadruple &other)
+    {
+        this->triple1 = other.triple1->clone();
+        this->triple2 = other.triple2->clone();
+        this->quad = other.quad->clone();
+    }
+
+    TwoTriplesAndAQuadruple::TwoTriplesAndAQuadruple(TwoTriplesAndAQuadruple &&other)
+    {
+        this->triple1 = move(other.triple1);
+        this->triple2 = move(other.triple2);
+        this->quad = move(other.quad);
+    }
+
+    TwoTriplesAndAQuadruple::~TwoTriplesAndAQuadruple() = default;
+
+    TwoTriplesAndAQuadruple &
+    TwoTriplesAndAQuadruple::operator=(const TwoTriplesAndAQuadruple &other)
+    {
+        this->triple1 = other.triple1->clone();
+        this->triple2 = other.triple2->clone();
+        this->quad = other.quad->clone();
+        return *this;
+    } 
+
+    TwoTriplesAndAQuadruple &TwoTriplesAndAQuadruple::operator=(TwoTriplesAndAQuadruple &&other)
+    {
+        this->triple1 = move(other.triple1);
+        this->triple2 = move(other.triple2);
+        this->quad = move(other.quad);
+        return *this;
     }
 
     unique_ptr<TwoTriplesAndAQuadruple> TwoTriplesAndAQuadruple::clone()
