@@ -215,8 +215,9 @@ namespace ElectionGuard
         /// </summary>
         private void WorkerMethod()
         {
+            NativePrecomputeBuffers.Init(max_buffers);
             waitHandle.Set();
-            NativePrecomputeBuffers.Populate(elgamalPublicKey.Handle, max_buffers);
+            NativePrecomputeBuffers.Populate(elgamalPublicKey.Handle);
 
             SendCompleted();
         }

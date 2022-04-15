@@ -254,8 +254,9 @@ EG_API eg_electionguard_status_t eg_encrypt_compact_ballot_with_nonce(
 
 #ifndef Precompute Functions
 
-EG_API eg_electionguard_status_t eg_precompute_populate(eg_element_mod_p_t *in_public_key,
-                                                        int max_buffers);
+EG_API eg_electionguard_status_t eg_precompute_init(int max_buffers);
+
+EG_API eg_electionguard_status_t eg_precompute_populate(eg_element_mod_p_t *in_public_key);
 
 EG_API eg_electionguard_status_t eg_precompute_stop();
 

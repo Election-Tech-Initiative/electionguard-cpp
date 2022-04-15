@@ -3308,9 +3308,11 @@ namespace ElectionGuard
         #region Precompute
         internal static unsafe class PrecomputeBuffers
         {
+            [DllImport(DllName, EntryPoint = "eg_precompute_init")]
+            internal static extern Status Init(int max_buffers);
+
             [DllImport(DllName, EntryPoint = "eg_precompute_populate")]
-            internal static extern Status Populate(
-                ElementModP.ElementModPHandle publicKey, int max_buffers);
+            internal static extern Status Populate(ElementModP.ElementModPHandle publicKey);
 
             [DllImport(DllName, EntryPoint = "eg_precompute_stop")]
             internal static extern Status Stop();
