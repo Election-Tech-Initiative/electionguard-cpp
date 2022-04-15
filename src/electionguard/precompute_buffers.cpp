@@ -195,7 +195,7 @@ namespace electionguard
         if (size_of_queue != 0) {
             getInstance().max = size_of_queue;
         } else {
-            getInstance().max = 5000;
+            getInstance().max = DEFAULT_PRECOMPUTE_SIZE;
         }
 
         // This loop goes through until the queues are full but can be stopped

@@ -224,7 +224,7 @@ namespace electionguard
         static void empty_queues();
 
       private:
-        uint32_t max = 5000;
+        uint32_t max = DEFAULT_PRECOMPUTE_SIZE;
         static std::mutex queue_lock;
         bool populate_OK = false;
         std::queue<std::unique_ptr<Triple>> triple_queue;
