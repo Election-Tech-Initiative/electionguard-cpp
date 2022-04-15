@@ -446,7 +446,9 @@ namespace electionguard
         uint8_t mac_uint8[HASHED_CIPHERTEXT_BLOCK_LENGTH];
         Hacl_HMAC_compute_sha2_256(mac_uint8, mac_key, sizeof(mac_key), &c0_and_c1.front(),
                                    c0_and_c1.size());
+
         vector<uint8_t> mac_as_vector((uint8_t *)mac_uint8, sizeof(mac_uint8));
+
         unique_ptr<ElementModQ> mac = make_unique<ElementModQ>(mac_uint8);
  
         return make_unique<HashedElGamalCiphertext>(*g_to_r, ciphertext, mac);
@@ -462,11 +464,15 @@ namespace electionguard
         // it should be extended with a discrete_log search to decrypt
         // values other than 0 or 1
         uint8_t key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
-        //uint8_t temp_xor_key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
+        uint8_t temp_xor_key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
         //vector<uint8_t> ciphertext;
-        //vector<uint8_t> plaintext_on_boundary;
+        vector<uint8_t> plaintext;
+
         uint32_t ciphertext_len = ciphertext.size();
         uint32_t num_xor_keys = ciphertext_len / HASHED_CIPHERTEXT_BLOCK_LENGTH;
+        if (0 != (ciphertext_len % HASHED_CIPHERTEXT_BLOCK_LENGTH)) {
+            // TODO throw appropriate exception
+        }
 
         auto publicKey_to_r = pow_mod_p(publicKey, secretKey);
         vector<uint8_t> publicKey_to_r_bytes = publicKey_to_r->toBytes();
@@ -510,50 +516,41 @@ namespace electionguard
             // TODO - throw an exception here
         }
 
-        vector<uint8_t> result;
-        return result;
-        /*
-        const auto &p = P();
-        auto secret = secretKey.toElementModP();
-        uint64_t divisor[MAX_P_LEN] = {};
-        bool success =
-          Hacl_Bignum4096_mod_exp_consttime(p.get(), this->getPad()->get(), MAX_P_SIZE,
-                                            secret->get(), static_cast<uint64_t *>(divisor));
-        if (!success) {
-            Log::warn("could not calculate mod exp");
-            return 0;
+        uint32_t plaintext_index = 0;
+        for (uint32_t i = 0; i < num_xor_keys; i++) {
+            uint8_t temp_plaintext[HASHED_CIPHERTEXT_BLOCK_LENGTH];
+
+            // reverse the count because we hash it in big endian and we are on little endian
+            uint32_t count = i + 1;
+            uint32_t count_be = htobe32(count);
+
+            // concatenate the reversed count, the description hash and the reversed length
+            std::vector<uint8_t> data_to_hash_for_key((uint8_t *)&count_be,
+                                                      (uint8_t *)&count_be + sizeof(count_be));
+            data_to_hash_for_key.insert(data_to_hash_for_key.end(),
+                                        partial_data_to_hash_for_key.begin(),
+                                        partial_data_to_hash_for_key.end());
+
+            Hacl_HMAC_compute_sha2_256(temp_xor_key_bytes, key_bytes, sizeof(key_bytes),
+                                       &data_to_hash_for_key.front(), data_to_hash_for_key.size());
+
+            // XOR the key with the plaintext
+            for (int j = 0; j < (int)sizeof(temp_plaintext); j++) {
+                temp_plaintext[j] = ciphertext[plaintext_index] ^ temp_xor_key_bytes[j];
+                // advance the plaintext index
+                plaintext_index++;
+            }
+
+            plaintext.insert(plaintext.end(), temp_plaintext,
+                             temp_plaintext + HASHED_CIPHERTEXT_BLOCK_LENGTH);
         }
 
-        uint64_t inverse[MAX_P_LEN] = {};
-        Hacl_Bignum4096_mod_inv_prime_vartime(p.get(), static_cast<uint64_t *>(divisor),
-                                              static_cast<uint64_t *>(inverse));
-
-        uint64_t mulResult[MAX_P_LEN_DOUBLE] = {};
-        Hacl_Bignum4096_mul(this->getData()->get(), static_cast<uint64_t *>(inverse),
-                            static_cast<uint64_t *>(mulResult));
-
-        uint64_t result[MAX_P_LEN] = {};
-        success = Hacl_Bignum4096_mod(p.get(), static_cast<uint64_t *>(mulResult),
-                                      static_cast<uint64_t *>(result));
-        if (!success) {
-            Log::warn("could not calculate mod");
-            return 0;
+        if (look_for_padding) {
+            // TODO 
+            // need to strip the padding
         }
 
-        // TODO: ISSUE #133: traverse a discrete_log lookup to find the result
-        auto result_as_p = make_unique<ElementModP>(result);
-        uint64_t retval = MAX_UINT64;
-        if (*result_as_p == ONE_MOD_P()) {
-            // if it is 1 it is false
-            retval = 0;
-        } else if (*result_as_p == G()) {
-            // if it is g, it is true
-            retval = 1;
-        }
-
-        // if it is anything else no result found (decrypt failed)
-        return retval;
-        */
+        return plaintext;
     }
 
 //    unique_ptr<HashedElGamalCiphertext> HashedElGamalCiphertext::clone() const
