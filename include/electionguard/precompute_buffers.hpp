@@ -16,9 +16,9 @@
 using std::begin;
 using std::copy;
 using std::end;
-using std::unique_ptr;
 using std::make_unique;
 using std::mutex;
+using std::unique_ptr;
 
 namespace electionguard
 {
@@ -30,41 +30,32 @@ namespace electionguard
     /// </summary>
     class EG_INTERNAL_API Triple
     {
-      unique_ptr<ElementModQ> exp;
-      unique_ptr<ElementModP> g_to_exp;
-      unique_ptr<ElementModP> pubkey_to_exp;
+        unique_ptr<ElementModQ> exp;
+        unique_ptr<ElementModP> g_to_exp;
+        unique_ptr<ElementModP> pubkey_to_exp;
 
       public:
-      explicit Triple(const ElementModP &publicKey) { generateTriple(publicKey); }
-      Triple() { }
-      Triple(unique_ptr<ElementModQ> exp, unique_ptr<ElementModP> g_to_exp,
-                unique_ptr<ElementModP> pubkey_to_exp);
+        explicit Triple(const ElementModP &publicKey) { generateTriple(publicKey); }
+        Triple() {}
+        Triple(unique_ptr<ElementModQ> exp, unique_ptr<ElementModP> g_to_exp,
+               unique_ptr<ElementModP> pubkey_to_exp);
 
-      Triple(const Triple &triple);
-      Triple(Triple &&);
-      ~Triple();
+        Triple(const Triple &triple);
+        Triple(Triple &&);
+        ~Triple();
 
-      Triple &operator=(const Triple &triple);
-      Triple &operator=(Triple &&);
+        Triple &operator=(const Triple &triple);
+        Triple &operator=(Triple &&);
 
-      unique_ptr<ElementModQ> get_exp()
-      {
-          return exp->clone();
-      }
+        unique_ptr<ElementModQ> get_exp() { return exp->clone(); }
 
-      unique_ptr<ElementModP> get_g_to_exp()
-      {
-          return g_to_exp->clone();
-      }
+        unique_ptr<ElementModP> get_g_to_exp() { return g_to_exp->clone(); }
 
-      unique_ptr<ElementModP> get_pubkey_to_exp()
-      {
-          return pubkey_to_exp->clone();
-      }
+        unique_ptr<ElementModP> get_pubkey_to_exp() { return pubkey_to_exp->clone(); }
 
-      unique_ptr<Triple> clone();
+        unique_ptr<Triple> clone();
 
-    protected:
+      protected:
         void generateTriple(const ElementModP &publicKey);
     };
 
@@ -74,7 +65,7 @@ namespace electionguard
     /// first random exponent (exp1), the second random exponent (exp2)
     /// g ^ exp1 mod p (g_to_exp1) and (g ^ exp2 mod p) * (K ^ exp mod p)
     /// (g_to_exp2 mult_by_pubkey_to_exp1 - where K is the public key).
-    /// </summary>    
+    /// </summary>
     class EG_INTERNAL_API Quadruple
     {
         unique_ptr<ElementModQ> exp1;
@@ -83,11 +74,8 @@ namespace electionguard
         unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1;
 
       public:
-        explicit Quadruple(const ElementModP &publicKey)
-        {
-            generateQuadruple(publicKey);
-        }
-        Quadruple() {};
+        explicit Quadruple(const ElementModP &publicKey) { generateQuadruple(publicKey); }
+        Quadruple(){};
         Quadruple(unique_ptr<ElementModQ> exp1, unique_ptr<ElementModQ> exp2,
                   unique_ptr<ElementModP> g_to_exp1,
                   unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1);
@@ -98,20 +86,11 @@ namespace electionguard
         Quadruple &operator=(const Quadruple &quadruple);
         Quadruple &operator=(Quadruple &&);
 
-        unique_ptr<ElementModQ> get_exp1()
-        {
-            return exp1->clone();
-        }
+        unique_ptr<ElementModQ> get_exp1() { return exp1->clone(); }
 
-        unique_ptr<ElementModQ> get_exp2()
-        {
-            return exp2->clone();
-        }
+        unique_ptr<ElementModQ> get_exp2() { return exp2->clone(); }
 
-        unique_ptr<ElementModP> get_g_to_exp1()
-        {
-            return g_to_exp1->clone();
-        }
+        unique_ptr<ElementModP> get_g_to_exp1() { return g_to_exp1->clone(); }
 
         unique_ptr<ElementModP> get_g_to_exp2_mult_by_pubkey_to_exp1()
         {
@@ -123,14 +102,14 @@ namespace electionguard
       protected:
         void generateQuadruple(const ElementModP &publicKey);
     };
- 
+
     /// <summary>
     /// This object holds the two Triples and a Quadruple of precomputed
     /// values that are used to speed up encryption of a selection.
     /// Since the values are precomputed it removes all the exponentiations
     /// from the ElGamal encryption of the selection as well as the
     /// computation of the Chaum Pedersen proof.
-    /// </summary>    
+    /// </summary>
     class EG_INTERNAL_API TwoTriplesAndAQuadruple
     {
         unique_ptr<Triple> triple1;
@@ -149,29 +128,17 @@ namespace electionguard
         TwoTriplesAndAQuadruple &operator=(const TwoTriplesAndAQuadruple &other);
         TwoTriplesAndAQuadruple &operator=(TwoTriplesAndAQuadruple &&);
 
-        unique_ptr<Triple> get_triple1()
-        {
-            return triple1->clone();
-        }
+        unique_ptr<Triple> get_triple1() { return triple1->clone(); }
 
-        unique_ptr<Triple> get_triple2()
-        {
-            return triple2->clone();
-        }
+        unique_ptr<Triple> get_triple2() { return triple2->clone(); }
 
-        unique_ptr<Quadruple> get_quad()
-        {
-            return quad->clone();
-        }
+        unique_ptr<Quadruple> get_quad() { return quad->clone(); }
 
-        bool isPopulated()
-        {
-            return populated;
-        }
+        bool isPopulated() { return populated; }
 
         unique_ptr<TwoTriplesAndAQuadruple> clone();
     };
-    
+
     /// <summary>
     /// A singleton context for a collection of precomputed triples and quadruples.
     /// </summary>
@@ -199,7 +166,7 @@ namespace electionguard
         /// values used by encryptSelection. The function is stopped by calling
         /// stop_populate. Pre-computed values are currently computed by generating
         /// two triples and a quad. We do this because two triples and a quad
-        /// are need for an encryptSelection.The triple queue is twice the size of 
+        /// are need for an encryptSelection.The triple queue is twice the size of
         /// the quad queue. We use two different queues in case we need to
         /// make the stop more granular at some point, in other words currently
         /// if we call stop it will finish the two triples and a quad before
@@ -215,16 +182,15 @@ namespace electionguard
         ///                             parameter is used</param>
         /// <returns>void</returns>
         /// </summary>
-        /// 
-        static void
-        populate(const ElementModP &elgamalPublicKey, uint32_t size_of_queue = 0);
+        ///
+        static void populate(const ElementModP &elgamalPublicKey, uint32_t size_of_queue = 0);
 
         /// <summary>
         /// The stop_populate method stops the population of the
         /// precomputations queues started by the populate method.
         /// <returns>void</returns>
         /// </summary>
-        /// 
+        ///
         static void stop_populate();
 
         /// <summary>
@@ -234,7 +200,7 @@ namespace electionguard
         /// <returns>uint32_t</returns>
         /// </summary>
         static uint32_t get_max_queue_size();
-     
+
         /// <summary>
         /// Get the current number of quadruples in the quadruple_queue,
         /// the number of triples in the triple_queue will be twice this.
@@ -259,10 +225,10 @@ namespace electionguard
 
       private:
         uint32_t max = 5000;
-        std::mutex queue_lock;
+        static std::mutex queue_lock;
         bool populate_OK = false;
         std::queue<std::unique_ptr<Triple>> triple_queue;
-        std::queue < std::unique_ptr<Quadruple>> quadruple_queue;
+        std::queue<std::unique_ptr<Quadruple>> quadruple_queue;
     };
 } // namespace electionguard
 
