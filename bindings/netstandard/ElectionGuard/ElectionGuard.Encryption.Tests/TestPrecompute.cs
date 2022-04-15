@@ -44,7 +44,6 @@ namespace ElectionGuard.Encryption.Tests
             precompute.StopPrecompute();
 
             var waitReturn = waitHandle.WaitOne(MAX_COMPLETE_DELAY);
-            Assert.AreEqual(true, waitReturn);
 
             int count = -1;
             int queue_size = -1;
@@ -52,8 +51,8 @@ namespace ElectionGuard.Encryption.Tests
             var status = precompute.GetStatus();
 
             Assert.AreEqual(LARGE_BUFFER_SIZE, queue_size);
-
             Assert.AreEqual(PrecomputeState.Running, runningStatus.CurrentState);
+            Assert.AreEqual(true, waitReturn);
         }
 
         [Test]
@@ -74,7 +73,6 @@ namespace ElectionGuard.Encryption.Tests
             precompute.StopPrecompute();
 
             var waitReturn = waitHandle.WaitOne(MAX_COMPLETE_DELAY);
-            Assert.AreEqual(true, waitReturn);
 
             int count = -1;
             int queue_size = -1;
@@ -86,6 +84,8 @@ namespace ElectionGuard.Encryption.Tests
 
             Assert.AreEqual(PrecomputeState.Running, statusRunning.CurrentState);
             Assert.AreEqual(PrecomputeState.UserStopped, status.CurrentState);
+
+            Assert.AreEqual(true, waitReturn);
         }
 
         [Test]
@@ -106,7 +106,6 @@ namespace ElectionGuard.Encryption.Tests
             precompute.StartPrecomputeAsync(keypair.PublicKey, SMALL_BUFFER_SIZE);
 
             var waitReturn = waitHandle.WaitOne(MAX_COMPLETE_DELAY);
-            Assert.AreEqual(true, waitReturn);
 
             int count = -1;
             int queue_size = -1;
@@ -117,6 +116,7 @@ namespace ElectionGuard.Encryption.Tests
             Assert.AreEqual(SMALL_BUFFER_SIZE, count);
 
             Assert.AreEqual(PrecomputeState.Completed, status.CurrentState);
+            Assert.AreEqual(true, waitReturn);
         }
 
     }
