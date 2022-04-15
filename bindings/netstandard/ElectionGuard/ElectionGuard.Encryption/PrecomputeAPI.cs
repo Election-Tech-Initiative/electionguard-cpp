@@ -201,8 +201,13 @@ namespace ElectionGuard
             if (currentStatus.CurrentState == PrecomputeState.Running)
             {
                 currentStatus.CurrentState = PrecomputeState.UserStopped;
-                NativePrecomputeBuffers.Stop();
             }
+            else
+            {
+                // if this is already stopped or completed, resend the Completed event to make sure calling app sees the stopping
+                SendCompleted();
+            }
+            NativePrecomputeBuffers.Stop();     // tell the calculations to 
         }
 
         /// <summary>
@@ -213,6 +218,11 @@ namespace ElectionGuard
             waitHandle.Set();
             NativePrecomputeBuffers.Populate(elgamalPublicKey.Handle, max_buffers);
 
+            SendCompleted();
+        }
+
+        private void SendCompleted()
+        {
             int count = -1;
             int queue_size = -2;
             GetProgress(out count, out queue_size);
