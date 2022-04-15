@@ -76,9 +76,8 @@ namespace ElectionGuard
         /// Starts the precompute process by creating a new thread to run the process
         /// </summary>
         /// <param name="publicKey">The max exponentiation to be calculated</param>
-        /// <param name="token">CancelationToken that can be used to start the process</param>
         /// <param name="buffers">The maximum number of buffers to precompute</param>
-        void StartPrecomputeAsync(ElementModP publicKey, CancellationToken token, int buffers);
+        void StartPrecomputeAsync(ElementModP publicKey, int buffers);
 
         /// <summary>
         /// Stops the precompute process
@@ -107,6 +106,8 @@ namespace ElectionGuard
     /// </summary>
     public class Precompute : IPrecomputeAPI
     {
+        AutoResetEvent waitHandle;
+
         private PrecomputeStatus currentStatus = new PrecomputeStatus
         {
             Percentage = 0,
@@ -177,18 +178,19 @@ namespace ElectionGuard
         /// Starts the precompute process by creating a new thread to run the process
         /// </summary>
         /// <param name="publicKey">The max exponentiation to be calculated</param>
-        /// <param name="token">CancelationToken that can be used to start the process</param>
         /// <param name="buffers">The maximum number of buffers to precompute</param>
-        public void StartPrecomputeAsync(ElementModP publicKey, CancellationToken token, int buffers = 0)
+        public void StartPrecomputeAsync(ElementModP publicKey, int buffers = 0)
         {
             currentStatus.CurrentState = PrecomputeState.Running;
             max_buffers = buffers;
             elgamalPublicKey = publicKey;
 
+            waitHandle = new AutoResetEvent(false);
             workerThread = new Thread(WorkerMethod);
             workerThread.Name = "Precompute Worker Thread";
             workerThread.Start();
-            Thread.Sleep(500);
+
+            waitHandle.WaitOne();   // make sure thread is created before returning
         }
 
         /// <summary>
@@ -208,6 +210,7 @@ namespace ElectionGuard
         /// </summary>
         private void WorkerMethod()
         {
+            waitHandle.Set();
             NativePrecomputeBuffers.Populate(elgamalPublicKey.Handle, max_buffers);
 
             int count = -1;
