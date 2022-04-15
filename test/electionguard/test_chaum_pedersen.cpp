@@ -134,7 +134,8 @@ TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
 
     // cause a two triples and a quad to be populated
-    PrecomputeBufferContext::populate(*keypair->getPublicKey(), 4);
+    PrecomputeBufferContext::init(4);
+    PrecomputeBufferContext::populate(*keypair->getPublicKey());
     PrecomputeBufferContext::stop_populate();
 
     // this function runs off to look in the precomputed values buffer and if
@@ -202,7 +203,8 @@ TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values")
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
 
     // cause a two triples and a quad to be populated
-    PrecomputeBufferContext::populate(*keypair->getPublicKey(), 2);
+    PrecomputeBufferContext::init(2);
+    PrecomputeBufferContext::populate(*keypair->getPublicKey());
     PrecomputeBufferContext::stop_populate();
 
     // this function runs off to look in the precomputed values buffer and if
@@ -240,7 +242,8 @@ TEST_CASE("Disjunctive CP Proof encryption of one with precomputed values")
     const auto &seed = TWO_MOD_Q();
 
     // cause a two triples and a quad to be populated
-    PrecomputeBufferContext::populate(*keypair->getPublicKey(), 2);
+    PrecomputeBufferContext::init(2);
+    PrecomputeBufferContext::populate(*keypair->getPublicKey());
     PrecomputeBufferContext::stop_populate();
 
     // this function runs off to look in the precomputed values buffer and if

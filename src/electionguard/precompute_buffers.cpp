@@ -186,9 +186,9 @@ namespace electionguard
                                                     quad->clone());
     }
 
-    void PrecomputeBufferContext::populate(const ElementModP &elgamalPublicKey,
-                                           uint32_t size_of_queue /* = 0 */)
+    void PrecomputeBufferContext::init(uint32_t size_of_queue /* = 0 */)
     {
+        std::lock_guard<std::mutex> lock(queue_lock);
         getInstance().populate_OK = true;
 
         // default size of quadruple_queue will be 5000
@@ -197,7 +197,10 @@ namespace electionguard
         } else {
             getInstance().max = DEFAULT_PRECOMPUTE_SIZE;
         }
+    }
 
+    void PrecomputeBufferContext::populate(const ElementModP &elgamalPublicKey)
+    {
         // This loop goes through until the queues are full but can be stopped
         // between generations of two triples and a quad. By full it means
         // we check how many quads are in the queue, to start with we will

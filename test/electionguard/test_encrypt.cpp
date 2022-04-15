@@ -49,7 +49,8 @@ TEST_CASE("Encrypt simple selection using precomputed values succeeds")
     auto plaintext = BallotGenerator::selectionFrom(*metadata);
 
     // cause a two triples and a quad to be populated 
-    PrecomputeBufferContext::populate(*keypair->getPublicKey(), 1);
+    PrecomputeBufferContext::init(1);
+    PrecomputeBufferContext::populate(*keypair->getPublicKey());
     PrecomputeBufferContext::stop_populate();
 
     uint32_t max_precomputed_queue_size = PrecomputeBufferContext::get_max_queue_size();
@@ -310,7 +311,8 @@ TEST_CASE("Encrypt simple ballot from file succeeds with precomputed values")
     auto ballot = BallotGenerator::getFakeBallot(*internal);
 
     // cause a two triples and a quad to be populated
-    PrecomputeBufferContext::populate(*keypair->getPublicKey(), 50);
+    PrecomputeBufferContext::init(50);
+    PrecomputeBufferContext::populate(*keypair->getPublicKey());
     PrecomputeBufferContext::stop_populate();
     uint32_t max_precomputed_queue_size = PrecomputeBufferContext::get_max_queue_size();
     uint32_t current_precomputed_queue_size = PrecomputeBufferContext::get_current_queue_size();

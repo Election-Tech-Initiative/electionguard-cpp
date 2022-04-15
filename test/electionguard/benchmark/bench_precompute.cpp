@@ -27,7 +27,8 @@ class ElGamalEncryptPrecomputedFixture : public benchmark::Fixture
         // cause 50 precomputed entries that will be used by the selection
         // encryptions, that should be more than enough and on teardown
         // the rest will be removed.
-        PrecomputeBufferContext::populate(*fixed_base_keypair->getPublicKey(), 50);
+        PrecomputeBufferContext::init(50);
+        PrecomputeBufferContext::populate(*fixed_base_keypair->getPublicKey());
     }
 
     void TearDown(const ::benchmark::State &state)
@@ -94,7 +95,8 @@ class ChaumPedersenPrecomputedFixture : public benchmark::Fixture
 
         // create precomputed entries that will be used by the selection
         // encryptions, on teardown the rest will be removed.
-        PrecomputeBufferContext::populate(*keypair->getPublicKey(), 150);
+        PrecomputeBufferContext::init(150);
+        PrecomputeBufferContext::populate(*keypair->getPublicKey());
 
         message = elgamalEncrypt(1UL, *nonce, *keypair->getPublicKey());
         auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
@@ -194,7 +196,8 @@ class CiphertextBallotSelectionPrecomputedFixture : public benchmark::Fixture
         // cause precomputed entries that will be used by the selection
         // encryptions, that should be more than enough and on teardown
         // the rest will be removed.
-        PrecomputeBufferContext::populate(*keypair->getPublicKey(), 50);
+        PrecomputeBufferContext::init(50);
+        PrecomputeBufferContext::populate(*keypair->getPublicKey());
 
         auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
@@ -279,7 +282,8 @@ class EncryptSelectionPrecomputedFixture : public benchmark::Fixture
         // cause precomputed entries that will be used by the selection
         // encryptions, that should be more than enough and on teardown
         // the rest will be removed.
-        PrecomputeBufferContext::populate(*keypair->getPublicKey(), 50);
+        PrecomputeBufferContext::init(50);
+        PrecomputeBufferContext::populate(*keypair->getPublicKey());
     }
 
     void TearDown(const ::benchmark::State &state)
@@ -331,7 +335,8 @@ BENCHMARK_DEFINE_F(PrecomputeFixture, precomputed)
 (benchmark::State &state)
 {
     for (auto _ : state) {
-        PrecomputeBufferContext::populate(*keypair->getPublicKey(), 1);
+        PrecomputeBufferContext::init(1);
+        PrecomputeBufferContext::populate(*keypair->getPublicKey());
 
         auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
     }
@@ -367,7 +372,8 @@ class EncryptBallotPrecomputeFixture : public benchmark::Fixture
 
         // precomputed entries that will be used by the selection
         // encryptions, on teardown the rest will be removed.
-        PrecomputeBufferContext::populate(*keypair->getPublicKey(), 2000);
+        PrecomputeBufferContext::init(2000);
+        PrecomputeBufferContext::populate(*keypair->getPublicKey());
     }
 
     void TearDown(const ::benchmark::State &state)

@@ -404,13 +404,24 @@ eg_electionguard_status_t eg_encrypt_compact_ballot_with_nonce(
 
 #pragma region Precompute
 
-EG_API eg_electionguard_status_t eg_precompute_populate(eg_element_mod_p_t *in_public_key,
-                                                        int max_buffers)
+EG_API eg_electionguard_status_t eg_precompute_init(int max_buffers)
+{
+
+    try {
+        PrecomputeBufferContext::init(max_buffers);
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const std::exception &e) {
+        Log::error(":eg_precompute_init", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_precompute_populate(eg_element_mod_p_t *in_public_key)
 {
 
     try {
         auto *public_key = AS_TYPE(ElementModP, in_public_key);
-        PrecomputeBufferContext::populate(*public_key, max_buffers);
+        PrecomputeBufferContext::populate(*public_key);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const std::exception &e) {
         Log::error(":eg_precompute_populate", e);

@@ -162,6 +162,18 @@ namespace electionguard
         }
 
         /// <summary>
+        /// The init method initializes the precompute and allows the queue
+        /// size to be set.
+        /// 
+        /// <param name="size_of_queue">by default the quad queue size is 5000, so
+        ///                             10000 triples, if the caller wants the
+        ///                             queue size to be different then this
+        ///                             parameter is used</param>
+        /// </summary>
+        /// 
+        static void init(uint32_t size_of_queue = 0);
+
+        /// <summary>
         /// The populate method populates the precomputations queues with
         /// values used by encryptSelection. The function is stopped by calling
         /// stop_populate. Pre-computed values are currently computed by generating
@@ -176,14 +188,10 @@ namespace electionguard
         /// use two queues.
         ///
         /// <param name="elgamalPublicKey">the elgamal public key for the election</param>
-        /// <param name="size_of_queue">by default the quad queue size is 5000, so
-        ///                             10000 triples, if the caller wants the
-        ///                             queue size to be different then this
-        ///                             parameter is used</param>
         /// <returns>void</returns>
         /// </summary>
         ///
-        static void populate(const ElementModP &elgamalPublicKey, uint32_t size_of_queue = 0);
+        static void populate(const ElementModP &elgamalPublicKey);
 
         /// <summary>
         /// The stop_populate method stops the population of the
