@@ -257,9 +257,6 @@ namespace electionguard
 
         // check if we found the precomputed values needed
         if (precomputedTwoTriplesAndAQuad->isPopulated()) {
-
-            Log::debug("****************** USING PRECOMPUTED ***********************");
-
             auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
             auto g_to_exp = triple1->get_g_to_exp();
             auto pubkey_to_exp = triple1->get_pubkey_to_exp();

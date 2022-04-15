@@ -123,61 +123,7 @@ namespace electionguard
       protected:
         void generateQuadruple(const ElementModP &publicKey);
     };
-    
-    class EG_INTERNAL_API TripleEntry
-    {
-      public:
-        TripleEntry(unique_ptr<ElementModQ> exp, unique_ptr<ElementModP> g_to_exp,
-                    unique_ptr<ElementModP> pubkey_to_exp);
-        TripleEntry(const TripleEntry &triple_entry);
-        TripleEntry(TripleEntry &&);
-        ~TripleEntry();
-
-        TripleEntry &operator=(const TripleEntry &triple_entry);
-        TripleEntry &operator=(TripleEntry &&);
-
-        uint64_t *get_exp() { return exp; }
-        uint64_t *get_g_to_exp() { return g_to_exp; }
-        uint64_t *get_pubkey_to_exp() { return pubkey_to_exp; }
-
-        unique_ptr<Triple> get_triple();
-
-      private:
-        uint64_t exp[MAX_Q_LEN];
-        uint64_t g_to_exp[MAX_P_LEN];
-        uint64_t pubkey_to_exp[MAX_P_LEN];
-    };
-    
-    class EG_INTERNAL_API QuadrupleEntry
-    {
-      public:
-        explicit QuadrupleEntry(unique_ptr<ElementModQ> exp1, unique_ptr<ElementModQ> exp2,
-                                unique_ptr<ElementModP> g_to_exp1,
-                                unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1);
-        QuadrupleEntry(const QuadrupleEntry &quadruple_entry);
-        QuadrupleEntry(QuadrupleEntry &&);
-        ~QuadrupleEntry();
-
-        QuadrupleEntry &operator=(const QuadrupleEntry &quad_entry);
-        QuadrupleEntry &operator=(QuadrupleEntry &&);
-
-        uint64_t *get_exp1() { return exp1; }
-        uint64_t *get_exp2() { return exp2; }
-        uint64_t *get_g_to_exp1() { return g_to_exp1; }
-        uint64_t *get_g_to_exp2_mult_by_pubkey_to_exp1()
-        {
-            return g_to_exp2_mult_by_pubkey_to_exp1;
-        }
-
-        unique_ptr<Quadruple> get_quadruple();
-
-      private:
-        uint64_t exp1[MAX_Q_LEN];
-        uint64_t exp2[MAX_Q_LEN];
-        uint64_t g_to_exp1[MAX_P_LEN];
-        uint64_t g_to_exp2_mult_by_pubkey_to_exp1[MAX_P_LEN];
-    };
-
+ 
     /// <summary>
     /// This object holds the two Triples and a Quadruple of precomputed
     /// values that are used to speed up encryption of a selection.
@@ -315,8 +261,8 @@ namespace electionguard
         uint32_t max = 5000;
         std::mutex queue_lock;
         bool populate_OK = false;
-        std::queue<TripleEntry *> triple_queue;
-        std::queue<QuadrupleEntry *> quadruple_queue;
+        std::queue<std::unique_ptr<Triple>> triple_queue;
+        std::queue < std::unique_ptr<Quadruple>> quadruple_queue;
     };
 } // namespace electionguard
 
