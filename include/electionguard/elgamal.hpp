@@ -115,18 +115,21 @@ namespace electionguard
 
 
     /// <summary>
-    /// An "exponential ElGamal ciphertext" (i.e., with the plaintext in the exponent to allow for
-    /// homomorphic addition). Create one with `elgamal_encrypt`. Add them with `elgamal_add`.
-    /// Decrypt using one of the supplied instance methods.
+    /// TODO
     /// </summary>
     class EG_API HashedElGamalCiphertext : public CryptoHashable
     {
+      private:
+        // TODO - need to use pimpl eventually
+        std::unique_ptr<ElementModP> pad;
+        std::vector<uint8_t> ciphertext;
+        std::unique_ptr<ElementModQ> mac;
       public:
         HashedElGamalCiphertext(const HashedElGamalCiphertext &other);
         HashedElGamalCiphertext(HashedElGamalCiphertext &&other);
-        HashedElGamalCiphertext(const ElementModP &g_to_r,
+        HashedElGamalCiphertext(const ElementModP &pad,
                                 std::vector<uint8_t> ciphertext,
-                                std::vector<uint8_t> mac);
+                                const ElementModP &mac);
         ~HashedElGamalCiphertext();
 
         HashedElGamalCiphertext &operator=(HashedElGamalCiphertext rhs);
@@ -179,7 +182,9 @@ namespace electionguard
         /// This is a convenience accessor useful for some use cases.
         /// This method should not be used by consumers operating in live secret ballot elections.
         /// </Summary>
-        uint64_t decrypt(const ElementModQ &secretKey);
+        std::vector<uint8_t> decrypt(const ElementModQ &secretKey, const ElementModP &publicKey,
+                                     const ElementModQ &descriptionHash,
+                                     bool look_for_padding);
 
         /// <Summary>
         /// Clone the value by making a deep copy.

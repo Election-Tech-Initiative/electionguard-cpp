@@ -264,41 +264,44 @@ namespace electionguard
 
 
 #pragma region HashedElGamalCiphertext
-
+    /*
     struct HashedElGamalCiphertext::Impl {
         unique_ptr<ElementModP> pad;
-        unique_ptr<ElementModP> data;
+        vector<uint8_t> ciphertext;
+        unique_ptr<ElementModQ> mac;
 
-        Impl(unique_ptr<ElementModP> pad, unique_ptr<ElementModP> data)
-            : pad(move(pad)), data(move(data))
+
+        Impl(unique_ptr<ElementModP> pad, vector<uint8_t> ciphertext)
+            : pad(move(pad)), ciphertext(move(ciphertext))
         {
         }
 
         [[nodiscard]] unique_ptr<HashedElGamalCiphertext::Impl> clone() const
         {
             auto _pad = make_unique<ElementModP>(*pad);
-            auto _data = make_unique<ElementModP>(*data);
-            return make_unique<HashedElGamalCiphertext::Impl>(move(_pad), move(_data));
+//            auto _data = make_unique<ElementModP>(*data);
+//            return make_unique<HashedElGamalCiphertext::Impl>(move(_pad), move(_data));
         }
 
         [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
         {
-            return hash_elems({pad.get(), data.get()});
+//            return hash_elems({pad.get(), ciphertext.get()});
         }
 
-        bool operator==(const Impl &other) { return *pad == *other.pad && *data == *other.data; }
+        bool operator==(const Impl &other) { return *pad == *other.pad; } // &&*data == *other.data;
+        }
     };
-
+    */
     // Lifecycle Methods
 
     HashedElGamalCiphertext::HashedElGamalCiphertext(const HashedElGamalCiphertext &other)
-        : pimpl(other.pimpl->clone())
+//        : pimpl(other.pimpl->clone())
     {
     }
 
-    HashedElGamalCiphertext::HashedElGamalCiphertext(const ElementModP &g_to_r,
-                                                     vector<uint8_t> ciphertext,
-                                                     vector<uint8_t> mac)
+    HashedElGamalCiphertext::HashedElGamalCiphertext(const ElementModP &pad,
+                                                     std::vector<uint8_t> ciphertext,
+                                                     const ElementModP &mac)
     {
     }
 
@@ -308,13 +311,14 @@ namespace electionguard
 
     HashedElGamalCiphertext &HashedElGamalCiphertext::operator=(HashedElGamalCiphertext rhs)
     {
-        swap(pimpl, rhs.pimpl);
+//        swap(pimpl, rhs.pimpl);
         return *this;
     }
 
     bool HashedElGamalCiphertext::operator==(const HashedElGamalCiphertext &other)
     {
-        return *pimpl == *other.pimpl;
+//        return *pimpl == *other.pimpl;
+        return true;
     }
 
     bool HashedElGamalCiphertext::operator!=(const HashedElGamalCiphertext &other)
@@ -324,22 +328,22 @@ namespace electionguard
 
     // Property Getters
 
-    ElementModP *HashedElGamalCiphertext::getPad() { return pimpl->pad.get(); }
-    ElementModP *HashedElGamalCiphertext::getPad() const { return pimpl->pad.get(); }
-    ElementModP *HashedElGamalCiphertext::getData() { return pimpl->data.get(); }
-    ElementModP *HashedElGamalCiphertext::getData() const { return pimpl->data.get(); }
+//    ElementModP *HashedElGamalCiphertext::getPad() { return pimpl->pad.get(); }
+//    ElementModP *HashedElGamalCiphertext::getPad() const { return pimpl->pad.get(); }
+//    ElementModP *HashedElGamalCiphertext::getData() { return pimpl->data.get(); }
+//    ElementModP *HashedElGamalCiphertext::getData() const { return pimpl->data.get(); }
 
     // Interface Overrides
 
-    unique_ptr<ElementModQ> HashedElGamalCiphertext::crypto_hash() { return pimpl->crypto_hash(); }
-    unique_ptr<ElementModQ> HashedElGamalCiphertext::crypto_hash() const
-    {
-        return pimpl->crypto_hash();
-    }
+//    unique_ptr<ElementModQ> HashedElGamalCiphertext::crypto_hash() { return pimpl->crypto_hash(); }
+//    unique_ptr<ElementModQ> HashedElGamalCiphertext::crypto_hash() const
+//    {
+//        return pimpl->crypto_hash();
+//    }
 
-//    unique_ptr<HashedElGamalCiphertext> HashedElGamalCiphertext::make(const ElementModP &g_to_R,
-//                                                                      byte *encryptedText,
-//                                                                      const ElementModQ &mac)
+//    unique_ptr<HashedElGamalCiphertext> HashedElGamalCiphertext::make(const ElementModP &pad,
+//                                                                        std::vector<uint8_t> ciphertext,
+//                                                                        const ElementModP &mac)
 //    {
 //        return make_unique<HashedElGamalCiphertext>(make_unique<ElementModP>(pad),
 //                                                    make_unique<ElementModP>(data));
@@ -439,22 +443,76 @@ namespace electionguard
         // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
         vector<uint8_t> c0_and_c1(g_to_r->toBytes());
         c0_and_c1.insert(c0_and_c1.end(), ciphertext.begin(), ciphertext.end());
-        uint8_t mac[HASHED_CIPHERTEXT_BLOCK_LENGTH];
-        Hacl_HMAC_compute_sha2_256(mac, mac_key, sizeof(mac_key), &c0_and_c1.front(),
+        uint8_t mac_uint8[HASHED_CIPHERTEXT_BLOCK_LENGTH];
+        Hacl_HMAC_compute_sha2_256(mac_uint8, mac_key, sizeof(mac_key), &c0_and_c1.front(),
                                    c0_and_c1.size());
-        vector<uint8_t> mac_vector(mac, mac + sizeof(mac));
+        vector<uint8_t> mac_as_vector((uint8_t *)mac_uint8, sizeof(mac_uint8));
+        unique_ptr<ElementModQ> mac = make_unique<ElementModQ>(mac_uint8);
  
-        return make_unique<HashedElGamalCiphertext>(*g_to_r, ciphertext, mac_vector);
+        return make_unique<HashedElGamalCiphertext>(*g_to_r, ciphertext, mac);
     }
 
-
-    uint64_t HashedElGamalCiphertext::decrypt(const ElementModQ &secretKey)
+    vector<uint8_t> HashedElGamalCiphertext::decrypt(const ElementModQ &secretKey,
+                                                     const ElementModP &publicKey,
+                                                     const ElementModQ &descriptionHash,
+                                                     bool look_for_padding)
     {
         // Note this decryption method is primarily used for testing
         // and is only capable of decrypting boolean results (0/1)
         // it should be extended with a discrete_log search to decrypt
         // values other than 0 or 1
+        uint8_t key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
+        //uint8_t temp_xor_key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
+        //vector<uint8_t> ciphertext;
+        //vector<uint8_t> plaintext_on_boundary;
+        uint32_t ciphertext_len = ciphertext.size();
+        uint32_t num_xor_keys = ciphertext_len / HASHED_CIPHERTEXT_BLOCK_LENGTH;
 
+        auto publicKey_to_r = pow_mod_p(publicKey, secretKey);
+        vector<uint8_t> publicKey_to_r_bytes = publicKey_to_r->toBytes();
+
+        // now we need to hash the concatenation of g_to_r with publicKey_to_r
+        // in order to get the base key
+        std::vector<uint8_t> a_b(pad->toBytes());
+        a_b.insert(a_b.end(), publicKey_to_r_bytes.begin(), publicKey_to_r_bytes.end());
+
+        Hacl_Hash_SHA2_hash_256(&a_b.front(), a_b.size(), key_bytes);
+
+        // reverse the length because we hash it in big endian and we are on little endian
+        uint32_t ciphertext_len_be = htobe32(ciphertext_len);
+
+        // vector with the description hash concatenated with the reversed length
+        std::vector<uint8_t> partial_data_to_hash_for_key(descriptionHash.toBytes());
+        partial_data_to_hash_for_key.insert(
+          partial_data_to_hash_for_key.end(), (uint8_t *)&ciphertext_len_be,
+          (uint8_t *)&ciphertext_len_be + sizeof(ciphertext_len_be));
+
+        vector<uint8_t> zero_count({0, 0, 0, 0});
+        std::vector<uint8_t> data_to_hash_mac_key(zero_count);
+        data_to_hash_mac_key.insert(data_to_hash_mac_key.end(),
+                                    partial_data_to_hash_for_key.begin(),
+                                    partial_data_to_hash_for_key.end());
+
+        // get the key for use in the mac
+        uint8_t mac_key[HASHED_CIPHERTEXT_BLOCK_LENGTH];
+        Hacl_HMAC_compute_sha2_256(mac_key, key_bytes, sizeof(key_bytes),
+                                   &data_to_hash_mac_key.front(), data_to_hash_mac_key.size());
+
+        // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
+        vector<uint8_t> c0_and_c1(pad->toBytes());
+        c0_and_c1.insert(c0_and_c1.end(), ciphertext.begin(), ciphertext.end());
+        uint8_t mac_uint8[HASHED_CIPHERTEXT_BLOCK_LENGTH];
+        Hacl_HMAC_compute_sha2_256(mac_uint8, mac_key, sizeof(mac_key), &c0_and_c1.front(),
+                                   c0_and_c1.size());
+        unique_ptr<ElementModQ> our_mac = make_unique<ElementModQ>(mac_uint8);
+
+        if (mac != our_mac) {
+            // TODO - throw an exception here
+        }
+
+        vector<uint8_t> result;
+        return result;
+        /*
         const auto &p = P();
         auto secret = secretKey.toElementModP();
         uint64_t divisor[MAX_P_LEN] = {};
@@ -495,6 +553,7 @@ namespace electionguard
 
         // if it is anything else no result found (decrypt failed)
         return retval;
+        */
     }
 
 //    unique_ptr<HashedElGamalCiphertext> HashedElGamalCiphertext::clone() const
