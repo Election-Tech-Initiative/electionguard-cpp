@@ -7,6 +7,7 @@
 #include "log.hpp"
 #include "nonces.hpp"
 #include "utils.hpp"
+#include "electionguard/precompute_buffers.hpp"
 
 #include <algorithm>
 #include <future>
@@ -231,6 +232,10 @@ namespace electionguard
                      const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &nonceSeed,
                      bool isPlaceholder /* = false */, bool shouldVerifyProofs /* = true */)
     {
+        unique_ptr<CiphertextBallotSelection> encrypted = NULL;
+        unique_ptr<ElGamalCiphertext> ciphertext;
+        unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad;
+
         // Validate Input
         if (!selection.isValid(description.getObjectId())) {
             // todo: include plaintext data in log output
@@ -246,18 +251,47 @@ namespace electionguard
         Log::trace("encryptSelection: for " + description.getObjectId() + " hash: ",
                    descriptionHash->toHex());
 
-        // Generate the encryption
-        auto ciphertext = elgamalEncrypt(selection.getVote(), *selectionNonce, elgamalPublicKey);
-        if (ciphertext == nullptr) {
-            throw runtime_error("encryptSelection:: Error generating ciphertext");
+        // this method runs off to look in the precomputed values buffer and if
+        // it finds what it needs then the returned class will contain those values
+        precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+
+        // check if we found the precomputed values needed
+        if (precomputedTwoTriplesAndAQuad->isPopulated()) {
+            auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
+            auto g_to_exp = triple1->get_g_to_exp();
+            auto pubkey_to_exp = triple1->get_pubkey_to_exp();
+
+            // Generate the encryption using precomputed values
+            ciphertext = elgamalEncrypt_with_precomputed(selection.getVote(),
+                                                         *g_to_exp, *pubkey_to_exp);
+            if (ciphertext == nullptr) {
+                throw runtime_error("encryptSelection:: Error generating ciphertext");
+            }
+
+            // note that there the public key and the selection nonce are not needed
+            // because the precomputation values are being used so a selection nonce
+            // was generated when precomputing and the public key was used in the
+            // precomputation
+            encrypted = CiphertextBallotSelection::make_with_precomputed(
+              selection.getObjectId(), description.getSequenceOrder(), *descriptionHash,
+              move(ciphertext), cryptoExtendedBaseHash, selection.getVote(),
+              move(precomputedTwoTriplesAndAQuad),
+              isPlaceholder, true);
+        } else {
+            // Generate the encryption
+            ciphertext =
+              elgamalEncrypt(selection.getVote(), *selectionNonce, elgamalPublicKey);
+            if (ciphertext == nullptr) {
+                throw runtime_error("encryptSelection:: Error generating ciphertext");
+            }
+
+            // TODO: ISSUE #134: encrypt/decrypt: encrypt the extended_data field
+
+            encrypted = CiphertextBallotSelection::make(
+              selection.getObjectId(), description.getSequenceOrder(), *descriptionHash,
+              move(ciphertext), elgamalPublicKey, cryptoExtendedBaseHash, selection.getVote(),
+              isPlaceholder, true, move(selectionNonce));
         }
-
-        // TODO: ISSUE #134: encrypt/decrypt: encrypt the extended_data field
-
-        auto encrypted = CiphertextBallotSelection::make(
-          selection.getObjectId(), description.getSequenceOrder(), *descriptionHash,
-          move(ciphertext), elgamalPublicKey, cryptoExtendedBaseHash, selection.getVote(),
-          isPlaceholder, true, move(selectionNonce));
 
         if (encrypted == nullptr || encrypted->getProof() == nullptr) {
             throw runtime_error("encryptSelection:: Error constructing encrypted selection");
@@ -270,10 +304,10 @@ namespace electionguard
 
         // verify the selection.
         if (encrypted->isValidEncryption(*descriptionHash, elgamalPublicKey,
-                                         cryptoExtendedBaseHash)) {
+                                            cryptoExtendedBaseHash)) {
             return encrypted;
         }
-        throw runtime_error("encryptSelection failed validity check");
+        throw runtime_error("encryptSelection failed validity check");        
     }
 
     unique_ptr<CiphertextBallotContest>

@@ -122,6 +122,17 @@ namespace electionguard
     elgamalEncrypt(const uint64_t m, const ElementModQ &nonce, const ElementModP &publicKey);
 
     /// <summary>
+    /// Encrypts a message with given precomputed values (two triples and a quadruple).
+    /// However, only the first triple is used in this function.
+    ///
+    /// <param name="m"> Message to elgamal_encrypt; must be an integer in [0,Q). </param>
+    /// <param name="precomputedTwoTriplesAndAQuad"> Precomputed two triples and a quad. </param>
+    /// <returns>A ciphertext tuple.</returns>
+    /// </summary>
+    EG_API std::unique_ptr<ElGamalCiphertext>
+    elgamalEncrypt_with_precomputed(uint64_t m, ElementModP &gToRho,
+                                    ElementModP &pubkeyToRho);
+    /// <summary>
     /// Accumulate the ciphertexts by adding them together.
     /// </summary>
     EG_API std::unique_ptr<ElGamalCiphertext>

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace ElectionGuard
 {
+    using NativePrecomputeBuffers = NativeInterface.PrecomputeBuffers;
+
+
     /// <summary>
     /// States that the precompute process can be in.
     /// </summary>
@@ -66,8 +69,15 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="maxexp">The max exponentiation to be calculated</param>
         /// <param name="token">CancelationToken that can be used to start the process</param>
-        /// <returns></returns>
+        [Obsolete]
         void StartPrecomputeAsync(long maxexp, CancellationToken token);
+
+        /// <summary>
+        /// Starts the precompute process by creating a new thread to run the process
+        /// </summary>
+        /// <param name="publicKey">The max exponentiation to be calculated</param>
+        /// <param name="buffers">The maximum number of buffers to precompute</param>
+        void StartPrecomputeAsync(ElementModP publicKey, int buffers);
 
         /// <summary>
         /// Stops the precompute process
@@ -96,8 +106,8 @@ namespace ElectionGuard
     /// </summary>
     public class Precompute : IPrecomputeAPI
     {
-        private CancellationTokenSource cancelTokenSource;
-        private CancellationToken cancelToken;
+        AutoResetEvent waitHandle;
+
         private PrecomputeStatus currentStatus = new PrecomputeStatus
         {
             Percentage = 0,
@@ -105,7 +115,8 @@ namespace ElectionGuard
             CurrentState = PrecomputeState.NotStarted
         };
         private Thread workerThread;
-        private long delay = 2;
+        private int max_buffers = 0;    // zero will say to run to a default number of runs
+        private ElementModP elgamalPublicKey;
 
         /// <summary>
         /// Event handler that will give back progress to the calling code
@@ -143,18 +154,43 @@ namespace ElectionGuard
         }
 
         /// <summary>
+        /// Gets the progress of the precompute
+        /// </summary>
+        /// <param name="count">count of the buffer entries</param>
+        /// <param name="queue_size">max size of the buffer queue</param>
+        public void GetProgress(out int count, out int queue_size)
+        {
+            NativePrecomputeBuffers.Status(out count, out queue_size);
+        }
+
+        /// <summary>
         /// Starts the precompute process by creating a new thread to run the process
         /// </summary>
         /// <param name="maxexp">The max exponentiation to be calculated</param>
         /// <param name="token">CancelationToken that can be used to start the process</param>
+        [Obsolete]
         public void StartPrecomputeAsync(long maxexp, CancellationToken token)
         {
-            cancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
-            cancelToken = token;
             currentStatus.CurrentState = PrecomputeState.Running;
-            delay = maxexp;
+        }
+
+        /// <summary>
+        /// Starts the precompute process by creating a new thread to run the process
+        /// </summary>
+        /// <param name="publicKey">The max exponentiation to be calculated</param>
+        /// <param name="buffers">The maximum number of buffers to precompute</param>
+        public void StartPrecomputeAsync(ElementModP publicKey, int buffers = 0)
+        {
+            currentStatus.CurrentState = PrecomputeState.Running;
+            max_buffers = buffers;
+            elgamalPublicKey = publicKey;
+
+            waitHandle = new AutoResetEvent(false);
             workerThread = new Thread(WorkerMethod);
+            workerThread.Name = "Precompute Worker Thread";
             workerThread.Start();
+
+            waitHandle.WaitOne();   // make sure thread is created before returning
         }
 
         /// <summary>
@@ -165,8 +201,13 @@ namespace ElectionGuard
             if (currentStatus.CurrentState == PrecomputeState.Running)
             {
                 currentStatus.CurrentState = PrecomputeState.UserStopped;
-                cancelTokenSource?.Cancel();
             }
+            else
+            {
+                // if this is already stopped or completed, resend the Completed event to make sure calling app sees the stopping
+                SendCompleted();
+            }
+            NativePrecomputeBuffers.Stop();     // tell the calculations to 
         }
 
         /// <summary>
@@ -174,35 +215,24 @@ namespace ElectionGuard
         /// </summary>
         private void WorkerMethod()
         {
-            double progress = 0;
-            if (cancelTokenSource == null)
-            {
-                cancelTokenSource = new CancellationTokenSource();
-            }
-            while (!cancelToken.IsCancellationRequested)
-            {
-                Thread.Sleep((int)delay * 1000);
+            NativePrecomputeBuffers.Init(max_buffers);
+            waitHandle.Set();
+            NativePrecomputeBuffers.Populate(elgamalPublicKey.Handle);
 
-                if (cancelToken.IsCancellationRequested)
-                {
-                    currentStatus.CurrentState = PrecomputeState.UserStopped;
-                    OnCompletedEvent();
-                    return;
-                }
+            SendCompleted();
+        }
 
-                progress += 10;
-                currentStatus.Percentage = progress;
-                if (progress == 100)
-                {
-                    currentStatus.CurrentState = PrecomputeState.Completed;
-                    OnCompletedEvent();
-                    return;
-                }
-                else
-                {
-                    OnProgressEvent();
-                }
-            }
+        private void SendCompleted()
+        {
+            int count = -1;
+            int queue_size = -2;
+            GetProgress(out count, out queue_size);
+            if (count == queue_size)
+                currentStatus.CurrentState = PrecomputeState.Completed;
+            currentStatus.Percentage = (double)count / queue_size;
+            currentStatus.CompletedExponentiationsCount = count;
+
+            OnCompletedEvent();
         }
 
     }
