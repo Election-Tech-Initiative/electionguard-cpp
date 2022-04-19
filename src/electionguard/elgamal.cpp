@@ -339,25 +339,41 @@ namespace electionguard
         std::vector<uint8_t> c0_c1_c2(pimpl->pad->toBytes());
         c0_c1_c2.insert(c0_c1_c2.end(), pimpl->ciphertext.begin(), pimpl->ciphertext.end());
         c0_c1_c2.insert(c0_c1_c2.end(), pimpl->mac.begin(), pimpl->mac.end());
-        HashedElGamalCiphertext::show_buffer("&&&&&&&&&&&&&&&&& Bytes to hash :", &c0_c1_c2.front(),
-                                             c0_c1_c2.size());
-
-        unique_ptr<ElementModQ> hash = hash_elems(c0_c1_c2);
-        HashedElGamalCiphertext::show_buffer("&&&&&&&&&&&&&&&&& HASH WITH hash_elems :",
-                                             &hash->toBytes().front(), hash->toBytes().size());
 
         uint8_t temp_hash[32];
         Hacl_Hash_SHA2_hash_256(&c0_c1_c2.front(), c0_c1_c2.size(), temp_hash);
-        HashedElGamalCiphertext::show_buffer(
-          "&&&&&&&&&&&&&&&&& HASH WITH Hacl_Hash_SHA2_hash_256 :", temp_hash, sizeof(temp_hash));
+
+        // reverse the bytes
+        uint64_t temp_hash_reversed[4];
+        uint8_t *ptemp = (uint8_t *)temp_hash_reversed;
+        for (int i = 0; i < (int)sizeof(temp_hash); i++) {
+            ptemp[i] = temp_hash[sizeof(temp_hash) - (i + 1)];
+        }
+        unique_ptr<ElementModQ> hash = make_unique<ElementModQ>(temp_hash_reversed);
 
         return hash;
     }
 
-    //unique_ptr<ElementModQ> HashedElGamalCiphertext::crypto_hash() const
-    //{
-    //    return pimpl->crypto_hash();
-    //}
+    unique_ptr<ElementModQ> HashedElGamalCiphertext::crypto_hash() const
+    {
+        // concatenate c0 | c1 | c2 (pad | ciphertext | mac)
+        std::vector<uint8_t> c0_c1_c2(pimpl->pad->toBytes());
+        c0_c1_c2.insert(c0_c1_c2.end(), pimpl->ciphertext.begin(), pimpl->ciphertext.end());
+        c0_c1_c2.insert(c0_c1_c2.end(), pimpl->mac.begin(), pimpl->mac.end());
+
+        uint8_t temp_hash[32];
+        Hacl_Hash_SHA2_hash_256(&c0_c1_c2.front(), c0_c1_c2.size(), temp_hash);
+
+        // reverse the bytes
+        uint64_t temp_hash_reversed[4];
+        uint8_t *ptemp = (uint8_t *)temp_hash_reversed;
+        for (int i = 0; i < (int)sizeof(temp_hash); i++) {
+            ptemp[i] = temp_hash[sizeof(temp_hash) - (i + 1)];
+        }
+        unique_ptr<ElementModQ> hash = make_unique<ElementModQ>(temp_hash_reversed);
+
+        return hash;
+    }
 
     // Public Methods
 
@@ -499,19 +515,6 @@ namespace electionguard
         return make_unique<HashedElGamalCiphertext>(pimpl->pad->clone(), pimpl->ciphertext, pimpl->mac);
     }
 
-    void HashedElGamalCiphertext::show_buffer(const char *message, uint8_t *buffer, uint32_t len)
-    {
-        std::string s = std::string("\n") + std::string(message) + std::string("\n");
-        for (int i = 0; i < (int)len; i++) {
-            char temp_s[20]; // maximum expected length of the float
-            std::snprintf(temp_s, sizeof(temp_s), "%02x", buffer[i]);
-            s += std::string("0x") + std::string(temp_s) + std::string(", ");
-            if (((i + 1) % 8) == 0) {
-                s += std::string("\n");
-            }
-        }
-        Log::debug(s);
-    }
 #pragma endregion // HashedElGamalCiphertext
 
     unique_ptr<HashedElGamalCiphertext> hashedElgamalEncrypt(std::vector<uint8_t> plaintext,

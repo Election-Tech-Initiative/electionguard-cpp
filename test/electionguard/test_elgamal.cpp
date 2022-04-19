@@ -142,22 +142,6 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding"
     auto ciphertext = HEGResult->getCiphertext();
     auto mac = HEGResult->getMac();
 
-    // check the crypto_hash is working as expected
-    // c0 is the pad, c1 is the ciphertext and c2 is the mac
-    unique_ptr<ElementModQ> hash_of_c0_c1_c2 = HEGResult->crypto_hash();
-    vector<uint8_t> hash_vector = hash_of_c0_c1_c2->toBytes();
-    /*
-    // perform the hash directly
-    std::vector<uint8_t> c0_c1_c2(p_pad->toBytes());
-    c0_c1_c2.insert(c0_c1_c2.end(), ciphertext.begin(), ciphertext.end());
-    c0_c1_c2.insert(c0_c1_c2.end(), mac.begin(), mac.end());
-    uint8_t temp_hash[32];
-    Hacl_Hash_SHA2_hash_256(&c0_c1_c2.front(), (uint32_t)(c0_c1_c2.size()), temp_hash);
-    vector<uint8_t> temp_hash_vector(temp_hash, temp_hash + sizeof(temp_hash));
-
-    // compare the hash computed by crypto_hash with our computed hash
-    CHECK(hash_vector == temp_hash_vector);
-    */
     // now lets decrypt
     unique_ptr<HashedElGamalCiphertext> newHEG = make_unique<HashedElGamalCiphertext>(
       move(p_pad), HEGResult->getCiphertext(), HEGResult->getMac());

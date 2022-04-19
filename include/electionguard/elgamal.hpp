@@ -198,7 +198,7 @@ namespace electionguard
         std::vector<uint8_t> getMac() const;
 
         virtual std::unique_ptr<ElementModQ> crypto_hash();
-        //virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
+        virtual std::unique_ptr<ElementModQ> crypto_hash() const;
 
         /// <summary>
         /// Decrypts ciphertext with the Auxiliary Encryption method (as specified in the
@@ -222,7 +222,6 @@ namespace electionguard
         /// </Summary>
         std::unique_ptr<HashedElGamalCiphertext> clone() const;
 
-        static void show_buffer(const char *message, uint8_t *buffer, uint32_t len);
       private:
         class Impl;
 #pragma warning(suppress : 4251)
