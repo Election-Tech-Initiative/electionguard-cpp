@@ -223,6 +223,24 @@ namespace electionguard
     }
 
     unique_ptr<ElGamalCiphertext>
+    elgamalEncrypt_with_precomputed(uint64_t m, ElementModP &g_to_rho, ElementModP &pubkey_to_rho)
+    {
+        ElementModP data = pubkey_to_rho;
+
+        if (m == 1) {
+            unique_ptr<ElementModP> temp = mul_mod_p(G(), pubkey_to_rho);
+            data = *temp;
+        }
+
+        Log::trace("Generated Encryption with Precomputed Values");
+        Log::trace("pad", g_to_rho.toHex());
+        Log::trace("data", data.toHex());
+
+        return make_unique<ElGamalCiphertext>(make_unique<ElementModP>(g_to_rho),
+            make_unique<ElementModP>(data));
+    }
+
+    unique_ptr<ElGamalCiphertext>
     elgamalAdd(const vector<reference_wrapper<ElGamalCiphertext>> &ciphertexts)
     {
         if (ciphertexts.empty()) {
