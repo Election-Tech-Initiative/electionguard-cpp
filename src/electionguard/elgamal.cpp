@@ -1,5 +1,6 @@
 #include "electionguard/elgamal.hpp"
 
+#include "../kremlin/Lib_Memzero0.h"
 #include "../kremlin/Hacl_Hash.h"
 #include "../kremlin/Hacl_HMAC.h"
 #include "../kremlin/Hacl_Bignum4096.h"
@@ -396,6 +397,8 @@ namespace electionguard
         a_b.insert(a_b.end(), publicKey_to_r_bytes.begin(), publicKey_to_r_bytes.end());
 
         Hacl_Hash_SHA2_hash_256(&a_b.front(), a_b.size(), key_bytes);
+        Lib_Memzero0_memzero(&publicKey_to_r_bytes.front(), publicKey_to_r_bytes.size());
+        Lib_Memzero0_memzero(&a_b.front(), a_b.size());
 
         // reverse the length because we hash it in big endian and we are on little endian
         uint32_t ciphertext_len_be = htobe32(ciphertext_len);
@@ -415,6 +418,8 @@ namespace electionguard
         uint8_t mac_key[HASHED_CIPHERTEXT_BLOCK_LENGTH];
         Hacl_HMAC_compute_sha2_256(mac_key, key_bytes, sizeof(key_bytes),
                                    &data_to_hash_mac_key.front(), data_to_hash_mac_key.size());
+        Lib_Memzero0_memzero(&data_to_hash_mac_key.front(), data_to_hash_mac_key.size());
+
 
         // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
         vector<uint8_t> c0_and_c1(pimpl->pad->toBytes());
@@ -428,6 +433,7 @@ namespace electionguard
         if (pimpl->mac != our_mac) {
             throw runtime_error("HashedElGamalCiphertext::decrypt the calculated mac didn't match the passed in mac");
         }
+        Lib_Memzero0_memzero(mac_key, sizeof(mac_key));
 
         uint32_t plaintext_index = 0;
         for (uint32_t i = 0; i < num_xor_keys; i++) {
@@ -446,6 +452,7 @@ namespace electionguard
 
             Hacl_HMAC_compute_sha2_256(temp_xor_key_bytes, key_bytes, sizeof(key_bytes),
                                        &data_to_hash_for_key.front(), data_to_hash_for_key.size());
+            Lib_Memzero0_memzero(&data_to_hash_for_key.front(), data_to_hash_for_key.size());
 
             // XOR the key with the plaintext
             for (int j = 0; j < (int)sizeof(temp_plaintext); j++) {
@@ -454,10 +461,15 @@ namespace electionguard
                 // advance the plaintext index
                 plaintext_index++;
             }
+            Lib_Memzero0_memzero(temp_xor_key_bytes, sizeof(temp_xor_key_bytes));
 
             plaintext_with_padding.insert(plaintext_with_padding.end(), temp_plaintext,
                              temp_plaintext + HASHED_CIPHERTEXT_BLOCK_LENGTH);
+            Lib_Memzero0_memzero(temp_plaintext, sizeof(temp_plaintext));
         }
+        Lib_Memzero0_memzero(&partial_data_to_hash_for_key.front(),
+                             partial_data_to_hash_for_key.size());
+        Lib_Memzero0_memzero(key_bytes, sizeof(key_bytes));
 
         if (look_for_padding) {
             // we have made sure that we are at least 1 block length
@@ -565,6 +577,8 @@ namespace electionguard
         a_b.insert(a_b.end(), publicKey_to_r_bytes.begin(), publicKey_to_r_bytes.end());
 
         Hacl_Hash_SHA2_hash_256(&a_b.front(), a_b.size(), key_bytes);
+        Lib_Memzero0_memzero(&publicKey_to_r_bytes.front(), publicKey_to_r_bytes.size());
+        Lib_Memzero0_memzero(&a_b.front(), a_b.size());
 
         // reverse the length because we hash it in big endian and we are on little endian
         uint32_t plaintext_len_be = htobe32(plaintext_len);
@@ -592,6 +606,7 @@ namespace electionguard
 
             Hacl_HMAC_compute_sha2_256(temp_xor_key_bytes, key_bytes, sizeof(key_bytes),
                                        &data_to_hash_for_key.front(), data_to_hash_for_key.size());
+            Lib_Memzero0_memzero(&data_to_hash_for_key.front(), data_to_hash_for_key.size());
 
             // XOR the key with the plaintext
             for (int j = 0; j < (int)sizeof(temp_ciphertext); j++) {
@@ -599,9 +614,11 @@ namespace electionguard
                 // advance the plaintext index
                 plaintext_index++;
             }
+            Lib_Memzero0_memzero(temp_xor_key_bytes, sizeof(temp_xor_key_bytes));
 
             ciphertext.insert(ciphertext.end(), temp_ciphertext,
                               temp_ciphertext + HASHED_CIPHERTEXT_BLOCK_LENGTH);
+            Lib_Memzero0_memzero(temp_ciphertext, sizeof(temp_ciphertext));
         }
 
         vector<uint8_t> zero_count({0, 0, 0, 0});
@@ -613,6 +630,10 @@ namespace electionguard
         uint8_t mac_key[HASHED_CIPHERTEXT_BLOCK_LENGTH];
         Hacl_HMAC_compute_sha2_256(mac_key, key_bytes, sizeof(key_bytes), &data_to_hash_mac_key.front(),
                                    data_to_hash_mac_key.size());
+        Lib_Memzero0_memzero(&partial_data_to_hash_for_key.front(),
+                             partial_data_to_hash_for_key.size());
+        Lib_Memzero0_memzero(&data_to_hash_mac_key.front(), data_to_hash_mac_key.size());
+        Lib_Memzero0_memzero(key_bytes, sizeof(key_bytes));
 
         // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
         vector<uint8_t> c0_and_c1(g_to_r->toBytes());
@@ -620,6 +641,7 @@ namespace electionguard
         uint8_t mac_uint8[HASHED_CIPHERTEXT_BLOCK_LENGTH];
         Hacl_HMAC_compute_sha2_256(mac_uint8, mac_key, sizeof(mac_key), &c0_and_c1.front(),
                                    c0_and_c1.size());
+        Lib_Memzero0_memzero(mac_key, sizeof(mac_key));
 
         vector<uint8_t> mac_as_vector(mac_uint8, mac_uint8 + sizeof(mac_uint8));
 
