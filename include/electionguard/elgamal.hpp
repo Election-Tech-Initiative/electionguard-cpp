@@ -142,20 +142,19 @@ namespace electionguard
     elgamalAdd(const std::vector<std::reference_wrapper<ElGamalCiphertext>> &ciphertexts);
 
     /// <summary>
-    /// TODO
+    /// A "Hashed ElGamal Ciphertext" as specified as the Auxiliary Encryption in
+    /// the ElectionGuard specification. The tuple g ^ r mod p concatenated with
+    /// K ^ r mod p are used to feed into a hash function to generate a main key
+    /// from which other keys derive to perform XOR encryption and to MAC the
+    /// result. Create one with `hashedElgamalEncrypt`. Decrypt using one the
+    /// 'decrypt' method.
     /// </summary>
     class EG_API HashedElGamalCiphertext
     {
-      private:
-        // TODO - need to use pimpl eventually
-        std::unique_ptr<ElementModP> pad;
-        std::vector<uint8_t> ciphertext;
-        std::vector<uint8_t> mac;
-
       public:
         HashedElGamalCiphertext(const HashedElGamalCiphertext &other);
         HashedElGamalCiphertext(HashedElGamalCiphertext &&other);
-        HashedElGamalCiphertext(const ElementModP &pad, std::vector<uint8_t> ciphertext,
+        HashedElGamalCiphertext(std::unique_ptr<ElementModP> pad, std::vector<uint8_t> ciphertext,
                                 std::vector<uint8_t> mac);
         ~HashedElGamalCiphertext();
 
@@ -165,65 +164,95 @@ namespace electionguard
         bool operator!=(const HashedElGamalCiphertext &other);
 
         /// <Summary>
-        /// The pad value also referred to as A, a, 𝑎, or alpha in the spec.
+        /// The g ^r mod p value also referred to as pad in the code and
+        /// c0 in the spec.
         /// </Summary>
-        std::unique_ptr<ElementModP> getPad() { return this->pad->clone(); }
+        ElementModP *getPad();
 
         /// <Summary>
-        /// The pad value also referred to as A, a, 𝑎, or alpha in the spec.
+        /// The g ^r mod p value also referred to as pad in the code and
+        /// c0 in the spec.
         /// </Summary>
-        //ElementModP *getPad() const;
+        ElementModP *getPad() const;
 
         /// <Summary>
-        ///
+        /// The vector of encrypted ciphertext bytes. Referred to as c1
+        /// in the spec.
         /// </Summary>
-        std::vector<uint8_t> getCiphertext() { return this->ciphertext; }
+        std::vector<uint8_t> getCiphertext();
 
         /// <Summary>
-        ///
+        /// The vector of encrypted ciphertext bytes. Referred to as c1
+        /// in the spec.
         /// </Summary>
-        std::vector<uint8_t> getMac() { return this->mac; }
+        std::vector<uint8_t> getCiphertext() const;
 
-        //virtual std::unique_ptr<ElementModQ> crypto_hash() override;
+        /// <Summary>
+        /// The vector of MAC bytes. Referred to as c2 in the spec.
+        /// </Summary>
+        std::vector<uint8_t> getMac();
+
+        /// <Summary>
+        /// The vector of MAC bytes. Referred to as c2 in the spec.
+        /// </Summary>
+        std::vector<uint8_t> getMac() const;
+
+        virtual std::unique_ptr<ElementModQ> crypto_hash();
         //virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
-        /// <Summary>
-        /// Make an ElGamal Ciphertext from the given g^R mod p, the encrypted text and the mac
-        /// </Summary>
-        //static std::unique_ptr<HashedElGamalCiphertext>
-        //make(const ElementModP &g_to_R, byte *encryptedText, const ElementModQ &mac);
-
-        /// <Summary>
-        /// Encrypt the plaintext directly using the provided public key.
-        ///
-        /// </Summary>
-        static std::unique_ptr<HashedElGamalCiphertext> encrypt(const ElementModQ &secretKey,
-                                                                const ElementModP &publicKey,
-                                                                const ElementModQ &descriptionHash,
-                                                                std::vector<uint8_t> plaintext,
-                                                                bool apply_padding);
-
-        /// <Summary>
-        /// Decrypt the ciphertext directly using the provided secret key.
-        ///
-        /// This is a convenience accessor useful for some use cases.
-        /// This method should not be used by consumers operating in live secret ballot elections.
-        /// </Summary>
-        std::vector<uint8_t> decrypt(const ElementModQ &secretKey, const ElementModP &publicKey,
+        /// <summary>
+        /// Decrypts ciphertext with the Auxiliary Encryption method (as specified in the
+        /// ElectionGuard specification) given a random nonce, an ElGamal public key,
+        /// and a description hash. The encrypt may be called to look for padding to
+        /// verify and remove, in this case the plaintext will be smaller than
+        /// the ciphertext, or not to look for padding in which case the
+        /// plaintext will be the same size as the ciphertext. 
+        /// 
+        /// <param name="nonce"> Randomly chosen nonce in [1,Q). </param>
+        /// <param name="publicKey"> ElGamal public key. </param>
+        /// <param name="descriptionHash"> Hash of the ballot description. </param>
+        /// <param name="look_for_padding"> Indicates if padding removed. </param>
+        /// <returns>A plaintext vector.</returns>
+        /// </summary>
+        std::vector<uint8_t> decrypt(const ElementModQ &nonce, const ElementModP &publicKey,
                                      const ElementModQ &descriptionHash, bool look_for_padding);
 
         /// <Summary>
         /// Clone the value by making a deep copy.
         /// </Summary>
-        //        std::unique_ptr<HashedElGamalCiphertext> clone() const;
+        std::unique_ptr<HashedElGamalCiphertext> clone() const;
 
         static void show_buffer(const char *message, uint8_t *buffer, uint32_t len);
-
       private:
-//        class Impl;
+        class Impl;
 #pragma warning(suppress : 4251)
-        //        std::unique_ptr<Impl> pimpl;
+                std::unique_ptr<Impl> pimpl;
     };
+
+    /// <summary>
+    /// Encrypts a message with the Auxiliary Encryption method (as specified in the
+    /// ElectionGuard specification) given a random nonce, an ElGamal public key,
+    /// and a description hash. The encrypt may be called to apply padding to
+    /// pad variable length data to block length, in this case the ciphertext
+    /// will be larger than the plaintext, or not to apply padding in which
+    /// case the ciphertext will be the same size as the plaintext. If no
+    /// padding is to be applied then the plaintext must be a multiple of the
+    /// block length, the length of a SHA256 hash (32 bytes).
+    ///
+    /// <param name="plaintext"> Message to hashed elgamal encrypt. </param>
+    /// <param name="nonce"> Randomly chosen nonce in [1,Q). </param>
+    /// <param name="publicKey"> ElGamal public key. </param>
+    /// <param name="descriptionHash"> Hash of the ballot description. </param>
+    /// <param name="apply_padding"> Indicates if padding should be applied. </param>
+    /// <returns>A ciphertext triple.</returns>
+    /// </summary>
+    EG_API std::unique_ptr<HashedElGamalCiphertext>
+    hashedElgamalEncrypt(std::vector<uint8_t> plaintext,
+                         const ElementModQ &nonce,
+                         const ElementModP &publicKey,
+                         const ElementModQ &descriptionHash,
+                         bool apply_padding);
+
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD__CPP_ELGAMAL_HPP_INCLUDED__ */

@@ -265,48 +265,41 @@ namespace electionguard
 
 
 #pragma region HashedElGamalCiphertext
-    /*
+    
     struct HashedElGamalCiphertext::Impl {
         unique_ptr<ElementModP> pad;
         vector<uint8_t> ciphertext;
-        unique_ptr<ElementModQ> mac;
+        vector<uint8_t> mac;
 
-
-        Impl(unique_ptr<ElementModP> pad, vector<uint8_t> ciphertext)
-            : pad(move(pad)), ciphertext(move(ciphertext))
+        Impl(unique_ptr<ElementModP> pad, vector<uint8_t> ciphertext, vector<uint8_t> mac)
+            : pad(move(pad)), ciphertext(ciphertext), mac(mac)
         {
         }
 
         [[nodiscard]] unique_ptr<HashedElGamalCiphertext::Impl> clone() const
         {
             auto _pad = make_unique<ElementModP>(*pad);
-//            auto _data = make_unique<ElementModP>(*data);
-//            return make_unique<HashedElGamalCiphertext::Impl>(move(_pad), move(_data));
+            return make_unique<HashedElGamalCiphertext::Impl>(move(_pad), ciphertext, mac);
         }
 
-        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
+        bool operator==(const Impl &other)
         {
-//            return hash_elems({pad.get(), ciphertext.get()});
-        }
-
-        bool operator==(const Impl &other) { return *pad == *other.pad; } // &&*data == *other.data;
+            return *pad == *other.pad && ciphertext == other.ciphertext && mac == other.mac;
         }
     };
-    */
+
     // Lifecycle Methods
 
-    HashedElGamalCiphertext::HashedElGamalCiphertext(const HashedElGamalCiphertext &other){}
-    //        : pimpl(other.pimpl->clone())
-    //{
-    //}
+    HashedElGamalCiphertext::HashedElGamalCiphertext(const HashedElGamalCiphertext &other)
+            : pimpl(other.pimpl->clone())
+    {
+    }
 
-    HashedElGamalCiphertext::HashedElGamalCiphertext(const ElementModP &pad,
+    HashedElGamalCiphertext::HashedElGamalCiphertext(std::unique_ptr<ElementModP> pad,
                                                      std::vector<uint8_t> ciphertext,
                                                      std::vector<uint8_t> mac)
+        : pimpl(new Impl(move(pad), ciphertext, mac))
     {
-        this->pad = make_unique<ElementModP>(pad);
-        this->ciphertext = ciphertext;
-        this->mac = mac;
     }
 
     HashedElGamalCiphertext::~HashedElGamalCiphertext(){};
@@ -315,14 +308,13 @@ namespace electionguard
 
     HashedElGamalCiphertext &HashedElGamalCiphertext::operator=(HashedElGamalCiphertext rhs)
     {
-//        swap(pimpl, rhs.pimpl);
+        swap(pimpl, rhs.pimpl);
         return *this;
     }
 
     bool HashedElGamalCiphertext::operator==(const HashedElGamalCiphertext &other)
     {
-//        return *pimpl == *other.pimpl;
-        return true;
+        return *pimpl == *other.pimpl;
     }
 
     bool HashedElGamalCiphertext::operator!=(const HashedElGamalCiphertext &other)
@@ -332,36 +324,201 @@ namespace electionguard
 
     // Property Getters
 
-//    ElementModP *HashedElGamalCiphertext::getPad() { return pimpl->pad.get(); }
-//    ElementModP *HashedElGamalCiphertext::getPad() const { return pimpl->pad.get(); }
-//    ElementModP *HashedElGamalCiphertext::getData() { return pimpl->data.get(); }
-//    ElementModP *HashedElGamalCiphertext::getData() const { return pimpl->data.get(); }
-
+    ElementModP *HashedElGamalCiphertext::getPad() { return pimpl->pad.get(); }
+    ElementModP *HashedElGamalCiphertext::getPad() const { return pimpl->pad.get(); }
+    vector<uint8_t> HashedElGamalCiphertext::getCiphertext() { return pimpl->ciphertext; }
+    vector<uint8_t> HashedElGamalCiphertext::getCiphertext() const { return pimpl->ciphertext; }
+    vector<uint8_t> HashedElGamalCiphertext::getMac() { return pimpl->mac; }
+    vector<uint8_t> HashedElGamalCiphertext::getMac() const { return pimpl->mac; }
 
     // Interface Overrides
 
-//    unique_ptr<ElementModQ> HashedElGamalCiphertext::crypto_hash() { return pimpl->crypto_hash(); }
-//    unique_ptr<ElementModQ> HashedElGamalCiphertext::crypto_hash() const
-//    {
-//        return pimpl->crypto_hash();
-//    }
+    unique_ptr<ElementModQ> HashedElGamalCiphertext::crypto_hash()
+    { 
+        // concatenate c0 | c1 | c2 (pad | ciphertext | mac)
+        std::vector<uint8_t> c0_c1_c2(pimpl->pad->toBytes());
+        c0_c1_c2.insert(c0_c1_c2.end(), pimpl->ciphertext.begin(), pimpl->ciphertext.end());
+        c0_c1_c2.insert(c0_c1_c2.end(), pimpl->mac.begin(), pimpl->mac.end());
+        HashedElGamalCiphertext::show_buffer("&&&&&&&&&&&&&&&&& Bytes to hash :", &c0_c1_c2.front(),
+                                             c0_c1_c2.size());
 
-//    unique_ptr<HashedElGamalCiphertext> HashedElGamalCiphertext::make(const ElementModP &pad,
-//                                                                        std::vector<uint8_t> ciphertext,
-//                                                                        const ElementModP &mac)
-//    {
-//        return make_unique<HashedElGamalCiphertext>(make_unique<ElementModP>(pad),
-//                                                    make_unique<ElementModP>(data));
-//    }
+        unique_ptr<ElementModQ> hash = hash_elems(c0_c1_c2);
+        HashedElGamalCiphertext::show_buffer("&&&&&&&&&&&&&&&&& HASH WITH hash_elems :",
+                                             &hash->toBytes().front(), hash->toBytes().size());
+
+        uint8_t temp_hash[32];
+        Hacl_Hash_SHA2_hash_256(&c0_c1_c2.front(), c0_c1_c2.size(), temp_hash);
+        HashedElGamalCiphertext::show_buffer(
+          "&&&&&&&&&&&&&&&&& HASH WITH Hacl_Hash_SHA2_hash_256 :", temp_hash, sizeof(temp_hash));
+
+        return hash;
+    }
+
+    //unique_ptr<ElementModQ> HashedElGamalCiphertext::crypto_hash() const
+    //{
+    //    return pimpl->crypto_hash();
+    //}
 
     // Public Methods
 
-    unique_ptr<HashedElGamalCiphertext>
-    HashedElGamalCiphertext::encrypt(const ElementModQ &secretKey,
-                                     const ElementModP &publicKey,
-                                     const ElementModQ &descriptionHash,
-                                     vector<uint8_t> plaintext,
-                                     bool apply_padding)
+    vector<uint8_t> HashedElGamalCiphertext::decrypt(const ElementModQ &nonce,
+                                                     const ElementModP &publicKey,
+                                                     const ElementModQ &descriptionHash,
+                                                     bool look_for_padding)
+    {
+        // Note this decryption method is primarily used for testing
+        // and is only capable of decrypting boolean results (0/1)
+        // it should be extended with a discrete_log search to decrypt
+        // values other than 0 or 1
+        uint8_t key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
+        uint8_t temp_xor_key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
+        vector<uint8_t> plaintext_with_padding;
+        vector<uint8_t> plaintext;
+
+        uint32_t ciphertext_len = pimpl->ciphertext.size();
+        uint32_t num_xor_keys = ciphertext_len / HASHED_CIPHERTEXT_BLOCK_LENGTH;
+        if ((0 != (ciphertext_len % HASHED_CIPHERTEXT_BLOCK_LENGTH)) || (ciphertext_len == 0))  {
+            throw invalid_argument("HashedElGamalCiphertext::decrypt the ciphertext "
+                                   "is not a multiple of the block length 32");
+        }
+
+        auto publicKey_to_r = pow_mod_p(publicKey, nonce);
+        vector<uint8_t> publicKey_to_r_bytes = publicKey_to_r->toBytes();
+
+        // now we need to hash the concatenation of g_to_r with publicKey_to_r
+        // in order to get the base key
+        std::vector<uint8_t> a_b(pimpl->pad->toBytes());
+        a_b.insert(a_b.end(), publicKey_to_r_bytes.begin(), publicKey_to_r_bytes.end());
+
+        Hacl_Hash_SHA2_hash_256(&a_b.front(), a_b.size(), key_bytes);
+
+        // reverse the length because we hash it in big endian and we are on little endian
+        uint32_t ciphertext_len_be = htobe32(ciphertext_len);
+
+        // vector with the description hash concatenated with the reversed length
+        std::vector<uint8_t> partial_data_to_hash_for_key(descriptionHash.toBytes());
+        partial_data_to_hash_for_key.insert(
+          partial_data_to_hash_for_key.end(), (uint8_t *)&ciphertext_len_be,
+          (uint8_t *)&ciphertext_len_be + sizeof(ciphertext_len_be));
+
+        vector<uint8_t> zero_count({0, 0, 0, 0});
+        std::vector<uint8_t> data_to_hash_mac_key(zero_count);
+        data_to_hash_mac_key.insert(data_to_hash_mac_key.end(),
+                                    partial_data_to_hash_for_key.begin(),
+                                    partial_data_to_hash_for_key.end());
+        // get the key for use in the mac
+        uint8_t mac_key[HASHED_CIPHERTEXT_BLOCK_LENGTH];
+        Hacl_HMAC_compute_sha2_256(mac_key, key_bytes, sizeof(key_bytes),
+                                   &data_to_hash_mac_key.front(), data_to_hash_mac_key.size());
+
+        // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
+        vector<uint8_t> c0_and_c1(pimpl->pad->toBytes());
+        c0_and_c1.insert(c0_and_c1.end(), pimpl->ciphertext.begin(),
+                         pimpl->ciphertext.end());
+
+        uint8_t mac_uint8[HASHED_CIPHERTEXT_BLOCK_LENGTH];
+        Hacl_HMAC_compute_sha2_256(mac_uint8, mac_key, sizeof(mac_key), &c0_and_c1.front(),
+                                   c0_and_c1.size());
+        vector<uint8_t> our_mac(mac_uint8, mac_uint8 + sizeof(mac_uint8));
+        if (pimpl->mac != our_mac) {
+            throw runtime_error("HashedElGamalCiphertext::decrypt the calculated mac didn't match the passed in mac");
+        }
+
+        uint32_t plaintext_index = 0;
+        for (uint32_t i = 0; i < num_xor_keys; i++) {
+            uint8_t temp_plaintext[HASHED_CIPHERTEXT_BLOCK_LENGTH];
+
+            // reverse the count because we hash it in big endian and we are on little endian
+            uint32_t count = i + 1;
+            uint32_t count_be = htobe32(count);
+
+            // concatenate the reversed count, the description hash and the reversed length
+            std::vector<uint8_t> data_to_hash_for_key((uint8_t *)&count_be,
+                                                      (uint8_t *)&count_be + sizeof(count_be));
+            data_to_hash_for_key.insert(data_to_hash_for_key.end(),
+                                        partial_data_to_hash_for_key.begin(),
+                                        partial_data_to_hash_for_key.end());
+
+            Hacl_HMAC_compute_sha2_256(temp_xor_key_bytes, key_bytes, sizeof(key_bytes),
+                                       &data_to_hash_for_key.front(), data_to_hash_for_key.size());
+
+            // XOR the key with the plaintext
+            for (int j = 0; j < (int)sizeof(temp_plaintext); j++) {
+                temp_plaintext[j] =
+                  pimpl->ciphertext[plaintext_index] ^ temp_xor_key_bytes[j];
+                // advance the plaintext index
+                plaintext_index++;
+            }
+
+            plaintext_with_padding.insert(plaintext_with_padding.end(), temp_plaintext,
+                             temp_plaintext + HASHED_CIPHERTEXT_BLOCK_LENGTH);
+        }
+
+        if (look_for_padding) {
+            // we have made sure that we are at least 1 block length
+            uint32_t original_plaintext_len_be;
+            memcpy(&original_plaintext_len_be, &plaintext_with_padding.front(),
+                   sizeof(original_plaintext_len_be));
+            uint32_t original_plaintext_len = be32toh(original_plaintext_len_be);
+            if (original_plaintext_len > (plaintext_with_padding.size() - sizeof(original_plaintext_len))) {
+                throw runtime_error("HashedElGamalCiphertext::decrypt the padding is incorrect, decrypt failed");
+            }
+
+            uint32_t padding_len = plaintext_with_padding.size() - (original_plaintext_len + sizeof(original_plaintext_len));
+            if (padding_len > HASHED_CIPHERTEXT_BLOCK_LENGTH - 1) {
+                throw runtime_error(
+                  "HashedElGamalCiphertext::decrypt the padding is incorrect, decrypt failed");
+            }
+
+            // check that the end bytes are 0x00
+            if (padding_len > 0)
+            {
+                for (int i = original_plaintext_len + sizeof(original_plaintext_len);
+                     i < (int)plaintext_with_padding.size(); i++) {
+                    if (plaintext_with_padding[i] != 0x00) {
+                        throw runtime_error("HashedElGamalCiphertext::decrypt the padding is "
+                                            "incorrect, decrypt failed");
+                    }
+                }
+            }
+
+            plaintext.insert(plaintext.end(),
+                               &plaintext_with_padding.front() + sizeof(original_plaintext_len),
+                               &plaintext_with_padding.front() +
+                                 (original_plaintext_len + sizeof(original_plaintext_len)));
+        } else {
+            plaintext = plaintext_with_padding;      
+        }
+
+        return plaintext;
+    }
+
+
+    unique_ptr<HashedElGamalCiphertext> HashedElGamalCiphertext::clone() const
+    {
+        return make_unique<HashedElGamalCiphertext>(pimpl->pad->clone(), pimpl->ciphertext, pimpl->mac);
+    }
+
+    void HashedElGamalCiphertext::show_buffer(const char *message, uint8_t *buffer, uint32_t len)
+    {
+        std::string s = std::string("\n") + std::string(message) + std::string("\n");
+        for (int i = 0; i < (int)len; i++) {
+            char temp_s[20]; // maximum expected length of the float
+            std::snprintf(temp_s, sizeof(temp_s), "%02x", buffer[i]);
+            s += std::string("0x") + std::string(temp_s) + std::string(", ");
+            if (((i + 1) % 8) == 0) {
+                s += std::string("\n");
+            }
+        }
+        Log::debug(s);
+    }
+#pragma endregion // HashedElGamalCiphertext
+
+    unique_ptr<HashedElGamalCiphertext> hashedElgamalEncrypt(std::vector<uint8_t> plaintext,
+                                                             const ElementModQ &nonce,
+                                                             const ElementModP &publicKey,
+                                                             const ElementModQ &descriptionHash,
+                                                             bool apply_padding)
     {
         uint8_t key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
         uint8_t temp_xor_key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
@@ -373,31 +530,30 @@ namespace electionguard
         if (apply_padding) {
             uint32_t original_plaintext_len = plaintext.size();
             uint32_t original_plaintext_len_be = htobe32(original_plaintext_len);
-            uint32_t pad_len = HASHED_CIPHERTEXT_BLOCK_LENGTH -
-                               ((original_plaintext_len + sizeof(uint32_t)) % HASHED_CIPHERTEXT_BLOCK_LENGTH);
+            uint32_t pad_len =
+              HASHED_CIPHERTEXT_BLOCK_LENGTH -
+              ((original_plaintext_len + sizeof(uint32_t)) % HASHED_CIPHERTEXT_BLOCK_LENGTH);
 
             // note the mod guarantees that pad_len is less than HASHED_CIPHERTEXT_BLOCK_LENGTH
             // we dont pad 0x00s if the length field plus plaintext length falls on a block length boundary
             if (pad_len < HASHED_CIPHERTEXT_BLOCK_LENGTH) {
-                uint8_t padding[HASHED_CIPHERTEXT_BLOCK_LENGTH];
-                memset(padding, 0x00, sizeof(padding));
+                uint8_t padding[HASHED_CIPHERTEXT_BLOCK_LENGTH] = {0};
 
                 // insert length in big endian form
-                plaintext_on_boundary.insert(plaintext_on_boundary.end(), (uint8_t *)&original_plaintext_len_be,
+                plaintext_on_boundary.insert(
+                  plaintext_on_boundary.end(), (uint8_t *)&original_plaintext_len_be,
                   (uint8_t *)&original_plaintext_len_be + sizeof(original_plaintext_len_be));
 
                 // insert plaintest
                 plaintext_on_boundary.insert(plaintext_on_boundary.end(), plaintext.begin(),
                                              plaintext.end());
                 // insert padding
-                plaintext_on_boundary.insert(plaintext_on_boundary.end(), padding,
-                                             padding + pad_len);
+                plaintext_on_boundary.insert(plaintext_on_boundary.end(), padding, padding + pad_len);
             }
         } else {
             if (0 != (plaintext.size() % HASHED_CIPHERTEXT_BLOCK_LENGTH)) {
-                throw invalid_argument(
-                    "HashedElGamalCiphertext::encrypt the apply_padding was false "
-                    "but the plaintext is not a multiple of the block length 32");
+                throw invalid_argument("HashedElGamalCiphertext::encrypt the apply_padding was false "
+                                       "but the plaintext is not a multiple of the block length 32");
             }
             plaintext_on_boundary.insert(plaintext_on_boundary.end(), plaintext.begin(),
                                          plaintext.end());
@@ -406,9 +562,9 @@ namespace electionguard
         uint32_t plaintext_len = plaintext_on_boundary.size();
         uint32_t num_xor_keys = plaintext_len / HASHED_CIPHERTEXT_BLOCK_LENGTH;
 
-        auto g_to_r = g_pow_p(secretKey);
+        auto g_to_r = g_pow_p(nonce);
 
-        auto publicKey_to_r = pow_mod_p(publicKey, secretKey);
+        auto publicKey_to_r = pow_mod_p(publicKey, nonce);
         vector<uint8_t> publicKey_to_r_bytes = publicKey_to_r->toBytes();
 
         // now we need to hash the concatenation of g_to_r with publicKey_to_r
@@ -452,19 +608,19 @@ namespace electionguard
                 plaintext_index++;
             }
 
-            ciphertext.insert(ciphertext.end(), temp_ciphertext, temp_ciphertext + HASHED_CIPHERTEXT_BLOCK_LENGTH);
+            ciphertext.insert(ciphertext.end(), temp_ciphertext,
+                              temp_ciphertext + HASHED_CIPHERTEXT_BLOCK_LENGTH);
         }
 
         vector<uint8_t> zero_count({0, 0, 0, 0});
         std::vector<uint8_t> data_to_hash_mac_key(zero_count);
-        data_to_hash_mac_key.insert(data_to_hash_mac_key.end(),
-                                    partial_data_to_hash_for_key.begin(),
+        data_to_hash_mac_key.insert(data_to_hash_mac_key.end(), partial_data_to_hash_for_key.begin(),
                                     partial_data_to_hash_for_key.end());
 
         // get the key for use in the mac
         uint8_t mac_key[HASHED_CIPHERTEXT_BLOCK_LENGTH];
-        Hacl_HMAC_compute_sha2_256(mac_key, key_bytes, sizeof(key_bytes),
-                                   &data_to_hash_mac_key.front(), data_to_hash_mac_key.size());
+        Hacl_HMAC_compute_sha2_256(mac_key, key_bytes, sizeof(key_bytes), &data_to_hash_mac_key.front(),
+                                   data_to_hash_mac_key.size());
 
         // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
         vector<uint8_t> c0_and_c1(g_to_r->toBytes());
@@ -475,145 +631,7 @@ namespace electionguard
 
         vector<uint8_t> mac_as_vector(mac_uint8, mac_uint8 + sizeof(mac_uint8));
 
-        return make_unique<HashedElGamalCiphertext>(*g_to_r, ciphertext, mac_as_vector);
+        return make_unique<HashedElGamalCiphertext>(move(g_to_r), ciphertext, mac_as_vector);
     }
-
-    vector<uint8_t> HashedElGamalCiphertext::decrypt(const ElementModQ &secretKey,
-                                                     const ElementModP &publicKey,
-                                                     const ElementModQ &descriptionHash,
-                                                     bool look_for_padding)
-    {
-        // Note this decryption method is primarily used for testing
-        // and is only capable of decrypting boolean results (0/1)
-        // it should be extended with a discrete_log search to decrypt
-        // values other than 0 or 1
-        uint8_t key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
-        uint8_t temp_xor_key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
-        vector<uint8_t> plaintext_with_padding;
-        vector<uint8_t> plaintext;
-
-        uint32_t ciphertext_len = ciphertext.size();
-        uint32_t num_xor_keys = ciphertext_len / HASHED_CIPHERTEXT_BLOCK_LENGTH;
-        if ((0 != (ciphertext_len % HASHED_CIPHERTEXT_BLOCK_LENGTH)) || (ciphertext_len == 0))  {
-            throw invalid_argument("HashedElGamalCiphertext::decrypt the ciphertext "
-                                   "is not a multiple of the block length 32");
-        }
-
-        auto publicKey_to_r = pow_mod_p(publicKey, secretKey);
-        vector<uint8_t> publicKey_to_r_bytes = publicKey_to_r->toBytes();
-
-        // now we need to hash the concatenation of g_to_r with publicKey_to_r
-        // in order to get the base key
-        std::vector<uint8_t> a_b(pad->toBytes());
-        a_b.insert(a_b.end(), publicKey_to_r_bytes.begin(), publicKey_to_r_bytes.end());
-
-        Hacl_Hash_SHA2_hash_256(&a_b.front(), a_b.size(), key_bytes);
-
-        // reverse the length because we hash it in big endian and we are on little endian
-        uint32_t ciphertext_len_be = htobe32(ciphertext_len);
-
-        // vector with the description hash concatenated with the reversed length
-        std::vector<uint8_t> partial_data_to_hash_for_key(descriptionHash.toBytes());
-        partial_data_to_hash_for_key.insert(
-          partial_data_to_hash_for_key.end(), (uint8_t *)&ciphertext_len_be,
-          (uint8_t *)&ciphertext_len_be + sizeof(ciphertext_len_be));
-
-        vector<uint8_t> zero_count({0, 0, 0, 0});
-        std::vector<uint8_t> data_to_hash_mac_key(zero_count);
-        data_to_hash_mac_key.insert(data_to_hash_mac_key.end(),
-                                    partial_data_to_hash_for_key.begin(),
-                                    partial_data_to_hash_for_key.end());
-
-        // get the key for use in the mac
-        uint8_t mac_key[HASHED_CIPHERTEXT_BLOCK_LENGTH];
-        Hacl_HMAC_compute_sha2_256(mac_key, key_bytes, sizeof(key_bytes),
-                                   &data_to_hash_mac_key.front(), data_to_hash_mac_key.size());
-
-        // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
-        vector<uint8_t> c0_and_c1(pad->toBytes());
-        c0_and_c1.insert(c0_and_c1.end(), ciphertext.begin(), ciphertext.end());
-        uint8_t mac_uint8[HASHED_CIPHERTEXT_BLOCK_LENGTH];
-        Hacl_HMAC_compute_sha2_256(mac_uint8, mac_key, sizeof(mac_key), &c0_and_c1.front(),
-                                   c0_and_c1.size());
-        vector<uint8_t> our_mac(mac_uint8, mac_uint8 + sizeof(mac_uint8));
-
-        if (mac != our_mac) {
-            throw runtime_error("HashedElGamalCiphertext::decrypt the calculated mac didn't match the passed in mac");
-        }
-
-        uint32_t plaintext_index = 0;
-        for (uint32_t i = 0; i < num_xor_keys; i++) {
-            uint8_t temp_plaintext[HASHED_CIPHERTEXT_BLOCK_LENGTH];
-
-            // reverse the count because we hash it in big endian and we are on little endian
-            uint32_t count = i + 1;
-            uint32_t count_be = htobe32(count);
-
-            // concatenate the reversed count, the description hash and the reversed length
-            std::vector<uint8_t> data_to_hash_for_key((uint8_t *)&count_be,
-                                                      (uint8_t *)&count_be + sizeof(count_be));
-            data_to_hash_for_key.insert(data_to_hash_for_key.end(),
-                                        partial_data_to_hash_for_key.begin(),
-                                        partial_data_to_hash_for_key.end());
-
-            Hacl_HMAC_compute_sha2_256(temp_xor_key_bytes, key_bytes, sizeof(key_bytes),
-                                       &data_to_hash_for_key.front(), data_to_hash_for_key.size());
-
-            // XOR the key with the plaintext
-            for (int j = 0; j < (int)sizeof(temp_plaintext); j++) {
-                temp_plaintext[j] = ciphertext[plaintext_index] ^ temp_xor_key_bytes[j];
-                // advance the plaintext index
-                plaintext_index++;
-            }
-
-            plaintext_with_padding.insert(plaintext_with_padding.end(), temp_plaintext,
-                             temp_plaintext + HASHED_CIPHERTEXT_BLOCK_LENGTH);
-        }
-
-        if (look_for_padding) {
-            // we have made sure that we are at least 1 block length
-            uint32_t original_plaintext_len_be;
-            memcpy(&original_plaintext_len_be, &plaintext_with_padding.front(),
-                   sizeof(original_plaintext_len_be));
-            uint32_t original_plaintext_len = be32toh(original_plaintext_len_be);
-            if (original_plaintext_len > (plaintext_with_padding.size() - sizeof(original_plaintext_len))) {
-                throw runtime_error("HashedElGamalCiphertext::decrypt the padding is incorrect, decrypt failed");
-            }
-
-            uint32_t padding_len = plaintext_with_padding.size() - (original_plaintext_len + sizeof(original_plaintext_len));
-            if (padding_len > HASHED_CIPHERTEXT_BLOCK_LENGTH - 1) {
-                throw runtime_error(
-                  "HashedElGamalCiphertext::decrypt the padding is incorrect, decrypt failed");
-            }
-
-            // check that the end bytes are 0x00
-            if (padding_len > 0)
-            {
-                for (int i = original_plaintext_len + sizeof(original_plaintext_len);
-                     i < plaintext_with_padding.size(); i++) {
-                    if (plaintext_with_padding[i] != 0x00) {
-                        throw runtime_error("HashedElGamalCiphertext::decrypt the padding is "
-                                            "incorrect, decrypt failed");
-                    }
-                }
-            }
-
-            plaintext.insert(plaintext.end(),
-                               &plaintext_with_padding.front() + sizeof(original_plaintext_len),
-                               &plaintext_with_padding.front() +
-                                 (original_plaintext_len + sizeof(original_plaintext_len)));
-        } else {
-            plaintext = plaintext_with_padding;      
-        }
-
-        return plaintext;
-    }
-
-//    unique_ptr<HashedElGamalCiphertext> HashedElGamalCiphertext::clone() const
-//    {
-//        return make_unique<HashedElGamalCiphertext>(pimpl->->clone(), pimpl->data->clone());
-//    }
-
-#pragma endregion // HashedElGamalCiphertext
 
 } // namespace electionguard
