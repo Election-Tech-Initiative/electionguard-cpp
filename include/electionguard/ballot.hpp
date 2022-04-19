@@ -6,6 +6,7 @@
 #include "elgamal.hpp"
 #include "export.h"
 #include "group.hpp"
+#include "precompute_buffers.hpp"
 
 #include <map>
 #include <memory>
@@ -276,6 +277,23 @@ namespace electionguard
              std::unique_ptr<ElementModQ> cryptoHash = nullptr,
              std::unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr,
              std::unique_ptr<ElGamalCiphertext> extendedData = nullptr);
+
+        /// <summary>
+        /// Constructs a `CipherTextBallotSelection` object. Most of the parameters here match up to fields
+        /// in the class, but this helper function will compute a Chaum-Pedersen proof if the
+        /// given nonce isn't `None`. Likewise, if a crypto_hash is not provided, it will be derived from
+        /// the other fields.
+        ///</summary>
+        static std::unique_ptr<CiphertextBallotSelection>
+        make_with_precomputed(
+          const std::string &objectId, uint64_t sequenceOrder,
+          const ElementModQ &descriptionHash, std::unique_ptr<ElGamalCiphertext> ciphertext,
+          const ElementModQ &cryptoExtendedBaseHash,
+          uint64_t plaintext,
+          std::unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
+          bool isPlaceholder = false, bool computeProof = true,
+          std::unique_ptr<ElementModQ> cryptoHash = nullptr,
+          std::unique_ptr<ElGamalCiphertext> extendedData = nullptr);
 
         /// <sumary>
         /// Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key.

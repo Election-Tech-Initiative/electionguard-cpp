@@ -2,6 +2,7 @@
 
 #include "log.hpp"
 #include "nonces.hpp"
+#include "electionguard/precompute_buffers.hpp"
 
 #include <cstdlib>
 #include <cstring>
@@ -168,6 +169,27 @@ namespace electionguard
             return make_one(message, r, k, q, seed);
         }
         return make_zero(message, r, k, q, seed);
+    }
+
+    unique_ptr<DisjunctiveChaumPedersenProof>
+    DisjunctiveChaumPedersenProof::make_with_precomputed(const ElGamalCiphertext &message,
+                                    unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
+                                    const ElementModQ &q,
+                                    uint64_t plaintext)
+    {
+        unique_ptr<DisjunctiveChaumPedersenProof> result;
+
+        if (plaintext > 1) {
+            throw invalid_argument(
+              "DisjunctiveChaumPedersenProof::make:: only supports plaintexts of 0 or 1");
+        }
+        Log::trace("DisjunctiveChaumPedersenProof: making proof without seed.");
+        if (plaintext == 1) {
+            return make_one_with_precomputed(message, move(precomputedTwoTriplesAndAQuad), q);
+        }
+        return make_zero_with_precomputed(message, move(precomputedTwoTriplesAndAQuad), q);
+
+        return result;
     }
 
     // Public Methods
@@ -348,6 +370,44 @@ namespace electionguard
     }
 
     unique_ptr<DisjunctiveChaumPedersenProof>
+    DisjunctiveChaumPedersenProof::make_zero_with_precomputed(const ElGamalCiphertext &message,
+                                    unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
+                                    const ElementModQ &q)
+    {
+        auto *alpha = message.getPad();
+        auto *beta = message.getData();
+
+        Log::trace("alpha: ", alpha->toHex());
+        Log::trace("beta: ", beta->toHex());
+
+        // Get our values from the precomputed values.
+        auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
+        auto r = triple1->get_exp();
+        auto triple2 = precomputedTwoTriplesAndAQuad->get_triple2();
+        auto quad = precomputedTwoTriplesAndAQuad->get_quad();
+        auto u = triple2->get_exp();
+        auto v = quad->get_exp1();
+        auto w = quad->get_exp2();
+        
+        auto a0 = triple2->get_g_to_exp();                      // 𝑔^𝑢 mod 𝑝
+        auto b0 = triple2->get_pubkey_to_exp();                 // 𝐾^𝑢 mod 𝑝
+        auto a1 = quad->get_g_to_exp1();                        // 𝑔^v mod 𝑝
+        auto b1 = quad->get_g_to_exp2_mult_by_pubkey_to_exp1();  // g^w⋅K^v mod p
+ 
+        // Compute the challenge
+        auto c = hash_elems(
+          {&const_cast<ElementModQ &>(q), alpha, beta, a0.get(), b0.get(), a1.get(), b1.get()});
+
+        //c_1 = w so we dont assign a new var for it
+        auto c0 = sub_mod_q(*c, *w);            // c_0=(c-w) mod q
+        auto v0 = a_plus_bc_mod_q(*u, *c0, *r); // v_0=(u+c_0⋅R) mod q
+        auto v1 = a_plus_bc_mod_q(*v, *w, *r);  // v_1=(v+c_1⋅R) mod q
+
+        return make_unique<DisjunctiveChaumPedersenProof>(
+          move(a0), move(b0), move(a1), move(b1), move(c0), move(w), move(c), move(v0), move(v1));
+    }
+
+    unique_ptr<DisjunctiveChaumPedersenProof>
     DisjunctiveChaumPedersenProof::make_one(const ElGamalCiphertext &message, const ElementModQ &r,
                                             const ElementModP &k, const ElementModQ &q)
     {
@@ -400,6 +460,46 @@ namespace electionguard
           {&const_cast<ElementModQ &>(q), alpha, beta, a0.get(), b0.get(), a1.get(), b1.get()});
         auto c1 = sub_mod_q(*c, *c0);
         auto v1 = a_plus_bc_mod_q(*u1, *c1, r);
+
+        return make_unique<DisjunctiveChaumPedersenProof>(
+          move(a0), move(b0), move(a1), move(b1), move(c0), move(c1), move(c), move(v0), move(v1));
+    }
+
+    unique_ptr<DisjunctiveChaumPedersenProof>
+    DisjunctiveChaumPedersenProof::make_one_with_precomputed(const ElGamalCiphertext &message,
+                                    unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
+                                    const ElementModQ &q)
+    {
+        unique_ptr<DisjunctiveChaumPedersenProof> result;
+        
+        auto *alpha = message.getPad();
+        auto *beta = message.getData();
+
+        Log::trace("alpha: ", alpha->toHex());
+        Log::trace("beta: ", beta->toHex());
+
+        // Get our values from the precomputed values.
+        auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
+        auto r = triple1->get_exp();
+        auto triple2 = precomputedTwoTriplesAndAQuad->get_triple2();
+        auto quad = precomputedTwoTriplesAndAQuad->get_quad();
+        auto u = triple2->get_exp();
+        auto v = quad->get_exp1();
+        auto w = quad->get_exp2();
+
+        auto a0 = quad->get_g_to_exp1();                        // 𝑔^v mod 𝑝
+        auto b0 = quad->get_g_to_exp2_mult_by_pubkey_to_exp1(); // g^w⋅K^v mod p
+        auto a1 = triple2->get_g_to_exp();                      // 𝑔^𝑢 mod 𝑝
+        auto b1 = triple2->get_pubkey_to_exp();                 // 𝐾^𝑢 mod 𝑝
+
+        // Compute challenge
+        auto c = hash_elems(
+          {&const_cast<ElementModQ &>(q), alpha, beta, a0.get(), b0.get(), a1.get(), b1.get()});
+
+        auto c0 = sub_mod_q(Q(), *w);          // c_0=(q-w)  mod q
+        auto c1 = add_mod_q(*c, *w);           // c_1=(c+w)  mod q
+        auto v0 = a_plus_bc_mod_q(*v, *c0, *r); // v_0=(v+c_0⋅R)  mod q
+        auto v1 = a_plus_bc_mod_q(*u, *c1, *r); // v_1=(u+c_1⋅R)  mod q
 
         return make_unique<DisjunctiveChaumPedersenProof>(
           move(a0), move(b0), move(a1), move(b1), move(c0), move(c1), move(c), move(v0), move(v1));
