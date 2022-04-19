@@ -302,7 +302,7 @@ namespace electionguard
     {
     }
 
-    HashedElGamalCiphertext::~HashedElGamalCiphertext(){};
+    HashedElGamalCiphertext::~HashedElGamalCiphertext() = default;
 
     // Operator Overloads
 
