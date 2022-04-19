@@ -183,6 +183,8 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data")
     std::unique_ptr<HashedElGamalCiphertext> HEGResult =
       hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, false);
 
+    unique_ptr<ElementModQ> hash = HEGResult->crypto_hash();
+
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
     vector<uint8_t> ciphertext = HEGResult->getCiphertext();
     vector<uint8_t> mac = HEGResult->getMac();
@@ -313,6 +315,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure - tampered w
 
     CHECK(decrypt_failed);
 }
+
 TEST_CASE("elgamalEncrypt_with_precomputed encrypt 1, decrypts with secret")
 {
     //auto nonce = ElementModQ::fromHex(a_fixed_nonce);

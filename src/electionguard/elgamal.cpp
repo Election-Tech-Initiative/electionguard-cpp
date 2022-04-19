@@ -335,26 +335,15 @@ namespace electionguard
 
     unique_ptr<ElementModQ> HashedElGamalCiphertext::crypto_hash()
     { 
-        // concatenate c0 | c1 | c2 (pad | ciphertext | mac)
-        std::vector<uint8_t> c0_c1_c2(pimpl->pad->toBytes());
-        c0_c1_c2.insert(c0_c1_c2.end(), pimpl->ciphertext.begin(), pimpl->ciphertext.end());
-        c0_c1_c2.insert(c0_c1_c2.end(), pimpl->mac.begin(), pimpl->mac.end());
-
-        uint8_t temp_hash[32];
-        Hacl_Hash_SHA2_hash_256(&c0_c1_c2.front(), c0_c1_c2.size(), temp_hash);
-
-        // reverse the bytes
-        uint64_t temp_hash_reversed[4];
-        uint8_t *ptemp = (uint8_t *)temp_hash_reversed;
-        for (int i = 0; i < (int)sizeof(temp_hash); i++) {
-            ptemp[i] = temp_hash[sizeof(temp_hash) - (i + 1)];
-        }
-        unique_ptr<ElementModQ> hash = make_unique<ElementModQ>(temp_hash_reversed);
-
-        return hash;
+        return local_crypto_hash();
     }
 
     unique_ptr<ElementModQ> HashedElGamalCiphertext::crypto_hash() const
+    {
+        return local_crypto_hash();
+    }
+
+    unique_ptr<ElementModQ> HashedElGamalCiphertext::local_crypto_hash() const
     {
         // concatenate c0 | c1 | c2 (pad | ciphertext | mac)
         std::vector<uint8_t> c0_c1_c2(pimpl->pad->toBytes());
