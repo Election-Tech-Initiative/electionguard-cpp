@@ -154,7 +154,7 @@ namespace electionguard
       public:
         HashedElGamalCiphertext(const HashedElGamalCiphertext &other);
         HashedElGamalCiphertext(HashedElGamalCiphertext &&other);
-        HashedElGamalCiphertext(std::unique_ptr<ElementModP> pad, std::vector<uint8_t> ciphertext,
+        HashedElGamalCiphertext(std::unique_ptr<ElementModP> pad, std::vector<uint8_t> data,
                                 std::vector<uint8_t> mac);
         ~HashedElGamalCiphertext();
 
@@ -179,13 +179,13 @@ namespace electionguard
         /// The vector of encrypted ciphertext bytes. Referred to as c1
         /// in the spec.
         /// </Summary>
-        std::vector<uint8_t> getCiphertext();
+        std::vector<uint8_t> getData();
 
         /// <Summary>
         /// The vector of encrypted ciphertext bytes. Referred to as c1
         /// in the spec.
         /// </Summary>
-        std::vector<uint8_t> getCiphertext() const;
+        std::vector<uint8_t> getData() const;
 
         /// <Summary>
         /// The vector of MAC bytes. Referred to as c2 in the spec.

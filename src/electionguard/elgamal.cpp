@@ -269,23 +269,23 @@ namespace electionguard
     
     struct HashedElGamalCiphertext::Impl {
         unique_ptr<ElementModP> pad;
-        vector<uint8_t> ciphertext;
+        vector<uint8_t> data;
         vector<uint8_t> mac;
 
-        Impl(unique_ptr<ElementModP> pad, vector<uint8_t> ciphertext, vector<uint8_t> mac)
-            : pad(move(pad)), ciphertext(ciphertext), mac(mac)
+        Impl(unique_ptr<ElementModP> pad, vector<uint8_t> data, vector<uint8_t> mac)
+            : pad(move(pad)), data(data), mac(mac)
         {
         }
 
         [[nodiscard]] unique_ptr<HashedElGamalCiphertext::Impl> clone() const
         {
             auto _pad = make_unique<ElementModP>(*pad);
-            return make_unique<HashedElGamalCiphertext::Impl>(move(_pad), ciphertext, mac);
+            return make_unique<HashedElGamalCiphertext::Impl>(move(_pad), data, mac);
         }
 
         bool operator==(const Impl &other)
         {
-            return *pad == *other.pad && ciphertext == other.ciphertext && mac == other.mac;
+            return *pad == *other.pad && data == other.data && mac == other.mac;
         }
     };
 
@@ -297,9 +297,9 @@ namespace electionguard
     }
 
     HashedElGamalCiphertext::HashedElGamalCiphertext(std::unique_ptr<ElementModP> pad,
-                                                     std::vector<uint8_t> ciphertext,
+                                                     std::vector<uint8_t> data,
                                                      std::vector<uint8_t> mac)
-        : pimpl(new Impl(move(pad), ciphertext, mac))
+        : pimpl(new Impl(move(pad), data, mac))
     {
     }
 
@@ -327,8 +327,8 @@ namespace electionguard
 
     ElementModP *HashedElGamalCiphertext::getPad() { return pimpl->pad.get(); }
     ElementModP *HashedElGamalCiphertext::getPad() const { return pimpl->pad.get(); }
-    vector<uint8_t> HashedElGamalCiphertext::getCiphertext() { return pimpl->ciphertext; }
-    vector<uint8_t> HashedElGamalCiphertext::getCiphertext() const { return pimpl->ciphertext; }
+    vector<uint8_t> HashedElGamalCiphertext::getData() { return pimpl->data; }
+    vector<uint8_t> HashedElGamalCiphertext::getData() const { return pimpl->data; }
     vector<uint8_t> HashedElGamalCiphertext::getMac() { return pimpl->mac; }
     vector<uint8_t> HashedElGamalCiphertext::getMac() const { return pimpl->mac; }
 
@@ -348,7 +348,7 @@ namespace electionguard
     {
         // concatenate c0 | c1 | c2 (pad | ciphertext | mac)
         std::vector<uint8_t> c0_c1_c2(pimpl->pad->toBytes());
-        c0_c1_c2.insert(c0_c1_c2.end(), pimpl->ciphertext.begin(), pimpl->ciphertext.end());
+        c0_c1_c2.insert(c0_c1_c2.end(), pimpl->data.begin(), pimpl->data.end());
         c0_c1_c2.insert(c0_c1_c2.end(), pimpl->mac.begin(), pimpl->mac.end());
 
         uint8_t temp_hash[32];
@@ -381,7 +381,7 @@ namespace electionguard
         vector<uint8_t> plaintext_with_padding;
         vector<uint8_t> plaintext;
 
-        uint32_t ciphertext_len = pimpl->ciphertext.size();
+        uint32_t ciphertext_len = pimpl->data.size();
         uint32_t num_xor_keys = ciphertext_len / HASHED_CIPHERTEXT_BLOCK_LENGTH;
         if ((0 != (ciphertext_len % HASHED_CIPHERTEXT_BLOCK_LENGTH)) || (ciphertext_len == 0))  {
             throw invalid_argument("HashedElGamalCiphertext::decrypt the ciphertext "
@@ -420,20 +420,23 @@ namespace electionguard
                                    &data_to_hash_mac_key.front(), data_to_hash_mac_key.size());
         Lib_Memzero0_memzero(&data_to_hash_mac_key.front(), data_to_hash_mac_key.size());
 
-
         // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
         vector<uint8_t> c0_and_c1(pimpl->pad->toBytes());
-        c0_and_c1.insert(c0_and_c1.end(), pimpl->ciphertext.begin(),
-                         pimpl->ciphertext.end());
+        c0_and_c1.insert(c0_and_c1.end(), pimpl->data.begin(),
+                         pimpl->data.end());
 
         uint8_t mac_uint8[HASHED_CIPHERTEXT_BLOCK_LENGTH];
         Hacl_HMAC_compute_sha2_256(mac_uint8, mac_key, sizeof(mac_key), &c0_and_c1.front(),
                                    c0_and_c1.size());
+        Lib_Memzero0_memzero(mac_key, sizeof(mac_key));
         vector<uint8_t> our_mac(mac_uint8, mac_uint8 + sizeof(mac_uint8));
+
         if (pimpl->mac != our_mac) {
+            Lib_Memzero0_memzero(&partial_data_to_hash_for_key.front(),
+                                 partial_data_to_hash_for_key.size());
+            Lib_Memzero0_memzero(key_bytes, sizeof(key_bytes));
             throw runtime_error("HashedElGamalCiphertext::decrypt the calculated mac didn't match the passed in mac");
         }
-        Lib_Memzero0_memzero(mac_key, sizeof(mac_key));
 
         uint32_t plaintext_index = 0;
         for (uint32_t i = 0; i < num_xor_keys; i++) {
@@ -457,7 +460,7 @@ namespace electionguard
             // XOR the key with the plaintext
             for (int j = 0; j < (int)sizeof(temp_plaintext); j++) {
                 temp_plaintext[j] =
-                  pimpl->ciphertext[plaintext_index] ^ temp_xor_key_bytes[j];
+                  pimpl->data[plaintext_index] ^ temp_xor_key_bytes[j];
                 // advance the plaintext index
                 plaintext_index++;
             }
@@ -513,7 +516,7 @@ namespace electionguard
 
     unique_ptr<HashedElGamalCiphertext> HashedElGamalCiphertext::clone() const
     {
-        return make_unique<HashedElGamalCiphertext>(pimpl->pad->clone(), pimpl->ciphertext, pimpl->mac);
+        return make_unique<HashedElGamalCiphertext>(pimpl->pad->clone(), pimpl->data, pimpl->mac);
     }
 
 #pragma endregion // HashedElGamalCiphertext

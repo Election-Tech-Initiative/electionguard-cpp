@@ -186,11 +186,11 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data")
     unique_ptr<ElementModQ> hash = HEGResult->crypto_hash();
 
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
-    vector<uint8_t> ciphertext = HEGResult->getCiphertext();
+    vector<uint8_t> data = HEGResult->getData();
     vector<uint8_t> mac = HEGResult->getMac();
 
     unique_ptr<HashedElGamalCiphertext> newHEG = make_unique<HashedElGamalCiphertext>(
-      move(pad), HEGResult->getCiphertext(), HEGResult->getMac());
+      move(pad), HEGResult->getData(), HEGResult->getMac());
 
     vector<uint8_t> new_plaintext = newHEG->decrypt(*nonce, *publicKey, *descriptionHash, false);
 
@@ -221,12 +221,12 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding"
 
     auto pad = HEGResult->getPad();
     unique_ptr<ElementModP> p_pad = make_unique<ElementModP>(*pad);
-    auto ciphertext = HEGResult->getCiphertext();
+    auto data = HEGResult->getData();
     auto mac = HEGResult->getMac();
 
     // now lets decrypt
     unique_ptr<HashedElGamalCiphertext> newHEG = make_unique<HashedElGamalCiphertext>(
-      move(p_pad), HEGResult->getCiphertext(), HEGResult->getMac());
+      move(p_pad), HEGResult->getData(), HEGResult->getMac());
 
     vector<uint8_t> new_plaintext = newHEG->decrypt(*nonce, *publicKey, *descriptionHash, true);
 
@@ -257,11 +257,11 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure different no
       hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, false);
 
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
-    vector<uint8_t> ciphertext = HEGResult->getCiphertext();
+    vector<uint8_t> data = HEGResult->getData();
     vector<uint8_t> mac = HEGResult->getMac();
 
     unique_ptr<HashedElGamalCiphertext> newHEG = make_unique<HashedElGamalCiphertext>(
-      move(pad), HEGResult->getCiphertext(), HEGResult->getMac());
+      move(pad), HEGResult->getData(), HEGResult->getMac());
 
     try {
         vector<uint8_t> new_plaintext =
@@ -293,18 +293,18 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure - tampered w
       hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, false);
 
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
-    vector<uint8_t> ciphertext = HEGResult->getCiphertext();
+    vector<uint8_t> data = HEGResult->getData();
     vector<uint8_t> mac = HEGResult->getMac();
 
-    // change a byte of ciphertext
-    if (ciphertext[ciphertext.size() / 2] == 0x00) {
-        ciphertext[ciphertext.size() / 2] = 0xff;
+    // change a byte of data
+    if (data[data.size() / 2] == 0x00) {
+        data[data.size() / 2] = 0xff;
     } else {
-        ciphertext[ciphertext.size() / 2] = 0x00;
+        data[data.size() / 2] = 0x00;
     }
 
     unique_ptr<HashedElGamalCiphertext> newHEG =
-      make_unique<HashedElGamalCiphertext>(move(pad), ciphertext, HEGResult->getMac());
+      make_unique<HashedElGamalCiphertext>(move(pad), data, HEGResult->getMac());
 
     try {
         vector<uint8_t> new_plaintext =
