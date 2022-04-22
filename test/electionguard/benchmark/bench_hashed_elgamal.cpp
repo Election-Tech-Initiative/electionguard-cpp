@@ -28,7 +28,7 @@ class HashedElgamalEncryptFixture : public benchmark::Fixture
         plaintext = plain;
 
         std::unique_ptr<HashedElGamalCiphertext> HEGResult = hashedElgamalEncrypt(
-          plaintext, *nonce, *keypair->getPublicKey(), *descriptionHash, false);
+          plaintext, *nonce, *keypair->getPublicKey(), *descriptionHash, false, 0);
             
     }
 
@@ -44,7 +44,7 @@ class HashedElgamalEncryptFixture : public benchmark::Fixture
 BENCHMARK_DEFINE_F(HashedElgamalEncryptFixture, HashedElGamalEncrypt)(benchmark::State &state)
 {
     for (auto _ : state) {
-        hashedElgamalEncrypt(plaintext, *nonce, *keypair->getPublicKey(), *descriptionHash, false);
+        hashedElgamalEncrypt(plaintext, *nonce, *keypair->getPublicKey(), *descriptionHash, false, 0);
     }
 }
 

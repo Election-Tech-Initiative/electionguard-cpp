@@ -475,39 +475,30 @@ namespace electionguard
         Lib_Memzero0_memzero(key_bytes, sizeof(key_bytes));
 
         if (look_for_padding) {
-            // we have made sure that we are at least 1 block length
-            uint32_t original_plaintext_len_be;
-            memcpy(&original_plaintext_len_be, &plaintext_with_padding.front(),
-                   sizeof(original_plaintext_len_be));
-            uint32_t original_plaintext_len = be32toh(original_plaintext_len_be);
-            if (original_plaintext_len > (plaintext_with_padding.size() - sizeof(original_plaintext_len))) {
-                throw runtime_error("HashedElGamalCiphertext::decrypt the padding is incorrect, decrypt failed");
-            }
+            uint16_t pad_len_be;
+            memcpy(&pad_len_be, &plaintext_with_padding.front(), sizeof(pad_len_be));
+            uint16_t pad_len = be16toh(pad_len_be);
 
-            uint32_t padding_len = plaintext_with_padding.size() - (original_plaintext_len + sizeof(original_plaintext_len));
-            if (padding_len > HASHED_CIPHERTEXT_BLOCK_LENGTH - 1) {
+            if (pad_len > (plaintext_with_padding.size() - sizeof(pad_len))) {
                 throw runtime_error(
                   "HashedElGamalCiphertext::decrypt the padding is incorrect, decrypt failed");
             }
 
             // check that the end bytes are 0x00
-            if (padding_len > 0)
-            {
-                for (int i = original_plaintext_len + sizeof(original_plaintext_len);
-                     i < (int)plaintext_with_padding.size(); i++) {
-                    if (plaintext_with_padding[i] != 0x00) {
+            if (pad_len > 0) {
+                for (int i = 1; i <= (int)pad_len; i++) {
+                    if (plaintext_with_padding[plaintext_with_padding.size() - i] != 0x00) {
                         throw runtime_error("HashedElGamalCiphertext::decrypt the padding is "
                                             "incorrect, decrypt failed");
                     }
                 }
             }
 
-            plaintext.insert(plaintext.end(),
-                               &plaintext_with_padding.front() + sizeof(original_plaintext_len),
-                               &plaintext_with_padding.front() +
-                                 (original_plaintext_len + sizeof(original_plaintext_len)));
+            plaintext.insert(plaintext.end(), &plaintext_with_padding.front() + sizeof(pad_len),
+                             &plaintext_with_padding.front() +
+                               (plaintext_with_padding.size() - pad_len));
         } else {
-            plaintext = plaintext_with_padding;      
+            plaintext = plaintext_with_padding;
         }
 
         return plaintext;
@@ -525,42 +516,52 @@ namespace electionguard
                                                              const ElementModQ &nonce,
                                                              const ElementModP &publicKey,
                                                              const ElementModQ &descriptionHash,
-                                                             bool apply_padding)
+                                                             bool apply_padding, uint32_t max_len)
     {
         uint8_t key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
         uint8_t temp_xor_key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
         vector<uint8_t> ciphertext;
         vector<uint8_t> plaintext_on_boundary;
 
-        // padding scheme is to just add 0x00 octets to the end of the plaintext
-        // out to a HASHED_CIPHERTEXT_BLOCK_LENGTH boundary
+        // padding scheme is to concatenate [length of the padding][plaintext][padding bytes of 0x00]
+        // padding bytes 0x00 are padded out to the first HASHED_CIPHERTEXT_BLOCK_LENGTH boundary
+        // past max_len. So if max_len is 62 then it will pad to the 64 byte boundary
         if (apply_padding) {
-            uint32_t original_plaintext_len = plaintext.size();
-            uint32_t original_plaintext_len_be = htobe32(original_plaintext_len);
-            uint32_t pad_len =
-              HASHED_CIPHERTEXT_BLOCK_LENGTH -
-              ((original_plaintext_len + sizeof(uint32_t)) % HASHED_CIPHERTEXT_BLOCK_LENGTH);
+            if ((max_len == 0) ||
+                (0 != ((max_len + sizeof(uint16_t)) % HASHED_CIPHERTEXT_BLOCK_LENGTH)) ||
+                (max_len > 65534)) {
+                throw invalid_argument("HashedElGamalCiphertext::encrypt the max_len must be a "
+                                       "multiple of the block length 32");
+            }
+            if (plaintext.size() > max_len) {
+                throw invalid_argument(
+                  "HashedElGamalCiphertext::encrypt the plaintext is greater than max_len");
+            }
 
-            // note the mod guarantees that pad_len is less than HASHED_CIPHERTEXT_BLOCK_LENGTH
+            //uint32_t original_plaintext_len = plaintext.size();
+            uint16_t pad_len = max_len - plaintext.size();
+            uint16_t pad_len_be = htobe16(pad_len);
+
+            std::vector<uint8_t> padding(pad_len, 0);
+
+            // insert length in big endian form
+            plaintext_on_boundary.insert(plaintext_on_boundary.end(), (uint8_t *)&pad_len_be,
+                                         (uint8_t *)&pad_len_be + sizeof(pad_len_be));
+            // insert plaintext
+            plaintext_on_boundary.insert(plaintext_on_boundary.end(), plaintext.begin(),
+                                         plaintext.end());
+
             // we dont pad 0x00s if the length field plus plaintext length falls on a block length boundary
-            if (pad_len < HASHED_CIPHERTEXT_BLOCK_LENGTH) {
-                uint8_t padding[HASHED_CIPHERTEXT_BLOCK_LENGTH] = {0};
-
-                // insert length in big endian form
-                plaintext_on_boundary.insert(
-                  plaintext_on_boundary.end(), (uint8_t *)&original_plaintext_len_be,
-                  (uint8_t *)&original_plaintext_len_be + sizeof(original_plaintext_len_be));
-
-                // insert plaintest
-                plaintext_on_boundary.insert(plaintext_on_boundary.end(), plaintext.begin(),
-                                             plaintext.end());
+            if (pad_len > 0) {
                 // insert padding
-                plaintext_on_boundary.insert(plaintext_on_boundary.end(), padding, padding + pad_len);
+                plaintext_on_boundary.insert(plaintext_on_boundary.end(), padding.begin(),
+                                             padding.end());
             }
         } else {
             if (0 != (plaintext.size() % HASHED_CIPHERTEXT_BLOCK_LENGTH)) {
-                throw invalid_argument("HashedElGamalCiphertext::encrypt the apply_padding was false "
-                                       "but the plaintext is not a multiple of the block length 32");
+                throw invalid_argument(
+                  "HashedElGamalCiphertext::encrypt the apply_padding was false "
+                  "but the plaintext is not a multiple of the block length 32");
             }
             plaintext_on_boundary.insert(plaintext_on_boundary.end(), plaintext.begin(),
                                          plaintext.end());

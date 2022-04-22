@@ -234,26 +234,30 @@ namespace electionguard
     /// <summary>
     /// Encrypts a message with the Auxiliary Encryption method (as specified in the
     /// ElectionGuard specification) given a random nonce, an ElGamal public key,
-    /// and a description hash. The encrypt may be called to apply padding to
-    /// pad variable length data to block length, in this case the ciphertext
-    /// will be larger than the plaintext, or not to apply padding in which
-    /// case the ciphertext will be the same size as the plaintext. If no
-    /// padding is to be applied then the plaintext must be a multiple of the
-    /// block length, the length of a SHA256 hash (32 bytes).
+    /// and a description hash. The encrypt may be called to apply padding. If
+    /// padding is applied then the max_len parameter indicates the maximum
+    /// length of the plaintext that may be encrypted. The padding scheme
+    /// applies two bytes for length of padding plus padding bytes. The
+    /// max_len + 2 must be a multiple of the block length (32). For example if
+    /// max_len is 62 then the maximum plaintext is 62 bytes and the
+    /// ciphertext will be 64 bytes. If padding is not to be applied then
+    /// the plaintext must be a multiple of the block length (32) and
+    /// the ciphertext will be the same size.
     ///
     /// <param name="plaintext"> Message to hashed elgamal encrypt. </param>
     /// <param name="nonce"> Randomly chosen nonce in [1,Q). </param>
     /// <param name="publicKey"> ElGamal public key. </param>
     /// <param name="descriptionHash"> Hash of the ballot description. </param>
     /// <param name="apply_padding"> Indicates if padding should be applied. </param>
+    /// <param name="max_len"> If padding is to be applied then this indicates the
+    ///  maximum length of plaintext, must be a multiple of the block
+    ///  length (32) minus 2. </param>
     /// <returns>A ciphertext triple.</returns>
     /// </summary>
     EG_API std::unique_ptr<HashedElGamalCiphertext>
-    hashedElgamalEncrypt(std::vector<uint8_t> plaintext,
-                         const ElementModQ &nonce,
-                         const ElementModP &publicKey,
-                         const ElementModQ &descriptionHash,
-                         bool apply_padding);
+    hashedElgamalEncrypt(std::vector<uint8_t> plaintext, const ElementModQ &nonce,
+                         const ElementModP &publicKey, const ElementModQ &descriptionHash,
+                         bool apply_padding, uint32_t max_len);
 
 } // namespace electionguard
 

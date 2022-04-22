@@ -181,7 +181,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data")
     vector<uint8_t> plaintext(bytes_to_use, bytes_to_use + sizeof(bytes_to_use));
 
     std::unique_ptr<HashedElGamalCiphertext> HEGResult =
-      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, false);
+      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, false, 0);
 
     unique_ptr<ElementModQ> hash = HEGResult->crypto_hash();
 
@@ -217,7 +217,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding"
                               +(uint8_t *)&plaintext_string.front() +
                                 (plaintext_string.size() * 2));
 
-    auto HEGResult = hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, true);
+    auto HEGResult = hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, true, 62);
 
     auto pad = HEGResult->getPad();
     unique_ptr<ElementModP> p_pad = make_unique<ElementModP>(*pad);
@@ -254,7 +254,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure different no
     bool decrypt_failed = false;
 
     std::unique_ptr<HashedElGamalCiphertext> HEGResult =
-      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, false);
+      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, false, 0);
 
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
     vector<uint8_t> data = HEGResult->getData();
@@ -290,7 +290,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure - tampered w
     bool decrypt_failed = false;
 
     std::unique_ptr<HashedElGamalCiphertext> HEGResult =
-      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, false);
+      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, false, 0);
 
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
     vector<uint8_t> data = HEGResult->getData();
