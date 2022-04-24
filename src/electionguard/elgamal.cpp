@@ -472,7 +472,6 @@ namespace electionguard
                                                              const ElementModQ &nonce,
                                                              const ElementModP &publicKey,
                                                              const ElementModQ &descriptionHash,
-                                                             bool apply_padding,
                                                              padded_data_size_t max_len)
     {
         vector<uint8_t> ciphertext;
@@ -481,7 +480,7 @@ namespace electionguard
         // padding scheme is to concatenate [length of the padding][plaintext][padding bytes of 0x00]
         // padding bytes 0x00 are padded out to the first HASHED_CIPHERTEXT_BLOCK_LENGTH boundary
         // past max_len. So if max_len is 62 then it will pad to the 64 byte boundary
-        if (apply_padding) {
+        if (max_len != NO_PADDING) {
             if ((max_len == 0) ||
                 (0 != ((max_len + sizeof(uint16_t)) % HASHED_CIPHERTEXT_BLOCK_LENGTH)) ||
                 (max_len > 65534)) {

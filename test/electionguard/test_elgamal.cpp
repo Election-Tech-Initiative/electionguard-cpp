@@ -182,7 +182,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data")
     vector<uint8_t> plaintext(bytes_to_use, bytes_to_use + sizeof(bytes_to_use));
 
     std::unique_ptr<HashedElGamalCiphertext> HEGResult =
-      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, false, NO_PADDING);
+      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, NO_PADDING);
 
     unique_ptr<ElementModQ> hash = HEGResult->crypto_hash();
 
@@ -217,7 +217,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data with padding but on 
     vector<uint8_t> plaintext(bytes_to_use, bytes_to_use + sizeof(bytes_to_use));
 
     std::unique_ptr<HashedElGamalCiphertext> HEGResult =
-      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, true, BYTES_32);
+      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, BYTES_32);
 
     unique_ptr<ElementModQ> hash = HEGResult->crypto_hash();
 
@@ -257,7 +257,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding"
                                 (plaintext_string.size() * 2));
 
     auto HEGResult =
-      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, true, BYTES_128);
+      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, BYTES_128);
 
     auto pad = HEGResult->getPad();
     unique_ptr<ElementModP> p_pad = make_unique<ElementModP>(*pad);
@@ -290,7 +290,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt no data")
     CHECK(plaintext.size() == 0);
 
     auto HEGResult =
-      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, true, BYTES_64);
+      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, BYTES_64);
 
     auto pad = HEGResult->getPad();
     unique_ptr<ElementModP> p_pad = make_unique<ElementModP>(*pad);
@@ -330,7 +330,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure different no
     bool decrypt_failed = false;
 
     std::unique_ptr<HashedElGamalCiphertext> HEGResult =
-      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, false, NO_PADDING);
+      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, NO_PADDING);
 
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
     vector<uint8_t> ciphertext = HEGResult->getData();
@@ -367,7 +367,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure - tampered w
     bool decrypt_failed = false;
 
     std::unique_ptr<HashedElGamalCiphertext> HEGResult =
-      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, false, NO_PADDING);
+      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, NO_PADDING);
 
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
     vector<uint8_t> ciphertext = HEGResult->getData();
@@ -414,21 +414,12 @@ TEST_CASE("HashedElGamalCiphertext encrypt failure length cases")
     vector<uint8_t> plaintext(bytes_to_use, bytes_to_use + sizeof(bytes_to_use));
     vector<uint8_t> longer_plaintext(longer_bytes_to_use,
                                      longer_bytes_to_use + sizeof(longer_bytes_to_use));
-    bool encrypt_max_len_0_failed = false;
     bool encrypt_longer_plaintext_failed = false;
     bool encrypt_no_pad_not_block_length_failed = false;
 
     try {
         std::unique_ptr<HashedElGamalCiphertext> HEGResult =
-          hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, true, NO_PADDING);
-    } catch (std::invalid_argument &e) {
-        encrypt_max_len_0_failed = true;
-    }
-    CHECK(encrypt_max_len_0_failed);
-
-    try {
-        std::unique_ptr<HashedElGamalCiphertext> HEGResult =
-          hashedElgamalEncrypt(longer_plaintext, *nonce, *publicKey, *descriptionHash, true, BYTES_32);
+          hashedElgamalEncrypt(longer_plaintext, *nonce, *publicKey, *descriptionHash, BYTES_32);
     } catch (std::invalid_argument &e) {
         encrypt_longer_plaintext_failed = true;
     }
@@ -436,7 +427,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt failure length cases")
 
     try {
         std::unique_ptr<HashedElGamalCiphertext> HEGResult =
-          hashedElgamalEncrypt(longer_plaintext, *nonce, *publicKey, *descriptionHash, false, NO_PADDING);
+          hashedElgamalEncrypt(longer_plaintext, *nonce, *publicKey, *descriptionHash, NO_PADDING);
     } catch (std::invalid_argument &e) {
         encrypt_no_pad_not_block_length_failed = true;
     }
