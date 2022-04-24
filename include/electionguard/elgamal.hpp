@@ -7,8 +7,6 @@
 #include <memory>
 #include <vector>
 
-#define HASHED_CIPHERTEXT_BLOCK_LENGTH 32U
-
 namespace electionguard
 {
     /// <summary>
@@ -141,6 +139,18 @@ namespace electionguard
     EG_API std::unique_ptr<ElGamalCiphertext>
     elgamalAdd(const std::vector<std::reference_wrapper<ElGamalCiphertext>> &ciphertexts);
 
+    #define HASHED_CIPHERTEXT_BLOCK_LENGTH 32U
+    #define _PAD_INDICATOR_SIZE sizeof(uint16_t)
+
+    typedef enum padded_data_size_e {
+        NO_PADDING = 0,
+        BYTES_32 = 32 - _PAD_INDICATOR_SIZE,
+        BYTES_64 = 64 - _PAD_INDICATOR_SIZE,
+        BYTES_128 = 128 - _PAD_INDICATOR_SIZE,
+        BYTES_256 = 256 - _PAD_INDICATOR_SIZE,
+        BYTES_512 = 512 - _PAD_INDICATOR_SIZE
+    } padded_data_size_t;
+
     /// <summary>
     /// A "Hashed ElGamal Ciphertext" as specified as the Auxiliary Encryption in
     /// the ElectionGuard specification. The tuple g ^ r mod p concatenated with
@@ -257,7 +267,7 @@ namespace electionguard
     EG_API std::unique_ptr<HashedElGamalCiphertext>
     hashedElgamalEncrypt(std::vector<uint8_t> plaintext, const ElementModQ &nonce,
                          const ElementModP &publicKey, const ElementModQ &descriptionHash,
-                         bool apply_padding, uint32_t max_len);
+                         bool apply_padding, padded_data_size_t max_len);
 
 } // namespace electionguard
 

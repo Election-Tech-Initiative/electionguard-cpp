@@ -472,7 +472,8 @@ namespace electionguard
                                                              const ElementModQ &nonce,
                                                              const ElementModP &publicKey,
                                                              const ElementModQ &descriptionHash,
-                                                             bool apply_padding, uint32_t max_len)
+                                                             bool apply_padding,
+                                                             padded_data_size_t max_len)
     {
         vector<uint8_t> ciphertext;
         vector<uint8_t> plaintext_on_boundary;
