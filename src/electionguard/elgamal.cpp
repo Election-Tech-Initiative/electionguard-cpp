@@ -1,11 +1,13 @@
 #include "electionguard/elgamal.hpp"
-
-#include "../kremlin/Lib_Memzero0.h"
-#include "../kremlin/Hacl_Hash.h"
-#include "../kremlin/Hacl_HMAC.h"
-#include "../kremlin/Hacl_Bignum4096.h"
 #include "electionguard/hash.hpp"
+#include "electionguard/hmac.hpp"
+
+#include "../kremlin/Hacl_HMAC.h"
+#include "../kremlin/Lib_Memzero0.h"
+#include "../kremlin/Hacl_Bignum4096.h"
 #include "log.hpp"
+#include <electionguard/hash.hpp>
+
 
 #include <stdexcept>
 #include <array>
@@ -376,8 +378,8 @@ namespace electionguard
         // and is only capable of decrypting boolean results (0/1)
         // it should be extended with a discrete_log search to decrypt
         // values other than 0 or 1
-        uint8_t key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
-        uint8_t temp_xor_key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
+        // 
+        //uint8_t temp_xor_key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
         vector<uint8_t> plaintext_with_padding;
         vector<uint8_t> plaintext;
 
@@ -388,91 +390,49 @@ namespace electionguard
                                    "is not a multiple of the block length 32");
         }
 
+        auto g_to_r = g_pow_p(nonce);
+
         auto publicKey_to_r = pow_mod_p(publicKey, nonce);
-        vector<uint8_t> publicKey_to_r_bytes = publicKey_to_r->toBytes();
 
         // now we need to hash the concatenation of g_to_r with publicKey_to_r
         // in order to get the base key
-        std::vector<uint8_t> a_b(pimpl->pad->toBytes());
-        a_b.insert(a_b.end(), publicKey_to_r_bytes.begin(), publicKey_to_r_bytes.end());
+        vector<ElementModP *> elems{g_to_r.get(), publicKey_to_r.get()};
+        auto master_key = hash_elems(elems);
 
-        Hacl_Hash_SHA2_hash_256(&a_b.front(), a_b.size(), key_bytes);
-        Lib_Memzero0_memzero(&publicKey_to_r_bytes.front(), publicKey_to_r_bytes.size());
-        Lib_Memzero0_memzero(&a_b.front(), a_b.size());
-
-        // reverse the length because we hash it in big endian and we are on little endian
-        uint32_t ciphertext_len_be = htobe32(ciphertext_len);
-
-        // vector with the description hash concatenated with the reversed length
-        std::vector<uint8_t> partial_data_to_hash_for_key(descriptionHash.toBytes());
-        partial_data_to_hash_for_key.insert(
-          partial_data_to_hash_for_key.end(), (uint8_t *)&ciphertext_len_be,
-          (uint8_t *)&ciphertext_len_be + sizeof(ciphertext_len_be));
-
-        vector<uint8_t> zero_count({0, 0, 0, 0});
-        std::vector<uint8_t> data_to_hash_mac_key(zero_count);
-        data_to_hash_mac_key.insert(data_to_hash_mac_key.end(),
-                                    partial_data_to_hash_for_key.begin(),
-                                    partial_data_to_hash_for_key.end());
-        // get the key for use in the mac
-        uint8_t mac_key[HASHED_CIPHERTEXT_BLOCK_LENGTH];
-        Hacl_HMAC_compute_sha2_256(mac_key, key_bytes, sizeof(key_bytes),
-                                   &data_to_hash_mac_key.front(), data_to_hash_mac_key.size());
-        Lib_Memzero0_memzero(&data_to_hash_mac_key.front(), data_to_hash_mac_key.size());
+        vector<uint8_t> mac_key =
+          get_hmac(master_key->toBytes(), descriptionHash.toBytes(), descriptionHash.toBytes().size(), 0);
 
         // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
         vector<uint8_t> c0_and_c1(pimpl->pad->toBytes());
         c0_and_c1.insert(c0_and_c1.end(), pimpl->data.begin(),
                          pimpl->data.end());
-
-        uint8_t mac_uint8[HASHED_CIPHERTEXT_BLOCK_LENGTH];
-        Hacl_HMAC_compute_sha2_256(mac_uint8, mac_key, sizeof(mac_key), &c0_and_c1.front(),
-                                   c0_and_c1.size());
-        Lib_Memzero0_memzero(mac_key, sizeof(mac_key));
-        vector<uint8_t> our_mac(mac_uint8, mac_uint8 + sizeof(mac_uint8));
+        vector<uint8_t> our_mac = get_hmac(mac_key, c0_and_c1, 0, 0);
+        Lib_Memzero0_memzero(&mac_key.front(), mac_key.size());
 
         if (pimpl->mac != our_mac) {
-            Lib_Memzero0_memzero(&partial_data_to_hash_for_key.front(),
-                                 partial_data_to_hash_for_key.size());
-            Lib_Memzero0_memzero(key_bytes, sizeof(key_bytes));
             throw runtime_error("HashedElGamalCiphertext::decrypt the calculated mac didn't match the passed in mac");
         }
 
         uint32_t plaintext_index = 0;
         for (uint32_t i = 0; i < num_xor_keys; i++) {
-            uint8_t temp_plaintext[HASHED_CIPHERTEXT_BLOCK_LENGTH];
+            vector<int8_t> temp_plaintext(HASHED_CIPHERTEXT_BLOCK_LENGTH, 0);
 
-            // reverse the count because we hash it in big endian and we are on little endian
-            uint32_t count = i + 1;
-            uint32_t count_be = htobe32(count);
-
-            // concatenate the reversed count, the description hash and the reversed length
-            std::vector<uint8_t> data_to_hash_for_key((uint8_t *)&count_be,
-                                                      (uint8_t *)&count_be + sizeof(count_be));
-            data_to_hash_for_key.insert(data_to_hash_for_key.end(),
-                                        partial_data_to_hash_for_key.begin(),
-                                        partial_data_to_hash_for_key.end());
-
-            Hacl_HMAC_compute_sha2_256(temp_xor_key_bytes, key_bytes, sizeof(key_bytes),
-                                       &data_to_hash_for_key.front(), data_to_hash_for_key.size());
-            Lib_Memzero0_memzero(&data_to_hash_for_key.front(), data_to_hash_for_key.size());
-
+            vector<uint8_t> xor_key =
+              get_hmac(master_key->toBytes(), descriptionHash.toBytes(),
+                       descriptionHash.toBytes().size(), i + 1);
+            
             // XOR the key with the plaintext
-            for (int j = 0; j < (int)sizeof(temp_plaintext); j++) {
-                temp_plaintext[j] =
-                  pimpl->data[plaintext_index] ^ temp_xor_key_bytes[j];
+            for (int j = 0; j < (int)HASHED_CIPHERTEXT_BLOCK_LENGTH; j++) {
+                temp_plaintext[j] = pimpl->data[plaintext_index] ^ xor_key[j];
                 // advance the plaintext index
                 plaintext_index++;
             }
-            Lib_Memzero0_memzero(temp_xor_key_bytes, sizeof(temp_xor_key_bytes));
+            Lib_Memzero0_memzero(&xor_key.front(), xor_key.size());
 
-            plaintext_with_padding.insert(plaintext_with_padding.end(), temp_plaintext,
-                             temp_plaintext + HASHED_CIPHERTEXT_BLOCK_LENGTH);
-            Lib_Memzero0_memzero(temp_plaintext, sizeof(temp_plaintext));
+            plaintext_with_padding.insert(plaintext_with_padding.end(),
+                                          temp_plaintext.begin(), temp_plaintext.end());
+            Lib_Memzero0_memzero(&temp_plaintext.front(), temp_plaintext.size());
         }
-        Lib_Memzero0_memzero(&partial_data_to_hash_for_key.front(),
-                             partial_data_to_hash_for_key.size());
-        Lib_Memzero0_memzero(key_bytes, sizeof(key_bytes));
 
         if (look_for_padding) {
             uint16_t pad_len_be;
@@ -504,7 +464,6 @@ namespace electionguard
         return plaintext;
     }
 
-
     unique_ptr<HashedElGamalCiphertext> HashedElGamalCiphertext::clone() const
     {
         return make_unique<HashedElGamalCiphertext>(pimpl->pad->clone(), pimpl->data, pimpl->mac);
@@ -518,8 +477,6 @@ namespace electionguard
                                                              const ElementModQ &descriptionHash,
                                                              bool apply_padding, uint32_t max_len)
     {
-        uint8_t key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
-        uint8_t temp_xor_key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
         vector<uint8_t> ciphertext;
         vector<uint8_t> plaintext_on_boundary;
 
@@ -573,83 +530,42 @@ namespace electionguard
         auto g_to_r = g_pow_p(nonce);
 
         auto publicKey_to_r = pow_mod_p(publicKey, nonce);
-        vector<uint8_t> publicKey_to_r_bytes = publicKey_to_r->toBytes();
 
         // now we need to hash the concatenation of g_to_r with publicKey_to_r
         // in order to get the base key
-        std::vector<uint8_t> a_b(g_to_r->toBytes());
-        a_b.insert(a_b.end(), publicKey_to_r_bytes.begin(), publicKey_to_r_bytes.end());
-
-        Hacl_Hash_SHA2_hash_256(&a_b.front(), a_b.size(), key_bytes);
-        Lib_Memzero0_memzero(&publicKey_to_r_bytes.front(), publicKey_to_r_bytes.size());
-        Lib_Memzero0_memzero(&a_b.front(), a_b.size());
-
-        // reverse the length because we hash it in big endian and we are on little endian
-        uint32_t plaintext_len_be = htobe32(plaintext_len);
-
-        // vector with the description hash concatenated with the reversed length
-        std::vector<uint8_t> partial_data_to_hash_for_key(descriptionHash.toBytes());
-        partial_data_to_hash_for_key.insert(partial_data_to_hash_for_key.end(),
-                                            (uint8_t *)&plaintext_len_be,
-                                            (uint8_t *)&plaintext_len_be + sizeof(plaintext_len_be));
+        vector<ElementModP *> elems{g_to_r.get(), publicKey_to_r.get()};
+        auto master_key = hash_elems(elems);
 
         uint32_t plaintext_index = 0;
         for (uint32_t i = 0; i < num_xor_keys; i++) {
-            uint8_t temp_ciphertext[HASHED_CIPHERTEXT_BLOCK_LENGTH];
+            vector<uint8_t> temp_ciphertext(HASHED_CIPHERTEXT_BLOCK_LENGTH, 0);
 
-            // reverse the count because we hash it in big endian and we are on little endian
-            uint32_t count = i + 1;
-            uint32_t count_be = htobe32(count);
-
-            // concatenate the reversed count, the description hash and the reversed length
-            std::vector<uint8_t> data_to_hash_for_key((uint8_t *)&count_be,
-                                                      (uint8_t *)&count_be + sizeof(count_be));
-            data_to_hash_for_key.insert(data_to_hash_for_key.end(),
-                                        partial_data_to_hash_for_key.begin(),
-                                        partial_data_to_hash_for_key.end());
-
-            Hacl_HMAC_compute_sha2_256(temp_xor_key_bytes, key_bytes, sizeof(key_bytes),
-                                       &data_to_hash_for_key.front(), data_to_hash_for_key.size());
-            Lib_Memzero0_memzero(&data_to_hash_for_key.front(), data_to_hash_for_key.size());
+            vector<uint8_t> xor_key = get_hmac(master_key->toBytes(), descriptionHash.toBytes(),
+                                               descriptionHash.toBytes().size(), i + 1);
 
             // XOR the key with the plaintext
-            for (int j = 0; j < (int)sizeof(temp_ciphertext); j++) {
-                temp_ciphertext[j] = plaintext_on_boundary[plaintext_index] ^ temp_xor_key_bytes[j];
+            for (int j = 0; j < (int)HASHED_CIPHERTEXT_BLOCK_LENGTH; j++) {
+                temp_ciphertext[j] = plaintext_on_boundary[plaintext_index] ^ xor_key[j];
                 // advance the plaintext index
                 plaintext_index++;
             }
-            Lib_Memzero0_memzero(temp_xor_key_bytes, sizeof(temp_xor_key_bytes));
+            Lib_Memzero0_memzero(&xor_key.front(), xor_key.size());
 
-            ciphertext.insert(ciphertext.end(), temp_ciphertext,
-                              temp_ciphertext + HASHED_CIPHERTEXT_BLOCK_LENGTH);
-            Lib_Memzero0_memzero(temp_ciphertext, sizeof(temp_ciphertext));
+            ciphertext.insert(ciphertext.end(), temp_ciphertext.begin(),
+                              temp_ciphertext.end());
+            Lib_Memzero0_memzero(&temp_ciphertext.front(), temp_ciphertext.size());
         }
 
-        vector<uint8_t> zero_count({0, 0, 0, 0});
-        std::vector<uint8_t> data_to_hash_mac_key(zero_count);
-        data_to_hash_mac_key.insert(data_to_hash_mac_key.end(), partial_data_to_hash_for_key.begin(),
-                                    partial_data_to_hash_for_key.end());
-
-        // get the key for use in the mac
-        uint8_t mac_key[HASHED_CIPHERTEXT_BLOCK_LENGTH];
-        Hacl_HMAC_compute_sha2_256(mac_key, key_bytes, sizeof(key_bytes), &data_to_hash_mac_key.front(),
-                                   data_to_hash_mac_key.size());
-        Lib_Memzero0_memzero(&partial_data_to_hash_for_key.front(),
-                             partial_data_to_hash_for_key.size());
-        Lib_Memzero0_memzero(&data_to_hash_mac_key.front(), data_to_hash_mac_key.size());
-        Lib_Memzero0_memzero(key_bytes, sizeof(key_bytes));
+        vector<uint8_t> mac_key =
+          get_hmac(master_key->toBytes(), descriptionHash.toBytes(), descriptionHash.toBytes().size(), 0);
 
         // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
         vector<uint8_t> c0_and_c1(g_to_r->toBytes());
         c0_and_c1.insert(c0_and_c1.end(), ciphertext.begin(), ciphertext.end());
-        uint8_t mac_uint8[HASHED_CIPHERTEXT_BLOCK_LENGTH];
-        Hacl_HMAC_compute_sha2_256(mac_uint8, mac_key, sizeof(mac_key), &c0_and_c1.front(),
-                                   c0_and_c1.size());
-        Lib_Memzero0_memzero(mac_key, sizeof(mac_key));
+        vector<uint8_t> mac = get_hmac(mac_key, c0_and_c1, 0, 0);
+        Lib_Memzero0_memzero(&mac_key.front(), mac_key.size());
 
-        vector<uint8_t> mac_as_vector(mac_uint8, mac_uint8 + sizeof(mac_uint8));
-
-        return make_unique<HashedElGamalCiphertext>(move(g_to_r), ciphertext, mac_as_vector);
+        return make_unique<HashedElGamalCiphertext>(move(g_to_r), ciphertext, mac);
     }
 
 } // namespace electionguard

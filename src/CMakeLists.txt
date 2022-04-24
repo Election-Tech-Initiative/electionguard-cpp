@@ -59,6 +59,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/group.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/hash.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/hmac.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/log.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/log.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/lookup_table.hpp

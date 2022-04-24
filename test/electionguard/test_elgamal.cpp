@@ -166,12 +166,13 @@ TEST_CASE("elgamalEncrypt encrypt 1 decrypts with secret")
 
 TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data")
 {
-    uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10, 0x1112131415161718,
-                                 0x191a1b1c1d1e1f20};
+    uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10,
+                                 0x1112131415161718, 0x191a1b1c1d1e1f20};
 
-    uint8_t bytes_to_use[32] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b,
-                                0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
-                                0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
+    uint8_t bytes_to_use[32] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                                0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
+                                0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
+                                0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
 
     const auto nonce = make_unique<ElementModQ>(qwords_to_use);
     const auto descriptionHash = make_unique<ElementModQ>(qwords_to_use);
@@ -186,7 +187,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data")
     unique_ptr<ElementModQ> hash = HEGResult->crypto_hash();
 
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
-    vector<uint8_t> data = HEGResult->getData();
+    vector<uint8_t> ciphertext = HEGResult->getData();
     vector<uint8_t> mac = HEGResult->getMac();
 
     unique_ptr<HashedElGamalCiphertext> newHEG = make_unique<HashedElGamalCiphertext>(
@@ -197,14 +198,52 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data")
     CHECK(plaintext == new_plaintext);
 }
 
+// it is on the boundary be
+TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data with padding but on boundary")
+{
+    uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10,
+                                 0x1112131415161718, 0x191a1b1c1d1e1f20};
+
+    uint8_t bytes_to_use[30] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                                0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
+                                0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
+                                0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e};
+
+    const auto nonce = make_unique<ElementModQ>(qwords_to_use);
+    const auto descriptionHash = make_unique<ElementModQ>(qwords_to_use);
+    const auto &secret = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(secret, false);
+    auto *publicKey = keypair->getPublicKey();
+    vector<uint8_t> plaintext(bytes_to_use, bytes_to_use + sizeof(bytes_to_use));
+
+    std::unique_ptr<HashedElGamalCiphertext> HEGResult =
+      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, true, 30);
+
+    unique_ptr<ElementModQ> hash = HEGResult->crypto_hash();
+
+    unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
+    vector<uint8_t> ciphertext = HEGResult->getData();
+    vector<uint8_t> mac = HEGResult->getMac();
+
+    CHECK(ciphertext.size() == 32);
+
+    unique_ptr<HashedElGamalCiphertext> newHEG = make_unique<HashedElGamalCiphertext>(
+      move(pad), HEGResult->getData(), HEGResult->getMac());
+
+    vector<uint8_t> new_plaintext = newHEG->decrypt(*nonce, *publicKey, *descriptionHash, true);
+
+    CHECK(plaintext == new_plaintext);
+}
+
 TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding")
 {
-    uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10, 0x1112131415161718,
-                                 0x191a1b1c1d1e1f20};
+    uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10,
+                                 0x1112131415161718, 0x191a1b1c1d1e1f20};
 
-    uint8_t bytes_to_use[32] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b,
-                                0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
-                                0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
+    uint8_t bytes_to_use[32] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                                0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
+                                0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
+                                0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
 
     const auto nonce = make_unique<ElementModQ>(qwords_to_use);
     const auto descriptionHash = make_unique<ElementModQ>(qwords_to_use);
@@ -217,12 +256,15 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding"
                               +(uint8_t *)&plaintext_string.front() +
                                 (plaintext_string.size() * 2));
 
-    auto HEGResult = hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, true, 62);
+    auto HEGResult =
+      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, true, 94);
 
     auto pad = HEGResult->getPad();
     unique_ptr<ElementModP> p_pad = make_unique<ElementModP>(*pad);
-    auto data = HEGResult->getData();
+    auto ciphertext = HEGResult->getData();
     auto mac = HEGResult->getMac();
+
+    CHECK(ciphertext.size() == 96);
 
     // now lets decrypt
     unique_ptr<HashedElGamalCiphertext> newHEG = make_unique<HashedElGamalCiphertext>(
@@ -233,16 +275,50 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding"
     CHECK(plaintext == new_plaintext);
 }
 
+TEST_CASE("HashedElGamalCiphertext encrypt and decrypt no data")
+{
+    uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10,
+                                 0x1112131415161718, 0x191a1b1c1d1e1f20};
+
+    const auto nonce = make_unique<ElementModQ>(qwords_to_use);
+    const auto descriptionHash = make_unique<ElementModQ>(qwords_to_use);
+    const auto &secret = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(secret, false);
+    auto *publicKey = keypair->getPublicKey();
+
+    vector<uint8_t> plaintext; // no data in plaintext
+    CHECK(plaintext.size() == 0);
+
+    auto HEGResult =
+      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, true, 62);
+
+    auto pad = HEGResult->getPad();
+    unique_ptr<ElementModP> p_pad = make_unique<ElementModP>(*pad);
+    auto ciphertext = HEGResult->getData();
+    auto mac = HEGResult->getMac();
+    CHECK(ciphertext.size() == 64); // two more bytes than max_len input to encrypt
+
+    // now lets decrypt
+    unique_ptr<HashedElGamalCiphertext> newHEG = make_unique<HashedElGamalCiphertext>(
+      move(p_pad), HEGResult->getData(), HEGResult->getMac());
+
+    vector<uint8_t> new_plaintext = newHEG->decrypt(*nonce, *publicKey, *descriptionHash, true);
+    CHECK(new_plaintext.size() == 0);
+
+    CHECK(plaintext == new_plaintext);
+}
+
 TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure different nonce")
 {
-    uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10, 0x1112131415161718,
-                                 0x191a1b1c1d1e1f20};
+    uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10,
+                                 0x1112131415161718, 0x191a1b1c1d1e1f20};
     // one bit difference in the nonce
     uint64_t different_qwords_to_use[4] = {0x0202030405060708, 0x090a0b0c0d0e0f10,
                                            0x1112131415161718, 0x191a1b1c1d1e1f20};
-    uint8_t bytes_to_use[32] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b,
-                                0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
-                                0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
+    uint8_t bytes_to_use[32] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                                0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
+                                0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
+                                0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
 
     const auto nonce = make_unique<ElementModQ>(qwords_to_use);
     const auto different_nonce = make_unique<ElementModQ>(different_qwords_to_use);
@@ -257,7 +333,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure different no
       hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, false, 0);
 
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
-    vector<uint8_t> data = HEGResult->getData();
+    vector<uint8_t> ciphertext = HEGResult->getData();
     vector<uint8_t> mac = HEGResult->getMac();
 
     unique_ptr<HashedElGamalCiphertext> newHEG = make_unique<HashedElGamalCiphertext>(
@@ -275,11 +351,12 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure different no
 
 TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure - tampered with ciphertext")
 {
-    uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10, 0x1112131415161718,
-                                 0x191a1b1c1d1e1f20};
-    uint8_t bytes_to_use[32] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b,
-                                0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
-                                0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
+    uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10,
+                                 0x1112131415161718, 0x191a1b1c1d1e1f20};
+    uint8_t bytes_to_use[32] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                                0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
+                                0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
+                                0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
 
     const auto nonce = make_unique<ElementModQ>(qwords_to_use);
     const auto descriptionHash = make_unique<ElementModQ>(qwords_to_use);
@@ -293,18 +370,18 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure - tampered w
       hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, false, 0);
 
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
-    vector<uint8_t> data = HEGResult->getData();
+    vector<uint8_t> ciphertext = HEGResult->getData();
     vector<uint8_t> mac = HEGResult->getMac();
 
-    // change a byte of data
-    if (data[data.size() / 2] == 0x00) {
-        data[data.size() / 2] = 0xff;
+    // change a byte of ciphertext
+    if (ciphertext[ciphertext.size() / 2] == 0x00) {
+        ciphertext[ciphertext.size() / 2] = 0xff;
     } else {
-        data[data.size() / 2] = 0x00;
+        ciphertext[ciphertext.size() / 2] = 0x00;
     }
 
     unique_ptr<HashedElGamalCiphertext> newHEG =
-      make_unique<HashedElGamalCiphertext>(move(pad), data, HEGResult->getMac());
+      make_unique<HashedElGamalCiphertext>(move(pad), ciphertext, HEGResult->getMac());
 
     try {
         vector<uint8_t> new_plaintext =
@@ -315,6 +392,66 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure - tampered w
 
     CHECK(decrypt_failed);
 }
+
+TEST_CASE("HashedElGamalCiphertext encrypt failure length cases")
+{
+    uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10,
+                                 0x1112131415161718, 0x191a1b1c1d1e1f20};
+    uint8_t bytes_to_use[32] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                                0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
+                                0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
+                                0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
+    uint8_t longer_bytes_to_use[40] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                                       0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
+                                       0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
+                                       0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20,
+                                       0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28};
+    const auto nonce = make_unique<ElementModQ>(qwords_to_use);
+    const auto descriptionHash = make_unique<ElementModQ>(qwords_to_use);
+    const auto &secret = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(secret, false);
+    auto *publicKey = keypair->getPublicKey();
+    vector<uint8_t> plaintext(bytes_to_use, bytes_to_use + sizeof(bytes_to_use));
+    vector<uint8_t> longer_plaintext(longer_bytes_to_use,
+                                     longer_bytes_to_use + sizeof(longer_bytes_to_use));
+    bool encrypt_max_len_0_failed = false;
+    bool encrypt_bad_max_len_failed = false;
+    bool encrypt_longer_plaintext_failed = false;
+    bool encrypt_no_pad_not_block_length_failed = false;
+
+    try {
+        std::unique_ptr<HashedElGamalCiphertext> HEGResult =
+          hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, true, 0);
+    } catch (std::invalid_argument &e) {
+        encrypt_max_len_0_failed = true;
+    }
+    CHECK(encrypt_max_len_0_failed);
+
+    try {
+        std::unique_ptr<HashedElGamalCiphertext> HEGResult =
+          hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, true, 31);
+    } catch (std::invalid_argument &e) {
+        encrypt_bad_max_len_failed = true;
+    }
+    CHECK(encrypt_bad_max_len_failed);
+
+    try {
+        std::unique_ptr<HashedElGamalCiphertext> HEGResult =
+          hashedElgamalEncrypt(longer_plaintext, *nonce, *publicKey, *descriptionHash, true, 30);
+    } catch (std::invalid_argument &e) {
+        encrypt_longer_plaintext_failed = true;
+    }
+    CHECK(encrypt_longer_plaintext_failed);
+
+    try {
+        std::unique_ptr<HashedElGamalCiphertext> HEGResult =
+          hashedElgamalEncrypt(longer_plaintext, *nonce, *publicKey, *descriptionHash, false, 0);
+    } catch (std::invalid_argument &e) {
+        encrypt_no_pad_not_block_length_failed = true;
+    }
+    CHECK(encrypt_no_pad_not_block_length_failed);
+}
+
 
 TEST_CASE("elgamalEncrypt_with_precomputed encrypt 1, decrypts with secret")
 {
