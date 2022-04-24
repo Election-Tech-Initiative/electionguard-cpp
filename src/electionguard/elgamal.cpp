@@ -369,8 +369,7 @@ namespace electionguard
 
     // Public Methods
 
-    vector<uint8_t> HashedElGamalCiphertext::decrypt(const ElementModQ &nonce,
-                                                     const ElementModP &publicKey,
+    vector<uint8_t> HashedElGamalCiphertext::decrypt(const ElementModQ &secret_key,
                                                      const ElementModQ &descriptionHash,
                                                      bool look_for_padding)
     {
@@ -390,13 +389,11 @@ namespace electionguard
                                    "is not a multiple of the block length 32");
         }
 
-        auto g_to_r = g_pow_p(nonce);
-
-        auto publicKey_to_r = pow_mod_p(publicKey, nonce);
+        auto publicKey_to_r = pow_mod_p(*pimpl->pad, secret_key);
 
         // now we need to hash the concatenation of g_to_r with publicKey_to_r
         // in order to get the base key
-        vector<ElementModP *> elems{g_to_r.get(), publicKey_to_r.get()};
+        vector<ElementModP *> elems{pimpl->pad.get(), publicKey_to_r.get()};
         auto master_key = hash_elems(elems);
 
         vector<uint8_t> mac_key =
@@ -471,7 +468,7 @@ namespace electionguard
 
 #pragma endregion // HashedElGamalCiphertext
 
-    unique_ptr<HashedElGamalCiphertext> hashedElgamalEncrypt(std::vector<uint8_t> plaintext,
+    unique_ptr<HashedElGamalCiphertext> hashedElgamalEncrypt(std::vector<uint8_t> message,
                                                              const ElementModQ &nonce,
                                                              const ElementModP &publicKey,
                                                              const ElementModQ &descriptionHash,
@@ -490,13 +487,13 @@ namespace electionguard
                 throw invalid_argument("HashedElGamalCiphertext::encrypt the max_len must be a "
                                        "multiple of the block length 32");
             }
-            if (plaintext.size() > max_len) {
+            if (message.size() > max_len) {
                 throw invalid_argument(
                   "HashedElGamalCiphertext::encrypt the plaintext is greater than max_len");
             }
 
             //uint32_t original_plaintext_len = plaintext.size();
-            uint16_t pad_len = max_len - plaintext.size();
+            uint16_t pad_len = max_len - message.size();
             uint16_t pad_len_be = htobe16(pad_len);
 
             std::vector<uint8_t> padding(pad_len, 0);
@@ -505,8 +502,8 @@ namespace electionguard
             plaintext_on_boundary.insert(plaintext_on_boundary.end(), (uint8_t *)&pad_len_be,
                                          (uint8_t *)&pad_len_be + sizeof(pad_len_be));
             // insert plaintext
-            plaintext_on_boundary.insert(plaintext_on_boundary.end(), plaintext.begin(),
-                                         plaintext.end());
+            plaintext_on_boundary.insert(plaintext_on_boundary.end(), message.begin(),
+                                         message.end());
 
             // we dont pad 0x00s if the length field plus plaintext length falls on a block length boundary
             if (pad_len > 0) {
@@ -515,13 +512,13 @@ namespace electionguard
                                              padding.end());
             }
         } else {
-            if (0 != (plaintext.size() % HASHED_CIPHERTEXT_BLOCK_LENGTH)) {
+            if (0 != (message.size() % HASHED_CIPHERTEXT_BLOCK_LENGTH)) {
                 throw invalid_argument(
                   "HashedElGamalCiphertext::encrypt the apply_padding was false "
                   "but the plaintext is not a multiple of the block length 32");
             }
-            plaintext_on_boundary.insert(plaintext_on_boundary.end(), plaintext.begin(),
-                                         plaintext.end());
+            plaintext_on_boundary.insert(plaintext_on_boundary.end(), message.begin(),
+                                         message.end());
         }
 
         uint32_t plaintext_len = plaintext_on_boundary.size();

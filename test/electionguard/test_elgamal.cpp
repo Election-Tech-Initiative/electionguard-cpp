@@ -193,7 +193,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data")
     unique_ptr<HashedElGamalCiphertext> newHEG = make_unique<HashedElGamalCiphertext>(
       move(pad), HEGResult->getData(), HEGResult->getMac());
 
-    vector<uint8_t> new_plaintext = newHEG->decrypt(*nonce, *publicKey, *descriptionHash, false);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(secret, *descriptionHash, false);
 
     CHECK(plaintext == new_plaintext);
 }
@@ -230,7 +230,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data with padding but on 
     unique_ptr<HashedElGamalCiphertext> newHEG = make_unique<HashedElGamalCiphertext>(
       move(pad), HEGResult->getData(), HEGResult->getMac());
 
-    vector<uint8_t> new_plaintext = newHEG->decrypt(*nonce, *publicKey, *descriptionHash, true);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(secret, *descriptionHash, true);
 
     CHECK(plaintext == new_plaintext);
 }
@@ -270,7 +270,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding"
     unique_ptr<HashedElGamalCiphertext> newHEG = make_unique<HashedElGamalCiphertext>(
       move(p_pad), HEGResult->getData(), HEGResult->getMac());
 
-    vector<uint8_t> new_plaintext = newHEG->decrypt(*nonce, *publicKey, *descriptionHash, true);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(secret, *descriptionHash, true);
 
     CHECK(plaintext == new_plaintext);
 }
@@ -302,7 +302,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt no data")
     unique_ptr<HashedElGamalCiphertext> newHEG = make_unique<HashedElGamalCiphertext>(
       move(p_pad), HEGResult->getData(), HEGResult->getMac());
 
-    vector<uint8_t> new_plaintext = newHEG->decrypt(*nonce, *publicKey, *descriptionHash, true);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(secret, *descriptionHash, true);
     CHECK(new_plaintext.size() == 0);
 
     CHECK(plaintext == new_plaintext);
@@ -321,7 +321,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure different no
                                 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
 
     const auto nonce = make_unique<ElementModQ>(qwords_to_use);
-    const auto different_nonce = make_unique<ElementModQ>(different_qwords_to_use);
+    const auto different_secret = make_unique<ElementModQ>(different_qwords_to_use);
     const auto descriptionHash = make_unique<ElementModQ>(qwords_to_use);
     const auto &secret = TWO_MOD_Q();
     auto keypair = ElGamalKeyPair::fromSecret(secret, false);
@@ -341,7 +341,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure different no
 
     try {
         vector<uint8_t> new_plaintext =
-          newHEG->decrypt(*different_nonce, *publicKey, *descriptionHash, false);
+          newHEG->decrypt(*different_secret, *descriptionHash, false);
     } catch (std::runtime_error &e) {
         decrypt_failed = true;
     }
@@ -385,7 +385,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure - tampered w
 
     try {
         vector<uint8_t> new_plaintext =
-          newHEG->decrypt(*nonce, *publicKey, *descriptionHash, false);
+          newHEG->decrypt(secret, *descriptionHash, false);
     } catch (std::runtime_error &e) {
         decrypt_failed = true;
     }

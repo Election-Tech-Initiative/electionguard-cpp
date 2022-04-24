@@ -25,15 +25,12 @@ namespace electionguard
         vector<uint8_t> hmac(32, 0);
         vector<uint8_t> data_to_hmac;
 
-        // reverse the length because we hash it in big endian and we are on little endian
         if (length > 0) {
-            uint32_t start_be = htobe32(start);
-            uint32_t length_be = htobe32(length);
-            data_to_hmac.insert(data_to_hmac.end(), (uint8_t *)&start_be,
-                                (uint8_t *)&start_be + sizeof(start_be));
+            data_to_hmac.insert(data_to_hmac.end(), (uint8_t *)&start,
+                                (uint8_t *)&start + sizeof(start));
             data_to_hmac.insert(data_to_hmac.end(), message.begin(), message.end());
-            data_to_hmac.insert(data_to_hmac.end(), (uint8_t *)&length_be,
-                                (uint8_t *)&length_be + sizeof(length_be));
+            data_to_hmac.insert(data_to_hmac.end(), (uint8_t *)&length,
+                                (uint8_t *)&length + sizeof(length));
         } else {
             data_to_hmac = message;
         }

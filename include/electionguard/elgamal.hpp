@@ -214,7 +214,7 @@ namespace electionguard
         /// <param name="look_for_padding"> Indicates if padding removed. </param>
         /// <returns>A plaintext vector.</returns>
         /// </summary>
-        std::vector<uint8_t> decrypt(const ElementModQ &nonce, const ElementModP &publicKey,
+        std::vector<uint8_t> decrypt(const ElementModQ &secret_key,
                                      const ElementModQ &descriptionHash, bool look_for_padding);
 
         /// <Summary>
