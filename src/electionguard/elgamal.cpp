@@ -374,11 +374,6 @@ namespace electionguard
                                                      bool look_for_padding)
     {
         // Note this decryption method is primarily used for testing
-        // and is only capable of decrypting boolean results (0/1)
-        // it should be extended with a discrete_log search to decrypt
-        // values other than 0 or 1
-        // 
-        //uint8_t temp_xor_key_bytes[HASHED_CIPHERTEXT_BLOCK_LENGTH];
         vector<uint8_t> plaintext_with_padding;
         vector<uint8_t> plaintext;
 
@@ -391,10 +386,8 @@ namespace electionguard
 
         auto publicKey_to_r = pow_mod_p(*pimpl->pad, secret_key);
 
-        // now we need to hash the concatenation of g_to_r with publicKey_to_r
-        // in order to get the base key
-        vector<ElementModP *> elems{pimpl->pad.get(), publicKey_to_r.get()};
-        auto master_key = hash_elems(elems);
+        // hash g_to_r and publicKey_to_r to get the master key
+        auto master_key = hash_elems({pimpl->pad.get(), publicKey_to_r.get()});
 
         vector<uint8_t> mac_key =
           get_hmac(master_key->toBytes(), descriptionHash.toBytes(), descriptionHash.toBytes().size(), 0);
@@ -528,10 +521,8 @@ namespace electionguard
 
         auto publicKey_to_r = pow_mod_p(publicKey, nonce);
 
-        // now we need to hash the concatenation of g_to_r with publicKey_to_r
-        // in order to get the base key
-        vector<ElementModP *> elems{g_to_r.get(), publicKey_to_r.get()};
-        auto master_key = hash_elems(elems);
+        // hash g_to_r and publicKey_to_r to get the master key
+        auto master_key = hash_elems({g_to_r.get(), publicKey_to_r.get()});
 
         uint32_t plaintext_index = 0;
         for (uint32_t i = 0; i < num_xor_keys; i++) {
