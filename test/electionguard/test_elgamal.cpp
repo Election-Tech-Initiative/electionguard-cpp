@@ -184,8 +184,6 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data")
     std::unique_ptr<HashedElGamalCiphertext> HEGResult =
       hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, NO_PADDING);
 
-    unique_ptr<ElementModQ> hash = HEGResult->crypto_hash();
-
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
     vector<uint8_t> ciphertext = HEGResult->getData();
     vector<uint8_t> mac = HEGResult->getMac();
@@ -218,8 +216,6 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data with padding but on 
 
     std::unique_ptr<HashedElGamalCiphertext> HEGResult =
       hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, BYTES_32);
-
-    unique_ptr<ElementModQ> hash = HEGResult->crypto_hash();
 
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
     vector<uint8_t> ciphertext = HEGResult->getData();

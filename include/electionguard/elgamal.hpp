@@ -159,7 +159,7 @@ namespace electionguard
     /// result. Create one with `hashedElgamalEncrypt`. Decrypt using one the
     /// 'decrypt' method.
     /// </summary>
-    class EG_API HashedElGamalCiphertext : public CryptoHashable
+    class EG_API HashedElGamalCiphertext
     {
       public:
         HashedElGamalCiphertext(const HashedElGamalCiphertext &other);
@@ -207,9 +207,6 @@ namespace electionguard
         /// </Summary>
         std::vector<uint8_t> getMac() const;
 
-        virtual std::unique_ptr<ElementModQ> crypto_hash() override;
-        virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
-
         /// <summary>
         /// Decrypts ciphertext with the Auxiliary Encryption method (as specified in the
         /// ElectionGuard specification) given a random nonce, an ElGamal public key,
@@ -231,9 +228,6 @@ namespace electionguard
         /// Clone the value by making a deep copy.
         /// </Summary>
         std::unique_ptr<HashedElGamalCiphertext> clone() const;
-
-      protected:
-        std::unique_ptr<ElementModQ> local_crypto_hash() const;
 
       private:
         class Impl;
