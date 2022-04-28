@@ -196,7 +196,6 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data")
     CHECK(plaintext == new_plaintext);
 }
 
-// it is on the boundary be
 TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data with padding but on boundary")
 {
     uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10,
