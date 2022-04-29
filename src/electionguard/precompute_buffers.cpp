@@ -232,11 +232,7 @@ namespace electionguard
         } while (getInstance().quadruple_queue.size() < getInstance().max);
     }
 
-    void PrecomputeBufferContext::stop_populate()
-    {
-        std::lock_guard<std::mutex> lock(queue_lock);
-        getInstance().populate_OK = false;
-    }
+    void PrecomputeBufferContext::stop_populate() { getInstance().populate_OK = false; }
 
     uint32_t PrecomputeBufferContext::get_max_queue_size() { return getInstance().max; }
 
