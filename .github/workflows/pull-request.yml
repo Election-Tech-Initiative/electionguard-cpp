@@ -2,14 +2,6 @@ name: Pull Request
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "apps/**"
-      - "bindings/**"
-      - "include/**"
-      - "src/**"
-      - "test/**"
-    branches: [main]
   pull_request:
     paths:
       - ".github/**"
