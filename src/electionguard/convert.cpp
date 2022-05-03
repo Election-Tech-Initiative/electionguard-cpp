@@ -5,7 +5,7 @@
 #include <codecvt>
 #include <iomanip>
 #include <iostream>
-#include <karamel/lowstar_endianness.h>
+#include <karamel/LowStar_Endianness.h>
 #include <sstream>
 #include <string>
 #include <vector>
