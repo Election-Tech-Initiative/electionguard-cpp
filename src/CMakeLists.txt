@@ -11,7 +11,7 @@ include(../cmake/CPM.cmake)
 CPMAddPackage(
         NAME date
         GITHUB_REPOSITORY HowardHinnant/date
-        VERSION 3.0.0
+        VERSION 3.0.1
 )
 
 CPMAddPackage(
@@ -70,37 +70,36 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/random.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/utils.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/variant_cast.hpp
-    ${PROJECT_SOURCE_DIR}/src/kremlin/evercrypt_targetconfig.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum.c
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum256.c
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum256.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum256_32.c
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum256_32.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.c
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096_32.c
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Bignum4096_32.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_GenericField64.c
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_GenericField64.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Hash.c
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Hash.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_HMAC_DRBG.c
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_HMAC_DRBG.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_HMAC.c
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_HMAC.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_IntTypes_Intrinsics.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Kremlib.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Spec.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Streaming_SHA2.c
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Hacl_Streaming_SHA2.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/lib_intrinsics.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Lib_Memzero.c
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Lib_Memzero0.c
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Lib_Memzero0.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Lib_RandomBuffer_System.c
-    ${PROJECT_SOURCE_DIR}/src/kremlin/Lib_RandomBuffer_System.h
-    ${PROJECT_SOURCE_DIR}/src/kremlin/libintvector.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/evercrypt_targetconfig.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Bignum.c
+    ${PROJECT_SOURCE_DIR}/src/karamel/internal/Hacl_Bignum.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Bignum256.c
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Bignum256.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Bignum256_32.c
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Bignum256_32.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Bignum4096.c
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Bignum4096.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Bignum4096_32.c
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Bignum4096_32.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_GenericField64.c
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_GenericField64.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Hash.c
+    ${PROJECT_SOURCE_DIR}/src/karamel/internal/Hacl_Hash.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_HMAC_DRBG.c
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_HMAC_DRBG.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_HMAC.c
+    ${PROJECT_SOURCE_DIR}/src/karamel/internal/Hacl_HMAC.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_IntTypes_Intrinsics.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Krmllib.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Spec.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Streaming_SHA2.c
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Streaming_SHA2.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/lib_intrinsics.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Lib_Memzero0.c
+    ${PROJECT_SOURCE_DIR}/src/karamel/Lib_Memzero0.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Lib_RandomBuffer_System.c
+    ${PROJECT_SOURCE_DIR}/src/karamel/Lib_RandomBuffer_System.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/libintvector.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_code.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_code.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_compact.h
@@ -176,7 +175,7 @@ target_include_directories(${META_PROJECT_TARGET}
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/${META_PROJECT_TARGET}
-        ${PROJECT_SOURCE_DIR}/src/kremlin
+        ${PROJECT_SOURCE_DIR}/src/karamel
 )
 
 # ---- Dependencies ----

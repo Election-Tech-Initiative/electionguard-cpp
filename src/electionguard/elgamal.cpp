@@ -1,6 +1,6 @@
 #include "electionguard/elgamal.hpp"
 
-#include "../kremlin/Hacl_Bignum4096.h"
+#include "../karamel/Hacl_Bignum4096.h"
 #include "electionguard/hash.hpp"
 #include "log.hpp"
 
@@ -222,8 +222,8 @@ namespace electionguard
         return make_unique<ElGamalCiphertext>(move(pad), move(data));
     }
 
-    unique_ptr<ElGamalCiphertext>
-    elgamalEncrypt_with_precomputed(uint64_t m, ElementModP &g_to_rho, ElementModP &pubkey_to_rho)
+    unique_ptr<ElGamalCiphertext> elgamalEncrypt_with_precomputed(uint64_t m, ElementModP &g_to_rho,
+                                                                  ElementModP &pubkey_to_rho)
     {
         ElementModP data = pubkey_to_rho;
 
@@ -237,7 +237,7 @@ namespace electionguard
         Log::trace("data", data.toHex());
 
         return make_unique<ElGamalCiphertext>(make_unique<ElementModP>(g_to_rho),
-            make_unique<ElementModP>(data));
+                                              make_unique<ElementModP>(data));
     }
 
     unique_ptr<ElGamalCiphertext>

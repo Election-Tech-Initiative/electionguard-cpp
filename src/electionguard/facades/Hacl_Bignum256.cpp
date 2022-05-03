@@ -1,6 +1,6 @@
 #include "Hacl_Bignum256.hpp"
 
-#include "../../kremlin/Hacl_Bignum256.h"
+#include "../../karamel/Hacl_Bignum256.h"
 #include "../log.hpp"
 
 #include <electionguard/constants.h>

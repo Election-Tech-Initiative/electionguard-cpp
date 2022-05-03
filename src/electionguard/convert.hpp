@@ -10,7 +10,7 @@
 #include <codecvt>
 #include <iomanip>
 #include <iostream>
-#include <kremlin/lowstar_endianness.h>
+#include <karamel/lowstar_endianness.h>
 #include <sstream>
 #include <string>
 #include <vector>

@@ -1,7 +1,7 @@
 #ifndef __FACADES__Hacl_Bignum4096_H_INCLUDED__
 #define __FACADES__Hacl_Bignum4096_H_INCLUDED__
 
-#include "../../kremlin/Hacl_Bignum4096.h"
+#include "../../karamel/Hacl_Bignum4096.h"
 #include "electionguard/export.h"
 
 #include <cstdint>

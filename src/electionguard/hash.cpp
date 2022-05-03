@@ -1,7 +1,7 @@
 #include "electionguard/hash.hpp"
 
-#include "../kremlin/Hacl_Bignum256.h"
-#include "../kremlin/Hacl_Streaming_SHA2.h"
+#include "../karamel/Hacl_Bignum256.h"
+#include "../karamel/Hacl_Streaming_SHA2.h"
 #include "log.hpp"
 
 #include <iomanip>

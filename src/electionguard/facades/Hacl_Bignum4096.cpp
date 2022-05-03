@@ -1,6 +1,6 @@
 #include "Hacl_Bignum4096.hpp"
 
-#include "../../kremlin/Hacl_Bignum4096.h"
+#include "../../karamel/Hacl_Bignum4096.h"
 #include "../log.hpp"
 
 using electionguard::Log;
