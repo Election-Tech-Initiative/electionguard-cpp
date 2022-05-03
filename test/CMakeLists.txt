@@ -81,6 +81,7 @@ add_executable(${CPP_BENCHMARK_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_group.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_hacl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_hash.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_hashed_elgamal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_nonces.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_precompute.cpp
 )

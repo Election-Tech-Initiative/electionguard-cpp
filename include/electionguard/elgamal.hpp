@@ -5,6 +5,7 @@
 #include "group.hpp"
 
 #include <memory>
+#include <vector>
 
 namespace electionguard
 {
@@ -137,6 +138,131 @@ namespace electionguard
     /// </summary>
     EG_API std::unique_ptr<ElGamalCiphertext>
     elgamalAdd(const std::vector<std::reference_wrapper<ElGamalCiphertext>> &ciphertexts);
+
+    #define HASHED_CIPHERTEXT_BLOCK_LENGTH 32U
+    #define _PAD_INDICATOR_SIZE sizeof(uint16_t)
+
+    typedef enum padded_data_size_e {
+        NO_PADDING = 0,
+        BYTES_32 = 32 - _PAD_INDICATOR_SIZE,
+        BYTES_64 = 64 - _PAD_INDICATOR_SIZE,
+        BYTES_128 = 128 - _PAD_INDICATOR_SIZE,
+        BYTES_256 = 256 - _PAD_INDICATOR_SIZE,
+        BYTES_512 = 512 - _PAD_INDICATOR_SIZE
+    } padded_data_size_t;
+
+    /// <summary>
+    /// A "Hashed ElGamal Ciphertext" as specified as the Auxiliary Encryption in
+    /// the ElectionGuard specification. The tuple g ^ r mod p concatenated with
+    /// K ^ r mod p are used to feed into a hash function to generate a main key
+    /// from which other keys derive to perform XOR encryption and to MAC the
+    /// result. Create one with `hashedElgamalEncrypt`. Decrypt using one the
+    /// 'decrypt' method.
+    /// </summary>
+    class EG_API HashedElGamalCiphertext
+    {
+      public:
+        HashedElGamalCiphertext(const HashedElGamalCiphertext &other);
+        HashedElGamalCiphertext(HashedElGamalCiphertext &&other);
+        HashedElGamalCiphertext(std::unique_ptr<ElementModP> pad, std::vector<uint8_t> data,
+                                std::vector<uint8_t> mac);
+        ~HashedElGamalCiphertext();
+
+        HashedElGamalCiphertext &operator=(HashedElGamalCiphertext rhs);
+        HashedElGamalCiphertext &operator=(HashedElGamalCiphertext &&rhs);
+        bool operator==(const HashedElGamalCiphertext &other);
+        bool operator!=(const HashedElGamalCiphertext &other);
+
+        /// <Summary>
+        /// The g ^r mod p value also referred to as pad in the code and
+        /// c0 in the spec.
+        /// </Summary>
+        ElementModP *getPad();
+
+        /// <Summary>
+        /// The g ^r mod p value also referred to as pad in the code and
+        /// c0 in the spec.
+        /// </Summary>
+        ElementModP *getPad() const;
+
+        /// <Summary>
+        /// The vector of encrypted ciphertext bytes. Referred to as c1
+        /// in the spec.
+        /// </Summary>
+        std::vector<uint8_t> getData();
+
+        /// <Summary>
+        /// The vector of encrypted ciphertext bytes. Referred to as c1
+        /// in the spec.
+        /// </Summary>
+        std::vector<uint8_t> getData() const;
+
+        /// <Summary>
+        /// The vector of MAC bytes. Referred to as c2 in the spec.
+        /// </Summary>
+        std::vector<uint8_t> getMac();
+
+        /// <Summary>
+        /// The vector of MAC bytes. Referred to as c2 in the spec.
+        /// </Summary>
+        std::vector<uint8_t> getMac() const;
+
+        /// <summary>
+        /// Decrypts ciphertext with the Auxiliary Encryption method (as specified in the
+        /// ElectionGuard specification) given a random nonce, an ElGamal public key,
+        /// and a description hash. The encrypt may be called to look for padding to
+        /// verify and remove, in this case the plaintext will be smaller than
+        /// the ciphertext, or not to look for padding in which case the
+        /// plaintext will be the same size as the ciphertext. 
+        /// 
+        /// <param name="nonce"> Randomly chosen nonce in [1,Q). </param>
+        /// <param name="publicKey"> ElGamal public key. </param>
+        /// <param name="descriptionHash"> Hash of the ballot description. </param>
+        /// <param name="look_for_padding"> Indicates if padding removed. </param>
+        /// <returns>A plaintext vector.</returns>
+        /// </summary>
+        std::vector<uint8_t> decrypt(const ElementModQ &secret_key,
+                                     const ElementModQ &descriptionHash, bool look_for_padding);
+
+        /// <Summary>
+        /// Clone the value by making a deep copy.
+        /// </Summary>
+        std::unique_ptr<HashedElGamalCiphertext> clone() const;
+
+      private:
+        class Impl;
+#pragma warning(suppress : 4251)
+                std::unique_ptr<Impl> pimpl;
+    };
+
+    /// <summary>
+    /// Encrypts a message with the Auxiliary Encryption method (as specified in the
+    /// ElectionGuard specification) given a random nonce, an ElGamal public key,
+    /// and a description hash. The encrypt may be called to apply padding. If
+    /// padding is to be applied then the max_len parameter may be used with
+    /// any of the padded_data_size_t enumeration values that is not NO_PADDING.
+    /// This value indicates the maximum length of the plaintext that may be
+    /// encrypted. The padding scheme applies two bytes for length of padding
+    /// plus padding bytes. If padding is not to be applied then the
+    /// max_len parameter must be NO_PADDING and the plaintext must
+    /// be a multiple of the block length (32) and the ciphertext will be
+    /// the same size.
+    ///
+    /// <param name="plaintext"> Message to hashed elgamal encrypt. </param>
+    /// <param name="nonce"> Randomly chosen nonce in [1,Q). </param>
+    /// <param name="publicKey"> ElGamal public key. </param>
+    /// <param name="descriptionHash"> Hash of the ballot description. </param>
+    /// <param name="max_len"> If padding is to be applied then this indicates the
+    ///  maximum length of plaintext, must be one padded_data_size_t enumeration
+    ///  values. If padding is not to be applied then this parameter must use
+    ///  the NO_PADDING padded_data_size_t enumeration value.</param>
+    /// <returns>A ciphertext triple.</returns>
+    /// </summary>
+    EG_API std::unique_ptr<HashedElGamalCiphertext>
+    hashedElgamalEncrypt(std::vector<uint8_t> plaintext, const ElementModQ &nonce,
+                         const ElementModP &publicKey, const ElementModQ &descriptionHash,
+                         padded_data_size_t max_len);
+
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD__CPP_ELGAMAL_HPP_INCLUDED__ */
