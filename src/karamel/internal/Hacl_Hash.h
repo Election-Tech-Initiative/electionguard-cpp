@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 #include "../Hacl_Krmllib.h"
-#include "evercrypt_targetconfig.h"
+#include "../evercrypt_targetconfig.h"
 #include "karamel/krml/internal/builtin.h"
 #include "karamel/krml/internal/target.h"
 #include "karamel/krml/internal/types.h"

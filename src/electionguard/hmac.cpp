@@ -1,7 +1,7 @@
 #include "electionguard/hmac.hpp"
 
-#include "../kremlin/Hacl_HMAC.h"
-#include "../kremlin/Lib_Memzero0.h"
+#include "../karamel/Lib_Memzero0.h"
+#include "../karamel/internal/Hacl_HMAC.h"
 #include "log.hpp"
 
 #include <iomanip>
@@ -36,8 +36,8 @@ namespace electionguard
         }
 
         // calculate the hmac and then zeroize the buffer holding the data we hmaced
-        Hacl_HMAC_compute_sha2_256(&hmac.front(), &key.front(), key.size(),
-                                   &data_to_hmac.front(), data_to_hmac.size());
+        Hacl_HMAC_compute_sha2_256(&hmac.front(), &key.front(), key.size(), &data_to_hmac.front(),
+                                   data_to_hmac.size());
         Lib_Memzero0_memzero(&data_to_hmac.front(), data_to_hmac.size());
 
         return hmac;
