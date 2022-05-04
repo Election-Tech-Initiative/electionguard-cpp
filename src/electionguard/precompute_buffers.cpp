@@ -207,12 +207,12 @@ namespace electionguard
         // try 5000 and see how that works. If the vendor wanted to pass the
         // queue size in we could use that.
         // for now we just go through the loop once
+        int iteration_count = 0;
         do {
             // TODO - Can we tolerate not returning until we have finished
             // generating two triples and a quadruple?
             // If not we can get more elaborate with the populate_OK checking
             std::lock_guard<std::mutex> lock(queue_lock);
-            int iteration_count = 0;
             if (getInstance().populate_OK) {
                 // generate two triples and a quadruple
                 //
