@@ -98,6 +98,7 @@ TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_pre
     CHECK((0UL == decrypted1));
     auto decrypted2 = cipherText2->decrypt(secret);
     CHECK((0UL == decrypted2));
+    PrecomputeBufferContext::empty_queues();
 }
 
 TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0")
@@ -128,6 +129,7 @@ TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0")
 
     auto decrypted = cipherText->decrypt(secret);
     CHECK((0UL == decrypted));
+    PrecomputeBufferContext::empty_queues();
 }
 
 TEST_CASE("elgamalEncrypt simple encrypt 1 decrypts with secret")
@@ -454,4 +456,5 @@ TEST_CASE("elgamalEncrypt_with_precomputed encrypt 1, decrypts with secret")
 
     auto decrypted = cipherText->decrypt(*secret);
     CHECK(1UL == decrypted);
+    PrecomputeBufferContext::empty_queues();
 }

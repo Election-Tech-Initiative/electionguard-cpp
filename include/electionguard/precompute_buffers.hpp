@@ -226,6 +226,14 @@ namespace electionguard
         static std::unique_ptr<TwoTriplesAndAQuadruple> getTwoTriplesAndAQuadruple();
 
         /// <summary>
+        /// Get the next triple from the triple queue.
+        /// This method is called by hashedElgamalEncrypt in order to get
+        /// the precomputed value to perform the hashed elgamal encryption.
+        /// <returns>std::unique_ptr<Triple></returns>
+        /// </summary>
+        static std::unique_ptr<Triple> getTriple();
+
+        /// <summary>
         /// Empty the precomputed values queues.
         /// <returns>void</returns>
         /// </summary>
@@ -236,7 +244,7 @@ namespace electionguard
         static std::mutex queue_lock;
         bool populate_OK = false;
         std::queue<std::unique_ptr<Triple>> triple_queue;
-        std::queue<std::unique_ptr<Quadruple>> quadruple_queue;
+        std::queue<std::unique_ptr<TwoTriplesAndAQuadruple>> twoTriplesAndAQuadruple_queue;
     };
 } // namespace electionguard
 

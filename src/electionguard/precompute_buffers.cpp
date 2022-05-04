@@ -204,7 +204,7 @@ namespace electionguard
         // This loop goes through until the queues are full but can be stopped
         // between generations of two triples and a quad. By full it means
         // we check how many quads are in the queue, to start with we will
-        // try 500 and see how that works. If the vendor wanted to pass the
+        // try 5000 and see how that works. If the vendor wanted to pass the
         // queue size in we could use that.
         // for now we just go through the loop once
         do {
@@ -212,6 +212,7 @@ namespace electionguard
             // generating two triples and a quadruple?
             // If not we can get more elaborate with the populate_OK checking
             std::lock_guard<std::mutex> lock(queue_lock);
+            int iteration_count = 0;
             if (getInstance().populate_OK) {
                 // generate two triples and a quadruple
                 //
@@ -220,16 +221,31 @@ namespace electionguard
                 unique_ptr<Triple> triple2 = make_unique<Triple>(elgamalPublicKey);
                 unique_ptr<Quadruple> quad = make_unique<Quadruple>(elgamalPublicKey);
 
-                getInstance().triple_queue.push(move(triple1));
+                unique_ptr<TwoTriplesAndAQuadruple> twoTriplesAndAQuadruple =
+                  make_unique<TwoTriplesAndAQuadruple>(move(triple1), move(triple2), move(quad));
 
-                getInstance().triple_queue.push(move(triple2));
+                getInstance().twoTriplesAndAQuadruple_queue.push(move(twoTriplesAndAQuadruple));
 
-                getInstance().quadruple_queue.push(move(quad));
-
+                // This is very rudimentary. We can add a more complex algorithm in
+                // the future, that would look at the queues and increase production if one
+                // is getting lower than expected.
+                // Every third iteration we generate two extra triples, one for use with
+                // the contest constant chaum pedersen proof and one for hashed elgamal encryption
+                // we need less of these because this exponentiation is done only every contest
+                // encryption whereas the two triples and a quadruple is used every selection
+                // encryption. The generating two triples every third iteration is a guess
+                // on how many precomputes we will need.
+                if ((iteration_count % 3) == 0) {
+                    unique_ptr<Triple> contest_triple1 = make_unique<Triple>(elgamalPublicKey);
+                    getInstance().triple_queue.push(move(contest_triple1));
+                    unique_ptr<Triple> contest_triple2 = make_unique<Triple>(elgamalPublicKey);
+                    getInstance().triple_queue.push(move(contest_triple2));
+                }
+                iteration_count++;
             } else {
                 return;
             }
-        } while (getInstance().quadruple_queue.size() < getInstance().max);
+        } while (getInstance().twoTriplesAndAQuadruple_queue.size() < getInstance().max);
     }
 
     void PrecomputeBufferContext::stop_populate() { getInstance().populate_OK = false; }
@@ -238,7 +254,7 @@ namespace electionguard
 
     uint32_t PrecomputeBufferContext::get_current_queue_size()
     {
-        return getInstance().quadruple_queue.size();
+        return getInstance().twoTriplesAndAQuadruple_queue.size();
     }
 
     std::unique_ptr<TwoTriplesAndAQuadruple> PrecomputeBufferContext::getTwoTriplesAndAQuadruple()
@@ -249,18 +265,25 @@ namespace electionguard
         std::lock_guard<std::mutex> lock(queue_lock);
 
         // make sure there are enough in the queues
-        if ((getInstance().triple_queue.size() >= 2) &&
-            (getInstance().quadruple_queue.size() >= 1)) {
+        if (!getInstance().twoTriplesAndAQuadruple_queue.empty()) {
+            result = std::move(getInstance().twoTriplesAndAQuadruple_queue.front());
+            getInstance().twoTriplesAndAQuadruple_queue.pop();
+        }
 
-            unique_ptr<Triple> triple1 = std::move(getInstance().triple_queue.front());
+        return result;
+    }
+
+    std::unique_ptr<Triple> PrecomputeBufferContext::getTriple()
+    {
+        unique_ptr<Triple> result = nullptr;
+
+        // take a lock while we get the triples and a quadruple
+        std::lock_guard<std::mutex> lock(queue_lock);
+
+        // make sure there are enough in the queues
+        if (!getInstance().triple_queue.empty()) {
+            result = std::move(getInstance().triple_queue.front());
             getInstance().triple_queue.pop();
-            unique_ptr<Triple> triple2 = std::move(getInstance().triple_queue.front());
-            getInstance().triple_queue.pop();
-
-            unique_ptr<Quadruple> quad = std::move(getInstance().quadruple_queue.front());
-            getInstance().quadruple_queue.pop();
-
-            result = make_unique<TwoTriplesAndAQuadruple>(move(triple1), move(triple2), move(quad));
         }
 
         return result;
@@ -269,11 +292,13 @@ namespace electionguard
     void PrecomputeBufferContext::empty_queues()
     {
         std::lock_guard<std::mutex> lock(queue_lock);
-        uint32_t size = getInstance().quadruple_queue.size();
-        for (int i = 0; i < (int)size; i++) {
+        uint32_t triple_size = getInstance().triple_queue.size();
+        for (int i = 0; i < (int)triple_size; i++) {
             getInstance().triple_queue.pop();
-            getInstance().triple_queue.pop();
-            getInstance().quadruple_queue.pop();
+        }
+        uint32_t twoTriplesAndAQuadruple_size = getInstance().twoTriplesAndAQuadruple_queue.size();
+        for (int i = 0; i < (int)twoTriplesAndAQuadruple_size; i++) {
+            getInstance().twoTriplesAndAQuadruple_queue.pop();
         }
     }
 

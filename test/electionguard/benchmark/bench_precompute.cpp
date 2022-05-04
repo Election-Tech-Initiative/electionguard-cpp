@@ -340,6 +340,7 @@ BENCHMARK_DEFINE_F(PrecomputeFixture, precomputed)
 
         auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
     }
+    PrecomputeBufferContext::empty_queues();
 }
 
 BENCHMARK_REGISTER_F(PrecomputeFixture, precomputed)
@@ -395,6 +396,7 @@ class EncryptBallotPrecomputeFixture : public benchmark::Fixture
 
 BENCHMARK_DEFINE_F(EncryptBallotPrecomputeFixture, encryptBallotPrecompute_Full_NoProofCheck)(benchmark::State &state)
 {
+    PrecomputeBufferContext::stop_populate();
     while (state.KeepRunning()) {
         auto result = encryptBallot(*ballot, *internal, *context, *device->getHash(),
                                     make_unique<ElementModQ>(*nonce), 0UL, false);

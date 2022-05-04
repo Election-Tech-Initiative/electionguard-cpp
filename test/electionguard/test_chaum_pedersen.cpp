@@ -194,6 +194,7 @@ TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
           false);
     CHECK(fourthMessageOneProof->isValid(*fourthMessage, *keypair->getPublicKey(), ONE_MOD_Q()) ==
           true);
+    PrecomputeBufferContext::empty_queues();
 }
 
 TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values")
@@ -233,6 +234,7 @@ TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values")
 
     CHECK(proof->isValid(*message1, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
     CHECK(badProof->isValid(*message2, *keypair->getPublicKey(), ONE_MOD_Q()) == false);
+    PrecomputeBufferContext::empty_queues();
 }
 
 TEST_CASE("Disjunctive CP Proof encryption of one with precomputed values")
@@ -272,4 +274,5 @@ TEST_CASE("Disjunctive CP Proof encryption of one with precomputed values")
 
     CHECK(proof->isValid(*message1, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
     CHECK(badProof->isValid(*message2, *keypair->getPublicKey(), ONE_MOD_Q()) == false);
+    PrecomputeBufferContext::empty_queues();
 }
