@@ -115,10 +115,9 @@ namespace electionguard
         unique_ptr<Triple> triple1;
         unique_ptr<Triple> triple2;
         unique_ptr<Quadruple> quad;
-        bool populated = false;
 
       public:
-        explicit TwoTriplesAndAQuadruple() { populated = false; }
+        explicit TwoTriplesAndAQuadruple() {}
         TwoTriplesAndAQuadruple(unique_ptr<Triple> in_triple1, unique_ptr<Triple> in_triple2,
                                 unique_ptr<Quadruple> in_quad);
         TwoTriplesAndAQuadruple(const TwoTriplesAndAQuadruple &other);
@@ -133,8 +132,6 @@ namespace electionguard
         unique_ptr<Triple> get_triple2() { return triple2->clone(); }
 
         unique_ptr<Quadruple> get_quad() { return quad->clone(); }
-
-        bool isPopulated() { return populated; }
 
         unique_ptr<TwoTriplesAndAQuadruple> clone();
     };

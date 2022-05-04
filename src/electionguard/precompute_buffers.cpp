@@ -144,7 +144,6 @@ namespace electionguard
         this->triple1 = move(triple1);
         this->triple2 = move(triple2);
         this->quad = move(quad);
-        populated = true;
     }
 
     TwoTriplesAndAQuadruple::TwoTriplesAndAQuadruple(const TwoTriplesAndAQuadruple &other)
@@ -259,7 +258,7 @@ namespace electionguard
 
     std::unique_ptr<TwoTriplesAndAQuadruple> PrecomputeBufferContext::getTwoTriplesAndAQuadruple()
     {
-        unique_ptr<TwoTriplesAndAQuadruple> result = make_unique<TwoTriplesAndAQuadruple>();
+        unique_ptr<TwoTriplesAndAQuadruple> result = nullptr;
 
         // take a lock while we get the triples and a quadruple
         std::lock_guard<std::mutex> lock(queue_lock);

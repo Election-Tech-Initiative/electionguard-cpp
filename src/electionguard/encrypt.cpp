@@ -234,7 +234,7 @@ namespace electionguard
     {
         unique_ptr<CiphertextBallotSelection> encrypted = NULL;
         unique_ptr<ElGamalCiphertext> ciphertext;
-        unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad;
+        unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad = nullptr;
 
         // Validate Input
         if (!selection.isValid(description.getObjectId())) {
@@ -256,7 +256,7 @@ namespace electionguard
         precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad->isPopulated()) {
+        if (precomputedTwoTriplesAndAQuad != nullptr) {
             auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
             auto g_to_exp = triple1->get_g_to_exp();
             auto pubkey_to_exp = triple1->get_pubkey_to_exp();
