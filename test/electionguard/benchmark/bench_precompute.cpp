@@ -46,7 +46,7 @@ BENCHMARK_DEFINE_F(ElGamalEncryptPrecomputedFixture, ElGamalEncryptPrecomputed)(
         auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad->isPopulated()) {
+        if (precomputedTwoTriplesAndAQuad != nullptr) {
             auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
             auto g_to_exp = triple1->get_g_to_exp();
             auto pubkey_to_exp = triple1->get_pubkey_to_exp();
@@ -102,7 +102,7 @@ class ChaumPedersenPrecomputedFixture : public benchmark::Fixture
         auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad->isPopulated()) {
+        if (precomputedTwoTriplesAndAQuad != nullptr) {
             disjunctive = DisjunctiveChaumPedersenProof::make_with_precomputed(
               *message, move(precomputedTwoTriplesAndAQuad), ONE_MOD_Q(), 1);
         }
@@ -130,7 +130,7 @@ BENCHMARK_DEFINE_F(ChaumPedersenPrecomputedFixture, disjunctiveChaumPedersenPrec
         auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad->isPopulated()) {
+        if (precomputedTwoTriplesAndAQuad != nullptr) {
             DisjunctiveChaumPedersenProof::make_with_precomputed(
               *message, move(precomputedTwoTriplesAndAQuad), ONE_MOD_Q(), 1);
         }
@@ -147,7 +147,7 @@ BENCHMARK_DEFINE_F(ChaumPedersenPrecomputedFixture, disjunctiveChaumPedersenPrec
         auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad->isPopulated()) {
+        if (precomputedTwoTriplesAndAQuad != nullptr) {
             auto item = DisjunctiveChaumPedersenProofPrecomputedHarness::make_zero_with_precomputed(
               *message, move(precomputedTwoTriplesAndAQuad), ONE_MOD_Q());
         }
@@ -164,7 +164,7 @@ BENCHMARK_DEFINE_F(ChaumPedersenPrecomputedFixture, disjunctiveChaumPedersenPrec
         auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad->isPopulated()) {
+        if (precomputedTwoTriplesAndAQuad != nullptr) {
             auto item = DisjunctiveChaumPedersenProofPrecomputedHarness::make_one_with_precomputed(
               *message, move(precomputedTwoTriplesAndAQuad), ONE_MOD_Q());
         }
@@ -202,7 +202,7 @@ class CiphertextBallotSelectionPrecomputedFixture : public benchmark::Fixture
         auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad->isPopulated()) {
+        if (precomputedTwoTriplesAndAQuad != nullptr) {
             auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
             auto g_to_exp = triple1->get_g_to_exp();
             auto pubkey_to_exp = triple1->get_pubkey_to_exp();
@@ -236,7 +236,7 @@ BENCHMARK_DEFINE_F(CiphertextBallotSelectionPrecomputedFixture,
         auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad->isPopulated()) {
+        if (precomputedTwoTriplesAndAQuad != nullptr) {
             auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
             auto g_to_exp = triple1->get_g_to_exp();
             auto pubkey_to_exp = triple1->get_pubkey_to_exp();
@@ -340,6 +340,7 @@ BENCHMARK_DEFINE_F(PrecomputeFixture, precomputed)
 
         auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
     }
+    PrecomputeBufferContext::empty_queues();
 }
 
 BENCHMARK_REGISTER_F(PrecomputeFixture, precomputed)
@@ -395,6 +396,7 @@ class EncryptBallotPrecomputeFixture : public benchmark::Fixture
 
 BENCHMARK_DEFINE_F(EncryptBallotPrecomputeFixture, encryptBallotPrecompute_Full_NoProofCheck)(benchmark::State &state)
 {
+    PrecomputeBufferContext::stop_populate();
     while (state.KeepRunning()) {
         auto result = encryptBallot(*ballot, *internal, *context, *device->getHash(),
                                     make_unique<ElementModQ>(*nonce), 0UL, false);

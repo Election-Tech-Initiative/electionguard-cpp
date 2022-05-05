@@ -146,13 +146,9 @@ TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
     auto precomputedTwoTriplesAndAQuad4 = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
     CHECK(precomputedTwoTriplesAndAQuad1 != nullptr);
-    CHECK(precomputedTwoTriplesAndAQuad1->isPopulated() == true);
     CHECK(precomputedTwoTriplesAndAQuad2 != nullptr);
-    CHECK(precomputedTwoTriplesAndAQuad2->isPopulated() == true);
     CHECK(precomputedTwoTriplesAndAQuad3 != nullptr);
-    CHECK(precomputedTwoTriplesAndAQuad3->isPopulated() == true);
     CHECK(precomputedTwoTriplesAndAQuad4 != nullptr);
-    CHECK(precomputedTwoTriplesAndAQuad4->isPopulated() == true);
 
     auto triple1_1 = precomputedTwoTriplesAndAQuad1->get_triple1();
     auto triple1_2 = precomputedTwoTriplesAndAQuad2->get_triple1();
@@ -194,6 +190,7 @@ TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
           false);
     CHECK(fourthMessageOneProof->isValid(*fourthMessage, *keypair->getPublicKey(), ONE_MOD_Q()) ==
           true);
+    PrecomputeBufferContext::empty_queues();
 }
 
 TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values")
@@ -213,9 +210,7 @@ TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values")
     auto precomputedTwoTriplesAndAQuad2 = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
     CHECK(precomputedTwoTriplesAndAQuad1 != nullptr);
-    CHECK(precomputedTwoTriplesAndAQuad1->isPopulated() == true);
     CHECK(precomputedTwoTriplesAndAQuad2 != nullptr);
-    CHECK(precomputedTwoTriplesAndAQuad2->isPopulated() == true);
 
     auto triple1_1 = precomputedTwoTriplesAndAQuad1->get_triple1();
     auto triple1_2 = precomputedTwoTriplesAndAQuad2->get_triple1();
@@ -233,6 +228,7 @@ TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values")
 
     CHECK(proof->isValid(*message1, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
     CHECK(badProof->isValid(*message2, *keypair->getPublicKey(), ONE_MOD_Q()) == false);
+    PrecomputeBufferContext::empty_queues();
 }
 
 TEST_CASE("Disjunctive CP Proof encryption of one with precomputed values")
@@ -252,9 +248,7 @@ TEST_CASE("Disjunctive CP Proof encryption of one with precomputed values")
     auto precomputedTwoTriplesAndAQuad2 = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
     CHECK(precomputedTwoTriplesAndAQuad1 != nullptr);
-    CHECK(precomputedTwoTriplesAndAQuad1->isPopulated() == true);
     CHECK(precomputedTwoTriplesAndAQuad2 != nullptr);
-    CHECK(precomputedTwoTriplesAndAQuad2->isPopulated() == true);
 
     auto triple1_1 = precomputedTwoTriplesAndAQuad1->get_triple1();
     auto triple1_2 = precomputedTwoTriplesAndAQuad2->get_triple1();
@@ -272,4 +266,5 @@ TEST_CASE("Disjunctive CP Proof encryption of one with precomputed values")
 
     CHECK(proof->isValid(*message1, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
     CHECK(badProof->isValid(*message2, *keypair->getPublicKey(), ONE_MOD_Q()) == false);
+    PrecomputeBufferContext::empty_queues();
 }
