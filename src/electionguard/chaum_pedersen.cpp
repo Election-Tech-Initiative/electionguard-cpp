@@ -581,13 +581,24 @@ namespace electionguard
         auto *alpha = message.getPad();
         auto *beta = message.getData();
 
-        // Pick a random number in Q.
+        // Derive nonce from seed and the constant string below
         auto nonces = make_unique<Nonces>(seed, "constant-chaum-pedersen-proof");
-        auto u = nonces->get(0);
+        unique_ptr<ElementModQ> u;
 
         // Compute the NIZKP
-        auto a = g_pow_p(*u);      //𝑔^𝑢 mod 𝑝
-        auto b = pow_mod_p(k, *u); // 𝐾^𝑢 mod 𝑝
+        unique_ptr<ElementModP> a; //𝑔^𝑢 mod 𝑝
+        unique_ptr<ElementModP> b; // 𝐾^𝑢 mod 𝑝
+        // check if the are precompute values rather than doing the exponentiations here
+        unique_ptr<Triple> triple = PrecomputeBufferContext::getTriple();
+        if (triple != nullptr) {
+            u = triple->get_exp();
+            a = triple->get_g_to_exp();
+            b = triple->get_pubkey_to_exp();
+        } else {
+            u = nonces->get(0);
+            a = g_pow_p(*u);      //𝑔^𝑢 mod 𝑝
+            b = pow_mod_p(k, *u); // 𝐾^𝑢 mod 𝑝
+        }
 
         // sha256(𝑄', A, B, a, b)
         auto c =

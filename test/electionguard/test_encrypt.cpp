@@ -81,6 +81,8 @@ TEST_CASE("Encrypt simple selection using precomputed values succeeds")
     CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
     CHECK(result->getProof()->isValid(*result->getCiphertext(), *keypair->getPublicKey(),
                                       ONE_MOD_Q()) == true);
+    // need to empty the queues because future tests don't use the same keys
+    PrecomputeBufferContext::empty_queues();
 }
 
 TEST_CASE("Encrypt simple selection malformed data fails")
@@ -130,7 +132,7 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
     auto mediator = make_unique<EncryptionMediator>(*internal, *context, *device);
-
+  
     // Act
     auto plaintext = BallotGenerator::getFakeBallot(*internal);
     // Log::debug(plaintext->toJson());
@@ -420,14 +422,14 @@ TEST_CASE("Encrypt simple ballot from file succeeds with precomputed values")
     auto ballot = BallotGenerator::getFakeBallot(*internal);
 
     // cause a two triples and a quad to be populated
-    PrecomputeBufferContext::init(50);
+    PrecomputeBufferContext::init(100);
     PrecomputeBufferContext::populate(*keypair->getPublicKey());
     PrecomputeBufferContext::stop_populate();
     uint32_t max_precomputed_queue_size = PrecomputeBufferContext::get_max_queue_size();
     uint32_t current_precomputed_queue_size = PrecomputeBufferContext::get_current_queue_size();
 
-    CHECK(50 == max_precomputed_queue_size);
-    CHECK(50 == current_precomputed_queue_size);
+    CHECK(100 == max_precomputed_queue_size);
+    CHECK(100 == current_precomputed_queue_size);
 
     // Act
     auto ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash(),
@@ -438,4 +440,5 @@ TEST_CASE("Encrypt simple ballot from file succeeds with precomputed values")
     // Assert
     CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
+    PrecomputeBufferContext::empty_queues();
 }
