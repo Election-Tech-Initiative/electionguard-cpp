@@ -108,6 +108,15 @@ namespace ElectionGuard
     {
         AutoResetEvent waitHandle;
 
+        /// <summary>
+        /// Default constructor to initialize buffers for testing
+        /// </summary>
+        public Precompute()
+        {
+            NativePrecomputeBuffers.Init(max_buffers);
+        }
+
+
         private PrecomputeStatus currentStatus = new PrecomputeStatus
         {
             Percentage = 0,
@@ -115,7 +124,7 @@ namespace ElectionGuard
             CurrentState = PrecomputeState.NotStarted
         };
         private Thread workerThread;
-        private int max_buffers = 0;    // zero will say to run to a default number of runs
+        private int max_buffers = 123;
         private ElementModP elgamalPublicKey;
 
         /// <summary>
