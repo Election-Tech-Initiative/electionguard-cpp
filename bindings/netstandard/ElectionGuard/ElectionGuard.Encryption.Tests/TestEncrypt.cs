@@ -86,8 +86,9 @@ namespace ElectionGuard.Encrypt.Tests
 
             // Act
             var ballot = BallotGenerator.GetFakeBallot(internalManifest, 2);
-            Assert.Throws<ArgumentException>(() => mediator.Encrypt(ballot));
+            var ciphertext = mediator.Encrypt(ballot);
 
+            Assert.That(ciphertext != null);
         }
 
         [Test]

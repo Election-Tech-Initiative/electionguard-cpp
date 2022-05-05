@@ -19,6 +19,10 @@ using namespace std;
 #    define TEST_USE_SAMPLE "hamilton-general"
 #endif
 
+#ifndef TEST_USE_FULL_SAMPLE
+#    define TEST_USE_FULL_SAMPLE "full"
+#endif
+
 namespace electionguard::tools::generators
 {
     class ManifestGenerator

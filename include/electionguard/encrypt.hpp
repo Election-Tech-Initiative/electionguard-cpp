@@ -112,13 +112,29 @@ namespace electionguard
                      bool isPlaceholder = false, bool shouldVerifyProofs = true);
 
     /// <summary>
+    /// Gets overvote and write in information from the selections in a contest
+    /// puts the information in a json string. The internalManifest is needed because
+    /// it has the candidates and the candidate holds the indicator if a
+    /// selection is a write in.
+    ///
+    /// <param name="contest">the contest in valid input form</param>
+    /// <param name="internalManifest">the `InternalManifest` which defines this ballot's structure</param>
+    /// <param name="is_overvote">indicates if an overvote was detected</param>
+    /// <returns>string holding the json with the write ins</returns>
+    /// </summary>
+    std::string getOvervoteAndWriteIns(const PlaintextBallotContest &contest,
+                                       const InternalManifest &internalManifest,
+                                       valid_contest_return is_overvote);
+
+    /// <summary>
     /// Encrypt a specific `BallotContest` in the context of a specific `Ballot`
     ///
     /// This method accepts a contest representation that only includes `True` selections.
     /// It will fill missing selections for a contest with `False` values, and generate `placeholder`
     /// selections to represent the number of seats available for a given contest.  By adding `placeholder`
     /// votes
-    /// <param name="plaintext">the selection in the valid input form</param>
+    /// <param name="contest">the contest in valid input form</param>
+    /// <param name="internalManifest">the `InternalManifest` which defines this ballot's structure</param>
     /// <param name="description">the `ContestDescriptionWithPlaceholders` from the `ContestDescription`
     ///                           which defines this contest's structure</param>
     /// <param name="elgamalPublicKey">the public key (K) used to encrypt the ballot</param>
@@ -131,6 +147,7 @@ namespace electionguard
     /// </summary>
     EG_API std::unique_ptr<CiphertextBallotContest>
     encryptContest(const PlaintextBallotContest &contest,
+                   const InternalManifest &internalManifest,
                    const ContestDescriptionWithPlaceholders &description,
                    const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
                    const ElementModQ &nonceSeed, bool shouldVerifyProofs = true);

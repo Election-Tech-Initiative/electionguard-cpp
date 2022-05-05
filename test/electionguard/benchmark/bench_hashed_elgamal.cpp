@@ -13,7 +13,7 @@ class HashedElgamalEncryptFixture : public benchmark::Fixture
   public:
     void SetUp(const ::benchmark::State &state)
     {
-        
+
         nonce = rand_q();
         secret = ElementModQ::fromHex(a_fixed_secret);
         keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
@@ -28,8 +28,7 @@ class HashedElgamalEncryptFixture : public benchmark::Fixture
         plaintext = plain;
 
         std::unique_ptr<HashedElGamalCiphertext> HEGResult = hashedElgamalEncrypt(
-          plaintext, *nonce, *keypair->getPublicKey(), *descriptionHash, NO_PADDING);
-            
+          plaintext, *nonce, *keypair->getPublicKey(), *descriptionHash, NO_PADDING, false);
     }
 
     void TearDown(const ::benchmark::State &state) {}
@@ -44,11 +43,10 @@ class HashedElgamalEncryptFixture : public benchmark::Fixture
 BENCHMARK_DEFINE_F(HashedElgamalEncryptFixture, HashedElGamalEncrypt)(benchmark::State &state)
 {
     for (auto _ : state) {
-        hashedElgamalEncrypt(plaintext, *nonce, *keypair->getPublicKey(),
-            *descriptionHash, NO_PADDING);
+        hashedElgamalEncrypt(plaintext, *nonce, *keypair->getPublicKey(), *descriptionHash,
+                             NO_PADDING, false);
     }
 }
 
-BENCHMARK_REGISTER_F(HashedElgamalEncryptFixture, HashedElGamalEncrypt)->Unit(benchmark::kMillisecond);
-
-
+BENCHMARK_REGISTER_F(HashedElgamalEncryptFixture, HashedElGamalEncrypt)
+  ->Unit(benchmark::kMillisecond);
