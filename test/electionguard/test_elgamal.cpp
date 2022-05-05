@@ -83,7 +83,6 @@ TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_pre
     auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
     CHECK(precomputedTwoTriplesAndAQuad != nullptr);
-    CHECK(precomputedTwoTriplesAndAQuad->isPopulated() == true);
 
     auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
 
@@ -98,6 +97,7 @@ TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_pre
     CHECK((0UL == decrypted1));
     auto decrypted2 = cipherText2->decrypt(secret);
     CHECK((0UL == decrypted2));
+    PrecomputeBufferContext::empty_queues();
 }
 
 TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0")
@@ -118,7 +118,6 @@ TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0")
     auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
     CHECK(precomputedTwoTriplesAndAQuad != nullptr);
-    CHECK(precomputedTwoTriplesAndAQuad->isPopulated() == true);
 
     auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
     CHECK(triple1 != nullptr);
@@ -128,6 +127,7 @@ TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0")
 
     auto decrypted = cipherText->decrypt(secret);
     CHECK((0UL == decrypted));
+    PrecomputeBufferContext::empty_queues();
 }
 
 TEST_CASE("elgamalEncrypt simple encrypt 1 decrypts with secret")

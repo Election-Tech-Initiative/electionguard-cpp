@@ -115,10 +115,9 @@ namespace electionguard
         unique_ptr<Triple> triple1;
         unique_ptr<Triple> triple2;
         unique_ptr<Quadruple> quad;
-        bool populated = false;
 
       public:
-        explicit TwoTriplesAndAQuadruple() { populated = false; }
+        explicit TwoTriplesAndAQuadruple() {}
         TwoTriplesAndAQuadruple(unique_ptr<Triple> in_triple1, unique_ptr<Triple> in_triple2,
                                 unique_ptr<Quadruple> in_quad);
         TwoTriplesAndAQuadruple(const TwoTriplesAndAQuadruple &other);
@@ -133,8 +132,6 @@ namespace electionguard
         unique_ptr<Triple> get_triple2() { return triple2->clone(); }
 
         unique_ptr<Quadruple> get_quad() { return quad->clone(); }
-
-        bool isPopulated() { return populated; }
 
         unique_ptr<TwoTriplesAndAQuadruple> clone();
     };
@@ -226,6 +223,14 @@ namespace electionguard
         static std::unique_ptr<TwoTriplesAndAQuadruple> getTwoTriplesAndAQuadruple();
 
         /// <summary>
+        /// Get the next triple from the triple queue.
+        /// This method is called by hashedElgamalEncrypt in order to get
+        /// the precomputed value to perform the hashed elgamal encryption.
+        /// <returns>std::unique_ptr<Triple></returns>
+        /// </summary>
+        static std::unique_ptr<Triple> getTriple();
+
+        /// <summary>
         /// Empty the precomputed values queues.
         /// <returns>void</returns>
         /// </summary>
@@ -236,7 +241,7 @@ namespace electionguard
         static std::mutex queue_lock;
         bool populate_OK = false;
         std::queue<std::unique_ptr<Triple>> triple_queue;
-        std::queue<std::unique_ptr<Quadruple>> quadruple_queue;
+        std::queue<std::unique_ptr<TwoTriplesAndAQuadruple>> twoTriplesAndAQuadruple_queue;
     };
 } // namespace electionguard
 
