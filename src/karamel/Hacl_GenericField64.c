@@ -354,6 +354,7 @@ void Hacl_GenericField64_exp_consttime(Hacl_Bignum_MontArithmetic_bn_mont_ctx_u6
                     }
                     {
                         uint32_t i0;
+                        uint64_t *a_bits_l = (uint64_t *)alloca(len1 * sizeof(uint64_t));
                         for (i0 = (uint32_t)0U; i0 < bBits / (uint32_t)4U; i0++) {
                             {
                                 uint32_t i;
@@ -380,8 +381,6 @@ void Hacl_GenericField64_exp_consttime(Hacl_Bignum_MontArithmetic_bn_mont_ctx_u6
                                     uint64_t bits_l = ite & mask_l;
                                     KRML_CHECK_SIZE(sizeof(uint64_t), len1);
                                     {
-                                        uint64_t *a_bits_l =
-                                          (uint64_t *)_malloca(len1 * sizeof(uint64_t));
                                         memset(a_bits_l, 0U, len1 * sizeof(uint64_t));
                                         memcpy(a_bits_l, table, len1 * sizeof(uint64_t));
                                         {
@@ -404,7 +403,6 @@ void Hacl_GenericField64_exp_consttime(Hacl_Bignum_MontArithmetic_bn_mont_ctx_u6
                                         }
                                         Hacl_Bignum_Montgomery_bn_mont_mul_u64(
                                           len1, k1.n, k1.mu, resM, a_bits_l, resM);
-                                        _freea(a_bits_l);
                                     }
                                 }
                             }
@@ -503,6 +501,7 @@ void Hacl_GenericField64_exp_vartime(Hacl_Bignum_MontArithmetic_bn_mont_ctx_u64 
                     }
                     {
                         uint32_t i;
+                        uint64_t *a_bits_l = (uint64_t *)alloca(len1 * sizeof(uint64_t));
                         for (i = (uint32_t)0U; i < bBits / (uint32_t)4U; i++) {
                             {
                                 uint32_t i0;
@@ -528,8 +527,6 @@ void Hacl_GenericField64_exp_vartime(Hacl_Bignum_MontArithmetic_bn_mont_ctx_u64 
                                     uint64_t bits_l = ite & mask_l;
                                     KRML_CHECK_SIZE(sizeof(uint64_t), len1);
                                     {
-                                        uint64_t *a_bits_l =
-                                          (uint64_t *)_malloca(len1 * sizeof(uint64_t));
                                         memset(a_bits_l, 0U, len1 * sizeof(uint64_t));
                                         {
                                             uint32_t bits_l32 = (uint32_t)bits_l;
@@ -538,7 +535,6 @@ void Hacl_GenericField64_exp_vartime(Hacl_Bignum_MontArithmetic_bn_mont_ctx_u64 
                                             Hacl_Bignum_Montgomery_bn_mont_mul_u64(
                                               len1, k1.n, k1.mu, resM, a_bits_l, resM);
                                         }
-                                        _freea(a_bits_l);
                                     }
                                 }
                             }
