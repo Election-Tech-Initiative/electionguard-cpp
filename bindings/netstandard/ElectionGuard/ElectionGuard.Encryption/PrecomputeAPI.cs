@@ -150,6 +150,14 @@ namespace ElectionGuard
         /// <returns><see cref="PrecomputeStatus">PrecomputeStatus</see> with all of the latest information</returns>
         public PrecomputeStatus GetStatus()
         {
+            int count = -1;
+            int queue_size = -2;
+            GetProgress(out count, out queue_size);
+            if (count == queue_size)
+                currentStatus.CurrentState = PrecomputeState.Completed;
+            currentStatus.Percentage = (double)count / queue_size;
+            currentStatus.CompletedExponentiationsCount = count;
+
             return currentStatus;
         }
 
