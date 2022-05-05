@@ -988,6 +988,8 @@ bool eg_ciphertext_ballot_is_valid_encryption(eg_ciphertext_ballot_t *handle,
                                               eg_element_mod_q_t *in_crypto_extended_base_hash)
 {
     try {
+        Log::debug("TTTTTTTTTTTTTTTTTTTTTTTTT");
+
         auto *ciphertext = AS_TYPE(CiphertextBallot, handle);
         auto *encryptionSeed = AS_TYPE(ElementModQ, in_encryption_seed);
         auto *public_key = AS_TYPE(ElementModP, in_public_key);

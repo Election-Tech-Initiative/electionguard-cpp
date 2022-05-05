@@ -1070,6 +1070,8 @@ namespace electionguard
             return false;
         }
 
+        Log::debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+
         // Check the proofs on the ballot
         unordered_map<string, bool> validProofs;
         for (const auto &contest : this->getContests()) {
