@@ -429,6 +429,52 @@ TEST_CASE("HashedElGamalCiphertext encrypt failure length cases")
     CHECK(encrypt_no_pad_not_block_length_failed);
 }
 
+TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding and precompute")
+{
+    uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10, 0x1112131415161718,
+                                 0x191a1b1c1d1e1f20};
+
+    uint8_t bytes_to_use[32] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b,
+                                0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
+                                0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
+
+    const auto nonce = make_unique<ElementModQ>(qwords_to_use);
+    const auto descriptionHash = make_unique<ElementModQ>(qwords_to_use);
+    const auto &secret = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(secret, false);
+    auto *publicKey = keypair->getPublicKey();
+
+    std::wstring plaintext_string(L"ElectionGuard Rocks!");
+    vector<uint8_t> plaintext((uint8_t *)&plaintext_string.front(),
+                              +(uint8_t *)&plaintext_string.front() +
+                                (plaintext_string.size() * 2));
+
+    // cause precomputed entries that will be used by the selection
+    // encryptions, that should be more than enough and on teardown
+    // the rest will be removed.
+    PrecomputeBufferContext::init(3);
+    PrecomputeBufferContext::populate(*keypair->getPublicKey());
+    PrecomputeBufferContext::stop_populate();
+
+    auto HEGResult =
+      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *descriptionHash, BYTES_128);
+
+    auto pad = HEGResult->getPad();
+    unique_ptr<ElementModP> p_pad = make_unique<ElementModP>(*pad);
+    auto ciphertext = HEGResult->getData();
+    auto mac = HEGResult->getMac();
+
+    CHECK(ciphertext.size() == 128);
+
+    // now lets decrypt
+    unique_ptr<HashedElGamalCiphertext> newHEG =
+      make_unique<HashedElGamalCiphertext>(move(p_pad), HEGResult->getData(), HEGResult->getMac());
+
+    vector<uint8_t> new_plaintext = newHEG->decrypt(secret, *descriptionHash, true);
+
+    CHECK(plaintext == new_plaintext);
+    PrecomputeBufferContext::empty_queues();
+}
 
 TEST_CASE("elgamalEncrypt_with_precomputed encrypt 1, decrypts with secret")
 {
