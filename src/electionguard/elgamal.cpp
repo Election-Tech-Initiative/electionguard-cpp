@@ -5,6 +5,9 @@
 #include "../karamel/internal/Hacl_HMAC.h"
 #include "electionguard/hash.hpp"
 #include "electionguard/hmac.hpp"
+
+#include "electionguard/precompute_buffers.hpp"
+
 #include "log.hpp"
 
 #include <array>
@@ -481,9 +484,19 @@ namespace electionguard
         uint32_t plaintext_len = plaintext_on_boundary.size();
         uint32_t num_xor_keys = plaintext_len / HASHED_CIPHERTEXT_BLOCK_LENGTH;
 
-        auto g_to_r = g_pow_p(nonce);
+        unique_ptr<ElementModP> g_to_r = nullptr;
+        unique_ptr<ElementModP> publicKey_to_r = nullptr;
+        // check if the are precompute values rather than doing the exponentiations here
+        unique_ptr<Triple> triple = PrecomputeBufferContext::getTriple();
+        if (triple != nullptr) {
+            g_to_r = triple->get_g_to_exp();
+            publicKey_to_r = triple->get_pubkey_to_exp();
+        } else {
+            g_to_r = g_pow_p(nonce);
 
-        auto publicKey_to_r = pow_mod_p(publicKey, nonce);
+            publicKey_to_r = pow_mod_p(publicKey, nonce);
+        }
+
 
         // hash g_to_r and publicKey_to_r to get the master key
         auto master_key = hash_elems({g_to_r.get(), publicKey_to_r.get()});
