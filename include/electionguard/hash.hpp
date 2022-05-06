@@ -22,7 +22,8 @@ namespace electionguard
       std::vector<std::reference_wrapper<const CryptoHashable>>,
       std::vector<std::reference_wrapper<const ElementModP>>,
       std::vector<std::reference_wrapper<const ElementModQ>>, std::vector<uint64_t>,
-      std::vector<std::string>>;
+      std::vector<std::string>,
+      std::vector<uint8_t>>;
 
     /// <Summary>
     /// Given zero or more elements, calculate their cryptographic hash
