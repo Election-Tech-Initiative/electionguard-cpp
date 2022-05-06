@@ -270,8 +270,20 @@ TEST_CASE("Encrypt full PlaintextBallot with WriteIn and Overvote with Encryptio
     auto mediator = make_unique<EncryptionMediator>(*internal, *context, *device);
     
     // Act
-    auto plaintextBallot =
-      BallotGenerator::getSimpleBallotFromFile(TEST_BALLOT_WITH_WRITEIN_SELECTED);
+    string plaintextBallot_json = string("{\"object_id\": \"03a29d15-667c-4ac8-afd7-549f19b8e4eb\","
+        "\"style_id\": \"jefferson-county-ballot-style\", \"contests\": [ {\"object_id\":"
+        "\"justice-supreme-court\", \"sequence_order\": 0, \"ballot_selections\": [{"
+        "\"object_id\": \"john-adams-selection\", \"sequence_order\": 0, \"vote\": 1,"
+        "\"is_placeholder_selection\": false, \"extended_data\": null}, {\"object_id\""
+        ": \"benjamin-franklin-selection\", \"sequence_order\": 1, \"vote\": 1,"
+        "\"is_placeholder_selection\": false, \"extended_data\": null}, {\"object_id\":"
+        " \"write-in-selection\", \"sequence_order\": 3, \"vote\": 1, \"is_placeholder_selection\""
+        ": false, \"write_in\": \"Susan B. Anthony\"}], \"extended_data\": null}]}");
+    // TODO - Once the relevant plaintext ballot file is in the environment then 
+    // uncomment the below and stop using the hard coded string.
+    //auto plaintextBallot =
+    //  BallotGenerator::getSimpleBallotFromFile(TEST_BALLOT_WITH_WRITEIN_SELECTED);
+    auto plaintextBallot = PlaintextBallot::fromJson(plaintextBallot_json);
     auto ciphertext = mediator->encrypt(*plaintextBallot);
     
     // Assert
