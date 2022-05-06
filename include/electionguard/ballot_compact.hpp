@@ -39,7 +39,8 @@ namespace electionguard
         CompactPlaintextBallot(const CompactPlaintextBallot &other);
         CompactPlaintextBallot(const CompactPlaintextBallot &&other);
         CompactPlaintextBallot(const std::string &objectId, const std::string &styleId,
-                               std::vector<uint64_t> selections, std::vector<std::string> writeins);
+                               std::vector<uint64_t> selections,
+                               std::map<uint64_t, std::unique_ptr<ExtendedData>> extendedData);
         ~CompactPlaintextBallot();
 
         CompactPlaintextBallot &operator=(CompactPlaintextBallot other);
@@ -65,15 +66,21 @@ namespace electionguard
         std::vector<uint64_t> getSelections() const;
 
         /// <Summary>
-        /// The collection of writeins on the ballot ordered by the contest sequence order
-        /// and the selection sequence order.  It is up to the consumer to guarantee the order of elements
+        /// The mapping of extended data selections as they apply to the selections on the ballot
+        /// by index order when calling `getSelections`.
         /// </Summary>
-        std::vector<std::string> getWriteIns() const;
+        std::map<uint64_t, std::reference_wrapper<ExtendedData>> getExtendedData() const;
 
         /// <Summary>
         /// Make a compact representation of a plaintext ballot
         /// </Summary>
         static std::unique_ptr<CompactPlaintextBallot> make(const PlaintextBallot &plaintext);
+
+        /// <Summary>
+        /// Convenience accessor for retrieving the extended data for a selection index
+        /// <returns>a value or a null pointer if none exists</returns>
+        /// </Summary>
+        std::unique_ptr<ExtendedData> getExtendedDataFor(const uint64_t index) const;
 
         /// <Summary>
         /// Export the ballot representation as BSON

@@ -37,8 +37,7 @@ namespace electionguard
         /// <Summary>
         /// Make an elgamal keypair from a secret.
         /// </Summary>
-        static std::unique_ptr<ElGamalKeyPair> fromSecret(const ElementModQ &secretKey,
-                                                          bool isFixedBase = true);
+        static std::unique_ptr<ElGamalKeyPair> fromSecret(const ElementModQ &secretKey, bool isFixedBase = true);
 
       private:
         class Impl;
@@ -132,18 +131,23 @@ namespace electionguard
     /// <returns>A ciphertext tuple.</returns>
     /// </summary>
     EG_API std::unique_ptr<ElGamalCiphertext>
-    elgamalEncrypt_with_precomputed(uint64_t m, ElementModP &gToRho, ElementModP &pubkeyToRho);
+    elgamalEncrypt_with_precomputed(uint64_t m, ElementModP &gToRho,
+                                    ElementModP &pubkeyToRho);
     /// <summary>
     /// Accumulate the ciphertexts by adding them together.
     /// </summary>
     EG_API std::unique_ptr<ElGamalCiphertext>
     elgamalAdd(const std::vector<std::reference_wrapper<ElGamalCiphertext>> &ciphertexts);
 
-#define HASHED_CIPHERTEXT_BLOCK_LENGTH 32U
-#define _PAD_INDICATOR_SIZE sizeof(uint16_t)
+    #define HASHED_CIPHERTEXT_BLOCK_LENGTH 32U
+    #define _PAD_INDICATOR_SIZE sizeof(uint16_t)
 
     typedef enum padded_data_size_e {
         NO_PADDING = 0,
+        BYTES_32 = 32 - _PAD_INDICATOR_SIZE,
+        BYTES_64 = 64 - _PAD_INDICATOR_SIZE,
+        BYTES_128 = 128 - _PAD_INDICATOR_SIZE,
+        BYTES_256 = 256 - _PAD_INDICATOR_SIZE,
         BYTES_512 = 512 - _PAD_INDICATOR_SIZE
     } padded_data_size_t;
 
@@ -155,7 +159,7 @@ namespace electionguard
     /// result. Create one with `hashedElgamalEncrypt`. Decrypt using one the
     /// 'decrypt' method.
     /// </summary>
-    class EG_API HashedElGamalCiphertext : public CryptoHashable
+    class EG_API HashedElGamalCiphertext
     {
       public:
         HashedElGamalCiphertext(const HashedElGamalCiphertext &other);
@@ -203,17 +207,14 @@ namespace electionguard
         /// </Summary>
         std::vector<uint8_t> getMac() const;
 
-        virtual std::unique_ptr<ElementModQ> crypto_hash() override;
-        virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
-
         /// <summary>
         /// Decrypts ciphertext with the Auxiliary Encryption method (as specified in the
         /// ElectionGuard specification) given a random nonce, an ElGamal public key,
         /// and a description hash. The encrypt may be called to look for padding to
         /// verify and remove, in this case the plaintext will be smaller than
         /// the ciphertext, or not to look for padding in which case the
-        /// plaintext will be the same size as the ciphertext.
-        ///
+        /// plaintext will be the same size as the ciphertext. 
+        /// 
         /// <param name="nonce"> Randomly chosen nonce in [1,Q). </param>
         /// <param name="publicKey"> ElGamal public key. </param>
         /// <param name="descriptionHash"> Hash of the ballot description. </param>
@@ -231,7 +232,7 @@ namespace electionguard
       private:
         class Impl;
 #pragma warning(suppress : 4251)
-        std::unique_ptr<Impl> pimpl;
+                std::unique_ptr<Impl> pimpl;
     };
 
     /// <summary>
@@ -243,17 +244,11 @@ namespace electionguard
     /// This value indicates the maximum length of the plaintext that may be
     /// encrypted. The padding scheme applies two bytes for length of padding
     /// plus padding bytes. If padding is not to be applied then the
-    /// max_len parameter must be NO_PADDING. and the plaintext must
+    /// max_len parameter must be NO_PADDING and the plaintext must
     /// be a multiple of the block length (32) and the ciphertext will be
-    /// the same size. If the max_len is set to  something other than
-    /// NO_PADDING and the allow_truncation parameter is set to
-    /// true then if the message parameter data is longer than
-    /// max_len then it will be truncated to max_len. If the max_len is set to
-    /// something other than NO_PADDING and the allow_truncation parameter
-    /// is set to false then if the message parameter data is longer than
-    /// max_len then an exception will be thrown.
+    /// the same size.
     ///
-    /// <param name="message"> Message to hashed elgamal encrypt. </param>
+    /// <param name="plaintext"> Message to hashed elgamal encrypt. </param>
     /// <param name="nonce"> Randomly chosen nonce in [1,Q). </param>
     /// <param name="publicKey"> ElGamal public key. </param>
     /// <param name="descriptionHash"> Hash of the ballot description. </param>
@@ -261,14 +256,12 @@ namespace electionguard
     ///  maximum length of plaintext, must be one padded_data_size_t enumeration
     ///  values. If padding is not to be applied then this parameter must use
     ///  the NO_PADDING padded_data_size_t enumeration value.</param>
-    /// <param name="allow_truncation"> Truncates data to the max_len if set to
-    /// true. If max_len is set to NO_PADDING then this parameter is ignored. </param>
     /// <returns>A ciphertext triple.</returns>
     /// </summary>
     EG_API std::unique_ptr<HashedElGamalCiphertext>
     hashedElgamalEncrypt(std::vector<uint8_t> plaintext, const ElementModQ &nonce,
                          const ElementModP &publicKey, const ElementModQ &descriptionHash,
-                         padded_data_size_t max_len, bool allow_truncation);
+                         padded_data_size_t max_len);
 
 } // namespace electionguard
 

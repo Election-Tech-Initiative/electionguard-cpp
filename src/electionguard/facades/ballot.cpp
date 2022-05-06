@@ -105,14 +105,17 @@ eg_plaintext_ballot_selection_new(const char *in_object_id, uint64_t in_vote,
     }
 }
 
-eg_electionguard_status_t eg_plaintext_ballot_selection_new_with_write_in(
+eg_electionguard_status_t eg_plaintext_ballot_selection_new_with_extended_data(
   const char *in_object_id, const uint64_t in_vote, bool in_is_placeholder_selection,
-  const char *in_write_in,
+  const char *in_extended_data_value, uint64_t in_extended_data_length,
   eg_plaintext_ballot_selection_t **out_handle)
 {
     try {
+        auto extendedData =
+          make_unique<ExtendedData>(string(in_extended_data_value), in_extended_data_length);
+
         auto result = make_unique<PlaintextBallotSelection>(
-          in_object_id, in_vote, in_is_placeholder_selection, in_write_in);
+          in_object_id, in_vote, in_is_placeholder_selection, move(extendedData));
         *out_handle = AS_TYPE(eg_plaintext_ballot_selection_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -165,16 +168,16 @@ bool eg_plaintext_ballot_selection_get_is_placeholder(eg_plaintext_ballot_select
 }
 
 eg_electionguard_status_t
-eg_plaintext_ballot_selection_get_write_in(eg_plaintext_ballot_selection_t *handle,
-                                                char **out_write_in)
+eg_plaintext_ballot_selection_get_extended_data(eg_plaintext_ballot_selection_t *handle,
+                                                eg_extended_data_t **out_extended_data_ref)
 {
     try {
-        auto result = AS_TYPE(PlaintextBallotSelection, handle)->getWriteIn();
-        *out_write_in = dynamicCopy(result);
+        auto *reference = AS_TYPE(PlaintextBallotSelection, handle)->getExtendedData();
+        *out_extended_data_ref = AS_TYPE(eg_extended_data_t, reference);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error("eg_plaintext_ballot_selection_get_write_in", e);
+        Log::error("eg_plaintext_ballot_selection_get_extended_data", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -988,8 +991,6 @@ bool eg_ciphertext_ballot_is_valid_encryption(eg_ciphertext_ballot_t *handle,
                                               eg_element_mod_q_t *in_crypto_extended_base_hash)
 {
     try {
-        Log::debug("TTTTTTTTTTTTTTTTTTTTTTTTT");
-
         auto *ciphertext = AS_TYPE(CiphertextBallot, handle);
         auto *encryptionSeed = AS_TYPE(ElementModQ, in_encryption_seed);
         auto *public_key = AS_TYPE(ElementModP, in_public_key);

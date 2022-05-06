@@ -838,6 +838,4 @@ namespace electionguard
 
 #pragma endregion
 
-    string vector_uint8_t_to_hex(const vector<uint8_t> &bytes) { return bytes_to_hex(bytes); }
-
 } // namespace electionguard

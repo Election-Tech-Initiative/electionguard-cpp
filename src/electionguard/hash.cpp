@@ -48,8 +48,7 @@ namespace electionguard
         VECTOR_ELEMENTMODP_CONST_REF = 19,
         VECTOR_ELEMENTMODQ_CONST_REF = 20,
         VECTOR_UINT64_T = 21,
-        VECTOR_STRING = 22,
-        VECTOR_UINT8_T = 23
+        VECTOR_STRING = 22
     };
 
     const char delimiter_char = '|';
@@ -236,12 +235,6 @@ namespace electionguard
             {
                 return hash_inner_vector<string>(get<vector<string>>(a));
             }
-            case VECTOR_UINT8_T: // vector<string>
-            {
-                vector<uint8_t> temp = get<vector<uint8_t>>(a);
-                return vector_uint8_t_to_hex(temp);
-            }
-                
         }
 
         return null_string;

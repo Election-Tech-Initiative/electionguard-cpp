@@ -65,12 +65,12 @@ namespace electionguard
     struct PlaintextBallotSelection::Impl : public ElectionObjectBase {
         uint64_t vote;
         bool isPlaceholderSelection;
-        string writeIn;
+        unique_ptr<ExtendedData> extendedData;
 
         Impl(string objectId, uint64_t vote, bool isPlaceholderSelection /* = false */,
-             string writeIn)
+             unique_ptr<ExtendedData> extendedData /* = nullptr*/)
             : vote(vote), isPlaceholderSelection(isPlaceholderSelection),
-              writeIn(move(writeIn))
+              extendedData(move(extendedData))
         {
             this->object_id = move(objectId);
         }
@@ -79,7 +79,7 @@ namespace electionguard
         {
             return make_unique<PlaintextBallotSelection::Impl>(
               this->object_id, this->vote, this->isPlaceholderSelection,
-              this->writeIn);
+              this->extendedData == nullptr ? nullptr : this->extendedData->clone());
         }
     };
 
@@ -97,8 +97,8 @@ namespace electionguard
 
     PlaintextBallotSelection::PlaintextBallotSelection(
       string objectId, uint64_t vote, bool isPlaceholderSelection /* = false */,
-      string writeIn)
-        : pimpl(new Impl(move(objectId), vote, isPlaceholderSelection, writeIn))
+      unique_ptr<ExtendedData> extendedData /* = nullptr*/)
+        : pimpl(new Impl(move(objectId), vote, isPlaceholderSelection, move(extendedData)))
     {
     }
 
@@ -118,7 +118,10 @@ namespace electionguard
     {
         return pimpl->isPlaceholderSelection;
     }
-    string PlaintextBallotSelection::getWriteIn() const { return pimpl->writeIn; }
+    ExtendedData *PlaintextBallotSelection::getExtendedData() const
+    {
+        return pimpl->extendedData.get();
+    }
 
     bool PlaintextBallotSelection::isValid(const std::string &expectedObjectId) const
     {
@@ -138,7 +141,7 @@ namespace electionguard
     {
         return make_unique<PlaintextBallotSelection>(
           pimpl->object_id, pimpl->vote, pimpl->isPlaceholderSelection,
-          pimpl->writeIn);
+          pimpl->extendedData == nullptr ? nullptr : pimpl->extendedData->clone());
     }
 
 #pragma endregion
@@ -461,20 +464,19 @@ namespace electionguard
 
     // Public Functions
 
-    valid_contest_return PlaintextBallotContest::isValid(const string &expectedObjectId,
+    bool PlaintextBallotContest::isValid(const string &expectedObjectId,
                                          uint64_t expectedNumberSelections,
                                          uint64_t expectedNumberElected,
-                                         uint64_t votesAllowd, /* = 0 */
-                                         bool supportOvervotes /* = true */) const
+                                         uint64_t votesAllowd /* = 0 */) const
     {
         if (pimpl->object_id != expectedObjectId) {
             Log::info(": invalid objectId");
-            return INVALID_OBJECT_ID_ERROR;
+            return false;
         }
 
         if (pimpl->selections.size() > expectedNumberSelections) {
             Log::info(": too many selections");
-            return TOO_MANY_SELECTIONS_ERROR;
+            return false;
         }
 
         uint64_t numberElected = 0;
@@ -489,11 +491,7 @@ namespace electionguard
 
         if (numberElected > expectedNumberElected) {
             Log::info(": too many elections");
-            if (supportOvervotes) {
-                return OVERVOTE;
-            } else {
-                return OVERVOTE_ERROR;
-            }
+            return false;
         }
 
         if (votesAllowd == 0) {
@@ -502,14 +500,10 @@ namespace electionguard
 
         if (votes > votesAllowd) {
             Log::info(": too many votes");
-            if (supportOvervotes) {
-                return OVERVOTE;
-            } else {
-                return OVERVOTE_ERROR;
-            }
+            return false;
         }
 
-        return SUCCESS;
+        return true;
     }
 
 #pragma endregion
@@ -524,18 +518,16 @@ namespace electionguard
         unique_ptr<ElGamalCiphertext> ciphertextAccumulation;
         unique_ptr<ElementModQ> cryptoHash;
         unique_ptr<ConstantChaumPedersenProof> proof;
-        unique_ptr<HashedElGamalCiphertext> hashedElGamal;
 
         Impl(const string &objectId, uint64_t sequenceOrder,
              unique_ptr<ElementModQ> descriptionHash,
              vector<unique_ptr<CiphertextBallotSelection>> selections,
              unique_ptr<ElementModQ> nonce, unique_ptr<ElGamalCiphertext> ciphertextAccumulation,
-             unique_ptr<ElementModQ> cryptoHash, unique_ptr<ConstantChaumPedersenProof> proof,
-             unique_ptr<HashedElGamalCiphertext> hashedElGamal)
+             unique_ptr<ElementModQ> cryptoHash, unique_ptr<ConstantChaumPedersenProof> proof)
             : sequenceOrder(sequenceOrder), descriptionHash(move(descriptionHash)),
               selections(move(selections)), nonce(move(nonce)),
               ciphertextAccumulation(move(ciphertextAccumulation)), cryptoHash(move(cryptoHash)),
-              proof(move(proof)), hashedElGamal(move(hashedElGamal))
+              proof(move(proof))
         {
             this->object_id = objectId;
         }
@@ -553,11 +545,10 @@ namespace electionguard
             auto _accumulation = make_unique<ElGamalCiphertext>(*ciphertextAccumulation);
             auto _cryptoHash = make_unique<ElementModQ>(*cryptoHash);
             auto _proof = make_unique<ConstantChaumPedersenProof>(*proof);
-            auto _hashedElGamal = make_unique<HashedElGamalCiphertext>(*hashedElGamal);
 
             return make_unique<CiphertextBallotContest::Impl>(
               object_id, sequenceOrder, move(_descriptionHash), move(_selections), move(_nonce),
-              move(_accumulation), move(_cryptoHash), move(_proof), move(_hashedElGamal));
+              move(_accumulation), move(_cryptoHash), move(_proof));
         }
     };
 
@@ -572,11 +563,10 @@ namespace electionguard
       const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
       vector<unique_ptr<CiphertextBallotSelection>> selections, unique_ptr<ElementModQ> nonce,
       unique_ptr<ElGamalCiphertext> ciphertextAccumulation, unique_ptr<ElementModQ> cryptoHash,
-      unique_ptr<ConstantChaumPedersenProof> proof,
-      unique_ptr<HashedElGamalCiphertext> hashedElGamal)
+      unique_ptr<ConstantChaumPedersenProof> proof)
         : pimpl(new Impl(objectId, sequenceOrder, make_unique<ElementModQ>(descriptionHash),
                          move(selections), move(nonce), move(ciphertextAccumulation),
-                         move(cryptoHash), move(proof), move(hashedElGamal)))
+                         move(cryptoHash), move(proof)))
     {
     }
     CiphertextBallotContest::~CiphertextBallotContest() = default;
@@ -629,11 +619,6 @@ namespace electionguard
         return pimpl->proof.get();
     }
 
-    unique_ptr<HashedElGamalCiphertext> CiphertextBallotContest::getHashedElGamalCiphertext() const
-    {
-        return pimpl->hashedElGamal.get()->clone();
-    }
-
     // Interface Overrides
 
     unique_ptr<ElementModQ>
@@ -650,8 +635,7 @@ namespace electionguard
       const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &proofSeed,
       uint64_t numberElected, unique_ptr<ElementModQ> nonce /* = nullptr */,
       unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
-      unique_ptr<ConstantChaumPedersenProof> proof /* = nullptr */,
-      unique_ptr<HashedElGamalCiphertext> hashedElGamal /*nullptr */)
+      unique_ptr<ConstantChaumPedersenProof> proof /* = nullptr */)
     {
         vector<reference_wrapper<CiphertextBallotSelection>> selectionReferences;
         selectionReferences.reserve(selections.size());
@@ -678,10 +662,9 @@ namespace electionguard
                                                proofSeed, cryptoExtendedBaseHash, numberElected);
             proof = move(owned_proof);
         }
-
         return make_unique<CiphertextBallotContest>(
           objectId, sequenceOrder, descriptionHash, move(selections), move(nonce),
-          move(accumulation), move(cryptoHash), move(proof), move(hashedElGamal));
+          move(accumulation), move(cryptoHash), move(proof));
     }
 
     // Public Methods
