@@ -755,38 +755,32 @@ namespace electionguard
     unique_ptr<ElementModQ> a_plus_bc_mod_q(const ElementModQ &a, const ElementModQ &b,
                                             const ElementModQ &c)
     {
-        // since the result of b*c can be larger than Q's 256,
-        // use P's length and 4096 Hacl for rest of calculation
+        // multiply b * c and the result will be twice Q in size
+        uint64_t bc[MAX_Q_LEN * 2] = {};
+        Hacl_Bignum256_mul(const_cast<ElementModQ &>(b).get(), const_cast<ElementModQ &>(c).get(),
+                           bc);
 
-        uint64_t resultBC[MAX_P_LEN] = {}; // init to MAX_P_LEN
-        Bignum256::mul(const_cast<ElementModQ &>(b).get(), const_cast<ElementModQ &>(c).get(),
-                       static_cast<uint64_t *>(resultBC));
-
-        auto bc_as_p = make_unique<ElementModP>(resultBC, true);
-        auto a_as_p = a.toElementModP();
-
-        uint64_t a_plus_bc_result[MAX_P_LEN_DOUBLE] = {};
-        uint64_t carry =
-          Bignum4096::add(a_as_p->get(), bc_as_p->get(), static_cast<uint64_t *>(a_plus_bc_result));
-
-        // we should never overflow P space since our max size
-        // is resultBC[MAX_Q_LEN_DOUBLE] + a[MAX_Q_LEN]
-        if (carry > 0) {
-            throw overflow_error("a_plus_bc_mod_q add operation out of bounds");
-        }
-
+        // perform the mod operation on bc
+        uint64_t bc_mod_q[MAX_Q_LEN] = {};
         const auto &q = Q();
-        auto q_as_p = q.toElementModP();
-        uint64_t resModQ[MAX_P_LEN] = {};
-        bool modSuccess = Bignum4096::mod(q_as_p->get(), static_cast<uint64_t *>(a_plus_bc_result),
-                                          static_cast<uint64_t *>(resModQ));
+        bool modSuccess = Hacl_Bignum256_mod(q.get(), bc, bc_mod_q);
         if (!modSuccess) {
             throw runtime_error("a_plus_bc_mod_q mod operation failed");
         }
-        uint64_t result[MAX_Q_LEN] = {};
-        memcpy(static_cast<uint64_t *>(result), resModQ, MAX_Q_SIZE);
 
-        return make_unique<ElementModQ>(result, true);
+        uint64_t a_plus_bc[MAX_Q_LEN * 2] = {};
+        uint64_t carry =
+          Hacl_Bignum256_add(const_cast<ElementModQ &>(a).get(), bc_mod_q, a_plus_bc);
+        // put the carry in
+        a_plus_bc[MAX_Q_LEN] = carry;
+
+        uint64_t res[MAX_Q_LEN] = {};
+        modSuccess = Hacl_Bignum256_mod(q.get(), a_plus_bc, res);
+        if (!modSuccess) {
+            throw runtime_error("a_plus_bc_mod_q mod operation failed");
+        }
+
+        return make_unique<ElementModQ>(res, true);
     }
 
     unique_ptr<ElementModQ> sub_from_q(const ElementModQ &a)
