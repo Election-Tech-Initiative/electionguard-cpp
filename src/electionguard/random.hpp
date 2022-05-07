@@ -1,8 +1,8 @@
 #ifndef __ELECTIONGUARD_CPP_SERIALIZE_HPP_INCLUDED__
 #define __ELECTIONGUARD_CPP_SERIALIZE_HPP_INCLUDED__
 
-#include "../kremlin/Hacl_HMAC_DRBG.h"
-#include "../kremlin/Lib_RandomBuffer_System.h"
+#include "../karamel/Hacl_HMAC_DRBG.h"
+#include "../karamel/Lib_RandomBuffer_System.h"
 #include "convert.hpp"
 #include "log.hpp"
 

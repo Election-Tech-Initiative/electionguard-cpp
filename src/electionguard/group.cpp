@@ -1,8 +1,8 @@
 #include "electionguard/group.hpp"
 
-#include "../kremlin/Hacl_HMAC_DRBG.h"
-#include "../kremlin/Lib_Memzero0.h"
-#include "../kremlin/Lib_RandomBuffer_System.h"
+#include "../karamel/Hacl_HMAC_DRBG.h"
+#include "../karamel/Lib_Memzero0.h"
+#include "../karamel/Lib_RandomBuffer_System.h"
 #include "convert.hpp"
 #include "facades/Hacl_Bignum256.hpp"
 #include "facades/Hacl_Bignum4096.hpp"

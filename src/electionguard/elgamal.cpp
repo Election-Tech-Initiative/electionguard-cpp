@@ -1,25 +1,26 @@
 #include "electionguard/elgamal.hpp"
+
+#include "../karamel/Hacl_Bignum4096.h"
+#include "../karamel/Lib_Memzero0.h"
+#include "../karamel/internal/Hacl_HMAC.h"
 #include "electionguard/hash.hpp"
 #include "electionguard/hmac.hpp"
+
 #include "electionguard/precompute_buffers.hpp"
 
-#include "../kremlin/Hacl_HMAC.h"
-#include "../kremlin/Lib_Memzero0.h"
-#include "../kremlin/Hacl_Bignum4096.h"
 #include "log.hpp"
-#include <electionguard/hash.hpp>
 
-
-#include <stdexcept>
 #include <array>
+#include <electionguard/hash.hpp>
 #include <memory>
+#include <stdexcept>
 
 using std::invalid_argument;
 using std::make_unique;
 using std::move;
 using std::reference_wrapper;
-using std::unique_ptr;
 using std::runtime_error;
+using std::unique_ptr;
 
 namespace electionguard
 {
@@ -231,8 +232,8 @@ namespace electionguard
         return make_unique<ElGamalCiphertext>(move(pad), move(data));
     }
 
-    unique_ptr<ElGamalCiphertext>
-    elgamalEncrypt_with_precomputed(uint64_t m, ElementModP &g_to_rho, ElementModP &pubkey_to_rho)
+    unique_ptr<ElGamalCiphertext> elgamalEncrypt_with_precomputed(uint64_t m, ElementModP &g_to_rho,
+                                                                  ElementModP &pubkey_to_rho)
     {
         ElementModP data = pubkey_to_rho;
 
@@ -246,7 +247,7 @@ namespace electionguard
         Log::trace("data", data.toHex());
 
         return make_unique<ElGamalCiphertext>(make_unique<ElementModP>(g_to_rho),
-            make_unique<ElementModP>(data));
+                                              make_unique<ElementModP>(data));
     }
 
     unique_ptr<ElGamalCiphertext>
@@ -267,9 +268,8 @@ namespace electionguard
         return make_unique<ElGamalCiphertext>(move(resultPad), move(resultData));
     }
 
-
 #pragma region HashedElGamalCiphertext
-    
+
     struct HashedElGamalCiphertext::Impl {
         unique_ptr<ElementModP> pad;
         vector<uint8_t> data;
@@ -295,7 +295,7 @@ namespace electionguard
     // Lifecycle Methods
 
     HashedElGamalCiphertext::HashedElGamalCiphertext(const HashedElGamalCiphertext &other)
-            : pimpl(other.pimpl->clone())
+        : pimpl(other.pimpl->clone())
     {
     }
 
@@ -347,7 +347,7 @@ namespace electionguard
 
         uint32_t ciphertext_len = pimpl->data.size();
         uint32_t num_xor_keys = ciphertext_len / HASHED_CIPHERTEXT_BLOCK_LENGTH;
-        if ((0 != (ciphertext_len % HASHED_CIPHERTEXT_BLOCK_LENGTH)) || (ciphertext_len == 0))  {
+        if ((0 != (ciphertext_len % HASHED_CIPHERTEXT_BLOCK_LENGTH)) || (ciphertext_len == 0)) {
             throw invalid_argument("HashedElGamalCiphertext::decrypt the ciphertext "
                                    "is not a multiple of the block length 32");
         }
@@ -357,28 +357,27 @@ namespace electionguard
         // hash g_to_r and publicKey_to_r to get the master key
         auto master_key = hash_elems({pimpl->pad.get(), publicKey_to_r.get()});
 
-        vector<uint8_t> mac_key =
-          get_hmac(master_key->toBytes(), descriptionHash.toBytes(), descriptionHash.toBytes().size(), 0);
+        vector<uint8_t> mac_key = get_hmac(master_key->toBytes(), descriptionHash.toBytes(),
+                                           descriptionHash.toBytes().size(), 0);
 
         // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
         vector<uint8_t> c0_and_c1(pimpl->pad->toBytes());
-        c0_and_c1.insert(c0_and_c1.end(), pimpl->data.begin(),
-                         pimpl->data.end());
+        c0_and_c1.insert(c0_and_c1.end(), pimpl->data.begin(), pimpl->data.end());
         vector<uint8_t> our_mac = get_hmac(mac_key, c0_and_c1, 0, 0);
         Lib_Memzero0_memzero(&mac_key.front(), mac_key.size());
 
         if (pimpl->mac != our_mac) {
-            throw runtime_error("HashedElGamalCiphertext::decrypt the calculated mac didn't match the passed in mac");
+            throw runtime_error(
+              "HashedElGamalCiphertext::decrypt the calculated mac didn't match the passed in mac");
         }
 
         uint32_t plaintext_index = 0;
         for (uint32_t i = 0; i < num_xor_keys; i++) {
             vector<int8_t> temp_plaintext(HASHED_CIPHERTEXT_BLOCK_LENGTH, 0);
 
-            vector<uint8_t> xor_key =
-              get_hmac(master_key->toBytes(), descriptionHash.toBytes(),
-                       descriptionHash.toBytes().size(), i + 1);
-            
+            vector<uint8_t> xor_key = get_hmac(master_key->toBytes(), descriptionHash.toBytes(),
+                                               descriptionHash.toBytes().size(), i + 1);
+
             // XOR the key with the plaintext
             for (int j = 0; j < (int)HASHED_CIPHERTEXT_BLOCK_LENGTH; j++) {
                 temp_plaintext[j] = pimpl->data[plaintext_index] ^ xor_key[j];
@@ -387,8 +386,8 @@ namespace electionguard
             }
             Lib_Memzero0_memzero(&xor_key.front(), xor_key.size());
 
-            plaintext_with_padding.insert(plaintext_with_padding.end(),
-                                          temp_plaintext.begin(), temp_plaintext.end());
+            plaintext_with_padding.insert(plaintext_with_padding.end(), temp_plaintext.begin(),
+                                          temp_plaintext.end());
             Lib_Memzero0_memzero(&temp_plaintext.front(), temp_plaintext.size());
         }
 
@@ -517,13 +516,12 @@ namespace electionguard
             }
             Lib_Memzero0_memzero(&xor_key.front(), xor_key.size());
 
-            ciphertext.insert(ciphertext.end(), temp_ciphertext.begin(),
-                              temp_ciphertext.end());
+            ciphertext.insert(ciphertext.end(), temp_ciphertext.begin(), temp_ciphertext.end());
             Lib_Memzero0_memzero(&temp_ciphertext.front(), temp_ciphertext.size());
         }
 
-        vector<uint8_t> mac_key =
-          get_hmac(master_key->toBytes(), descriptionHash.toBytes(), descriptionHash.toBytes().size(), 0);
+        vector<uint8_t> mac_key = get_hmac(master_key->toBytes(), descriptionHash.toBytes(),
+                                           descriptionHash.toBytes().size(), 0);
 
         // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
         vector<uint8_t> c0_and_c1(g_to_r->toBytes());

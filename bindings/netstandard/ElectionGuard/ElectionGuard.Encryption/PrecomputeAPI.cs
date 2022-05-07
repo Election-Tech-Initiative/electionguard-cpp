@@ -106,7 +106,20 @@ namespace ElectionGuard
     /// </summary>
     public class Precompute : IPrecomputeAPI
     {
+        readonly static int DUMMY_BUFFER_SIZE = 100;   // set a buffer size that will be > 0 and < the default of 5000 for initialization
+        readonly int INIT_COUNT = -1;            // initializer for count to make sure we are getting a value back from the C++
+        readonly int INIT_QUEUE_SIZE = -2;       // initializer for the queue size to make sure that its diffrent than the count and being set
+
         AutoResetEvent waitHandle;
+
+        /// <summary>
+        /// Default constructor to initialize buffers for testing
+        /// </summary>
+        public Precompute()
+        {
+            NativePrecomputeBuffers.Init(max_buffers);
+        }
+
 
         private PrecomputeStatus currentStatus = new PrecomputeStatus
         {
@@ -115,7 +128,7 @@ namespace ElectionGuard
             CurrentState = PrecomputeState.NotStarted
         };
         private Thread workerThread;
-        private int max_buffers = 0;    // zero will say to run to a default number of runs
+        private int max_buffers = DUMMY_BUFFER_SIZE;
         private ElementModP elgamalPublicKey;
 
         /// <summary>
@@ -150,6 +163,14 @@ namespace ElectionGuard
         /// <returns><see cref="PrecomputeStatus">PrecomputeStatus</see> with all of the latest information</returns>
         public PrecomputeStatus GetStatus()
         {
+            int count = INIT_COUNT;
+            int queue_size = INIT_QUEUE_SIZE;
+            GetProgress(out count, out queue_size);
+            if (count == queue_size)
+                currentStatus.CurrentState = PrecomputeState.Completed;
+            currentStatus.Percentage = (double)count / queue_size;
+            currentStatus.CompletedExponentiationsCount = count;
+
             return currentStatus;
         }
 
