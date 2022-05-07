@@ -1,6 +1,7 @@
 #include "Hacl_Bignum4096.hpp"
 
 #include "../../karamel/Hacl_Bignum4096.h"
+#include "../../karamel/Hacl_GenericField64.h"
 #include "../log.hpp"
 
 using electionguard::Log;
@@ -78,6 +79,21 @@ namespace hacl
             return Hacl_Bignum4096_mod_exp_consttime_precomp(context.get(), a, bBits, b, res);
         }
         return Hacl_Bignum4096_mod_exp_vartime_precomp(context.get(), a, bBits, b, res);
+    }
+
+    void Bignum4096::to_montgomery_form(uint64_t *a, uint64_t *aM) const
+    {
+        Hacl_GenericField64_to_field(context.get(), a, aM);
+    }
+
+    void Bignum4096::from_montgomery_form(uint64_t *aM, uint64_t *a) const
+    {
+        Hacl_GenericField64_from_field(context.get(), aM, a);
+    }
+
+    void Bignum4096::montgomery_mod_mul_stay_in_mont_form(uint64_t *aM, uint64_t *bM, uint64_t *cM) const
+    {
+        Hacl_GenericField64_mul(context.get(), aM, bM, cM);
     }
 
     const Bignum4096 &CONTEXT_P()
