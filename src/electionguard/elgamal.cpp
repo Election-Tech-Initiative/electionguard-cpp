@@ -211,8 +211,8 @@ namespace electionguard
 
 #pragma endregion
 
-    unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModQ &nonce,
-                                                 const ElementModP &publicKey)
+    unique_ptr<ElGamalCiphertext>
+    elgamalEncrypt(uint64_t m, const ElementModQ &nonce, const ElementModP &publicKey)
     {
         if ((const_cast<ElementModQ &>(nonce) == ZERO_MOD_Q())) {
             throw invalid_argument("elgamalEncrypt encryption requires a non-zero nonce");
@@ -286,6 +286,11 @@ namespace electionguard
             return make_unique<HashedElGamalCiphertext::Impl>(move(_pad), data, mac);
         }
 
+        [[nodiscard]] unique_ptr<ElementModQ> crypto_hash() const
+        {
+            return hash_elems({pad.get(), data, mac});
+        }
+
         bool operator==(const Impl &other)
         {
             return *pad == *other.pad && data == other.data && mac == other.mac;
@@ -334,6 +339,12 @@ namespace electionguard
     vector<uint8_t> HashedElGamalCiphertext::getData() const { return pimpl->data; }
     vector<uint8_t> HashedElGamalCiphertext::getMac() { return pimpl->mac; }
     vector<uint8_t> HashedElGamalCiphertext::getMac() const { return pimpl->mac; }
+
+    unique_ptr<ElementModQ> HashedElGamalCiphertext::crypto_hash() { return pimpl->crypto_hash(); }
+    unique_ptr<ElementModQ> HashedElGamalCiphertext::crypto_hash() const
+    {
+        return pimpl->crypto_hash();
+    }
 
     // Public Methods
 
@@ -428,11 +439,10 @@ namespace electionguard
 
 #pragma endregion // HashedElGamalCiphertext
 
-    unique_ptr<HashedElGamalCiphertext> hashedElgamalEncrypt(std::vector<uint8_t> message,
-                                                             const ElementModQ &nonce,
-                                                             const ElementModP &publicKey,
-                                                             const ElementModQ &descriptionHash,
-                                                             padded_data_size_t max_len)
+    unique_ptr<HashedElGamalCiphertext>
+    hashedElgamalEncrypt(std::vector<uint8_t> message, const ElementModQ &nonce,
+                         const ElementModP &publicKey, const ElementModQ &descriptionHash,
+                         padded_data_size_t max_len, bool allow_truncation)
     {
         vector<uint8_t> ciphertext;
         vector<uint8_t> plaintext_on_boundary;
@@ -441,35 +451,41 @@ namespace electionguard
         // padding bytes 0x00 are padded out to the first HASHED_CIPHERTEXT_BLOCK_LENGTH boundary
         // past max_len. So if max_len is 62 then it will pad to the 64 byte boundary
         if (max_len != NO_PADDING) {
-            if ((max_len == 0) ||
-                (0 != ((max_len + sizeof(uint16_t)) % HASHED_CIPHERTEXT_BLOCK_LENGTH)) ||
-                (max_len > 65534)) {
-                throw invalid_argument("HashedElGamalCiphertext::encrypt the max_len must be a "
-                                       "multiple of the block length 32");
-            }
-            if (message.size() > max_len) {
-                throw invalid_argument(
-                  "HashedElGamalCiphertext::encrypt the plaintext is greater than max_len");
-            }
+            uint16_t pad_len = 0;
+            uint16_t pad_len_be = 0;
 
-            //uint32_t original_plaintext_len = plaintext.size();
-            uint16_t pad_len = max_len - message.size();
-            uint16_t pad_len_be = htobe16(pad_len);
+            if (allow_truncation && (message.size() > max_len)) {
+                // truncate the data
+                // insert length in big endian form
+                plaintext_on_boundary.insert(plaintext_on_boundary.end(), (uint8_t *)&pad_len_be,
+                                             (uint8_t *)&pad_len_be + sizeof(pad_len_be));
+                // insert plaintext
+                plaintext_on_boundary.insert(plaintext_on_boundary.end(), &message.front(),
+                                             &message.front() + max_len);
+            } else {
+                if (message.size() > max_len) {
+                    throw invalid_argument(
+                      "HashedElGamalCiphertext::encrypt the plaintext is greater than max_len");
+                }
 
-            std::vector<uint8_t> padding(pad_len, 0);
+                uint16_t pad_len = max_len - message.size();
+                uint16_t pad_len_be = htobe16(pad_len);
 
-            // insert length in big endian form
-            plaintext_on_boundary.insert(plaintext_on_boundary.end(), (uint8_t *)&pad_len_be,
-                                         (uint8_t *)&pad_len_be + sizeof(pad_len_be));
-            // insert plaintext
-            plaintext_on_boundary.insert(plaintext_on_boundary.end(), message.begin(),
-                                         message.end());
+                std::vector<uint8_t> padding(pad_len, 0);
 
-            // we dont pad 0x00s if the length field plus plaintext length falls on a block length boundary
-            if (pad_len > 0) {
-                // insert padding
-                plaintext_on_boundary.insert(plaintext_on_boundary.end(), padding.begin(),
-                                             padding.end());
+                // insert length in big endian form
+                plaintext_on_boundary.insert(plaintext_on_boundary.end(), (uint8_t *)&pad_len_be,
+                                             (uint8_t *)&pad_len_be + sizeof(pad_len_be));
+                // insert plaintext
+                plaintext_on_boundary.insert(plaintext_on_boundary.end(), message.begin(),
+                                             message.end());
+
+                // we dont pad 0x00s if the length field plus plaintext length falls on a block length boundary
+                if (pad_len > 0) {
+                    // insert padding
+                    plaintext_on_boundary.insert(plaintext_on_boundary.end(), padding.begin(),
+                                                 padding.end());
+                }
             }
         } else {
             if (0 != (message.size() % HASHED_CIPHERTEXT_BLOCK_LENGTH)) {
@@ -496,7 +512,6 @@ namespace electionguard
 
             publicKey_to_r = pow_mod_p(publicKey, nonce);
         }
-
 
         // hash g_to_r and publicKey_to_r to get the master key
         auto master_key = hash_elems({g_to_r.get(), publicKey_to_r.get()});

@@ -836,6 +836,8 @@ namespace electionguard
         return add_mod_q(*random_q, ZERO_MOD_Q());
     }
 
+    string vector_uint8_t_to_hex(const vector<uint8_t> &bytes) { return bytes_to_hex(bytes); }
+
 #pragma endregion
 
 } // namespace electionguard

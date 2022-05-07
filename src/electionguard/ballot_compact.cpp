@@ -32,11 +32,11 @@ namespace electionguard
     struct CompactPlaintextBallot::Impl : public ElectionObjectBase {
         string styleId;
         vector<uint64_t> selections;
-        map<uint64_t, unique_ptr<ExtendedData>> extendedData;
+        vector<string> writeins;
 
         Impl(const string &objectId, const string &styleId, vector<uint64_t> selections,
-             map<uint64_t, unique_ptr<ExtendedData>> extendedData)
-            : selections(move(selections)), extendedData(move(extendedData))
+             vector<string> writeins)
+            : selections(move(selections)), writeins(move(writeins))
         {
             this->object_id = objectId;
             this->styleId = styleId;
@@ -47,8 +47,8 @@ namespace electionguard
 
     CompactPlaintextBallot::CompactPlaintextBallot(
       const string &objectId, const string &styleId, vector<uint64_t> selections,
-      map<uint64_t, unique_ptr<ExtendedData>> extendedData)
-        : pimpl(new Impl(objectId, styleId, move(selections), move(extendedData)))
+      std::vector<std::string> writeins)
+        : pimpl(new Impl(objectId, styleId, move(selections), move(writeins)))
     {
     }
     CompactPlaintextBallot::~CompactPlaintextBallot() = default;
@@ -65,14 +65,8 @@ namespace electionguard
     string CompactPlaintextBallot::getStyleId() const { return pimpl->styleId; }
 
     vector<uint64_t> CompactPlaintextBallot::getSelections() const { return pimpl->selections; }
-    map<uint64_t, reference_wrapper<ExtendedData>> CompactPlaintextBallot::getExtendedData() const
-    {
-        map<uint64_t, reference_wrapper<ExtendedData>> extendedData;
-        for (const auto &data : pimpl->extendedData) {
-            extendedData.emplace(data.first, ref(*data.second));
-        }
-        return extendedData;
-    }
+    vector<string> CompactPlaintextBallot::getWriteIns() const { return pimpl->writeins; }
+
 
     // Public Static Methods
 
@@ -83,15 +77,6 @@ namespace electionguard
     }
 
     // Public Methods
-
-    unique_ptr<ExtendedData> CompactPlaintextBallot::getExtendedDataFor(const uint64_t index) const
-    {
-        auto extendedData = pimpl->extendedData.find(index);
-        if (extendedData != pimpl->extendedData.end()) {
-            return extendedData->second->clone();
-        }
-        return nullptr;
-    }
 
     vector<uint8_t> CompactPlaintextBallot::toBson() const
     {
@@ -247,20 +232,19 @@ namespace electionguard
     unique_ptr<CompactPlaintextBallot> compressPlaintextBallot(const PlaintextBallot &plaintext)
     {
         vector<uint64_t> selections;
+        vector<std::string> writeins;
         map<uint64_t, unique_ptr<ExtendedData>> extendedData;
         uint32_t index = 0;
         for (const auto &contest : plaintext.getContests()) {
             for (const auto &selection : contest.get().getSelections()) {
                 selections.push_back(selection.get().getVote());
-                if (selection.get().getExtendedData() != nullptr) {
-                    extendedData.emplace(index, selection.get().getExtendedData()->clone());
-                }
+                writeins.push_back(selection.get().getWriteIn());
                 index++;
             }
         }
 
         return make_unique<CompactPlaintextBallot>(plaintext.getObjectId(), plaintext.getStyleId(),
-                                                   move(selections), move(extendedData));
+                                                   move(selections), move(writeins));
     }
 
     unique_ptr<CompactCiphertextBallot> compressCiphertextBallot(const PlaintextBallot &plaintext,
@@ -304,11 +288,10 @@ namespace electionguard
             // Iterate through the selections on the contest and expand each selection
             for (const auto &selection : contest.get().getSelections()) {
                 auto vote = compactBallot.getSelections().at(index);
-                auto extendedData = compactBallot.getExtendedDataFor(index);
+                auto writeIn = compactBallot.getWriteIns().at(index);
 
                 selections.push_back(make_unique<PlaintextBallotSelection>(
-                  selection.get().getObjectId(), vote, false,
-                  extendedData == nullptr ? nullptr : move(extendedData)));
+                  selection.get().getObjectId(), vote, false, writeIn));
 
                 index++;
             }
