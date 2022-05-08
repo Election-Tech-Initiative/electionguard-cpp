@@ -757,25 +757,24 @@ namespace electionguard
     {
         // multiply b * c and the result will be twice Q in size
         uint64_t bc[MAX_Q_LEN * 2] = {};
-        Hacl_Bignum256_mul(const_cast<ElementModQ &>(b).get(), const_cast<ElementModQ &>(c).get(),
-                           bc);
+        Bignum256::mul(const_cast<ElementModQ &>(b).get(), const_cast<ElementModQ &>(c).get(),
+                       bc);
 
         // perform the mod operation on bc
         uint64_t bc_mod_q[MAX_Q_LEN] = {};
         const auto &q = Q();
-        bool modSuccess = Hacl_Bignum256_mod(q.get(), bc, bc_mod_q);
+        bool modSuccess = Bignum256::mod(q.get(), bc, bc_mod_q);
         if (!modSuccess) {
             throw runtime_error("a_plus_bc_mod_q mod operation failed");
         }
 
         uint64_t a_plus_bc[MAX_Q_LEN * 2] = {};
-        uint64_t carry =
-          Hacl_Bignum256_add(const_cast<ElementModQ &>(a).get(), bc_mod_q, a_plus_bc);
+        uint64_t carry = Bignum256::add(const_cast<ElementModQ &>(a).get(), bc_mod_q, a_plus_bc);
         // put the carry in
         a_plus_bc[MAX_Q_LEN] = carry;
 
         uint64_t res[MAX_Q_LEN] = {};
-        modSuccess = Hacl_Bignum256_mod(q.get(), a_plus_bc, res);
+        modSuccess = Bignum256::mod(q.get(), a_plus_bc, res);
         if (!modSuccess) {
             throw runtime_error("a_plus_bc_mod_q mod operation failed");
         }
