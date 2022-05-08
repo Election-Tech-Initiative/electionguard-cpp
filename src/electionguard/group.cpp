@@ -756,7 +756,7 @@ namespace electionguard
                                             const ElementModQ &c)
     {
         // multiply b * c and the result will be twice Q in size
-        uint64_t bc[MAX_Q_LEN * 2] = {};
+        uint64_t bc[MAX_Q_LEN_DOUBLE] = {};
         Bignum256::mul(const_cast<ElementModQ &>(b).get(), const_cast<ElementModQ &>(c).get(),
                        bc);
 
@@ -768,7 +768,7 @@ namespace electionguard
             throw runtime_error("a_plus_bc_mod_q mod operation failed");
         }
 
-        uint64_t a_plus_bc[MAX_Q_LEN * 2] = {};
+        uint64_t a_plus_bc[MAX_Q_LEN_DOUBLE] = {};
         uint64_t carry = Bignum256::add(const_cast<ElementModQ &>(a).get(), bc_mod_q, a_plus_bc);
         // put the carry in
         a_plus_bc[MAX_Q_LEN] = carry;
