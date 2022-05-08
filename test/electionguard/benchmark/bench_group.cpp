@@ -33,6 +33,11 @@ class GroupElementFixture : public benchmark::Fixture
 
         auto array_size = sizeof(LARGE_P_ARRAY_1) / sizeof(uint64_t);
         p1_vector.assign(&LARGE_P_ARRAY_1[0], &LARGE_P_ARRAY_1[array_size]);
+
+        a = rand_q();
+        b = rand_q();
+        c = rand_q();
+
     }
 
     void TearDown(const ::benchmark::State &state) {}
@@ -43,6 +48,9 @@ class GroupElementFixture : public benchmark::Fixture
     unique_ptr<ElementModQ> q1;
     unique_ptr<ElementModQ> q2;
     vector<uint64_t> p1_vector;
+    unique_ptr<ElementModQ> a;
+    unique_ptr<ElementModQ> b;
+    unique_ptr<ElementModQ> c;
 };
 
 BENCHMARK_DEFINE_F(GroupElementFixture, ElementModP_fromArray)(benchmark::State &state)
@@ -216,3 +224,12 @@ BENCHMARK_DEFINE_F(GroupElementFixture, add_mod_q_overflow)(benchmark::State &st
 }
 
 BENCHMARK_REGISTER_F(GroupElementFixture, add_mod_q_overflow)->Unit(benchmark::kMillisecond);
+
+BENCHMARK_DEFINE_F(GroupElementFixture, a_plus_bc_mod_q)(benchmark::State &state)
+{
+    for (auto _ : state) {
+        auto r = a_plus_bc_mod_q(*a, *b, *c);
+    }
+}
+
+BENCHMARK_REGISTER_F(GroupElementFixture, a_plus_bc_mod_q)->Unit(benchmark::kMillisecond);
