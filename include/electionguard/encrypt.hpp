@@ -124,7 +124,7 @@ namespace electionguard
     /// </summary>
     std::string getOvervoteAndWriteIns(const PlaintextBallotContest &contest,
                                        const InternalManifest &internalManifest,
-                                       valid_contest_return is_overvote);
+                                       eg_valid_contest_return_type_t is_overvote);
 
     /// <summary>
     /// Encrypt a specific `BallotContest` in the context of a specific `Ballot`

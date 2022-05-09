@@ -330,13 +330,13 @@ namespace electionguard
         //TODO: void setNonce(ElementModQ *nonce);
     };
 
-    typedef enum valid_contest_return_e {
+    typedef enum eg_valid_contest_return_e {
         SUCCESS = 0,
         OVERVOTE = 1,
         OVERVOTE_ERROR = 2,
         INVALID_OBJECT_ID_ERROR = 2,
         TOO_MANY_SELECTIONS_ERROR = 3,
-    } valid_contest_return;
+    } eg_valid_contest_return_type_t;
 
     /// <summary>
     /// A PlaintextBallotContest represents the selections made by a voter for a specific ContestDescription
@@ -378,10 +378,10 @@ namespace electionguard
         ///
         /// Note: because this class supports partial representations, undervotes are considered a valid state.
         /// </Summary>
-        valid_contest_return isValid(const std::string &expectedObjectId,
-                                     uint64_t expectedNumberSelections,
-                                     uint64_t expectedNumberElected, uint64_t votesAllowd = 0,
-                                     bool supportOvervotes = true) const;
+        eg_valid_contest_return_type_t isValid(const std::string &expectedObjectId,
+                                               uint64_t expectedNumberSelections,
+                                               uint64_t expectedNumberElected, uint64_t votesAllowd = 0,
+                                               bool supportOvervotes = true) const;
 
       private:
         class Impl;

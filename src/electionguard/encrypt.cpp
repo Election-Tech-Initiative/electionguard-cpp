@@ -312,7 +312,7 @@ namespace electionguard
 
     string getOvervoteAndWriteIns(const PlaintextBallotContest &contest,
                                   const InternalManifest &internalManifest,
-                                  valid_contest_return is_overvote)
+                                  eg_valid_contest_return_type_t is_overvote)
     {
         json extendedData; 
         auto selections = contest.getSelections();
@@ -387,7 +387,7 @@ namespace electionguard
     {
         // Validate Input
         bool supportOvervotes = true;
-        valid_contest_return is_valid_contest =
+        eg_valid_contest_return_type_t is_valid_contest =
           contest.isValid(description.getObjectId(), description.getSelections().size(),
           description.getNumberElected(), description.getVotesAllowed(), supportOvervotes);
         if ((is_valid_contest != SUCCESS) && (is_valid_contest != OVERVOTE)) {

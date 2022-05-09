@@ -461,7 +461,8 @@ namespace electionguard
 
     // Public Functions
 
-    valid_contest_return PlaintextBallotContest::isValid(const string &expectedObjectId,
+    eg_valid_contest_return_type_t
+    PlaintextBallotContest::isValid(const string &expectedObjectId,
                                          uint64_t expectedNumberSelections,
                                          uint64_t expectedNumberElected,
                                          uint64_t votesAllowd, /* = 0 */
