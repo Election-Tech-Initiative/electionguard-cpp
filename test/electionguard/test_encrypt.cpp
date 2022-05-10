@@ -201,20 +201,12 @@ TEST_CASE("Encrypt PlaintextBallot overvote")
     CHECK(heg != nullptr);
     CHECK(heg->getData().size() == (size_t)(BYTES_512 + sizeof(uint16_t)));
 
-    auto style = internal->getBallotStyle(plaintext->getStyleId());
-
-    unique_ptr<ElementModQ> descriptionHash;
-    for (const auto &description : internal->getContestsFor(style->getObjectId())) {
-        if (string("justice-supreme-court") == description.get().getObjectId()) {
-            descriptionHash = description.get().crypto_hash();
-        }
-    }
-
-    unique_ptr<ElementModP> new_pad = make_unique<ElementModP>(*heg->getPad());
+     unique_ptr<ElementModP> new_pad = make_unique<ElementModP>(*heg->getPad());
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(new_pad), heg->getData(), heg->getMac());
 
-    vector<uint8_t> new_plaintext = newHEG->decrypt(secret, *descriptionHash, true);
+    vector<uint8_t> new_plaintext =
+      newHEG->decrypt(secret, *context->getCryptoExtendedBaseHash(), true);
     string new_plaintext_string((char *)&new_plaintext.front(), new_plaintext.size());
 
     CHECK(new_plaintext_string ==
@@ -304,21 +296,13 @@ TEST_CASE("Encrypt full PlaintextBallot with WriteIn and Overvote with Encryptio
 
     CHECK(heg != nullptr);
     CHECK(heg->getData().size() == (size_t)(BYTES_512 + sizeof(uint16_t)));
-    
-    auto style = internal->getBallotStyle(plaintextBallot->getStyleId());
-
-    unique_ptr<ElementModQ> descriptionHash;
-    for (const auto &description : internal->getContestsFor(style->getObjectId())) {
-        if (string("justice-supreme-court") == description.get().getObjectId()) {
-            descriptionHash = description.get().crypto_hash();
-        }
-    }
 
     unique_ptr<ElementModP> new_pad = make_unique<ElementModP>(*heg->getPad());
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(new_pad), heg->getData(), heg->getMac());
 
-    vector<uint8_t> new_plaintext = newHEG->decrypt(secret, *descriptionHash, true);
+    vector<uint8_t> new_plaintext =
+      newHEG->decrypt(secret, *context->getCryptoExtendedBaseHash(), true);
     string new_plaintext_string((char *)&new_plaintext.front(), new_plaintext.size());
     Log::debug(new_plaintext_string);
 

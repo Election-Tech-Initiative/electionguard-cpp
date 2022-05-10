@@ -140,6 +140,7 @@ namespace electionguard
     elgamalAdd(const std::vector<std::reference_wrapper<ElGamalCiphertext>> &ciphertexts);
 
 #define HASHED_CIPHERTEXT_BLOCK_LENGTH 32U
+#define HASHED_BLOCK_LENGTH_IN_BITS 256U
 #define _PAD_INDICATOR_SIZE sizeof(uint16_t)
 
     typedef enum padded_data_size_e {

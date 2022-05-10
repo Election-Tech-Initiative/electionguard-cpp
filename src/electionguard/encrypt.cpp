@@ -490,8 +490,8 @@ namespace electionguard
 
         // Perform HashedElGamalCiphertext calculation
         unique_ptr<HashedElGamalCiphertext> hashedElGamal =
-          hashedElgamalEncrypt(extendedData_plaintext, *extendedDataNonce,
-            elgamalPublicKey, *descriptionHash, BYTES_512, true);
+          hashedElgamalEncrypt(extendedData_plaintext, *extendedDataNonce, elgamalPublicKey,
+                               cryptoExtendedBaseHash, BYTES_512, true);
 
         // TODO: ISSUE #33: support other cases such as cumulative voting
         // (individual selections being an encryption of > 1)

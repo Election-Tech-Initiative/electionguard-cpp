@@ -349,7 +349,7 @@ namespace electionguard
     // Public Methods
 
     vector<uint8_t> HashedElGamalCiphertext::decrypt(const ElementModQ &secret_key,
-                                                     const ElementModQ &descriptionHash,
+                                                     const ElementModQ &encryption_seed,
                                                      bool look_for_padding)
     {
         // Note this decryption method is primarily used for testing
@@ -357,7 +357,7 @@ namespace electionguard
         vector<uint8_t> plaintext;
 
         uint32_t ciphertext_len = pimpl->data.size();
-        uint32_t num_xor_keys = ciphertext_len / HASHED_CIPHERTEXT_BLOCK_LENGTH;
+        uint32_t number_of_blocks = ciphertext_len / HASHED_CIPHERTEXT_BLOCK_LENGTH;
         if ((0 != (ciphertext_len % HASHED_CIPHERTEXT_BLOCK_LENGTH)) || (ciphertext_len == 0)) {
             throw invalid_argument("HashedElGamalCiphertext::decrypt the ciphertext "
                                    "is not a multiple of the block length 32");
@@ -365,11 +365,11 @@ namespace electionguard
 
         auto publicKey_to_r = pow_mod_p(*pimpl->pad, secret_key);
 
-        // hash g_to_r and publicKey_to_r to get the master key
-        auto master_key = hash_elems({pimpl->pad.get(), publicKey_to_r.get()});
+        // hash g_to_r and publicKey_to_r to get the session key
+        auto session_key = hash_elems({pimpl->pad.get(), publicKey_to_r.get()});
 
-        vector<uint8_t> mac_key = get_hmac(master_key->toBytes(), descriptionHash.toBytes(),
-                                           descriptionHash.toBytes().size(), 0);
+        vector<uint8_t> mac_key = get_hmac(session_key->toBytes(), encryption_seed.toBytes(),
+                                           number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, 0);
 
         // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
         vector<uint8_t> c0_and_c1(pimpl->pad->toBytes());
@@ -383,11 +383,12 @@ namespace electionguard
         }
 
         uint32_t plaintext_index = 0;
-        for (uint32_t i = 0; i < num_xor_keys; i++) {
+        for (uint32_t i = 0; i < number_of_blocks; i++) {
             vector<int8_t> temp_plaintext(HASHED_CIPHERTEXT_BLOCK_LENGTH, 0);
 
-            vector<uint8_t> xor_key = get_hmac(master_key->toBytes(), descriptionHash.toBytes(),
-                                               descriptionHash.toBytes().size(), i + 1);
+            vector<uint8_t> xor_key =
+              get_hmac(session_key->toBytes(), encryption_seed.toBytes(),
+                       number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, i + 1);
 
             // XOR the key with the plaintext
             for (int j = 0; j < (int)HASHED_CIPHERTEXT_BLOCK_LENGTH; j++) {
@@ -441,7 +442,7 @@ namespace electionguard
 
     unique_ptr<HashedElGamalCiphertext>
     hashedElgamalEncrypt(std::vector<uint8_t> message, const ElementModQ &nonce,
-                         const ElementModP &publicKey, const ElementModQ &descriptionHash,
+                         const ElementModP &publicKey, const ElementModQ &encryption_seed,
                          padded_data_size_t max_len, bool allow_truncation)
     {
         vector<uint8_t> ciphertext;
@@ -498,7 +499,7 @@ namespace electionguard
         }
 
         uint32_t plaintext_len = plaintext_on_boundary.size();
-        uint32_t num_xor_keys = plaintext_len / HASHED_CIPHERTEXT_BLOCK_LENGTH;
+        uint32_t number_of_blocks = plaintext_len / HASHED_CIPHERTEXT_BLOCK_LENGTH;
 
         unique_ptr<ElementModP> g_to_r = nullptr;
         unique_ptr<ElementModP> publicKey_to_r = nullptr;
@@ -513,15 +514,16 @@ namespace electionguard
             publicKey_to_r = pow_mod_p(publicKey, nonce);
         }
 
-        // hash g_to_r and publicKey_to_r to get the master key
-        auto master_key = hash_elems({g_to_r.get(), publicKey_to_r.get()});
+        // hash g_to_r and publicKey_to_r to get the session key
+        auto session_key = hash_elems({g_to_r.get(), publicKey_to_r.get()});
 
         uint32_t plaintext_index = 0;
-        for (uint32_t i = 0; i < num_xor_keys; i++) {
+        for (uint32_t i = 0; i < number_of_blocks; i++) {
             vector<uint8_t> temp_ciphertext(HASHED_CIPHERTEXT_BLOCK_LENGTH, 0);
 
-            vector<uint8_t> xor_key = get_hmac(master_key->toBytes(), descriptionHash.toBytes(),
-                                               descriptionHash.toBytes().size(), i + 1);
+            vector<uint8_t> xor_key =
+              get_hmac(session_key->toBytes(), encryption_seed.toBytes(),
+                       number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, i + 1);
 
             // XOR the key with the plaintext
             for (int j = 0; j < (int)HASHED_CIPHERTEXT_BLOCK_LENGTH; j++) {
@@ -535,8 +537,8 @@ namespace electionguard
             Lib_Memzero0_memzero(&temp_ciphertext.front(), temp_ciphertext.size());
         }
 
-        vector<uint8_t> mac_key = get_hmac(master_key->toBytes(), descriptionHash.toBytes(),
-                                           descriptionHash.toBytes().size(), 0);
+        vector<uint8_t> mac_key = get_hmac(session_key->toBytes(), encryption_seed.toBytes(),
+                                           number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, 0);
 
         // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
         vector<uint8_t> c0_and_c1(g_to_r->toBytes());
