@@ -210,7 +210,7 @@ TEST_CASE("Encrypt PlaintextBallot overvote")
     string new_plaintext_string((char *)&new_plaintext.front(), new_plaintext.size());
 
     CHECK(new_plaintext_string ==
-      string("{\"error\":\"overvote\",\"errorData\":[\"benjamin-franklin-selection\""
+      string("{\"error\":\"overvote\",\"error_data\":[\"benjamin-franklin-selection\""
           ",\"john-adams-selection\"]}"));
 }
 
@@ -307,8 +307,8 @@ TEST_CASE("Encrypt full PlaintextBallot with WriteIn and Overvote with Encryptio
     Log::debug(new_plaintext_string);
 
     CHECK(new_plaintext_string ==
-      string("{\"error\":\"overvote\",\"errorData\":[\"john-adams-selection\","
-             "\"benjamin-franklin-selection\",\"write-in-selection\"],\"writeins\""
+      string("{\"error\":\"overvote\",\"error_data\":[\"john-adams-selection\","
+             "\"benjamin-franklin-selection\",\"write-in-selection\"],\"write_ins\""
              ":{\"write-in-selection\":\"Susan B. Anthony\"}}"));
 }
 

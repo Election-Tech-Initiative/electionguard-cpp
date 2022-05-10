@@ -329,7 +329,7 @@ namespace electionguard
                     errorData.push_back(selection.get().getObjectId());
                 }
             }
-            overvoteAndWriteIns["errorData"] = errorData;
+            overvoteAndWriteIns["error_data"] = errorData;
         }
 
         json writeins;
@@ -366,7 +366,7 @@ namespace electionguard
         }
 
         if (writeins.dump() != string("null")) {
-            overvoteAndWriteIns["writeins"] = writeins;
+            overvoteAndWriteIns["write_ins"] = writeins;
         }
 
         string overvoteAndWriteIns_string("");
