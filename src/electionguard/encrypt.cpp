@@ -314,12 +314,12 @@ namespace electionguard
                                   const InternalManifest &internalManifest,
                                   eg_valid_contest_return_type_t is_overvote)
     {
-        json extendedData; 
+        json overvoteAndWriteIns; 
         auto selections = contest.getSelections();
 
         // if an overvote is detected then put the selections into json
         if (is_overvote == OVERVOTE) {
-            extendedData["error"] = "overvote";
+            overvoteAndWriteIns["error"] = "overvote";
             json errorData;
             // run through the selections in this contest and see if any of them are writeins
             // the number of selections should be short, the number of ballot selections
@@ -329,7 +329,7 @@ namespace electionguard
                     errorData.push_back(selection.get().getObjectId());
                 }
             }
-            extendedData["errorData"] = errorData;
+            overvoteAndWriteIns["errorData"] = errorData;
         }
 
         json writeins;
@@ -366,15 +366,15 @@ namespace electionguard
         }
 
         if (writeins.dump() != string("null")) {
-            extendedData["writeins"] = writeins;
+            overvoteAndWriteIns["writeins"] = writeins;
         }
 
-        string extendedData_string("");
-        if (extendedData.dump() != string("null")) {
-            extendedData_string = extendedData.dump();      
+        string overvoteAndWriteIns_string("");
+        if (overvoteAndWriteIns.dump() != string("null")) {
+            overvoteAndWriteIns_string = overvoteAndWriteIns.dump();      
         }
 
-        return extendedData_string;
+        return overvoteAndWriteIns_string;
     }
 
     unique_ptr<CiphertextBallotContest>
