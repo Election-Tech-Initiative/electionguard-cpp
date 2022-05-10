@@ -219,10 +219,13 @@ namespace electionguard
         }
 
         auto pad = g_pow_p(nonce);
-        auto e = ElementModP::fromUint64(m);
-        auto gpowp_m = g_pow_p(*e);
         auto pubkey_pow_n = pow_mod_p(publicKey, nonce);
-        auto data = mul_mod_p(*gpowp_m, *pubkey_pow_n);
+        unique_ptr<ElementModP> data = nullptr;
+        if (m == 1) {
+            data = mul_mod_p(G(), *pubkey_pow_n);
+        } else {
+            data = move(pubkey_pow_n);
+        }
 
         Log::trace("Generated Encryption");
         Log::trace("publicKey", publicKey.toHex());

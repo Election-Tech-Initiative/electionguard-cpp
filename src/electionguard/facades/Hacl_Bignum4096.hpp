@@ -54,6 +54,13 @@ namespace hacl
         void modExp(uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res,
                     bool useConstTime = false) const;
 
+        void to_montgomery_form(uint64_t *a, uint64_t *aM) const;
+
+        void from_montgomery_form(uint64_t *aM, uint64_t *a) const;
+
+        void montgomery_mod_mul_stay_in_mont_form(uint64_t *aM, uint64_t *bM,
+                                                         uint64_t *cM) const;
+
       private:
         struct handle_destructor {
             void operator()(Hacl_Bignum_MontArithmetic_bn_mont_ctx_u64 *handle) const
