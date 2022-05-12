@@ -1803,14 +1803,17 @@ namespace electionguard
 
     struct InternalManifest::Impl {
         vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits;
+        vector<unique_ptr<Candidate>> candidates;
         vector<unique_ptr<ContestDescriptionWithPlaceholders>> contests;
         vector<unique_ptr<BallotStyle>> ballotStyles;
         unique_ptr<ElementModQ> manifestHash;
 
         Impl(vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
+             vector<unique_ptr<Candidate>> candidates,
              vector<unique_ptr<ContestDescriptionWithPlaceholders>> contests,
              vector<unique_ptr<BallotStyle>> ballotStyles, unique_ptr<ElementModQ> manifestHash)
-            : geopoliticalUnits(move(geopoliticalUnits)), contests(move(contests)),
+            : geopoliticalUnits(move(geopoliticalUnits)), candidates(move(candidates)),
+              contests(move(contests)),
               ballotStyles(move(ballotStyles)), manifestHash(move(manifestHash))
         {
         }
@@ -1822,15 +1825,17 @@ namespace electionguard
 
     InternalManifest::InternalManifest(
       vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
+      vector<unique_ptr<Candidate>> candidates,
       vector<unique_ptr<ContestDescriptionWithPlaceholders>> contests,
       vector<unique_ptr<BallotStyle>> ballotStyles, const ElementModQ &manifestHash)
-        : pimpl(new Impl(move(geopoliticalUnits), move(contests), move(ballotStyles),
+        : pimpl(new Impl(move(geopoliticalUnits), move(candidates), move(contests),
+                         move(ballotStyles),
                          make_unique<ElementModQ>(manifestHash)))
     {
     }
 
     InternalManifest::InternalManifest(const Manifest &description)
-        : pimpl(new Impl(copyGeopoliticalUnits(description),
+        : pimpl(new Impl(copyGeopoliticalUnits(description), copyCandidates(description),
                          generateContestsWithPlaceholders(description),
                          copyBallotStyles(description), description.crypto_hash()))
     {
@@ -1856,6 +1861,16 @@ namespace electionguard
         vector<reference_wrapper<GeopoliticalUnit>> references;
         references.reserve(pimpl->geopoliticalUnits.size());
         for (auto &reference : pimpl->geopoliticalUnits) {
+            references.push_back(ref(*reference));
+        }
+        return references;
+    }
+
+    vector<reference_wrapper<Candidate>> InternalManifest::getCandidates() const
+    {
+        vector<reference_wrapper<Candidate>> references;
+        references.reserve(pimpl->candidates.size());
+        for (auto &reference : pimpl->candidates) {
             references.push_back(ref(*reference));
         }
         return references;
@@ -1993,6 +2008,17 @@ namespace electionguard
         collection.reserve(source.size());
         for (auto element : source) {
             collection.push_back(make_unique<GeopoliticalUnit>(element.get()));
+        }
+        return collection;
+    }
+
+    vector<unique_ptr<Candidate>> InternalManifest::copyCandidates(const Manifest &description)
+    {
+        vector<unique_ptr<Candidate>> collection;
+        auto source = description.getCandidates();
+        collection.reserve(source.size());
+        for (auto element : source) {
+            collection.push_back(make_unique<Candidate>(element.get()));
         }
         return collection;
     }

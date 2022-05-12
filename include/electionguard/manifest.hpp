@@ -971,6 +971,7 @@ namespace electionguard
         InternalManifest(InternalManifest &&other);
         explicit InternalManifest(
           std::vector<std::unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
+          std::vector<std::unique_ptr<Candidate>> candidates,
           std::vector<std::unique_ptr<ContestDescriptionWithPlaceholders>> contests,
           std::vector<std::unique_ptr<BallotStyle>> ballotStyles, const ElementModQ &manifestHash);
         InternalManifest(const Manifest &description);
@@ -988,6 +989,11 @@ namespace electionguard
         /// Collection of geopolitical units for this election.
         /// </Summary>
         std::vector<std::reference_wrapper<GeopoliticalUnit>> getGeopoliticalUnits() const;
+
+        /// <Summary>
+        /// Collection of candidates for this election.
+        /// </Summary>
+        std::vector<std::reference_wrapper<Candidate>> getCandidates() const;
 
         /// <Summary>
         /// Collection of contests for this election.
@@ -1051,6 +1057,9 @@ namespace electionguard
 
         static std::vector<std::unique_ptr<GeopoliticalUnit>>
         copyGeopoliticalUnits(const Manifest &description);
+
+        static std::vector<std::unique_ptr<Candidate>>
+        copyCandidates(const Manifest &description);
 
         static std::vector<std::unique_ptr<BallotStyle>>
         copyBallotStyles(const Manifest &description);

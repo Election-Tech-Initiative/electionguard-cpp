@@ -73,7 +73,7 @@ namespace ElectionGuard.Encrypt.Tests
         }
 
         [Test]
-        public void Test_Encrypt_Ballot_Overvote_Fails()
+        public void Test_Encrypt_Ballot_Overvote_Succeeds()
         {
             // Configure the election context
             var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
@@ -86,8 +86,9 @@ namespace ElectionGuard.Encrypt.Tests
 
             // Act
             var ballot = BallotGenerator.GetFakeBallot(internalManifest, 2);
-            Assert.Throws<ArgumentException>(() => mediator.Encrypt(ballot));
+            var ciphertext = mediator.Encrypt(ballot);
 
+            Assert.That(ciphertext.IsValidEncryption(context.ManifestHash, keypair.PublicKey, context.CryptoExtendedBaseHash));
         }
 
         [Test]

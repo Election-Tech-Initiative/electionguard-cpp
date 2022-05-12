@@ -588,6 +588,8 @@ namespace electionguard
                 auto geopoliticalUnits =
                   geopoliticalUnitsToJson(serializable.getGeopoliticalUnits());
 
+                auto candidates = candidatesToJson(serializable.getCandidates());
+
                 // Contests
                 json contests;
                 for (const auto &contest : serializable.getContests()) {
@@ -627,6 +629,7 @@ namespace electionguard
 
                 json result = {{"manifest_hash", serializable.getManifestHash()->toHex()},
                                {"geopolitical_units", geopoliticalUnits},
+                               {"candidates", candidates},
                                {"contests", contests},
                                {"ballot_styles", ballotStyles}};
 
@@ -635,6 +638,8 @@ namespace electionguard
             static unique_ptr<electionguard::InternalManifest> toObject(json j)
             {
                 auto geopoliticalUnits = geopoliticalUnitsFromJson(j["geopolitical_units"]);
+
+                auto candidates = candidatesFromJson(j["candidates"]);
 
                 auto contests = j["contests"];
 
@@ -682,7 +687,7 @@ namespace electionguard
                 auto manifestHash = ElementModQ::fromHex(manifest_hash);
 
                 return make_unique<electionguard::InternalManifest>(
-                  move(geopoliticalUnits), move(contestDescriptions), move(ballotStyles),
+                  move(geopoliticalUnits), move(candidates), move(contestDescriptions), move(ballotStyles),
                   *manifestHash);
             }
 
@@ -810,12 +815,11 @@ namespace electionguard
                 for (auto contest : serializable.getContests()) {
                     json selections;
 
-                    // TODO: #134 extended data
-
                     for (auto selection : contest.get().getSelections()) {
                         json s = {{"object_id", selection.get().getObjectId()},
                                   {"vote", selection.get().getVote()},
-                                  {"is_placeholder_selection", selection.get().getIsPlaceholder()}};
+                                  {"is_placeholder_selection", selection.get().getIsPlaceholder()},
+                                  {"write_in", selection.get().getWriteIn()}};
                         selections.push_back(s);
                     }
                     contests.push_back({
@@ -855,11 +859,15 @@ namespace electionguard
                             isPlaceholder = selection["is_placeholder_selection"].get<bool>();
                         }
 
-                        // TODO: #134 extended data
-
+                        string write_in;
+                        if (selection.contains("write_in") &&
+                            !selection["write_in"].is_null()) {
+                            write_in = selection["write_in"].get<string>();
+                        }
+                
                         plaintextSelections.push_back(
                           make_unique<electionguard::PlaintextBallotSelection>(
-                            selection_object_id, vote, isPlaceholder));
+                            selection_object_id, vote, isPlaceholder, write_in));
                     }
 
                     plaintextContests.push_back(make_unique<electionguard::PlaintextBallotContest>(
@@ -907,16 +915,16 @@ namespace electionguard
                     selections.push_back(selection);
                 }
 
-                json extendedData;
-                for (auto &[key, value] : serializable.getExtendedData()) {
-                    json data = {{"value", value.get().value}, {"length", value.get().length}};
-                    extendedData.emplace(to_string(key), data);
+                json writeins;
+                for (auto writein : serializable.getWriteIns()) {
+                    writeins.push_back(writein);
                 }
 
                 json result = {{"object_id", serializable.getObjectId()},
                                {"style_id", serializable.getStyleId()},
                                {"selections", selections},
-                               {"extended_data", extendedData}};
+                               {"writeins", writeins}};
+
                 return result;
             }
             static unique_ptr<electionguard::CompactPlaintextBallot> toObject(json j)
@@ -925,6 +933,7 @@ namespace electionguard
                 auto style_id = j["style_id"].get<string>();
 
                 auto selections = j["selections"];
+                auto in_writeins = j["writeins"];
 
                 vector<uint64_t> votes;
                 votes.reserve(selections.size());
@@ -933,18 +942,13 @@ namespace electionguard
                     votes.push_back(vote);
                 }
 
-                map<uint64_t, unique_ptr<electionguard::ExtendedData>> extendedDataMap;
-                if (j.contains("extended_data") && !j["extended_data"].is_null()) {
-                    for (auto &[key, body] : j["extended_data"].items()) {
-                        auto value = body["value"].get<string>();
-                        auto length = body["length"].get<uint64_t>();
-                        extendedDataMap.emplace(stoul(key),
-                                                make_unique<ExtendedData>(value, length));
-                    }
+                vector<string> writeins;
+                for (auto &writein_json : in_writeins) {
+                    writeins.push_back(writein_json.dump());
                 }
 
                 return make_unique<electionguard::CompactPlaintextBallot>(
-                  object_id, style_id, move(selections), move(extendedDataMap));
+                  object_id, style_id, move(selections), move(writeins));
             }
 
           public:
@@ -1029,6 +1033,12 @@ namespace electionguard
                       {"response", p->getResponse()->toHex()},
                       {"constant", p->getConstant()},
                     };
+                    auto e = contest.get().getHashedElGamalCiphertext();
+                    json extended_data = {
+                      {"pad", e->getPad()->toHex()},
+                      {"data", bytes_to_hex(e->getData())},
+                      {"mac", bytes_to_hex(e->getMac())},
+                    };
                     json contest_props = {
                       {"object_id", contest.get().getObjectId()},
                       {"sequence_order", contest.get().getSequenceOrder()},
@@ -1037,6 +1047,7 @@ namespace electionguard
                       {"ciphertext_accumulation", ciphertext},
                       {"crypto_hash", contest.get().getCryptoHash()->toHex()},
                       {"proof", contest_proof},
+                      {"extended_data", extended_data},
                     };
                     if (withNonces) {
                         contest_props["nonce"] = contest.get().getNonce()->toHex();
@@ -1089,6 +1100,20 @@ namespace electionguard
                         ElementModP::fromHex(contest_ciphertext_pad),
                         ElementModP::fromHex(contest_ciphertext_data));
                     auto contest_crypto_hash = contest["crypto_hash"].get<string>();
+
+                    auto hashed_el_gamal = contest["extended_data"];
+                    auto hashed_el_gamal_pad = hashed_el_gamal["pad"].get<string>();
+                    auto hashed_el_gamal_data = hashed_el_gamal["data"].get<string>();
+                    auto hashed_el_gamal_mac = hashed_el_gamal["mac"].get<string>();
+
+                    auto hashed_el_gamal_data_sanitized = sanitize_hex_string(hashed_el_gamal_data);
+                    auto hashed_el_gamal_mac_sanitized = sanitize_hex_string(hashed_el_gamal_mac);
+
+                    auto deserializedHashedElGamal =
+                      make_unique<electionguard::HashedElGamalCiphertext>(
+                      ElementModP::fromHex(hashed_el_gamal_pad),
+                        hex_to_bytes(hashed_el_gamal_data_sanitized),
+                        hex_to_bytes(hashed_el_gamal_mac_sanitized));
 
                     auto proof = contest["proof"];
                     auto contest_proof_pad = proof["pad"].get<string>();
@@ -1178,7 +1203,8 @@ namespace electionguard
                         contest_object_id, contest_sequence_order,
                         *ElementModQ::fromHex(contest_description_hash), move(ciphertextSelections),
                         move(nonce), move(deserialized_contest_ciphertext),
-                        ElementModQ::fromHex(contest_crypto_hash), move(deserializedProof)));
+                        ElementModQ::fromHex(contest_crypto_hash), move(deserializedProof),
+                        move(deserializedHashedElGamal)));
                 }
 
                 auto nonce = ballot_nonce.empty() ? make_unique<ElementModQ>(ZERO_MOD_Q())
