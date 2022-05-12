@@ -4,10 +4,11 @@
 #include "electionguard/ballot_code.hpp"
 #include "electionguard/elgamal.hpp"
 #include "electionguard/hash.hpp"
-#include "electionguard/precompute_buffers.hpp"
 #include "log.hpp"
 #include "nonces.hpp"
 #include "utils.hpp"
+#include "electionguard/precompute_buffers.hpp"
+#include <nlohmann/json.hpp>
 
 #include <algorithm>
 #include <future>
@@ -25,6 +26,7 @@ using std::unique_ptr;
 using std::vector;
 
 using electionguard::getSystemTimestamp;
+using nlohmann::json;
 
 namespace electionguard
 {
@@ -262,8 +264,8 @@ namespace electionguard
             auto pubkey_to_exp = triple1->get_pubkey_to_exp();
 
             // Generate the encryption using precomputed values
-            ciphertext =
-              elgamalEncrypt_with_precomputed(selection.getVote(), *g_to_exp, *pubkey_to_exp);
+            ciphertext = elgamalEncrypt_with_precomputed(selection.getVote(),
+                                                         *g_to_exp, *pubkey_to_exp);
             if (ciphertext == nullptr) {
                 throw runtime_error("encryptSelection:: Error generating ciphertext");
             }
@@ -275,15 +277,15 @@ namespace electionguard
             encrypted = CiphertextBallotSelection::make_with_precomputed(
               selection.getObjectId(), description.getSequenceOrder(), *descriptionHash,
               move(ciphertext), cryptoExtendedBaseHash, selection.getVote(),
-              move(precomputedTwoTriplesAndAQuad), isPlaceholder, true);
+              move(precomputedTwoTriplesAndAQuad),
+              isPlaceholder, true);
         } else {
             // Generate the encryption
-            ciphertext = elgamalEncrypt(selection.getVote(), *selectionNonce, elgamalPublicKey);
+            ciphertext =
+              elgamalEncrypt(selection.getVote(), *selectionNonce, elgamalPublicKey);
             if (ciphertext == nullptr) {
                 throw runtime_error("encryptSelection:: Error generating ciphertext");
             }
-
-            // TODO: ISSUE #134: encrypt/decrypt: encrypt the extended_data field
 
             encrypted = CiphertextBallotSelection::make(
               selection.getObjectId(), description.getSequenceOrder(), *descriptionHash,
@@ -302,22 +304,93 @@ namespace electionguard
 
         // verify the selection.
         if (encrypted->isValidEncryption(*descriptionHash, elgamalPublicKey,
-                                         cryptoExtendedBaseHash)) {
+                                            cryptoExtendedBaseHash)) {
             return encrypted;
         }
-        throw runtime_error("encryptSelection failed validity check");
+        throw runtime_error("encryptSelection failed validity check");        
+    }
+
+    string getOvervoteAndWriteIns(const PlaintextBallotContest &contest,
+                                  const InternalManifest &internalManifest,
+                                  eg_valid_contest_return_type_t is_overvote)
+    {
+        json overvoteAndWriteIns; 
+        auto selections = contest.getSelections();
+
+        // if an overvote is detected then put the selections into json
+        if (is_overvote == OVERVOTE) {
+            overvoteAndWriteIns["error"] = "overvote";
+            json errorData;
+            // run through the selections in this contest and see if any of them are writeins
+            // the number of selections should be short, the number of ballot selections
+            // and candidates will be longer but shouldn't be too long
+            for (const auto &selection : selections) {
+                if (selection.get().getVote() == 1) {
+                    errorData.push_back(selection.get().getObjectId());
+                }
+            }
+            overvoteAndWriteIns["error_data"] = errorData;
+        }
+
+        json writeins;
+        auto candidates = internalManifest.getCandidates();
+        std::vector<std::reference_wrapper<SelectionDescription>> ballotSelections;
+
+        // find the contest in the manifest
+        for (const auto &manifestContest : internalManifest.getContests()) {
+            if (contest.getObjectId() == manifestContest.get().getObjectId()) {
+                ballotSelections = manifestContest.get().getSelections();
+            }
+        }
+
+        // run through the selections in this contest and see if any of them are writeins
+        // the number of selections should be short, the number of ballot selections
+        // and candidates will be longer but shouldn't be too long
+        for (const auto &selection : selections) {
+            if (selection.get().getVote() == 1) {
+                for (const auto ballotSelection : ballotSelections) {
+                    if (selection.get().getObjectId() == ballotSelection.get().getObjectId()) {
+                        for (const auto &candidate : candidates) {
+                            // check if the candidate is the correct one and if it is the writein option
+                            if (ballotSelection.get().getCandidateId() ==
+                                candidate.get().getObjectId()) {
+                                if (candidate.get().isWriteIn()) {
+                                    writeins[selection.get().getObjectId()] =
+                                      selection.get().getWriteIn();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (writeins.dump() != string("null")) {
+            overvoteAndWriteIns["write_ins"] = writeins;
+        }
+
+        string overvoteAndWriteIns_string("");
+        if (overvoteAndWriteIns.dump() != string("null")) {
+            overvoteAndWriteIns_string = overvoteAndWriteIns.dump();      
+        }
+
+        return overvoteAndWriteIns_string;
     }
 
     unique_ptr<CiphertextBallotContest>
     encryptContest(const PlaintextBallotContest &contest,
+                   const InternalManifest &internalManifest,
                    const ContestDescriptionWithPlaceholders &description,
                    const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
                    const ElementModQ &nonceSeed, bool shouldVerifyProofs /* = true */)
 
     {
         // Validate Input
-        if (!contest.isValid(description.getObjectId(), description.getSelections().size(),
-                             description.getNumberElected(), description.getVotesAllowed())) {
+        bool supportOvervotes = true;
+        eg_valid_contest_return_type_t is_valid_contest =
+          contest.isValid(description.getObjectId(), description.getSelections().size(),
+          description.getNumberElected(), description.getVotesAllowed(), supportOvervotes);
+        if ((is_valid_contest != SUCCESS) && (is_valid_contest != OVERVOTE)) {
             throw invalid_argument("the plaintext contest was invalid");
         }
 
@@ -333,13 +406,17 @@ namespace electionguard
         auto chaumPedersenNonce = nonceSequence->next();
         std::shared_ptr<ElementModQ> sharedNonce(move(contestNonce));
 
-        vector<future<unique_ptr<CiphertextBallotSelection>>> tasks;
         vector<unique_ptr<CiphertextBallotSelection>> encryptedSelections;
+
+        // get the writein data if there is any
+        string extendedData = getOvervoteAndWriteIns(contest, internalManifest, is_valid_contest);
 
         // TODO: ISSUE #36: this code could be inefficient if we had a contest
         // with a lot of choices, although the O(n^2) iteration here is small
         // compared to the huge cost of doing the cryptography.
         uint64_t selectionCount = 0;
+
+        unique_ptr<PlaintextBallotSelection> duplicate_selection;
 
         // iterate over the actual selections for each contest description
         // and apply the selected value if it exists.  If it does not, an explicit
@@ -358,16 +435,20 @@ namespace electionguard
 
                 // track the selection count so we can append the
                 // appropriate number of true placeholder votes
-                const auto slection_ptr = &selection->get();
-                selectionCount += selection->get().getVote();
+                auto selection_ptr = &selection->get();
 
-                tasks.push_back(Scheduler::submit([=] {
-                    auto encrypted = encryptSelection(
-                      *slection_ptr, selectionDescription.get(), *elgamalPublicKey_ptr,
-                      *cryptoExtendedBaseHash_ptr, *sharedNonce.get(), false, shouldVerifyProofs);
-                    return encrypted;
-                }));
+                // if the is an overvote then we need to make all the selection votes 0
+                if (is_valid_contest == OVERVOTE) {
+                    duplicate_selection = make_unique<PlaintextBallotSelection>(
+                      selection_ptr->getObjectId(), 0, false);
+                    selection_ptr = duplicate_selection.get();
+                }
 
+                selectionCount += selection_ptr->getVote();
+
+                encryptedSelections.push_back(encryptSelection(
+                  *selection_ptr, selectionDescription.get(), *elgamalPublicKey_ptr,
+                      *cryptoExtendedBaseHash_ptr, *sharedNonce.get(), false, shouldVerifyProofs));
             } else {
                 // Should never happen since the contest is normalized by emplaceMissingValues
                 throw runtime_error("encryptedContest:: Error constructing encrypted selection");
@@ -378,26 +459,39 @@ namespace electionguard
         // After we loop through all of the real selections on the ballot,
         // we loop through each placeholder value and determine if it should be filled in
         for (const auto &placeholder : description.getPlaceholders()) {
-            // for undervotes, select the placeholder value as true for each available seat
-            // note this pattern is used since DisjunctiveChaumPedersen expects a 0 or 1
-            // so each seat can only have a maximum value of 1 in the current implementation
             bool selectPlaceholder = false;
-            if (selectionCount < description.getNumberElected()) {
+            // if the is an overvote then we don't count any of the selections
+            if (is_valid_contest == OVERVOTE) {
                 selectPlaceholder = true;
-                selectionCount += 1;
+            } else {
+                // for undervotes, select the placeholder value as true for each available seat
+                // note this pattern is used since DisjunctiveChaumPedersen expects a 0 or 1
+                // so each seat can only have a maximum value of 1 in the current implementation
+                if (selectionCount < description.getNumberElected()) {
+                    selectPlaceholder = true;
+                    selectionCount += 1;
+                }
             }
 
-            tasks.push_back(Scheduler::submit([=] {
-                auto placeholderSelection = selectionFrom(placeholder, true, selectPlaceholder);
-                auto encrypted = encryptSelection(
+            auto placeholderSelection = selectionFrom(placeholder, true, selectPlaceholder);
+            encryptedSelections.push_back(encryptSelection(
                   *placeholderSelection, placeholder, *elgamalPublicKey_ptr,
-                  *cryptoExtendedBaseHash_ptr, *sharedNonce.get(), false, shouldVerifyProofs);
-                return encrypted;
-            }));
+                  *cryptoExtendedBaseHash_ptr, *sharedNonce.get(), false, shouldVerifyProofs));
         }
 
-        // wait for all tasks to complete
-        encryptedSelections = wait_all(tasks);
+        // Derive the extendedDataNonce from the selection nonce and a constant
+        auto noncesForExtendedData =
+            make_unique<Nonces>(*sharedNonce->clone(), "constant-extended-data");
+        auto extendedDataNonce = noncesForExtendedData->get(0);
+
+        vector<uint8_t> extendedData_plaintext((uint8_t *)&extendedData.front(),
+                                               (uint8_t *)&extendedData.front() +
+                                                 extendedData.size());
+
+        // Perform HashedElGamalCiphertext calculation
+        unique_ptr<HashedElGamalCiphertext> hashedElGamal =
+          hashedElgamalEncrypt(extendedData_plaintext, *extendedDataNonce, elgamalPublicKey,
+                               cryptoExtendedBaseHash, BYTES_512, true);
 
         // TODO: ISSUE #33: support other cases such as cumulative voting
         // (individual selections being an encryption of > 1)
@@ -410,7 +504,8 @@ namespace electionguard
         auto encryptedContest = CiphertextBallotContest::make(
           contest.getObjectId(), description.getSequenceOrder(), *descriptionHash,
           move(encryptedSelections), elgamalPublicKey, cryptoExtendedBaseHash, *chaumPedersenNonce,
-          description.getNumberElected(), sharedNonce->clone());
+          description.getNumberElected(), sharedNonce->clone(), nullptr,
+          nullptr, move(hashedElGamal));
 
         if (encryptedContest == nullptr || encryptedContest->getProof() == nullptr) {
             throw runtime_error("encryptedContest:: Error constructing encrypted constest");
@@ -446,7 +541,8 @@ namespace electionguard
                 if (contest.get().getObjectId() == description.get().getObjectId()) {
                     hasContest = true;
                     auto encrypted = encryptContest(
-                      contest.get(), description.get(), *context.getElGamalPublicKey(),
+                      contest.get(), internalManifest, description.get(),
+                      *context.getElGamalPublicKey(),
                       *context.getCryptoExtendedBaseHash(), nonceSeed, shouldVerifyProofs);
 
                     encryptedContests.push_back(move(encrypted));

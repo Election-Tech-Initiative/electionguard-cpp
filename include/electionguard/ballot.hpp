@@ -43,11 +43,12 @@ namespace electionguard
     /// <returns>BallotBoxState.unknown if the value cannot be resolved</returns>
     /// </Summary>
     EG_API BallotBoxState getBallotBoxState(const std::string &value);
-
+    
     /// <summary>
     /// ExtendedData represents any arbitrary data expressible as a string with a length.
     ///
-    /// This class is used primarily as a field on a selection to indicate a write-in candidate text value
+    /// This class is used primarily as a field to hold encrypted data on a
+    /// contest, overvote data and writeins.
     /// </summary>
     struct ExtendedData {
       public:
@@ -71,7 +72,7 @@ namespace electionguard
             return std::make_unique<ExtendedData>(this->value, this->length);
         }
     };
-
+    
     /// <summary>
     /// A BallotSelection represents an individual selection on a ballot.
     ///
@@ -94,8 +95,7 @@ namespace electionguard
         PlaintextBallotSelection(const PlaintextBallotSelection &other);
         PlaintextBallotSelection(PlaintextBallotSelection &&other);
         PlaintextBallotSelection(std::string objectId, uint64_t vote,
-                                 bool isPlaceholderSelection = false,
-                                 std::unique_ptr<ExtendedData> extendedData = nullptr);
+                                 bool isPlaceholderSelection = false, std::string writeIn = "");
         ~PlaintextBallotSelection();
 
         PlaintextBallotSelection &operator=(PlaintextBallotSelection other);
@@ -118,9 +118,9 @@ namespace electionguard
         bool getIsPlaceholder() const;
 
         /// <summary>
-        /// an optional field of arbitrary data, such as the value of a write-in candidate
+        /// an optional field holding the value of a write-in candidate
         /// </summary>
-        ExtendedData *getExtendedData() const;
+        std::string getWriteIn() const;
 
         /// <summary>
         /// Given a PlaintextBallotSelection validates that the object matches an expected object
@@ -330,6 +330,14 @@ namespace electionguard
         //TODO: void setNonce(ElementModQ *nonce);
     };
 
+    typedef enum eg_valid_contest_return_e {
+        SUCCESS = 0,
+        OVERVOTE = 1,
+        OVERVOTE_ERROR = 2,
+        INVALID_OBJECT_ID_ERROR = 2,
+        TOO_MANY_SELECTIONS_ERROR = 3,
+    } eg_valid_contest_return_type_t;
+
     /// <summary>
     /// A PlaintextBallotContest represents the selections made by a voter for a specific ContestDescription
     ///
@@ -370,8 +378,10 @@ namespace electionguard
         ///
         /// Note: because this class supports partial representations, undervotes are considered a valid state.
         /// </Summary>
-        bool isValid(const std::string &expectedObjectId, uint64_t expectedNumberSelections,
-                     uint64_t expectedNumberElected, uint64_t votesAllowd = 0) const;
+        eg_valid_contest_return_type_t isValid(const std::string &expectedObjectId,
+                                               uint64_t expectedNumberSelections,
+                                               uint64_t expectedNumberElected, uint64_t votesAllowd = 0,
+                                               bool supportOvervotes = true) const;
 
       private:
         class Impl;
@@ -404,7 +414,8 @@ namespace electionguard
                                 std::unique_ptr<ElementModQ> nonce,
                                 std::unique_ptr<ElGamalCiphertext> ciphertextAccumulation,
                                 std::unique_ptr<ElementModQ> cryptoHash,
-                                std::unique_ptr<ConstantChaumPedersenProof> proof);
+                                std::unique_ptr<ConstantChaumPedersenProof> proof,
+                                std::unique_ptr<HashedElGamalCiphertext> hashedElGamal);
         ~CiphertextBallotContest();
 
         CiphertextBallotContest &operator=(CiphertextBallotContest other);
@@ -453,6 +464,12 @@ namespace electionguard
         ConstantChaumPedersenProof *getProof() const;
 
         /// <summary>
+        /// The hashed elgamal ciphertext is the encrypted extended data (overvote information
+        /// and writeins).
+        /// </summary>
+        std::unique_ptr<HashedElGamalCiphertext> getHashedElGamalCiphertext() const;
+
+        /// <summary>
         /// Given an encrypted BallotContest, generates a hash, suitable for rolling up
         /// into a hash / tracking code for an entire ballot. Of note, this particular hash examines
         /// the `encryptionSeed` and `ballot_selections`, but not the proof.
@@ -479,7 +496,8 @@ namespace electionguard
              const ElementModQ &proofSeed, const uint64_t numberElected,
              std::unique_ptr<ElementModQ> nonce = nullptr,
              std::unique_ptr<ElementModQ> cryptoHash = nullptr,
-             std::unique_ptr<ConstantChaumPedersenProof> proof = nullptr);
+             std::unique_ptr<ConstantChaumPedersenProof> proof = nullptr,
+             std::unique_ptr<HashedElGamalCiphertext> hashedElGamal = nullptr);
 
         /// <summary>
         /// An aggregate nonce for the contest composed of the nonces of the selections.
