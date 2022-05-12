@@ -77,6 +77,10 @@ namespace ElectionGuard
             return Marshal.PtrToStringAnsi(value);
         }
 
+
+        /// <summary>
+        /// Get the value using the designated key
+        /// </summary>
         public unsafe string this[string searchKey]
         {
             get

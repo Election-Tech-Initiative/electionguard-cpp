@@ -2209,6 +2209,20 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Creates a `Manifest` object
+        /// </summary>
+        /// <param name="electionScopeId"></param>
+        /// <param name="electionType">election type</param>
+        /// <param name="startDate">start date for election</param>
+        /// <param name="endDate">end data for the election</param>
+        /// <param name="gpUnits">array of the `GeopoliticalUnit` for election</param>
+        /// <param name="parties">array of the `Party` for election</param>
+        /// <param name="candidates">array of the `Candidate` for election</param>
+        /// <param name="contests">array of the `ContestDescription` for election</param>
+        /// <param name="ballotStyles">array of the `BallotStyle` for election</param>
+        /// <param name="name">name of the election</param>
+        /// <param name="contact">contact information for the election</param>
         public unsafe Manifest(
              string electionScopeId, ElectionType electionType,
              DateTime startDate, DateTime endDate,
