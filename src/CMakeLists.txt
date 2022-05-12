@@ -82,6 +82,8 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Bignum4096.h
     ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Bignum4096_32.c
     ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Bignum4096_32.h
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_GenericField32.c
+    ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_GenericField32.h
     ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_GenericField64.c
     ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_GenericField64.h
     ${PROJECT_SOURCE_DIR}/src/karamel/Hacl_Hash.c
