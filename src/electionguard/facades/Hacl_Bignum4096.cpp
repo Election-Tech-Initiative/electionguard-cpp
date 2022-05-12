@@ -127,28 +127,25 @@ namespace hacl
     void Bignum4096::modExp(uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res,
                             bool useConstTime /* = true */) const
     {
-#ifdef _WIN32
         if (bBits <= 0) {
             Log::trace("Bignum4096::modExp:: bbits <= 0");
             return throw;
         }
         if (useConstTime) {
+#ifdef _WIN32
             return Hacl_Bignum4096_32_mod_exp_consttime_precomp(context.get(),
                                                                 reinterpret_cast<uint32_t *>(a), bBits,
                                                                 reinterpret_cast<uint32_t *>(b),
                                                                 reinterpret_cast<uint32_t *>(res));
+#else
+            return Hacl_Bignum4096_mod_exp_consttime_precomp(context.get(), a, bBits, b, res);
+#endif // _WIN32
         }
+#ifdef _WIN32
         return Hacl_Bignum4096_32_mod_exp_vartime_precomp(context.get(), reinterpret_cast<uint32_t *>(a),
                                                           bBits, reinterpret_cast<uint32_t *>(b),
                                                           reinterpret_cast<uint32_t *>(res));
 #else
-        if (bBits <= 0) {
-            Log::trace("Bignum4096::modExp:: bbits <= 0");
-            return throw;
-        }
-        if (useConstTime) {
-            return Hacl_Bignum4096_mod_exp_consttime_precomp(context.get(), a, bBits, b, res);
-        }
         return Hacl_Bignum4096_mod_exp_vartime_precomp(context.get(), a, bBits, b, res);
 #endif // _WIN32
     }
