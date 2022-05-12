@@ -176,7 +176,6 @@ namespace hacl
     void Bignum4096::montgomery_mod_mul_stay_in_mont_form(uint64_t *aM, uint64_t *bM, uint64_t *cM) const
     {
 #ifdef _WIN32
-        //Log::debug("32 BIT ####################### MUL");
         Hacl_GenericField32_mul(context.get(), reinterpret_cast<uint32_t *>(aM),
                                 reinterpret_cast<uint32_t *>(bM), reinterpret_cast<uint32_t *>(cM));
 #else
