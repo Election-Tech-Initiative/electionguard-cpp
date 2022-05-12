@@ -23,6 +23,9 @@ namespace ElectionGuard.Encrypt.Tests
             // Assert
             Assert.That(firstValue == "value");
             Assert.That(secondValue == "thing");
+            Assert.That(list["some"] == "value");
+            Assert.That(list["another"] == "thing");
+            Assert.That(list["notthere"] == null);
         }
     }
 }
