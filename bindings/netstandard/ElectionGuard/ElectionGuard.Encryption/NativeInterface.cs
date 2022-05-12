@@ -1888,7 +1888,31 @@ namespace ElectionGuard
                 ulong ballotStylesSize,
                 out ManifestHandle handle);
 
-            // TODO: eg_election_manifest_new_with_contact
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_new_with_contact",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string electionScopeId,
+                ElectionType electionType,
+                InternationalizedText.InternationalizedTextHandle name,
+                ulong startDate,
+                ulong endDate,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] gpUnits,
+                ulong gpUnitsSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] parties,
+                ulong partiesSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] candidates,
+                ulong candidatesSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] contests,
+                ulong contestSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] ballotStyles,
+                ulong ballotStylesSize,
+                ContactInformation.ContactInformationHandle contact,
+                out ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
