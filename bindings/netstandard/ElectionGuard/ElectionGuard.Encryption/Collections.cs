@@ -77,6 +77,27 @@ namespace ElectionGuard
             return Marshal.PtrToStringAnsi(value);
         }
 
+
+        /// <summary>
+        /// Get the value using the designated key
+        /// </summary>
+        public unsafe string this[string searchKey]
+        {
+            get
+            {
+                var count = NativeInterface.LinkedList.GetCount(Handle);
+                for (ulong position = 0; position < count; position++)
+                {
+                    var status = NativeInterface.LinkedList.GetElementAt(
+                            Handle, position, out IntPtr key, out IntPtr value);
+                    status.ThrowIfError();
+                    if (Marshal.PtrToStringAnsi(key) == searchKey)
+                        return Marshal.PtrToStringAnsi(value);
+                }
+                return null;
+            }
+        }
+
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

@@ -513,6 +513,8 @@ namespace electionguard
                     serialized.push_back({"contact_information", contactInformation});
                 }
 
+                serialized.push_back({"spec_version", "1.0"});
+
                 return serialized;
             }
 
@@ -1059,7 +1061,7 @@ namespace electionguard
                   {"manifest_hash", serializable.getManifestHash()->toHex()},
                   {"code_seed", serializable.getBallotCodeSeed()->toHex()},
                   {"contests", contests},
-                  {"ballot_code", serializable.getBallotCode()->toHex()},
+                  {"code", serializable.getBallotCode()->toHex()},
                   {"timestamp", serializable.getTimestamp()},
                   {"crypto_hash", serializable.getCryptoHash()->toHex()},
                 };
@@ -1074,7 +1076,7 @@ namespace electionguard
                 auto style_id = j["style_id"].get<string>();
                 auto manifest_hash = j["manifest_hash"].get<string>();
                 auto code_seed = j["code_seed"].get<string>();
-                auto ballot_code = j["ballot_code"].get<string>();
+                auto ballot_code = j["code"].get<string>();
                 auto timestamp = j["timestamp"].get<uint64_t>();
                 auto ballot_nonce = j["nonce"].is_null() ? "" : j["nonce"].get<string>();
                 auto crypto_hash = j["crypto_hash"].get<string>();
@@ -1265,7 +1267,7 @@ namespace electionguard
             {
 
                 auto result = SubmittedBallotWrapper::fromObjectWrapper(serializable);
-                result["state"] = getBallotBoxStateString(serializable.getState());
+                result["state"] = serializable.getState();
 
                 return result;
             }
@@ -1273,7 +1275,7 @@ namespace electionguard
             static unique_ptr<electionguard::SubmittedBallot> toObject(json j)
             {
                 auto ciphertext = SubmittedBallotWrapper::toObjectWrapper(j);
-                auto state = getBallotBoxState(j["state"].get<string>());
+                auto state = electionguard::BallotBoxState(j["state"].get<uint64_t>());
                 // TODO: make this a move instead of a copy
                 return electionguard::SubmittedBallot::from(*ciphertext, state);
             }
@@ -1327,30 +1329,29 @@ namespace electionguard
                 json plaintext =
                   CompactPlaintextBallotWrapper::fromObjectWrapper(*serializable.getPlaintext());
 
-                json result = {
-                  {"plaintext", plaintext},
-                  {"code_seed", serializable.getBallotCodeSeed()->toHex()},
-                  {"ballot_code", serializable.getBallotCode()->toHex()},
-                  {"nonce", serializable.getNonce()->toHex()},
-                  {"timestamp", serializable.getTimestamp()},
-                  {"ballot_box_state", getBallotBoxStateString(serializable.getBallotBoxState())}};
+                json result = {{"plaintext", plaintext},
+                               {"code_seed", serializable.getBallotCodeSeed()->toHex()},
+                               {"code", serializable.getBallotCode()->toHex()},
+                               {"nonce", serializable.getNonce()->toHex()},
+                               {"timestamp", serializable.getTimestamp()},
+                               {"ballot_box_state", serializable.getBallotBoxState()}};
                 return result;
             }
             static unique_ptr<electionguard::CompactCiphertextBallot> toObject(json j)
             {
 
                 auto codeSeed = j["code_seed"].get<string>();
-                auto ballotCode = j["ballot_code"].get<string>();
+                auto ballotCode = j["code"].get<string>();
                 auto nonce = j["nonce"].get<string>();
                 auto timestamp = j["timestamp"].get<uint64_t>();
-                auto ballotBoxState = j["ballot_box_state"].get<string>();
+                auto ballotBoxState =
+                  electionguard::BallotBoxState(j["ballot_box_state"].get<uint64_t>());
 
                 auto plaintext = CompactPlaintextBallotWrapper::toObjectWrapper(j["plaintext"]);
 
                 return make_unique<electionguard::CompactCiphertextBallot>(
-                  move(plaintext), getBallotBoxState(ballotBoxState),
-                  ElementModQ::fromHex(codeSeed), ElementModQ::fromHex(ballotCode), timestamp,
-                  ElementModQ::fromHex(nonce));
+                  move(plaintext), ballotBoxState, ElementModQ::fromHex(codeSeed),
+                  ElementModQ::fromHex(ballotCode), timestamp, ElementModQ::fromHex(nonce));
             }
 
           public:
