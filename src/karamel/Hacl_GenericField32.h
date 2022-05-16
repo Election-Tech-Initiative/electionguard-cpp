@@ -30,11 +30,10 @@ extern "C" {
 #endif
 
 #include <string.h>
-#include "krml/internal/types.h"
-#include "krml/lowstar_endianness.h"
-#include "krml/internal/target.h"
-#include "krml/internal/builtin.h"
-
+#include "karamel/krml/internal/types.h"
+#include "karamel/krml/lowstar_endianness.h"
+#include "karamel/krml/internal/target.h"
+#include "karamel/krml/internal/builtin.h"
 
 #include "Hacl_Bignum256_32.h"
 #include "evercrypt_targetconfig.h"
