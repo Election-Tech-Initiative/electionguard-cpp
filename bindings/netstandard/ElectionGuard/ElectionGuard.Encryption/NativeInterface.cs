@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 
@@ -1893,7 +1893,6 @@ namespace ElectionGuard
             internal static extern Status New(
                 [MarshalAs(UnmanagedType.LPStr)] string electionScopeId,
                 ElectionType electionType,
-                InternationalizedText.InternationalizedTextHandle name,
                 ulong startDate,
                 ulong endDate,
                 // TODO ISSUE #212: type safety
@@ -1911,6 +1910,7 @@ namespace ElectionGuard
                 // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] ballotStyles,
                 ulong ballotStylesSize,
+                InternationalizedText.InternationalizedTextHandle name,
                 ContactInformation.ContactInformationHandle contact,
                 out ManifestHandle handle);
 

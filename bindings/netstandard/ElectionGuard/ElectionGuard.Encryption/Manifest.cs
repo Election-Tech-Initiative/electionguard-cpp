@@ -2266,7 +2266,7 @@ namespace ElectionGuard
             }
 
             var status = NativeInterface.Manifest.New(
-                electionScopeId, electionType, name.Handle,
+                electionScopeId, electionType,
                 (ulong)new DateTimeOffset(startDate).ToUnixTimeMilliseconds(),
                 (ulong)new DateTimeOffset(endDate).ToUnixTimeMilliseconds(),
                 gpUnitPointers, (ulong)gpUnitPointers.LongLength,
@@ -2274,6 +2274,7 @@ namespace ElectionGuard
                 candidatePointers, (ulong)candidatePointers.LongLength,
                 contestPointers, (ulong)contestPointers.LongLength,
                 ballotStylePointers, (ulong)ballotStylePointers.LongLength,
+                name.Handle,
                 contact.Handle,
                 out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
