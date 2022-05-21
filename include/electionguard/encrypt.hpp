@@ -4,11 +4,14 @@
 #include "ballot.hpp"
 #include "ballot_compact.hpp"
 #include "election.hpp"
+#include "export.h"
 #include "group.hpp"
 #include "manifest.hpp"
-#include "export.h"
 
 #include <memory>
+#include <nlohmann/json.hpp>
+
+using nlohmann::json;
 
 namespace electionguard
 {
@@ -46,9 +49,23 @@ namespace electionguard
         /// </summary>
         uint64_t getTimestamp() const;
 
+        /// <summary>
+        /// Allow for serialization
+        /// </summary>
+        static vector<uint8_t> toBson(const electionguard::EncryptionDevice &serializable);
+
+        static string toJson(const electionguard::EncryptionDevice &serializable);
+
+        static unique_ptr<electionguard::EncryptionDevice> fromBson(vector<uint8_t> data);
+
+        static unique_ptr<electionguard::EncryptionDevice> fromJson(string data);
+
       private:
         class Impl;
         std::unique_ptr<Impl> pimpl;
+
+        static json fromObject(const electionguard::EncryptionDevice &serializable);
+        static unique_ptr<electionguard::EncryptionDevice> toObject(json j);
     };
 
     /// <summary>
