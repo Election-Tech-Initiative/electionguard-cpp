@@ -165,7 +165,7 @@ namespace electionguard
     static json
     geopoliticalUnitsToJson(const vector<reference_wrapper<GeopoliticalUnit>> &serializable)
     {
-        json serialized;
+        json serialized = json::array();
         for (const auto &element : serializable) {
             serialized.push_back(geopoliticalUnitToJson(element));
         }
@@ -219,7 +219,7 @@ namespace electionguard
 
     static json partiesToJson(const vector<reference_wrapper<Party>> &serializable)
     {
-        json serialized;
+        json serialized = json::array();
         for (const auto &element : serializable) {
 
             serialized.push_back(partyToJson(element));
@@ -280,7 +280,7 @@ namespace electionguard
 
     static json candidatesToJson(const vector<reference_wrapper<Candidate>> &serializable)
     {
-        json serialized;
+        json serialized = json::array();
         for (const auto &element : serializable) {
 
             serialized.push_back(candidateToJson(element));
@@ -346,7 +346,7 @@ namespace electionguard
 
     static json ballotStylesToJson(const vector<reference_wrapper<BallotStyle>> &serializable)
     {
-        json serialized;
+        json serialized = json::array();
         for (const auto &element : serializable) {
             serialized.push_back(ballotStyleToJson(element));
         }
@@ -456,7 +456,7 @@ namespace electionguard
     static json
     contestDescriptionsToJson(const vector<reference_wrapper<ContestDescription>> &serializable)
     {
-        json serialized;
+        json serialized = json::array();
         for (const auto &element : serializable) {
             serialized.push_back(contestDescriptionToJson(element));
         }
@@ -687,8 +687,8 @@ namespace electionguard
                 auto manifestHash = ElementModQ::fromHex(manifest_hash);
 
                 return make_unique<electionguard::InternalManifest>(
-                  move(geopoliticalUnits), move(candidates), move(contestDescriptions), move(ballotStyles),
-                  *manifestHash);
+                  move(geopoliticalUnits), move(candidates), move(contestDescriptions),
+                  move(ballotStyles), *manifestHash);
             }
 
           public:
@@ -860,11 +860,10 @@ namespace electionguard
                         }
 
                         string write_in;
-                        if (selection.contains("write_in") &&
-                            !selection["write_in"].is_null()) {
+                        if (selection.contains("write_in") && !selection["write_in"].is_null()) {
                             write_in = selection["write_in"].get<string>();
                         }
-                
+
                         plaintextSelections.push_back(
                           make_unique<electionguard::PlaintextBallotSelection>(
                             selection_object_id, vote, isPlaceholder, write_in));
@@ -1111,7 +1110,7 @@ namespace electionguard
 
                     auto deserializedHashedElGamal =
                       make_unique<electionguard::HashedElGamalCiphertext>(
-                      ElementModP::fromHex(hashed_el_gamal_pad),
+                        ElementModP::fromHex(hashed_el_gamal_pad),
                         hex_to_bytes(hashed_el_gamal_data_sanitized),
                         hex_to_bytes(hashed_el_gamal_mac_sanitized));
 
