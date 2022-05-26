@@ -26,6 +26,11 @@ bool test_g_pow_p_with_random(void)
         assert(false);
     }
 
+    eg_element_mod_p_t *r = NULL;
+    if (eg_element_mod_p_constant_r(&r)) {
+        assert(false);
+    }
+
     eg_element_mod_q_t *e = NULL;
     if (eg_element_mod_q_rand_q_new(&e)) {
         assert(false);

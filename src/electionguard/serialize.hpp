@@ -16,6 +16,10 @@
 #include <nlohmann/json.hpp>
 #include <unordered_map>
 
+using electionguard::G;
+using electionguard::P;
+using electionguard::Q;
+using electionguard::R;
 using std::make_unique;
 using std::reference_wrapper;
 using std::string;
@@ -1381,6 +1385,27 @@ namespace electionguard
             {
                 return toObject(json::from_msgpack(data));
             }
+        };
+
+        class Constants
+        {
+          private:
+            static json fromObject()
+            {
+                json serialized;
+                serialized["large_prime"] = P().toHex();
+                serialized["small_prime"] = Q().toHex();
+                serialized["cofactor"] = R().toHex();
+                serialized["generator"] = G().toHex();
+                return serialized;
+            }
+
+          public:
+            static vector<uint8_t> toBson() { return json::to_bson(fromObject()); }
+
+            static vector<uint8_t> toMsgPack() { return json::to_msgpack(fromObject()); }
+
+            static string toJson() { return fromObject().dump(); }
         };
     };
 } // namespace electionguard
