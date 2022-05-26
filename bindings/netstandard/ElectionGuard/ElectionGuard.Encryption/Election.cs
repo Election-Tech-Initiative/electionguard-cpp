@@ -16,9 +16,6 @@ namespace ElectionGuard
     /// Specifically, `crypto_base_hash`, `crypto_extended_base_hash` and `elgamal_public_key`
     /// are populated with election-specific information necessary for encrypting the election.
     /// Refer to the [Electionguard Specification](https://github.com/microsoft/electionguard) for more information.
-    ///
-    /// To make an instance of this class, don't construct it directly. Use
-    /// `make_ciphertext_election_context` instead.
     /// </summary>
     public class CiphertextElectionContext : DisposableBase
     {
