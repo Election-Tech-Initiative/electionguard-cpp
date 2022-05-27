@@ -118,5 +118,16 @@ namespace ElectionGuard.Encrypt.Tests
             // Assert
             Assert.That(compact.ObjectId == fromMsgpack.ObjectId);
         }
+
+        [Test]
+        public void Test_Constant_Serialization_Succeeds()
+        {
+            var constants = Constants.ToJson();
+            Assert.That(constants.Contains(Constants.P.ToHex()));
+            Assert.That(constants.Contains(Constants.Q.ToHex()));
+            Assert.That(constants.Contains(Constants.R.ToHex()));
+            Assert.That(constants.Contains(Constants.G.ToHex()));
+        }
+
     }
 }

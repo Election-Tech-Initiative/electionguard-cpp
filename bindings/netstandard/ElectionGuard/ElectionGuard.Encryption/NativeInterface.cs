@@ -532,6 +532,10 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status P(out ElementModP.ElementModPHandle handle);
 
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_constant_r",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status R(out ElementModP.ElementModPHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_constant_zero_mod_p",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ZERO_MOD_P(out ElementModP.ElementModPHandle handle);
@@ -544,7 +548,7 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status TWO_MOD_P(out ElementModP.ElementModPHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_element_mod_p_constant_p",
+            [DllImport(DllName, EntryPoint = "eg_element_mod_q_constant_q",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Q(out ElementModQ.ElementModQHandle handle);
 
@@ -559,6 +563,11 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_constant_two_mod_q",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status TWO_MOD_Q(out ElementModQ.ElementModQHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_constant_to_json",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status ToJson(out IntPtr data, out ulong size);
+
         }
 
         #endregion

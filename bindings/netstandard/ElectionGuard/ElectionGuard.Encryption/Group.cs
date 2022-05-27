@@ -277,6 +277,22 @@ namespace ElectionGuard
         }
 
         /// <summary>
+        /// R value in Hacl_Bignum4096 format
+        /// </summary>
+        public unsafe static ElementModP R
+        {
+            get
+            {
+                var status = NativeInterface.Constants.R(out NaiveElementModP handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    throw new ElectionGuardException($"R Error Status: {status}");
+                }
+                return new ElementModP(handle);
+            }
+        }
+
+        /// <summary>
         /// zero as data for `ElementModP`
         /// </summary>
         public unsafe static ElementModP ZERO_MOD_P
@@ -387,5 +403,19 @@ namespace ElectionGuard
                 return new ElementModQ(handle);
             }
         }
+
+        /// <Summary>
+        /// Export the representation as JSON
+        /// </Summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
+        public unsafe static string ToJson()
+        {
+            var status = NativeInterface.Constants.ToJson(
+                 out IntPtr pointer, out ulong size);
+            status.ThrowIfError();
+            var json = Marshal.PtrToStringAnsi(pointer);
+            return json;
+        }
+
     }
 }
