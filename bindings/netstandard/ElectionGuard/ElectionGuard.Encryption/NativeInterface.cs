@@ -3275,7 +3275,8 @@ namespace ElectionGuard
 
         internal static unsafe class Encrypt
         {
-            [DllImport(DllName, EntryPoint = "eg_encrypt_selection")]
+            [DllImport(DllName, EntryPoint = "eg_encrypt_selection",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Selection(
                 PlaintextBallotSelection.PlaintextBallotSelectionHandle plaintext,
                 SelectionDescription.SelectionDescriptionHandle description,
@@ -3285,7 +3286,8 @@ namespace ElectionGuard
                 bool shouldVerifyProofs,
                 out CiphertextBallotSelection.CiphertextBallotSelectionHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_encrypt_contest")]
+            [DllImport(DllName, EntryPoint = "eg_encrypt_contest",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Contest(
                 PlaintextBallotContest.PlaintextBallotContestHandle plaintext,
                 ContestDescription.ContestDescriptionHandle description,
@@ -3341,16 +3343,20 @@ namespace ElectionGuard
         #region Precompute
         internal static unsafe class PrecomputeBuffers
         {
-            [DllImport(DllName, EntryPoint = "eg_precompute_init")]
+            [DllImport(DllName, EntryPoint = "eg_precompute_init",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Init(int max_buffers);
 
-            [DllImport(DllName, EntryPoint = "eg_precompute_populate")]
+            [DllImport(DllName, EntryPoint = "eg_precompute_populate",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Populate(ElementModP.ElementModPHandle publicKey);
 
-            [DllImport(DllName, EntryPoint = "eg_precompute_stop")]
+            [DllImport(DllName, EntryPoint = "eg_precompute_stop",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Stop();
 
-            [DllImport(DllName, EntryPoint = "eg_precompute_status")]
+            [DllImport(DllName, EntryPoint = "eg_precompute_status",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Status(out int count, out int queue_size);
         }
 
