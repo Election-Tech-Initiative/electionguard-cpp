@@ -12,6 +12,9 @@
 #include <nlohmann/json.hpp>
 
 using nlohmann::json;
+using std::unique_ptr;
+using std::vector;
+using std::string;
 
 namespace electionguard
 {

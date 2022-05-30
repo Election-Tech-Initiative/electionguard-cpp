@@ -6,7 +6,7 @@ make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --quest
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Mon May 30 11:38:59 2022
+# Make data base, printed on Mon May 30 16:40:50 2022
 
 # Variables
 
@@ -23,7 +23,7 @@ USERPROFILE = C:\Users\ratze
 # environment
 LOCALAPPDATA = C:\Users\ratze\AppData\Local
 # environment
-VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-3b57305a-b4e0-4865-8b94-4ff139ffd804-sock
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-a2a6703f-5a01-4660-b93a-6a46043f28d0-sock
 # environment
 VSCODE_CWD = C:\Users\ratze\AppData\Local\Programs\Microsoft VS Code
 # environment
@@ -39,7 +39,7 @@ MAKE_COMMAND := C:/ProgramData/chocolatey/lib/make/tools/install/bin/make.exe
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_24636_YHYXDJNZLFDGZMCR
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_4220_XKKBWWXIRPIDXFNW
 # environment
 IOLIBS = C:\Program Files\darktable\lib\libgphoto2_port\0.12.0
 # environment
@@ -105,7 +105,7 @@ MAKEFILE_LIST := Makefile
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 24636
+VSCODE_PID = 4220
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # environment
@@ -159,7 +159,8 @@ ELECTIONGUARD_BUILD_BINDING_DIR = $(ELECTIONGUARD_BUILD_DIR)/bindings
 # automatic
 ^F = $(notdir $^)
 # makefile (from 'Makefile', line 17)
-OPERATING_SYSTEM := Windows
+OPERATING_SYSTEM 
+ := Windows
 # environment
 PROMPT = $P$G
 # environment
@@ -648,6 +649,6 @@ bench:
 # strcache performance: lookups = 112 / hit rate = 52%
 # hash-table stats:
 # Load=53/8192=1%, Rehash=0, Collisions=0/112=0%
-# Finished Make data base on Mon May 30 11:38:59 2022
+# Finished Make data base on Mon May 30 16:40:50 2022
 
  
