@@ -86,43 +86,29 @@ namespace electionguard
         return toObject(json::parse(data));
     }
 
-    json EncryptionDevice::fromObject(const electionguard::EncryptionDevice &serializable) {}
+    json EncryptionDevice::fromObject(const electionguard::EncryptionDevice &serializable)
+    {
+
+
+        json j = {
+          {"deviceUuid", serializable.pimpl->deviceUuid},
+          {"sessionUuid", serializable.pimpl->sessionUuid},
+          {"launchCode", serializable.pimpl->launchCode},
+          {"location", serializable.pimpl->location},
+        };
+
+        return j;
+    }
 
     unique_ptr<electionguard::EncryptionDevice> EncryptionDevice::toObject(json j)
     {
-        auto deviceUuid= j["crypto_base_hash"].get<string>();
-        auto crypto_extended_base_hash = j["crypto_extended_base_hash"].get<string>();
-        auto commitment_hash = j["commitment_hash"].get<string>();
-        auto manifest_hash = j["manifest_hash"].get<string>();
-        auto elgamal_public_key = j["elgamal_public_key"].get<string>();
-        auto number_of_guardians = j["number_of_guardians"].get<uint64_t>();
-        auto quorum = j["quorum"].get<uint64_t>();
+        auto deviceUuid = j["deviceUuid"].get<uint64_t>();
+        auto sessionUuid = j["sessionUuid"].get<uint64_t>();
+        auto launchCode = j["launchCode"].get<uint64_t>();
+        auto location = j["location"].get<string>();
 
-        auto commitmentHash = ElementModQ::fromHex(commitment_hash);
-        auto manifestHash = ElementModQ::fromHex(manifest_hash);
-        auto cryptoBaseHash = ElementModQ::fromHex(crypto_base_hash);
-        auto cryptoExtendedBaseHash = ElementModQ::fromHex(crypto_extended_base_hash);
-        auto elGamalPublicKey = ElementModP::fromHex(elgamal_public_key);
-
-        // ensure the elgamal public key instance is set as a fixed base
-        elGamalPublicKey->setIsFixedBase(true);
-
-        if (j.contains("extended_data") && !j["extended_data"].is_null()) {
-            std::unordered_map<string, string> extendedDataMap;
-
-            for (auto &[key, value] : j["extended_data"].items()) {
-                extendedDataMap.emplace(key, value);
-            }
-
-            return make_unique<CiphertextElectionContext>(
-              number_of_guardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-              move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
-              move(extendedDataMap));
-        }
-
-        return make_unique<CiphertextElectionContext>(
-          number_of_guardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-          move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash));
+        return make_unique<EncryptionDevice>(
+          deviceUuid,sessionUuid,launchCode,location);
     }
 #pragma endregion
 

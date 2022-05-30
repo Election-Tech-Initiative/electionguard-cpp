@@ -1,0 +1,16 @@
+make.exe build-msvc --dry-run --always-make --keep-going --print-directory
+make: Entering directory 'c:/Users/ratze/Desktop/contribution1CPPElectionGuard/electionguard-cpp'
+echo 🖥️ BUILD MSVC
+cmake -S . -B c:/Users/ratze/Desktop/contribution1CPPElectionGuard/electionguard-cpp/build/libs/msvc/Win32 -G "Visual Studio 16 2019" -A Win32 \
+	-DCMAKE_BUILD_TYPE=Release \
+	-DBUILD_SHARED_LIBS=ON \
+	-DCPM_SOURCE_CACHE=c:/Users/ratze/Desktop/contribution1CPPElectionGuard/electionguard-cpp/.cache/CPM
+cmake -S . -B c:/Users/ratze/Desktop/contribution1CPPElectionGuard/electionguard-cpp/build/libs/msvc/x64 -G "Visual Studio 16 2019" -A x64 \
+	-DCMAKE_BUILD_TYPE=Release \
+	-DBUILD_SHARED_LIBS=ON \
+	-DCAN_USE_VECTOR_INTRINSICS=ON \
+	-DCPM_SOURCE_CACHE=c:/Users/ratze/Desktop/contribution1CPPElectionGuard/electionguard-cpp/.cache/CPM
+cmake --build c:/Users/ratze/Desktop/contribution1CPPElectionGuard/electionguard-cpp/build/libs/msvc/Win32 --config Release
+cmake --build c:/Users/ratze/Desktop/contribution1CPPElectionGuard/electionguard-cpp/build/libs/msvc/x64 --config Release
+make: Leaving directory 'c:/Users/ratze/Desktop/contribution1CPPElectionGuard/electionguard-cpp'
+ 
