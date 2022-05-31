@@ -1,3 +1,4 @@
+
 #include "electionguard/encrypt.hpp"
 
 #include "async.hpp"
@@ -6,6 +7,7 @@
 #include "electionguard/hash.hpp"
 #include "log.hpp"
 #include "nonces.hpp"
+#include "serialize.hpp"
 #include "utils.hpp"
 
 #include <algorithm>
@@ -24,7 +26,7 @@ using std::unique_ptr;
 using std::vector;
 
 using electionguard::getSystemTimestamp;
-
+using DeviceSerializer = electionguard::Serialize::EncryptionDevice;
 namespace electionguard
 {
 #pragma region EncryptionDevice
@@ -49,6 +51,7 @@ namespace electionguard
                                        const uint64_t launchCode, const string &location)
         : pimpl(new Impl(deviceUuid, sessionUuid, launchCode, location))
     {
+
         Log::trace("EncryptionDevice: Created: UUID: " + to_string(deviceUuid) +
                    " at: " + location);
     }
@@ -69,47 +72,33 @@ namespace electionguard
     uint64_t EncryptionDevice::getTimestamp() const { return getSystemTimestamp(); }
 
     //allowing for serialization
-    vector<uint8_t> EncryptionDevice::toBson(const electionguard::EncryptionDevice &serializable)
+    vector<uint8_t> EncryptionDevice::toBson() const { return DeviceSerializer::toBson(*this); }
+
+    string EncryptionDevice::toJson() const { return DeviceSerializer::toJson(*this); }
+
+    unique_ptr<EncryptionDevice> EncryptionDevice::fromJson(string data)
     {
-        return json::to_bson(fromObject(serializable));
-    }
-    string EncryptionDevice::toJson(const electionguard::EncryptionDevice &serializable)
-    {
-        return fromObject(serializable).dump();
-    }
-    unique_ptr<electionguard::EncryptionDevice> EncryptionDevice::fromBson(vector<uint8_t> data)
-    {
-        return toObject(json::from_bson(data));
-    }
-    unique_ptr<electionguard::EncryptionDevice> EncryptionDevice::fromJson(string data)
-    {
-        return toObject(json::parse(data));
+        return DeviceSerializer::fromJson(move(data));
     }
 
-    json EncryptionDevice::fromObject(const electionguard::EncryptionDevice &serializable)
+    unique_ptr<EncryptionDevice> EncryptionDevice::fromBson(vector<uint8_t> data)
     {
-
-
-        json j = {
-          {"deviceUuid", serializable.pimpl->deviceUuid},
-          {"sessionUuid", serializable.pimpl->sessionUuid},
-          {"launchCode", serializable.pimpl->launchCode},
-          {"location", serializable.pimpl->location},
-        };
-
-        return j;
+        return DeviceSerializer::fromBson(move(data));
     }
 
-    unique_ptr<electionguard::EncryptionDevice> EncryptionDevice::toObject(json j)
-    {
-        auto deviceUuid = j["deviceUuid"].get<uint64_t>();
-        auto sessionUuid = j["sessionUuid"].get<uint64_t>();
-        auto launchCode = j["launchCode"].get<uint64_t>();
-        auto location = j["location"].get<string>();
-
-        return make_unique<EncryptionDevice>(
-          deviceUuid,sessionUuid,launchCode,location);
+    uint64_t EncryptionDevice::getDeviceUuid() const {
+        return pimpl->deviceUuid;
     }
+    uint64_t EncryptionDevice::getSessionUuid() const {
+        return pimpl->sessionUuid;
+    }
+    uint64_t EncryptionDevice::getLaunchCode() const {
+        return pimpl->launchCode;
+    }
+    std::string EncryptionDevice::getLocation() const {
+        return pimpl->location;
+    }
+
 #pragma endregion
 
 #pragma region EncryptionMediator

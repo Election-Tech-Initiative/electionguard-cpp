@@ -9,12 +9,10 @@
 #include "manifest.hpp"
 
 #include <memory>
-#include <nlohmann/json.hpp>
 
-using nlohmann::json;
+using std::string;
 using std::unique_ptr;
 using std::vector;
-using std::string;
 
 namespace electionguard
 {
@@ -52,16 +50,19 @@ namespace electionguard
         /// </summary>
         uint64_t getTimestamp() const;
 
+        uint64_t getDeviceUuid() const;
+        uint64_t getSessionUuid() const;
+        uint64_t getLaunchCode() const;
+        std::string getLocation() const;
+
         /// <summary>
         /// Allow for serialization
         /// </summary>
-        static vector<uint8_t> toBson(const electionguard::EncryptionDevice &serializable);
+        std::vector<uint8_t> toBson() const;
+        std::string toJson() const;
 
-        static string toJson(const electionguard::EncryptionDevice &serializable);
-
-        static unique_ptr<electionguard::EncryptionDevice> fromBson(vector<uint8_t> data);
-
-        static unique_ptr<electionguard::EncryptionDevice> fromJson(string data);
+        static std::unique_ptr<EncryptionDevice> fromBson(std::vector<uint8_t> data);
+        static std::unique_ptr<EncryptionDevice> fromJson(std::string data);
 
       private:
         class Impl;
