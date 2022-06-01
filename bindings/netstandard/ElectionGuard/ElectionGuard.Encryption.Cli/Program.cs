@@ -6,21 +6,13 @@ namespace ElectionGuard.Encryption.Cli;
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
-        Parser.Default.ParseArguments<EncryptOptions, SayHiOptions>(args)
-            .MapResult(
-                (EncryptOptions opts) =>
-                {
-                    new EncryptCommand().Encrypt();
-                    return 0;
-                },
-                (SayHiOptions opts) =>
-                {
-                    Console.WriteLine("hi");
-                    return 0;
-                },
-                errs => 1
-                );
+        await Parser.Default.ParseArguments<EncryptOptions, SayHiOptions>(args)
+            .WithParsed((SayHiOptions opts) =>
+            {
+                Console.WriteLine($"hi {opts.Name}");
+            })
+            .WithParsedAsync<EncryptOptions>(EncryptCommand.Encrypt);
     }
 }
