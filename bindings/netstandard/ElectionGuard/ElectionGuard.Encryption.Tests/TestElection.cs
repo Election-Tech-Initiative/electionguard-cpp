@@ -7,6 +7,18 @@ namespace ElectionGuard.Encrypt.Tests
     [TestFixture]
     public class TestElection
     {
+
+        [Test]
+        public void Test_Can_Create_Context_Config()
+        {
+            // Act
+            var result = new ContextConfiguration(true, 350);
+
+            // Assert
+            Assert.That(result.MaxBallots == 350);
+            Assert.That(result.AllowedOverVotes);
+        }
+
         [Test]
         public void Test_Can_Deserialize_Ciphertext_Election_Context()
         {
@@ -15,11 +27,8 @@ namespace ElectionGuard.Encrypt.Tests
 
             // Act
             var result = new CiphertextElectionContext(data);
-            // Assert
-            System.Console.WriteLine(result.ToJson());
-            System.Console.WriteLine(result.Configuration.MaxBallots);
-            System.Console.WriteLine(result.Configuration.AllowedOverVotes);
 
+            // Assert
             Assert.That(result.CommitmentHash.ToHex() == "02");
             Assert.That(result.ManifestHash.ToHex() == "02");
             Assert.That(result.Configuration.MaxBallots == 1000000);
@@ -35,9 +44,6 @@ namespace ElectionGuard.Encrypt.Tests
             // Act
             var result = new CiphertextElectionContext(data);
 
-            System.Console.WriteLine(result.ToJson());
-            System.Console.WriteLine(result.Configuration.MaxBallots);
-            System.Console.WriteLine(result.Configuration.AllowedOverVotes);
             // Assert
             Assert.That(result.Configuration.MaxBallots == 50000);
             Assert.That(!result.Configuration.AllowedOverVotes);

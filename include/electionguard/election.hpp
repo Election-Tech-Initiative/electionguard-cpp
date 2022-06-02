@@ -12,6 +12,8 @@
 #include <unordered_map>
 #include <vector>
 
+using std::make_unique;
+
 namespace electionguard
 {
     /// <summary>
@@ -33,6 +35,12 @@ namespace electionguard
         ///
         /// </summary>
         bool getAllowOverVotes() const { return allowOverVotes; };
+
+        static std::unique_ptr<ContextConfiguration> make(const bool allowOvervotes,
+                                                          const uint64_t maxBallots)
+        {
+            return make_unique<ContextConfiguration>(allowOvervotes, maxBallots);
+        }
 
       private:
         uint64_t maxNumberOfBallots;

@@ -2186,11 +2186,11 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    // var status = ContextConfiguration.Free(TypedPtr);
-                    // if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                    // {
-                    //     throw new ElectionGuardException($"ContextConfiguration Error Free: {status}", status);
-                    // }
+                    var status = ContextConfiguration.Free(TypedPtr);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        throw new ElectionGuardException($"ContextConfiguration Error Free: {status}", status);
+                    }
                     return true;
                 }
             }
@@ -2209,6 +2209,17 @@ namespace ElectionGuard
                 ContextConfigurationHandle handle,
                 ref UInt64 max_ballots);
 
+
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_config_free",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Free(ContextConfigurationType* handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_config_make",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Make(
+                bool allow_overvotes,
+                UInt64 max_ballots,
+                out ContextConfigurationHandle handle);
         }
 
         #endregion

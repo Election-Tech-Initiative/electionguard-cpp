@@ -54,6 +54,33 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_config_get_max_b
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
+eg_electionguard_status_t
+eg_ciphertext_election_context_config_free(eg_context_configuration_t *handle)
+{
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete AS_TYPE(ContextConfiguration, handle); // NOLINT(cppcoreguidelines-owning-memory)
+    handle = nullptr;
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_ciphertext_election_context_config_make(bool in_allow_overvotes, uint64_t in_number_of_guardians,
+                                           eg_context_configuration_t **out_handle)
+{
+    try {
+        auto context = ContextConfiguration::make(in_allow_overvotes, in_number_of_guardians);
+
+        *out_handle = AS_TYPE(eg_context_configuration_t, context.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_election_context_config_make", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 #pragma endregion
 
 #pragma region CiphertextElectionContext

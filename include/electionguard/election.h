@@ -24,6 +24,13 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_config_get_allow
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_config_get_max_ballots(
   eg_context_configuration_t *handle, uint64_t *out_max_ballots);
 
+EG_API eg_electionguard_status_t
+eg_ciphertext_election_context_config_free(eg_context_configuration_t *handle);
+
+EG_API eg_electionguard_status_t
+eg_ciphertext_election_context_config_make(bool in_allow_overvotes, uint64_t in_number_of_guardians,
+                                           eg_context_configuration_t **out_handle);
+
 #endif
 
 #ifndef CiphertextElectionContext

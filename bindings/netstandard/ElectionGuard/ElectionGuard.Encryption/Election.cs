@@ -10,7 +10,7 @@ namespace ElectionGuard
     using NativeContextConfig = NativeInterface.ContextConfiguration.ContextConfigurationHandle;
 
 
-    public struct ContextConfiguration
+    public class ContextConfiguration : DisposableBase
     {
         internal unsafe NativeContextConfig Handle;
         unsafe internal ContextConfiguration(NativeContextConfig handle)
@@ -40,6 +40,27 @@ namespace ElectionGuard
                 return value;
             }
         }
+
+        public unsafe ContextConfiguration(bool allowOverVotes, UInt64 maxVotes)
+        {
+            var status = NativeInterface.ContextConfiguration.Make(
+                allowOverVotes, maxVotes, out Handle);
+            status.ThrowIfError();
+        }
+
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+        {
+            base.DisposeUnmanaged();
+
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
+            Handle = null;
+        }
+
+
     }
 
     /// <summary>
