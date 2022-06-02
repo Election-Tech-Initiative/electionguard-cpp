@@ -192,10 +192,65 @@ eg_electionguard_status_t eg_ciphertext_election_context_make(
     }
 }
 
+eg_electionguard_status_t eg_ciphertext_election_context_make_with_configuration(
+  uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
+  eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
+  eg_context_configuration_t *in_configuration, eg_ciphertext_election_context_t **out_handle)
+{
+    try {
+        auto *publicKeyPtr = AS_TYPE(ElementModP, in_elgamal_public_key);
+        auto *commitmentHashPtr = AS_TYPE(ElementModQ, in_commitment_hash);
+        auto *manifestHashPtr = AS_TYPE(ElementModQ, in_manifest_hash);
+
+        auto context =
+          CiphertextElectionContext::make(in_number_of_guardians, in_quorum, publicKeyPtr->clone(),
+                                          commitmentHashPtr->clone(), manifestHashPtr->clone());
+
+        *out_handle = AS_TYPE(eg_ciphertext_election_context_t, context.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_election_context_make", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 eg_electionguard_status_t eg_ciphertext_election_context_make_with_extended_data(
   uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
   eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
   eg_linked_list_t *in_extended_data, eg_ciphertext_election_context_t **out_handle)
+{
+    try {
+        auto *publicKeyPtr = AS_TYPE(ElementModP, in_elgamal_public_key);
+        auto *commitmentHashPtr = AS_TYPE(ElementModQ, in_commitment_hash);
+        auto *manifestHashPtr = AS_TYPE(ElementModQ, in_manifest_hash);
+
+        unordered_map<string, string> extendedData = {};
+        for (uint64_t i = 0; i < eg_linked_list_get_count(in_extended_data); i++) {
+            char *edKey = NULL;
+            char *edValue = NULL;
+            if (eg_linked_list_get_element_at(in_extended_data, i, &edKey, &edValue)) {
+                return ELECTIONGUARD_STATUS_ERROR_BAD_ACCESS;
+            }
+            extendedData[string(edKey)] = string(edValue);
+        }
+
+        auto context = CiphertextElectionContext::make(
+          in_number_of_guardians, in_quorum, publicKeyPtr->clone(), commitmentHashPtr->clone(),
+          manifestHashPtr->clone(), move(extendedData));
+
+        *out_handle = AS_TYPE(eg_ciphertext_election_context_t, context.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_election_context_make_with_extended_data", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_ciphertext_election_context_make_with_configuration_and_extended_data(
+  uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
+  eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
+  eg_context_configuration_t *in_configuration, eg_linked_list_t *in_extended_data,
+  eg_ciphertext_election_context_t **out_handle)
 {
     try {
         auto *publicKeyPtr = AS_TYPE(ElementModP, in_elgamal_public_key);

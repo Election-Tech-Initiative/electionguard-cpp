@@ -120,6 +120,11 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_make(
   eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
   eg_ciphertext_election_context_t **out_handle);
 
+EG_API eg_electionguard_status_t eg_ciphertext_election_context_make_with_configuration(
+  uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
+  eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
+  eg_context_configuration_t *in_configuration, eg_ciphertext_election_context_t **out_handle);
+
 /**
  * Makes a CiphertextElectionContext object.
  * 
@@ -135,6 +140,13 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_make_with_extend
   uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
   eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
   eg_linked_list_t *in_extended_data, eg_ciphertext_election_context_t **out_handle);
+
+EG_API eg_electionguard_status_t
+eg_ciphertext_election_context_make_with_configuration_and_extended_data(
+  uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
+  eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
+  eg_context_configuration_t *in_configuration, eg_linked_list_t *in_extended_data,
+  eg_ciphertext_election_context_t **out_handle);
 
 /**
  * Makes a CiphertextElectionContext object from the hex string representations.

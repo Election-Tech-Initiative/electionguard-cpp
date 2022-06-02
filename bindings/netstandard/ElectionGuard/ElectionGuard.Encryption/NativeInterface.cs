@@ -2312,6 +2312,17 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle manifest_hash,
                 out CiphertextElectionContextHandle handle);
 
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_with_configuration",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Make(
+                ulong number_of_guardians,
+                ulong quorum,
+                ElementModP.ElementModPHandle elgamal_public_key,
+                ElementModQ.ElementModQHandle commitment_hash,
+                ElementModQ.ElementModQHandle manifest_hash,
+                ContextConfiguration.ContextConfigurationHandle configuration,
+                out CiphertextElectionContextHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_with_extended_data",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Make(
@@ -2322,6 +2333,19 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle manifest_hash,
                 LinkedList.LinkedListHandle extended_data,
                 out CiphertextElectionContextHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_with_configuration_and_extended_data",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Make(
+                ulong number_of_guardians,
+                ulong quorum,
+                ElementModP.ElementModPHandle elgamal_public_key,
+                ElementModQ.ElementModQHandle commitment_hash,
+                ElementModQ.ElementModQHandle manifest_hash,
+                ContextConfiguration.ContextConfigurationHandle configuration,
+                LinkedList.LinkedListHandle extended_data,
+                out CiphertextElectionContextHandle handle);
+
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_from_hex",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]

@@ -206,6 +206,20 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
+        public unsafe CiphertextElectionContext(ulong numberOfGuardians,
+                ulong quorum,
+                ElementModP publicKey,
+                ElementModQ commitmentHash,
+                ElementModQ manifestHash,
+                ContextConfiguration config)
+        {
+            var status = NativeInterface.CiphertextElectionContext.Make(
+                numberOfGuardians, quorum, publicKey.Handle,
+                commitmentHash.Handle, manifestHash.Handle, config.Handle, out Handle);
+            status.ThrowIfError();
+        }
+
+
         /// <summary>
         ///  Makes a CiphertextElectionContext object.
         ///
@@ -228,6 +242,24 @@ namespace ElectionGuard
                 commitmentHash.Handle, manifestHash.Handle, extendedData.Handle, out Handle);
             status.ThrowIfError();
         }
+
+
+
+        public unsafe CiphertextElectionContext(ulong numberOfGuardians,
+                ulong quorum,
+                ElementModP publicKey,
+                ElementModQ commitmentHash,
+                ElementModQ manifestHash,
+                ContextConfiguration config,
+                LinkedList extendedData)
+        {
+            var status = NativeInterface.CiphertextElectionContext.Make(
+                numberOfGuardians, quorum, publicKey.Handle,
+                commitmentHash.Handle, manifestHash.Handle, config.Handle, extendedData.Handle, out Handle);
+            status.ThrowIfError();
+        }
+
+
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
