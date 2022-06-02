@@ -2174,6 +2174,48 @@ namespace ElectionGuard
 
         #endregion
 
+        #region ContextConfiguration
+        internal static unsafe class ContextConfiguration
+        {
+            internal unsafe struct ContextConfigurationType { };
+
+            internal class ContextConfigurationHandle
+                : ElectionguardSafeHandle<ContextConfigurationType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    //                    var status = ContextConfiguration.Free(TypedPtr);
+                    //                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    //                    {
+                    //                        throw new ElectionGuardException($"ContextConfiguration Error Free: {status}", status);
+                    //                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_election_context_config_get_allowed_overvotes",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetAllowedOverVotes(
+                ContextConfigurationHandle handle,
+                ref bool allowed_overvotes);
+
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_election_context_config_get_max_ballots",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetMaxBallots(
+                ContextConfigurationHandle handle,
+                ref UInt64 max_ballots);
+
+        }
+
+        #endregion
+
+
+
+
         #region CiphertextElectionContext
 
         internal static unsafe class CiphertextElectionContext
@@ -2199,6 +2241,13 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Free(CiphertextElectionType* handle);
+
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_election_context_get_configuration",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetConfiguration(
+                CiphertextElectionContextHandle handle,
+                out ContextConfiguration.ContextConfigurationHandle context_config);
 
             [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_election_context_get_elgamal_public_key",

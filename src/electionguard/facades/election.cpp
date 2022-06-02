@@ -16,6 +16,7 @@ extern "C" {
 }
 
 using electionguard::CiphertextElectionContext;
+using electionguard::ContextConfiguration;
 using electionguard::dynamicCopy;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
@@ -26,6 +27,34 @@ using std::string;
 using std::unique_ptr;
 using std::unordered_map;
 using std::vector;
+
+#pragma region CiphertextElectionContextConfiguration
+
+EG_API eg_electionguard_status_t eg_ciphertext_election_context_config_get_allowed_overvotes(
+  eg_context_configuration_t *handle, bool *out_allowed_overvotes)
+{
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto config = AS_TYPE(ContextConfiguration, handle);
+    *out_allowed_overvotes = config->getAllowOverVotes();
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+EG_API eg_electionguard_status_t eg_ciphertext_election_context_config_get_max_ballots(
+  eg_context_configuration_t *handle, uint64_t *out_max_ballots)
+{
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto config = AS_TYPE(ContextConfiguration, handle);
+    *out_max_ballots = config->getMaxNumberOfBallots();
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+#pragma endregion
 
 #pragma region CiphertextElectionContext
 
@@ -46,6 +75,15 @@ eg_electionguard_status_t eg_ciphertext_election_context_get_elgamal_public_key(
 {
     const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getElGamalPublicKey();
     *out_elgamal_public_key_ref = AS_TYPE(eg_element_mod_p_t, const_cast<ElementModP *>(pointer));
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_ciphertext_election_context_get_configuration(eg_ciphertext_election_context_t *handle,
+                                                 eg_context_configuration_t **out_config)
+{
+    const auto pointer = AS_TYPE(CiphertextElectionContext, handle)->getConfiguration();
+    *out_config = AS_TYPE(eg_context_configuration_t, const_cast<ContextConfiguration *>(&pointer));
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 

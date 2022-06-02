@@ -7,7 +7,40 @@ namespace ElectionGuard
     using NativeElementModP = NativeInterface.ElementModP.ElementModPHandle;
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
     using NativeLinkedList = NativeInterface.LinkedList.LinkedListHandle;
+    using NativeContextConfig = NativeInterface.ContextConfiguration.ContextConfigurationHandle;
 
+
+    public struct ContextConfiguration
+    {
+        internal unsafe NativeContextConfig Handle;
+        unsafe internal ContextConfiguration(NativeContextConfig handle)
+        {
+            Handle = handle;
+        }
+
+        public unsafe bool AllowedOverVotes
+        {
+            get
+            {
+                bool value = true;
+                var status = NativeInterface.ContextConfiguration.GetAllowedOverVotes(
+                    Handle, ref value);
+                status.ThrowIfError();
+                return value;
+            }
+        }
+        public unsafe UInt64 MaxBallots
+        {
+            get
+            {
+                UInt64 value = 1;
+                var status = NativeInterface.ContextConfiguration.GetMaxBallots(
+                    Handle, ref value);
+                status.ThrowIfError();
+                return value;
+            }
+        }
+    }
 
     /// <summary>
     /// `CiphertextElectionContext` is the ElectionGuard representation of a specific election
@@ -103,6 +136,21 @@ namespace ElectionGuard
                 return new LinkedList(value);
             }
         }
+
+        /// <summary>
+        /// Get a linked list containing the extended data of the election.
+        /// </summary>
+        public unsafe ContextConfiguration Configuration
+        {
+            get
+            {
+                var status = NativeInterface.CiphertextElectionContext.GetConfiguration(
+                    Handle, out NativeContextConfig value);
+                status.ThrowIfError();
+                return new ContextConfiguration(value);
+            }
+        }
+
 
         internal unsafe NativeCiphertextElectionContext Handle;
 
