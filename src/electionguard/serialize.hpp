@@ -213,10 +213,21 @@ namespace electionguard
     {
         // TODO: other cases
         if (j.contains("name") && !j["name"].is_null()) {
+            string abbreviation;
+            string color;
+            string logo_uri;
+            if (!j["abbreviation"].is_null()) {
+                abbreviation = j["abbreviation"].get<string>();
+            }
+            if (!j["color"].is_null()) {
+                color = j["color"].get<string>();
+            }
+            if (!j["logo_uri"].is_null()) {
+                logo_uri = j["logo_uri"].get<string>();
+            }
             return make_unique<Party>(j["object_id"].get<string>(),
-                                      internationalizedTextFromJson(j["name"]),
-                                      j["abbreviation"].get<string>(), j["color"].get<string>(),
-                                      j["logo_uri"].get<string>());
+                                      internationalizedTextFromJson(j["name"]), abbreviation, color,
+                                      logo_uri);
         }
         return make_unique<Party>(j["object_id"].get<string>());
     }
