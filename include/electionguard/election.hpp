@@ -58,7 +58,7 @@ namespace electionguard
                                            std::unique_ptr<ElementModQ> manifestHash,
                                            std::unique_ptr<ElementModQ> cryptoBaseHash,
                                            std::unique_ptr<ElementModQ> cryptoExtendedBaseHash,
-                                           ContextConfiguration config);
+                                           std::unique_ptr<ContextConfiguration> config);
         explicit CiphertextElectionContext(const uint64_t numberOfGuardians, const uint64_t quorum,
                                            std::unique_ptr<ElementModP> elGamalPublicKey,
                                            std::unique_ptr<ElementModQ> commitmentHash,
@@ -70,7 +70,8 @@ namespace electionguard
           std::unique_ptr<ElementModP> elGamalPublicKey,
           std::unique_ptr<ElementModQ> commitmentHash, std::unique_ptr<ElementModQ> manifestHash,
           std::unique_ptr<ElementModQ> cryptoBaseHash,
-          std::unique_ptr<ElementModQ> cryptoExtendedBaseHash, ContextConfiguration config,
+          std::unique_ptr<ElementModQ> cryptoExtendedBaseHash,
+          std::unique_ptr<ContextConfiguration> config,
           std::unordered_map<std::string, std::string> extendedData);
         explicit CiphertextElectionContext(
           const uint64_t numberOfGuardians, const uint64_t quorum,
@@ -87,7 +88,7 @@ namespace electionguard
         /// <summary>
         /// The number of guardians necessary to generate the public key
         /// </summary>
-        ContextConfiguration getConfiguration() const;
+        const ContextConfiguration *getConfiguration() const;
 
         /// <summary>
         /// The number of guardians necessary to generate the public key

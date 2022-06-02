@@ -737,8 +737,8 @@ namespace electionguard
                     extendedData.emplace(key, value);
                 }
                 json config = {
-                  {"allow_overvotes", serializable.getConfiguration().getAllowOverVotes()},
-                  {"max_votes", serializable.getConfiguration().getMaxNumberOfBallots()}};
+                  {"allow_overvotes", serializable.getConfiguration()->getAllowOverVotes()},
+                  {"max_votes", serializable.getConfiguration()->getMaxNumberOfBallots()}};
 
                 json j = {
                   {"crypto_base_hash", serializable.getCryptoBaseHash()->toHex()},
@@ -779,7 +779,8 @@ namespace electionguard
 
                 // ensure the elgamal public key instance is set as a fixed base
                 elGamalPublicKey->setIsFixedBase(true);
-                ContextConfiguration config(allows_overvotes, max_ballots);
+                unique_ptr<ContextConfiguration> config =
+                  make_unique<ContextConfiguration>(allows_overvotes, max_ballots);
 
                 if (j.contains("extended_data") && !j["extended_data"].is_null()) {
                     std::unordered_map<string, string> extendedDataMap;
@@ -791,12 +792,13 @@ namespace electionguard
                     return make_unique<CiphertextElectionContext>(
                       number_of_guardians, quorum, move(elGamalPublicKey), move(commitmentHash),
                       move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
-                      config, move(extendedDataMap));
+                      move(config), move(extendedDataMap));
                 }
 
                 return make_unique<CiphertextElectionContext>(
                   number_of_guardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-                  move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash), config);
+                  move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
+                  move(config));
             }
 
           public:

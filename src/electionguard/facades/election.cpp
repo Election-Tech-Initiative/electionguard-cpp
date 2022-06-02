@@ -83,7 +83,7 @@ eg_ciphertext_election_context_get_configuration(eg_ciphertext_election_context_
                                                  eg_context_configuration_t **out_config)
 {
     const auto pointer = AS_TYPE(CiphertextElectionContext, handle)->getConfiguration();
-    *out_config = AS_TYPE(eg_context_configuration_t, const_cast<ContextConfiguration *>(&pointer));
+    *out_config = AS_TYPE(eg_context_configuration_t, const_cast<ContextConfiguration *>(pointer));
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 

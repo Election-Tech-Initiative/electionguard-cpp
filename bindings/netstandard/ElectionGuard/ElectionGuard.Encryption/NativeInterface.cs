@@ -2186,11 +2186,11 @@ namespace ElectionGuard
                 {
                     if (IsClosed) return true;
 
-                    //                    var status = ContextConfiguration.Free(TypedPtr);
-                    //                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                    //                    {
-                    //                        throw new ElectionGuardException($"ContextConfiguration Error Free: {status}", status);
-                    //                    }
+                    // var status = ContextConfiguration.Free(TypedPtr);
+                    // if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    // {
+                    //     throw new ElectionGuardException($"ContextConfiguration Error Free: {status}", status);
+                    // }
                     return true;
                 }
             }
