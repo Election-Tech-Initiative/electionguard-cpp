@@ -39,6 +39,7 @@ namespace electionguard
         unique_ptr<ElementModQ> cryptoBaseHash;
         unique_ptr<ElementModQ> cryptoExtendedBaseHash;
         unordered_map<string, string> extendedData;
+        unique_ptr<ContextConfiguration> configuration;
 
         Impl(uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
              unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
@@ -50,6 +51,21 @@ namespace electionguard
             this->numberOfGuardians = numberOfGuardians;
             this->quorum = quorum;
             this->extendedData = {};
+            this->configuration = make_unique<ContextConfiguration>();
+        }
+
+        Impl(uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
+             unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
+             unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash,
+             unique_ptr<ContextConfiguration> config)
+            : Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+                   move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash))
+
+        {
+            this->numberOfGuardians = numberOfGuardians;
+            this->quorum = quorum;
+            this->extendedData = {};
+            this->configuration = move(config);
         }
 
         Impl(uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
@@ -62,6 +78,20 @@ namespace electionguard
         {
             this->numberOfGuardians = numberOfGuardians;
             this->quorum = quorum;
+            this->configuration = make_unique<ContextConfiguration>();
+        }
+
+        Impl(uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
+             unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
+             unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash,
+             unique_ptr<ContextConfiguration> config, unordered_map<string, string> extendedData)
+            : Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+                   move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
+                   move(extendedData))
+        {
+            this->numberOfGuardians = numberOfGuardians;
+            this->quorum = quorum;
+            this->configuration = move(config);
         }
     };
 
@@ -79,10 +109,30 @@ namespace electionguard
       uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
       unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
       unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash,
+      unique_ptr<ContextConfiguration> config)
+        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+                         move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
+                         move(config)))
+    {
+    }
+    CiphertextElectionContext::CiphertextElectionContext(
+      uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
+      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
+      unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash,
       unordered_map<string, string> extendedData)
         : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
                          move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
                          move(extendedData)))
+    {
+    }
+    CiphertextElectionContext::CiphertextElectionContext(
+      uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
+      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
+      unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash,
+      unique_ptr<ContextConfiguration> config, unordered_map<string, string> extendedData)
+        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+                         move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
+                         move(config), move(extendedData)))
     {
     }
     CiphertextElectionContext::~CiphertextElectionContext() = default;
@@ -96,6 +146,10 @@ namespace electionguard
     }
 
     // Property Getters
+    const ContextConfiguration *CiphertextElectionContext::getConfiguration() const
+    {
+        return pimpl->configuration.get();
+    }
 
     uint64_t CiphertextElectionContext::getNumberOfGuardians() const
     {
@@ -170,6 +224,25 @@ namespace electionguard
     unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
       uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
       unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
+      unique_ptr<ContextConfiguration> config)
+    {
+        auto cryptoBaseHash = hash_elems(
+          {&const_cast<ElementModP &>(P()), &const_cast<ElementModQ &>(Q()),
+           &const_cast<ElementModP &>(G()), numberOfGuardians, quorum, manifestHash.get()});
+
+        auto cryptoExtendedBaseHash = hash_elems({cryptoBaseHash.get(), commitmentHash.get()});
+
+        // ensure the elgamal public key instance is set as a fixed base
+        elGamalPublicKey->setIsFixedBase(true);
+
+        return make_unique<CiphertextElectionContext>(
+          numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+          move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash), move(config));
+    }
+
+    unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
+      uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
+      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
       std::unordered_map<std::string, std::string> extendedData)
     {
         auto cryptoBaseHash = hash_elems(
@@ -184,6 +257,27 @@ namespace electionguard
         return make_unique<CiphertextElectionContext>(
           numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
           move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
+          move(extendedData));
+    }
+
+    unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
+      uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
+      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
+      unique_ptr<ContextConfiguration> config,
+      std::unordered_map<std::string, std::string> extendedData)
+    {
+        auto cryptoBaseHash = hash_elems(
+          {&const_cast<ElementModP &>(P()), &const_cast<ElementModQ &>(Q()),
+           &const_cast<ElementModP &>(G()), numberOfGuardians, quorum, manifestHash.get()});
+
+        auto cryptoExtendedBaseHash = hash_elems({cryptoBaseHash.get(), commitmentHash.get()});
+
+        // ensure the elgamal public key instance is set as a fixed base
+        elGamalPublicKey->setIsFixedBase(true);
+
+        return make_unique<CiphertextElectionContext>(
+          numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+          move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash), move(config),
           move(extendedData));
     }
 
@@ -216,6 +310,39 @@ namespace electionguard
 
         return make(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
                     move(manifestHash), move(extendedData));
+    }
+
+    unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
+      uint64_t numberOfGuardians, uint64_t quorum, const string &elGamalPublicKeyInHex,
+      const string &commitmentHashInHex, const string &manifestHashInHex,
+      unique_ptr<ContextConfiguration> config)
+    {
+        auto elGamalPublicKey = ElementModP::fromHex(elGamalPublicKeyInHex);
+        auto commitmentHash = ElementModQ::fromHex(commitmentHashInHex);
+        auto manifestHash = ElementModQ::fromHex(manifestHashInHex);
+
+        // ensure the elgamal public key instance is set as a fixed base
+        elGamalPublicKey->setIsFixedBase(true);
+
+        return make(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+                    move(manifestHash), move(config));
+    }
+
+    unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
+      uint64_t numberOfGuardians, uint64_t quorum, const string &elGamalPublicKeyInHex,
+      const string &commitmentHashInHex, const string &manifestHashInHex,
+      unique_ptr<ContextConfiguration> config,
+      std::unordered_map<std::string, std::string> extendedData)
+    {
+        auto elGamalPublicKey = ElementModP::fromHex(elGamalPublicKeyInHex);
+        auto commitmentHash = ElementModQ::fromHex(commitmentHashInHex);
+        auto manifestHash = ElementModQ::fromHex(manifestHashInHex);
+
+        // ensure the elgamal public key instance is set as a fixed base
+        elGamalPublicKey->setIsFixedBase(true);
+
+        return make(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+                    move(manifestHash), move(config), move(extendedData));
     }
 
 #pragma endregion

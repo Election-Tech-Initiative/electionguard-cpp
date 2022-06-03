@@ -747,6 +747,9 @@ namespace electionguard
                 for (auto &[key, value] : serializable.getExtendedData()) {
                     extendedData.emplace(key, value);
                 }
+                json config = {
+                  {"allow_overvotes", serializable.getConfiguration()->getAllowOverVotes()},
+                  {"max_votes", serializable.getConfiguration()->getMaxNumberOfBallots()}};
 
                 json j = {
                   {"crypto_base_hash", serializable.getCryptoBaseHash()->toHex()},
@@ -756,7 +759,7 @@ namespace electionguard
                   {"elgamal_public_key", serializable.getElGamalPublicKey()->toHex()},
                   {"number_of_guardians", serializable.getNumberOfGuardians()},
                   {"quorum", serializable.getQuorum()},
-                };
+                  {"configuration", config}};
                 if (serializable.getExtendedData().size() > 0) {
                     j["extended_data"] = extendedData;
                 }
@@ -772,6 +775,12 @@ namespace electionguard
                 auto elgamal_public_key = j["elgamal_public_key"].get<string>();
                 auto number_of_guardians = j["number_of_guardians"].get<uint64_t>();
                 auto quorum = j["quorum"].get<uint64_t>();
+                bool allows_overvotes = true;
+                uint64_t max_ballots = DEFAULT_MAX_BALLOTS;
+                if (j.contains("configuration") && !j["configuration"].is_null()) {
+                    allows_overvotes = j["configuration"]["allow_overvotes"].get<bool>();
+                    max_ballots = j["configuration"]["max_votes"].get<uint64_t>();
+                }
 
                 auto commitmentHash = ElementModQ::fromHex(commitment_hash);
                 auto manifestHash = ElementModQ::fromHex(manifest_hash);
@@ -781,6 +790,8 @@ namespace electionguard
 
                 // ensure the elgamal public key instance is set as a fixed base
                 elGamalPublicKey->setIsFixedBase(true);
+                unique_ptr<ContextConfiguration> config =
+                  make_unique<ContextConfiguration>(allows_overvotes, max_ballots);
 
                 if (j.contains("extended_data") && !j["extended_data"].is_null()) {
                     std::unordered_map<string, string> extendedDataMap;
@@ -792,12 +803,13 @@ namespace electionguard
                     return make_unique<CiphertextElectionContext>(
                       number_of_guardians, quorum, move(elGamalPublicKey), move(commitmentHash),
                       move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
-                      move(extendedDataMap));
+                      move(config), move(extendedDataMap));
                 }
 
                 return make_unique<CiphertextElectionContext>(
                   number_of_guardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-                  move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash));
+                  move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
+                  move(config));
             }
 
           public:
