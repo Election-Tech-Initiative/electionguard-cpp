@@ -25,11 +25,13 @@ internal class EncryptOptions
 
     private void ValidateDirectories()
     {
-        var requiredDirectories = new[] { BallotsDir, OutDir };
-        var missingDirectories = requiredDirectories.Where(f => !Directory.Exists(f));
-        foreach (var directory in missingDirectories)
+        if (string.IsNullOrEmpty(BallotsDir)) throw new ArgumentNullException(nameof(BallotsDir));
+        if (string.IsNullOrEmpty(OutDir)) throw new ArgumentNullException(nameof(OutDir));
+
+        if (!Directory.Exists(BallotsDir)) throw new ArgumentException($"ballots directory does not exist"); ;
+        if (!Directory.Exists(OutDir))
         {
-            throw new ArgumentException($"{directory} does not exist");
+            Directory.CreateDirectory(OutDir);
         }
     }
 
