@@ -10,6 +10,9 @@ namespace ElectionGuard
     using NativeContextConfig = NativeInterface.ContextConfiguration.ContextConfigurationHandle;
 
 
+    /// <summary>
+    /// Class to handle configuration settings for the ElectionContext
+    /// </summary>
     public class ContextConfiguration : DisposableBase
     {
         internal unsafe NativeContextConfig Handle;
@@ -18,6 +21,9 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Determines if overvotes are allowed for the election.  This defaults to true
+        /// </summary>
         public unsafe bool AllowedOverVotes
         {
             get
@@ -29,6 +35,9 @@ namespace ElectionGuard
                 return value;
             }
         }
+        /// <summary>
+        /// Determines the maximum number of votes that an election can have, Defaults to 1000000
+        /// </summary>
         public unsafe UInt64 MaxBallots
         {
             get
@@ -41,6 +50,11 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Parameterized constructor for the configuration class
+        /// </summary>
+        /// <param name="allowOverVotes">if overvotes are allowed</param>
+        /// <param name="maxVotes">maximum number of votes</param>
         public unsafe ContextConfiguration(bool allowOverVotes, UInt64 maxVotes)
         {
             var status = NativeInterface.ContextConfiguration.Make(
