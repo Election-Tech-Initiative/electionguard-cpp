@@ -1,22 +1,58 @@
-using System;
+﻿using System;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
+    /// <summary>
+    /// Enumeration used to keep the status error messages for the exception handling
+    /// </summary>
     public enum Status
     {
+        /// <summary>
+        /// The operation finished successfully
+        /// </summary>
         ELECTIONGUARD_STATUS_SUCCESS = 0,
+
+        /// <summary>
+        /// There was an error with the arguments passed in
+        /// </summary>
         ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT,
+
+        /// <summary>
+        /// Data was being accessed outside its range
+        /// </summary>
         ELECTIONGUARD_STATUS_ERROR_OUT_OF_RANGE,
+
+        /// <summary>
+        /// Error with writing/reading the data
+        /// </summary>
         ELECTIONGUARD_STATUS_ERROR_IO_ERROR,
+
+        /// <summary>
+        /// Had issue accessing data
+        /// </summary>
         ELECTIONGUARD_STATUS_ERROR_BAD_ACCESS,
+
+        /// <summary>
+        /// Error allocating the data
+        /// </summary>
         ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC,
+
+        /// <summary>
+        /// The data already exists
+        /// </summary>
         ELECTIONGUARD_STATUS_ERROR_ALREADY_EXISTS,
+
+        /// <summary>
+        /// Error used as a default when catching any exception
+        /// </summary>
         ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR,
 
+        /// <summary>
         /// This code should always be the last code in the collection
-        // so that the status codes string can be correctly derived
+        /// so that the status codes string can be correctly derived
+        /// </summary>
         ELECTIONGUARD_STATUS_UNKNOWN
 
 
@@ -496,6 +532,10 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status P(out ElementModP.ElementModPHandle handle);
 
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_constant_r",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status R(out ElementModP.ElementModPHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_constant_zero_mod_p",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ZERO_MOD_P(out ElementModP.ElementModPHandle handle);
@@ -508,7 +548,7 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status TWO_MOD_P(out ElementModP.ElementModPHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_element_mod_p_constant_p",
+            [DllImport(DllName, EntryPoint = "eg_element_mod_q_constant_q",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Q(out ElementModQ.ElementModQHandle handle);
 
@@ -523,6 +563,11 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_constant_two_mod_q",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status TWO_MOD_Q(out ElementModQ.ElementModQHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_constant_to_json",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status ToJson(out IntPtr data, out ulong size);
+
         }
 
         #endregion
@@ -1852,7 +1897,31 @@ namespace ElectionGuard
                 ulong ballotStylesSize,
                 out ManifestHandle handle);
 
-            // TODO: eg_election_manifest_new_with_contact
+            [DllImport(DllName, EntryPoint = "eg_election_manifest_new_with_contact",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status New(
+                [MarshalAs(UnmanagedType.LPStr)] string electionScopeId,
+                ElectionType electionType,
+                ulong startDate,
+                ulong endDate,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] gpUnits,
+                ulong gpUnitsSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] parties,
+                ulong partiesSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] candidates,
+                ulong candidatesSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] contests,
+                ulong contestSize,
+                // TODO ISSUE #212: type safety
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] ballotStyles,
+                ulong ballotStylesSize,
+                InternationalizedText.InternationalizedTextHandle name,
+                ContactInformation.ContactInformationHandle contact,
+                out ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
@@ -3230,7 +3299,8 @@ namespace ElectionGuard
 
         internal static unsafe class Encrypt
         {
-            [DllImport(DllName, EntryPoint = "eg_encrypt_selection")]
+            [DllImport(DllName, EntryPoint = "eg_encrypt_selection",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Selection(
                 PlaintextBallotSelection.PlaintextBallotSelectionHandle plaintext,
                 SelectionDescription.SelectionDescriptionHandle description,
@@ -3240,7 +3310,8 @@ namespace ElectionGuard
                 bool shouldVerifyProofs,
                 out CiphertextBallotSelection.CiphertextBallotSelectionHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_encrypt_contest")]
+            [DllImport(DllName, EntryPoint = "eg_encrypt_contest",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Contest(
                 PlaintextBallotContest.PlaintextBallotContestHandle plaintext,
                 ContestDescription.ContestDescriptionHandle description,
@@ -3292,7 +3363,31 @@ namespace ElectionGuard
                 bool shouldVerifyProofs,
                 out CompactCiphertextBallot.CompactCiphertextBallotHandle handle);
         }
+
+        #region Precompute
+        internal static unsafe class PrecomputeBuffers
+        {
+            [DllImport(DllName, EntryPoint = "eg_precompute_init",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Init(int max_buffers);
+
+            [DllImport(DllName, EntryPoint = "eg_precompute_populate",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Populate(ElementModP.ElementModPHandle publicKey);
+
+            [DllImport(DllName, EntryPoint = "eg_precompute_stop",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Stop();
+
+            [DllImport(DllName, EntryPoint = "eg_precompute_status",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Status(out int count, out int queue_size);
+        }
+
+        #endregion
+
     }
 
     #endregion
+
 }

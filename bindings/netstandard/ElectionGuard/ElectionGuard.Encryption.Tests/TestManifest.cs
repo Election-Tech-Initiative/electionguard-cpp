@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 using ElectionGuard.Encryption.Utils;
 
@@ -89,5 +90,43 @@ namespace ElectionGuard.Encrypt.Tests
             Assert.That(manifest.CryptoHash().ToHex() == result.CryptoHash().ToHex());
             Assert.That(result.IsValid());
         }
+
+
+        [Test]
+        public void Test_Can_Create_Manifest_With_Name()
+        {
+            var language = new Language(
+                string.Format("{0},{1}", "my jurisdiction", "here"), "en");
+            List<GeopoliticalUnit> gpUnits = new List<GeopoliticalUnit>();
+            List<Party> parties = new List<Party>();
+            List<Candidate> candidates = new List<Candidate>();
+            List<ContestDescription> contests = new List<ContestDescription>();
+            List<BallotStyle> ballotStyles = new List<BallotStyle>();
+
+            gpUnits.Add(new GeopoliticalUnit("mydistrict", "first unit", ReportingUnitType.city));
+            parties.Add(new Party("myparty"));
+            candidates.Add(new Candidate("mycandidate", false));
+            List<SelectionDescription> selections = new List<SelectionDescription>();
+            selections.Add(new SelectionDescription("selection1", "mycandidate", 1));
+            contests.Add(new ContestDescription("firstcontest", "mydistrict", 1, VoteVariationType.n_of_m, 1, "mrmayor", selections.ToArray()));
+            string[] gps = { "mydistrict" };
+            ballotStyles.Add(new BallotStyle("style1", gps));
+
+            var result = new Manifest(
+                "test-manifest",
+                ElectionType.general,
+                DateTime.Now.AddDays(1),
+                DateTime.Now.AddDays(1).AddDays(1),
+                gpUnits.ToArray(),
+                parties.ToArray(),
+                candidates.ToArray(),
+                contests.ToArray(),
+                ballotStyles.ToArray(),
+                new InternationalizedText(new[] { language }),
+                new ContactInformation("na"));
+
+            Assert.That(result.IsValid());
+        }
+
     }
 }

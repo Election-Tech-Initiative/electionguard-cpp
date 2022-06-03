@@ -7,6 +7,7 @@
 extern "C" {
 #include "electionguard/group.h"
 }
+#include "serialize.hpp"
 
 #include <cstring>
 
@@ -20,6 +21,7 @@ using electionguard::ONE_MOD_Q;
 using electionguard::P;
 using electionguard::pow_mod_p;
 using electionguard::Q;
+using electionguard::R;
 using electionguard::rand_q;
 using electionguard::TWO_MOD_P;
 using electionguard::TWO_MOD_Q;
@@ -28,6 +30,8 @@ using electionguard::ZERO_MOD_Q;
 
 using std::make_unique;
 using std::string;
+
+using ConstantsSerializer = electionguard::Serialize::Constants;
 
 #pragma region ElementModP
 
@@ -223,6 +227,12 @@ eg_electionguard_status_t eg_element_mod_p_constant_p(eg_element_mod_p_t **out_c
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
+eg_electionguard_status_t eg_element_mod_p_constant_r(eg_element_mod_p_t **out_constant_ref)
+{
+    *out_constant_ref = AS_TYPE(eg_element_mod_p_t, const_cast<ElementModP *>(&R()));
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
 eg_electionguard_status_t
 eg_element_mod_p_constant_zero_mod_p(eg_element_mod_p_t **out_constant_ref)
 {
@@ -296,6 +306,26 @@ eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_h
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(": eg_element_mod_q_rand_q_new", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+#pragma endregion
+
+#pragma region Group Serialization Functions
+
+eg_electionguard_status_t eg_constant_to_json(char **out_data, uint64_t *out_size)
+{
+    try {
+        auto result = ConstantsSerializer::toJson();
+
+        size_t size = 0;
+        *out_data = dynamicCopy(result, &size);
+        *out_size = (uint64_t)size;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_constant_to_json", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }

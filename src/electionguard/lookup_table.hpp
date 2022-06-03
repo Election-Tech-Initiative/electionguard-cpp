@@ -53,8 +53,13 @@ namespace electionguard
         /// </summary>
         std::vector<uint64_t> pow_mod_p(uint64_t (&exponent)[MAX_Q_LEN]) const
         {
-            uint64_t result[MAX_P_LEN] = {1UL};
+            uint64_t montgomery_result[MAX_P_LEN] = {};
+            uint64_t result[MAX_P_LEN] = {};
             uint8_t exponentBytes[MAX_Q_SIZE] = {};
+
+            // copy the 1 in montgomery form into montgomery_result to start
+            copy((uint64_t *)one_in_montgomery_form, (uint64_t *)one_in_montgomery_form + MAX_P_LEN,
+                 montgomery_result);
 
             // convert the bignum to byte array
             // which aligns with the k window size
@@ -73,8 +78,12 @@ namespace electionguard
                     continue;
                 }
 
-                mul_mod_p(result, const_cast<uint64_t *>(_lookupTable[i][slice]), result);
+                mul_mod_p_mont(montgomery_result, const_cast<uint64_t *>(_lookupTable[i][slice]),
+                          montgomery_result);
             }
+
+            // convert from montogomery form
+            CONTEXT_P().from_montgomery_form(montgomery_result, result);
 
             // wrap in a vector for convenience
             std::vector<uint64_t> vec(begin(result), end(result));
@@ -91,31 +100,38 @@ namespace electionguard
 
             uint64_t row_base[MAX_P_LEN] = {};
             uint64_t running_base[MAX_P_LEN] = {};
+            uint64_t one[MAX_P_LEN] = {1UL};
+
+
+            // convert base to montgomery form
+            CONTEXT_P().to_montgomery_form(base, row_base);
 
             // assign initial values
-            copy(base, base + len, row_base);
-            copy(base, base + len, running_base);
+            copy(row_base, row_base + len, running_base);
 
             // iterate over each m-row in the table
             for (uint64_t i = 0; i < TableLength; i++) {
                 // iterate over each b-bit and compute the table values
                 for (uint64_t j = 1; j < OrderBits; j++) {
                     copy(begin(running_base), end(running_base), begin(_lookupTable[i][j]));
-                    mul_mod_p(running_base, row_base, running_base);
+                    mul_mod_p_mont(running_base, row_base, running_base);
                 }
                 copy(begin(running_base), end(running_base), begin(row_base));
             }
+
+            // also convert 1 to montgomery form and store it because we use it to
+            // start every table based exponentiation and there is no point in
+            // computing it each time
+            CONTEXT_P().to_montgomery_form(one, one_in_montgomery_form);
         }
 
-        void mul_mod_p(uint64_t *lhs, uint64_t *rhs, uint64_t *res) const
+        void mul_mod_p_mont(uint64_t *lhs, uint64_t *rhs, uint64_t *res) const
         {
-            uint64_t mulResult[MAX_P_LEN_DOUBLE] = {};
-            Bignum4096::mul(lhs, rhs, static_cast<uint64_t *>(mulResult));
-            CONTEXT_P().mod(static_cast<uint64_t *>(mulResult), res);
+            CONTEXT_P().montgomery_mod_mul_stay_in_mont_form(lhs, rhs, res);
         }
-
       private:
         FixedBaseTable _lookupTable = {};
+        uint64_t one_in_montgomery_form[MAX_P_LEN] = {};
     };
 
     typedef LookupTable<LUT_WINDOW_SIZE, LUT_ORDER_BITS, LUT_TABLE_LENGTH> LookupTableType;

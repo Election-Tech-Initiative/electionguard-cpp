@@ -28,6 +28,7 @@ using electionguard::Log;
 using electionguard::PlaintextBallot;
 using electionguard::PlaintextBallotContest;
 using electionguard::PlaintextBallotSelection;
+using electionguard::PrecomputeBufferContext;
 using electionguard::SelectionDescription;
 
 using std::invalid_argument;
@@ -244,20 +245,22 @@ eg_electionguard_status_t eg_encrypt_selection(eg_plaintext_ballot_selection_t *
 #pragma region EncryptContest
 
 eg_electionguard_status_t eg_encrypt_contest(
-  eg_plaintext_ballot_contest_t *in_plaintext,
+  eg_plaintext_ballot_contest_t *in_plaintext, eg_internal_manifest_t *in_manifest,
   eg_contest_description_with_placeholders_t *in_description, eg_element_mod_p_t *in_public_key,
   eg_element_mod_q_t *in_crypto_extended_base_hash, eg_element_mod_q_t *in_nonce_seed,
   bool in_should_verify_proofs, eg_ciphertext_ballot_contest_t **out_handle)
 {
     try {
         auto *plaintext = AS_TYPE(PlaintextBallotContest, in_plaintext);
+        auto *internalManifest = AS_TYPE(InternalManifest, in_manifest);
         auto *description = AS_TYPE(ContestDescriptionWithPlaceholders, in_description);
         auto *public_key = AS_TYPE(ElementModP, in_public_key);
         auto *crypto_extended_base_hash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
         auto *nonce_seed_ = AS_TYPE(ElementModQ, in_nonce_seed);
 
         auto ciphertext =
-          encryptContest(*plaintext, *description, *public_key, *crypto_extended_base_hash,
+          encryptContest(*plaintext, *internalManifest, *description, *public_key,
+                         *crypto_extended_base_hash,
                          *nonce_seed_, in_should_verify_proofs);
 
         *out_handle = AS_TYPE(eg_ciphertext_ballot_contest_t, ciphertext.release());
@@ -396,6 +399,60 @@ eg_electionguard_status_t eg_encrypt_compact_ballot_with_nonce(
     } catch (const exception &e) {
         Log::error(":eg_encrypt_compact_ballot_with_nonce", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+#pragma endregion
+
+#pragma region Precompute
+
+EG_API eg_electionguard_status_t eg_precompute_init(int max_buffers)
+{
+
+    try {
+        PrecomputeBufferContext::init(max_buffers);
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const std::exception &e) {
+        Log::error(":eg_precompute_init", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_precompute_populate(eg_element_mod_p_t *in_public_key)
+{
+
+    try {
+        auto *public_key = AS_TYPE(ElementModP, in_public_key);
+        PrecomputeBufferContext::populate(*public_key);
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const std::exception &e) {
+        Log::error(":eg_precompute_populate", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_precompute_stop()
+{
+
+    try {
+        PrecomputeBufferContext::stop_populate();
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const std::exception &e) {
+        Log::error(":eg_precompute_stop", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_precompute_status(int *out_count, int *out_queue_size)
+{
+
+    try {
+        *out_count = PrecomputeBufferContext::get_current_queue_size();
+        *out_queue_size = PrecomputeBufferContext::get_max_queue_size();
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const std::exception &e) {
+        Log::error(":eg_precompute_stop", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     }
 }
 

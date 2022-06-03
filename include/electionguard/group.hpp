@@ -283,6 +283,8 @@ namespace electionguard
     /// </summary>
     EG_API std::unique_ptr<ElementModQ> rand_q();
 
+    std::string vector_uint8_t_to_hex(const std::vector<uint8_t> &bytes);
+
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD_CPP_GROUP_HPP_INCLUDED__ */

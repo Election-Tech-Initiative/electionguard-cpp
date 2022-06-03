@@ -69,6 +69,7 @@ eg_element_mod_q_from_hex_unchecked(char *in_hex, eg_element_mod_q_t **out_handl
 
 EG_API eg_electionguard_status_t eg_element_mod_p_constant_g(eg_element_mod_p_t **out_constant_ref);
 EG_API eg_electionguard_status_t eg_element_mod_p_constant_p(eg_element_mod_p_t **out_constant_ref);
+EG_API eg_electionguard_status_t eg_element_mod_p_constant_r(eg_element_mod_p_t **out_constant_ref);
 EG_API eg_electionguard_status_t
 eg_element_mod_p_constant_zero_mod_p(eg_element_mod_p_t **out_constant_ref);
 EG_API eg_electionguard_status_t
@@ -83,6 +84,7 @@ EG_API eg_electionguard_status_t
 eg_element_mod_q_constant_one_mod_q(eg_element_mod_q_t **out_constant_ref);
 EG_API eg_electionguard_status_t
 eg_element_mod_q_constant_two_mod_q(eg_element_mod_q_t **out_constant_ref);
+EG_API eg_electionguard_status_t eg_constant_to_json(char **out_data, uint64_t *out_size);
 
 #endif
 

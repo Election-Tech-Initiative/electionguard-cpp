@@ -2209,6 +2209,80 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Creates a `Manifest` object
+        /// </summary>
+        /// <param name="electionScopeId"></param>
+        /// <param name="electionType">election type</param>
+        /// <param name="startDate">start date for election</param>
+        /// <param name="endDate">end data for the election</param>
+        /// <param name="gpUnits">array of the `GeopoliticalUnit` for election</param>
+        /// <param name="parties">array of the `Party` for election</param>
+        /// <param name="candidates">array of the `Candidate` for election</param>
+        /// <param name="contests">array of the `ContestDescription` for election</param>
+        /// <param name="ballotStyles">array of the `BallotStyle` for election</param>
+        /// <param name="name">name of the election</param>
+        /// <param name="contact">contact information for the election</param>
+        public unsafe Manifest(
+             string electionScopeId, ElectionType electionType,
+             DateTime startDate, DateTime endDate,
+             GeopoliticalUnit[] gpUnits, Party[] parties,
+             Candidate[] candidates, ContestDescription[] contests,
+             BallotStyle[] ballotStyles, InternationalizedText name, ContactInformation contact)
+        {
+            IntPtr[] gpUnitPointers = new IntPtr[gpUnits.Length];
+            for (var i = 0; i < gpUnits.Length; i++)
+            {
+                gpUnitPointers[i] = gpUnits[i].Handle.Ptr;
+                gpUnits[i].Dispose();
+            }
+
+            IntPtr[] partyPointers = new IntPtr[parties.Length];
+            for (var i = 0; i < parties.Length; i++)
+            {
+                partyPointers[i] = parties[i].Handle.Ptr;
+                parties[i].Dispose();
+            }
+
+            IntPtr[] candidatePointers = new IntPtr[candidates.Length];
+            for (var i = 0; i < candidates.Length; i++)
+            {
+                candidatePointers[i] = candidates[i].Handle.Ptr;
+                candidates[i].Dispose();
+            }
+
+            IntPtr[] contestPointers = new IntPtr[contests.Length];
+            for (var i = 0; i < contests.Length; i++)
+            {
+                contestPointers[i] = contests[i].Handle.Ptr;
+                contests[i].Dispose();
+            }
+
+            IntPtr[] ballotStylePointers = new IntPtr[ballotStyles.Length];
+            for (var i = 0; i < ballotStyles.Length; i++)
+            {
+                ballotStylePointers[i] = ballotStyles[i].Handle.Ptr;
+                ballotStyles[i].Dispose();
+            }
+
+            var status = NativeInterface.Manifest.New(
+                electionScopeId, electionType,
+                (ulong)new DateTimeOffset(startDate).ToUnixTimeMilliseconds(),
+                (ulong)new DateTimeOffset(endDate).ToUnixTimeMilliseconds(),
+                gpUnitPointers, (ulong)gpUnitPointers.LongLength,
+                partyPointers, (ulong)partyPointers.LongLength,
+                candidatePointers, (ulong)candidatePointers.LongLength,
+                contestPointers, (ulong)contestPointers.LongLength,
+                ballotStylePointers, (ulong)ballotStylePointers.LongLength,
+                name.Handle,
+                contact.Handle,
+                out Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                throw new ElectionGuardException($"Manifest Error Status: {status}");
+            }
+        }
+
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
