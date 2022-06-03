@@ -3378,7 +3378,7 @@ namespace ElectionGuard
                 ElementModP.ElementModPHandle publicKey,
                 ElementModQ.ElementModQHandle crypto_extended_base_hash,
                 ElementModQ.ElementModQHandle nonceSeed,
-                bool shouldVerifyProofs,
+                bool shouldVerifyProofs, bool allowOvervotes,
                 out CiphertextBallotContest.CiphertextBallotContestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot",

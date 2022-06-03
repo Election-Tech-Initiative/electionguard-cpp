@@ -212,12 +212,13 @@ namespace ElectionGuard
             ElementModP elgamalPublicKey,
             ElementModQ cryptoExtendedBaseHash,
             ElementModQ nonceSeed,
-            bool shouldVerifyProofs = true
+            bool shouldVerifyProofs = true,
+            bool allowOvervotes = true
         )
         {
             var status = NativeInterface.Encrypt.Contest(
                     plaintext.Handle, description.Handle, elgamalPublicKey.Handle,
-                    cryptoExtendedBaseHash.Handle, nonceSeed.Handle, shouldVerifyProofs,
+                    cryptoExtendedBaseHash.Handle, nonceSeed.Handle, shouldVerifyProofs, allowOvervotes,
                     out NativeCiphertextBallotContest ciphertext);
             status.ThrowIfError();
             return new CiphertextBallotContest(ciphertext);

@@ -4,15 +4,15 @@
 #include "electionguard/ballot_code.hpp"
 #include "electionguard/elgamal.hpp"
 #include "electionguard/hash.hpp"
+#include "electionguard/precompute_buffers.hpp"
 #include "log.hpp"
 #include "nonces.hpp"
 #include "utils.hpp"
-#include "electionguard/precompute_buffers.hpp"
-#include <nlohmann/json.hpp>
 
 #include <algorithm>
 #include <future>
 #include <iostream>
+#include <nlohmann/json.hpp>
 
 extern "C" {
 #include "../karamel/Hacl_Bignum4096.h"
@@ -264,8 +264,8 @@ namespace electionguard
             auto pubkey_to_exp = triple1->get_pubkey_to_exp();
 
             // Generate the encryption using precomputed values
-            ciphertext = elgamalEncrypt_with_precomputed(selection.getVote(),
-                                                         *g_to_exp, *pubkey_to_exp);
+            ciphertext =
+              elgamalEncrypt_with_precomputed(selection.getVote(), *g_to_exp, *pubkey_to_exp);
             if (ciphertext == nullptr) {
                 throw runtime_error("encryptSelection:: Error generating ciphertext");
             }
@@ -277,12 +277,10 @@ namespace electionguard
             encrypted = CiphertextBallotSelection::make_with_precomputed(
               selection.getObjectId(), description.getSequenceOrder(), *descriptionHash,
               move(ciphertext), cryptoExtendedBaseHash, selection.getVote(),
-              move(precomputedTwoTriplesAndAQuad),
-              isPlaceholder, true);
+              move(precomputedTwoTriplesAndAQuad), isPlaceholder, true);
         } else {
             // Generate the encryption
-            ciphertext =
-              elgamalEncrypt(selection.getVote(), *selectionNonce, elgamalPublicKey);
+            ciphertext = elgamalEncrypt(selection.getVote(), *selectionNonce, elgamalPublicKey);
             if (ciphertext == nullptr) {
                 throw runtime_error("encryptSelection:: Error generating ciphertext");
             }
@@ -304,17 +302,17 @@ namespace electionguard
 
         // verify the selection.
         if (encrypted->isValidEncryption(*descriptionHash, elgamalPublicKey,
-                                            cryptoExtendedBaseHash)) {
+                                         cryptoExtendedBaseHash)) {
             return encrypted;
         }
-        throw runtime_error("encryptSelection failed validity check");        
+        throw runtime_error("encryptSelection failed validity check");
     }
 
     string getOvervoteAndWriteIns(const PlaintextBallotContest &contest,
                                   const InternalManifest &internalManifest,
                                   eg_valid_contest_return_type_t is_overvote)
     {
-        json overvoteAndWriteIns; 
+        json overvoteAndWriteIns;
         auto selections = contest.getSelections();
 
         // if an overvote is detected then put the selections into json
@@ -371,24 +369,23 @@ namespace electionguard
 
         string overvoteAndWriteIns_string("");
         if (overvoteAndWriteIns.dump() != string("null")) {
-            overvoteAndWriteIns_string = overvoteAndWriteIns.dump();      
+            overvoteAndWriteIns_string = overvoteAndWriteIns.dump();
         }
 
         return overvoteAndWriteIns_string;
     }
 
     unique_ptr<CiphertextBallotContest>
-    encryptContest(const PlaintextBallotContest &contest,
-                   const InternalManifest &internalManifest,
+    encryptContest(const PlaintextBallotContest &contest, const InternalManifest &internalManifest,
                    const ContestDescriptionWithPlaceholders &description,
                    const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
-                   const ElementModQ &nonceSeed, bool shouldVerifyProofs /* = true */)
+                   const ElementModQ &nonceSeed, bool shouldVerifyProofs /* = true */,
+                   bool supportOvervotes /* = true */)
 
     {
         // Validate Input
-        bool supportOvervotes = true;
-        eg_valid_contest_return_type_t is_valid_contest =
-          contest.isValid(description.getObjectId(), description.getSelections().size(),
+        eg_valid_contest_return_type_t is_valid_contest = contest.isValid(
+          description.getObjectId(), description.getSelections().size(),
           description.getNumberElected(), description.getVotesAllowed(), supportOvervotes);
         if ((is_valid_contest != SUCCESS) && (is_valid_contest != OVERVOTE)) {
             throw invalid_argument("the plaintext contest was invalid");
@@ -439,8 +436,8 @@ namespace electionguard
 
                 // if the is an overvote then we need to make all the selection votes 0
                 if (is_valid_contest == OVERVOTE) {
-                    duplicate_selection = make_unique<PlaintextBallotSelection>(
-                      selection_ptr->getObjectId(), 0, false);
+                    duplicate_selection =
+                      make_unique<PlaintextBallotSelection>(selection_ptr->getObjectId(), 0, false);
                     selection_ptr = duplicate_selection.get();
                 }
 
@@ -448,7 +445,7 @@ namespace electionguard
 
                 encryptedSelections.push_back(encryptSelection(
                   *selection_ptr, selectionDescription.get(), *elgamalPublicKey_ptr,
-                      *cryptoExtendedBaseHash_ptr, *sharedNonce.get(), false, shouldVerifyProofs));
+                  *cryptoExtendedBaseHash_ptr, *sharedNonce.get(), false, shouldVerifyProofs));
             } else {
                 // Should never happen since the contest is normalized by emplaceMissingValues
                 throw runtime_error("encryptedContest:: Error constructing encrypted selection");
@@ -475,18 +472,17 @@ namespace electionguard
 
             auto placeholderSelection = selectionFrom(placeholder, true, selectPlaceholder);
             encryptedSelections.push_back(encryptSelection(
-                  *placeholderSelection, placeholder, *elgamalPublicKey_ptr,
-                  *cryptoExtendedBaseHash_ptr, *sharedNonce.get(), false, shouldVerifyProofs));
+              *placeholderSelection, placeholder, *elgamalPublicKey_ptr,
+              *cryptoExtendedBaseHash_ptr, *sharedNonce.get(), false, shouldVerifyProofs));
         }
 
         // Derive the extendedDataNonce from the selection nonce and a constant
         auto noncesForExtendedData =
-            make_unique<Nonces>(*sharedNonce->clone(), "constant-extended-data");
+          make_unique<Nonces>(*sharedNonce->clone(), "constant-extended-data");
         auto extendedDataNonce = noncesForExtendedData->get(0);
 
-        vector<uint8_t> extendedData_plaintext((uint8_t *)&extendedData.front(),
-                                               (uint8_t *)&extendedData.front() +
-                                                 extendedData.size());
+        vector<uint8_t> extendedData_plaintext(
+          (uint8_t *)&extendedData.front(), (uint8_t *)&extendedData.front() + extendedData.size());
 
         // Perform HashedElGamalCiphertext calculation
         unique_ptr<HashedElGamalCiphertext> hashedElGamal =
@@ -504,8 +500,8 @@ namespace electionguard
         auto encryptedContest = CiphertextBallotContest::make(
           contest.getObjectId(), description.getSequenceOrder(), *descriptionHash,
           move(encryptedSelections), elgamalPublicKey, cryptoExtendedBaseHash, *chaumPedersenNonce,
-          description.getNumberElected(), sharedNonce->clone(), nullptr,
-          nullptr, move(hashedElGamal));
+          description.getNumberElected(), sharedNonce->clone(), nullptr, nullptr,
+          move(hashedElGamal));
 
         if (encryptedContest == nullptr || encryptedContest->getProof() == nullptr) {
             throw runtime_error("encryptedContest:: Error constructing encrypted constest");
@@ -542,8 +538,9 @@ namespace electionguard
                     hasContest = true;
                     auto encrypted = encryptContest(
                       contest.get(), internalManifest, description.get(),
-                      *context.getElGamalPublicKey(),
-                      *context.getCryptoExtendedBaseHash(), nonceSeed, shouldVerifyProofs);
+                      *context.getElGamalPublicKey(), *context.getCryptoExtendedBaseHash(),
+                      nonceSeed, shouldVerifyProofs,
+                      context.getConfiguration()->getAllowOverVotes());
 
                     encryptedContests.push_back(move(encrypted));
                     break;

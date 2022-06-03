@@ -4,9 +4,9 @@
 #include "ballot.hpp"
 #include "ballot_compact.hpp"
 #include "election.hpp"
+#include "export.h"
 #include "group.hpp"
 #include "manifest.hpp"
-#include "export.h"
 
 #include <memory>
 
@@ -146,11 +146,11 @@ namespace electionguard
     /// <returns>A `CiphertextBallotContest`</returns>
     /// </summary>
     EG_API std::unique_ptr<CiphertextBallotContest>
-    encryptContest(const PlaintextBallotContest &contest,
-                   const InternalManifest &internalManifest,
+    encryptContest(const PlaintextBallotContest &contest, const InternalManifest &internalManifest,
                    const ContestDescriptionWithPlaceholders &description,
                    const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
-                   const ElementModQ &nonceSeed, bool shouldVerifyProofs = true);
+                   const ElementModQ &nonceSeed, bool shouldVerifyProofs = true,
+                   bool supportOvervotes = true);
 
     /// <summary>
     /// Encrypt the contests of a specific `Ballot` in the context of a specific `CiphertextElectionContext`

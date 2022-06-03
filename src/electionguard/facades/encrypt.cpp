@@ -244,11 +244,13 @@ eg_electionguard_status_t eg_encrypt_selection(eg_plaintext_ballot_selection_t *
 
 #pragma region EncryptContest
 
-eg_electionguard_status_t eg_encrypt_contest(
-  eg_plaintext_ballot_contest_t *in_plaintext, eg_internal_manifest_t *in_manifest,
-  eg_contest_description_with_placeholders_t *in_description, eg_element_mod_p_t *in_public_key,
-  eg_element_mod_q_t *in_crypto_extended_base_hash, eg_element_mod_q_t *in_nonce_seed,
-  bool in_should_verify_proofs, eg_ciphertext_ballot_contest_t **out_handle)
+eg_electionguard_status_t
+eg_encrypt_contest(eg_plaintext_ballot_contest_t *in_plaintext, eg_internal_manifest_t *in_manifest,
+                   eg_contest_description_with_placeholders_t *in_description,
+                   eg_element_mod_p_t *in_public_key,
+                   eg_element_mod_q_t *in_crypto_extended_base_hash,
+                   eg_element_mod_q_t *in_nonce_seed, bool in_should_verify_proofs,
+                   bool in_allow_overvotes, eg_ciphertext_ballot_contest_t **out_handle)
 {
     try {
         auto *plaintext = AS_TYPE(PlaintextBallotContest, in_plaintext);
@@ -258,10 +260,9 @@ eg_electionguard_status_t eg_encrypt_contest(
         auto *crypto_extended_base_hash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
         auto *nonce_seed_ = AS_TYPE(ElementModQ, in_nonce_seed);
 
-        auto ciphertext =
-          encryptContest(*plaintext, *internalManifest, *description, *public_key,
-                         *crypto_extended_base_hash,
-                         *nonce_seed_, in_should_verify_proofs);
+        auto ciphertext = encryptContest(*plaintext, *internalManifest, *description, *public_key,
+                                         *crypto_extended_base_hash, *nonce_seed_,
+                                         in_should_verify_proofs, in_allow_overvotes);
 
         *out_handle = AS_TYPE(eg_ciphertext_ballot_contest_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
