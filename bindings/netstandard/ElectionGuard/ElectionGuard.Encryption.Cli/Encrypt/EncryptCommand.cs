@@ -19,8 +19,11 @@
         private async Task EncryptInternal(EncryptOptions encryptOptions)
         {
             encryptOptions.Validate();
+            if (string.IsNullOrEmpty(encryptOptions.Context)) throw new ArgumentNullException(nameof(encryptOptions.Context));
+            if (string.IsNullOrEmpty(encryptOptions.Manifest)) throw new ArgumentNullException(nameof(encryptOptions.Manifest));
+            if (string.IsNullOrEmpty(encryptOptions.BallotsDir)) throw new ArgumentNullException(nameof(encryptOptions.BallotsDir));
 
-            var encryptionMediator = await GetEncryptionMediator(encryptOptions);
+            var encryptionMediator = await GetEncryptionMediator(encryptOptions.Context, encryptOptions.Manifest);
             var ballotFiles = GetBallotFiles(encryptOptions.BallotsDir);
 
             foreach (var ballotFile in ballotFiles)
@@ -41,10 +44,10 @@
             return submittedBallot;
         }
 
-        private static async Task<EncryptionMediator> GetEncryptionMediator(EncryptOptions encryptOptions)
+        private static async Task<EncryptionMediator> GetEncryptionMediator(string contextFile, string manifestFile)
         {
-            var context = await GetContext(encryptOptions.Context);
-            var internalManifest = await GetInternalManifest(encryptOptions);
+            var context = await GetContext(contextFile);
+            var internalManifest = await GetInternalManifest(manifestFile);
             var device = GetDevice();
             var encryptionMediator = new EncryptionMediator(internalManifest, context, device);
             return encryptionMediator;
@@ -75,9 +78,9 @@
             return new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
         }
 
-        private static async Task<InternalManifest> GetInternalManifest(EncryptOptions encryptOptions)
+        private static async Task<InternalManifest> GetInternalManifest(string manifestFile)
         {
-            var manifestJson = await File.ReadAllTextAsync(encryptOptions.Manifest);
+            var manifestJson = await File.ReadAllTextAsync(manifestFile);
             var manifest = new Manifest(manifestJson);
             return new InternalManifest(manifest);
         }

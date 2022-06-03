@@ -6,16 +6,16 @@ namespace ElectionGuard.Encryption.Cli.Encrypt;
 internal class EncryptOptions
 {
     [Option('c', "context", Required = true, HelpText = "Json file containing an ElectionGuard context that contains encryption details.")]
-    public string Context { get; set; }
+    public string? Context { get; set; }
 
     [Option('m', "manifest", Required = true, HelpText = "Json file containing an ElectionGuard manifest that contains election details.")]
-    public string Manifest { get; set; }
+    public string? Manifest { get; set; }
 
     [Option('b', "ballots", Required = true, HelpText = "File folder containing ballots to encrypt.")]
-    public string BallotsDir { get; set; }
+    public string? BallotsDir { get; set; }
 
     [Option('o', "out", Required = true, HelpText = "File folder in which to place encrypted ballots.")]
-    public string OutDir { get; set; }
+    public string? OutDir { get; set; }
 
     public void Validate()
     {

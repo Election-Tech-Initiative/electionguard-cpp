@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
     <StartupObject>ElectionGuard.Encryption.Cli.Program</StartupObject>
     <AssemblyName>eg</AssemblyName>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

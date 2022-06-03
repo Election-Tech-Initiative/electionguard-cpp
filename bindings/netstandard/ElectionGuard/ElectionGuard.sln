@@ -16,7 +16,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Encryption.Be
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Encryption.Utils", "ElectionGuard.Encryption.Utils\ElectionGuard.Encryption.Utils.csproj", "{6AC780D0-1862-4680-8B47-AD6CCF97B66C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuard.Encryption.Cli", "ElectionGuard.Encryption.Cli\ElectionGuard.Encryption.Cli.csproj", "{A7289C54-F777-45EA-A6E8-9C7605706CBE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Encryption.Cli", "ElectionGuard.Encryption.Cli\ElectionGuard.Encryption.Cli.csproj", "{A7289C54-F777-45EA-A6E8-9C7605706CBE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -76,8 +76,8 @@ Global
 		{6AC780D0-1862-4680-8B47-AD6CCF97B66C}.Release|x64.Build.0 = Release|x64
 		{6AC780D0-1862-4680-8B47-AD6CCF97B66C}.Release|x86.ActiveCfg = Release|x86
 		{6AC780D0-1862-4680-8B47-AD6CCF97B66C}.Release|x86.Build.0 = Release|x86
-		{A7289C54-F777-45EA-A6E8-9C7605706CBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A7289C54-F777-45EA-A6E8-9C7605706CBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7289C54-F777-45EA-A6E8-9C7605706CBE}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{A7289C54-F777-45EA-A6E8-9C7605706CBE}.Debug|Any CPU.Build.0 = Debug|x64
 		{A7289C54-F777-45EA-A6E8-9C7605706CBE}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{A7289C54-F777-45EA-A6E8-9C7605706CBE}.Debug|x64.Build.0 = Debug|Any CPU
 		{A7289C54-F777-45EA-A6E8-9C7605706CBE}.Debug|x86.ActiveCfg = Debug|Any CPU
