@@ -3130,10 +3130,12 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_encryption_device_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+                
             internal static extern Status Free(EncryptionDeviceType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_encryption_device_get_hash",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+
             internal static extern Status GetHash(
                 EncryptionDeviceHandle handle,
                 out ElementModQ.ElementModQHandle device_hash);

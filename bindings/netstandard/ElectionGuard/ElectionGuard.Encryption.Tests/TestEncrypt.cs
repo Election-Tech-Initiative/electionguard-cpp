@@ -8,6 +8,22 @@ namespace ElectionGuard.Encrypt.Tests
     public class TestEncrypt
     {
         [Test]
+        public void Test_Device_Serialization_Succeeds()
+        {
+
+            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Brazil");
+
+            var deviceToJson = device.ToJson();
+
+            var deviceCreatedFromJson = new EncryptionDevice(deviceToJson);
+
+            Assert.That(deviceToJson.Contains("Brazil"));
+
+            Assert.That(deviceCreatedFromJson.ToJson().Contains("Brazil"));
+
+        }
+
+        [Test]
         public void Test_Encrypt_Ballot_Simple_Succeeds()
         {
             // Configure the election context
