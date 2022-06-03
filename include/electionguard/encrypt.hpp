@@ -9,6 +9,7 @@
 #include "manifest.hpp"
 
 #include <memory>
+#include <nlohmann/json.hpp>
 
 using std::string;
 using std::unique_ptr;
@@ -68,7 +69,8 @@ namespace electionguard
         class Impl;
         std::unique_ptr<Impl> pimpl;
 
-
+        static json fromObject(const electionguard::EncryptionDevice &serializable);
+        static unique_ptr<electionguard::EncryptionDevice> toObject(json j);
     };
 
     /// <summary>
@@ -166,8 +168,7 @@ namespace electionguard
     /// <returns>A `CiphertextBallotContest`</returns>
     /// </summary>
     EG_API std::unique_ptr<CiphertextBallotContest>
-    encryptContest(const PlaintextBallotContest &contest,
-                   const InternalManifest &internalManifest,
+    encryptContest(const PlaintextBallotContest &contest, const InternalManifest &internalManifest,
                    const ContestDescriptionWithPlaceholders &description,
                    const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
                    const ElementModQ &nonceSeed, bool shouldVerifyProofs = true);

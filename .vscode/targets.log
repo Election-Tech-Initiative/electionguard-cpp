@@ -6,7 +6,7 @@ make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --quest
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Thu Jun 02 19:47:46 2022
+# Make data base, printed on Thu Jun 02 20:31:40 2022
 
 # Variables
 
@@ -23,9 +23,9 @@ USERPROFILE = C:\Users\ratze
 # environment
 LOCALAPPDATA = C:\Users\ratze\AppData\Local
 # environment
-VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-4fa9461d-056e-4e76-a01d-3be65dbfff73-sock
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-f62c6faa-a895-4074-bb4f-a61383391c13-sock
 # environment
-VSCODE_CWD = C:\WINDOWS\system32
+VSCODE_CWD = C:\WINDOWS\System32
 # environment
 CHOCOLATEYINSTALL = C:\ProgramData\chocolatey
 # environment
@@ -39,7 +39,7 @@ MAKE_COMMAND := C:/ProgramData/chocolatey/lib/make/tools/install/bin/make.exe
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_30360_NUJCXMNWSOCUORDK
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_30000_OHYNAXXCGRBCXUHK
 # environment
 IOLIBS = C:\Program Files\darktable\lib\libgphoto2_port\0.12.0
 # environment
@@ -105,7 +105,7 @@ MAKEFILE_LIST := Makefile
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 30360
+VSCODE_PID = 30000
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # environment
@@ -261,9 +261,9 @@ ELECTIONGUARD_BUILD_DIR = $(realpath .)/build
 
 # Directories
 
-# . (key c:/Users/ratze/Desktop/contribution1CPPElectionGuard/electionguard-cpp, mtime 1653161284): 28 files, no impossibilities.
+# . (key c:/Users/ratze/Desktop/contribution1CPPElectionGuard/electionguard-cpp, mtime 1654215164): 29 files, no impossibilities.
 
-# 28 files, no impossibilities in 1 directories.
+# 29 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -642,12 +642,12 @@ bench:
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 53 / storage = 574 B / avg = 10 B
-# current buf: size = 8174 B / used = 574 B / count = 53 / avg = 10 B
+# strcache buffers: 1 (0) / strings = 54 / storage = 593 B / avg = 10 B
+# current buf: size = 8174 B / used = 593 B / count = 54 / avg = 10 B
 
-# strcache performance: lookups = 112 / hit rate = 52%
+# strcache performance: lookups = 113 / hit rate = 52%
 # hash-table stats:
-# Load=53/8192=1%, Rehash=0, Collisions=0/112=0%
-# Finished Make data base on Thu Jun 02 19:47:46 2022
+# Load=54/8192=1%, Rehash=0, Collisions=0/113=0%
+# Finished Make data base on Thu Jun 02 20:31:40 2022
 
  
