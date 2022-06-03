@@ -50,6 +50,24 @@ namespace ElectionGuard.Encrypt.Tests
         }
 
         [Test]
+        public void Test_Can_Create_Ciphertext_Election_Context()
+        {
+            var config = new ContextConfiguration(false, 4200);
+
+            // Act
+            var result = new CiphertextElectionContext(1, 1,
+                Constants.ONE_MOD_P,
+                new ElementModQ("02"), new ElementModQ("02"), config);
+
+            // Assert
+            Assert.That(result.CommitmentHash.ToHex() == "02");
+            Assert.That(result.ManifestHash.ToHex() == "02");
+            Assert.That(!result.Configuration.AllowedOverVotes);
+            Assert.That(result.Configuration.MaxBallots == 4200);
+        }
+
+
+        [Test]
         public void Test_Can_Assign_Extended_Data_To_Ciphertext_Election_Context()
         {
             // Arrange

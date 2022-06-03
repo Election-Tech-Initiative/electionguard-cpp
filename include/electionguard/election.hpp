@@ -154,6 +154,12 @@ namespace electionguard
              std::unique_ptr<ElementModQ> commitmentHash,
              std::unique_ptr<ElementModQ> manifestHash);
 
+        static std::unique_ptr<CiphertextElectionContext>
+        make(const uint64_t numberOfGuardians, const uint64_t quorum,
+             std::unique_ptr<ElementModP> elGamalPublicKey,
+             std::unique_ptr<ElementModQ> commitmentHash, std::unique_ptr<ElementModQ> manifestHash,
+             std::unique_ptr<ContextConfiguration> config);
+
         /// <summary>
         ///  Makes a CiphertextElectionContext object.
         ///
@@ -170,6 +176,13 @@ namespace electionguard
              std::unique_ptr<ElementModQ> commitmentHash, std::unique_ptr<ElementModQ> manifestHash,
              std::unordered_map<std::string, std::string> extendedData);
 
+        static std::unique_ptr<CiphertextElectionContext>
+        make(const uint64_t numberOfGuardians, const uint64_t quorum,
+             std::unique_ptr<ElementModP> elGamalPublicKey,
+             std::unique_ptr<ElementModQ> commitmentHash, std::unique_ptr<ElementModQ> manifestHash,
+             std::unique_ptr<ContextConfiguration> config,
+             std::unordered_map<std::string, std::string> extendedData);
+
         /// <summary>
         ///  Makes a CiphertextElectionContext object from hex string representations.
         ///
@@ -183,6 +196,11 @@ namespace electionguard
         make(const uint64_t numberOfGuardians, const uint64_t quorum,
              const std::string &elGamalPublicKeyInHex, const std::string &commitmentHashInHex,
              const std::string &manifestHashInHex);
+
+        static std::unique_ptr<CiphertextElectionContext>
+        make(const uint64_t numberOfGuardians, const uint64_t quorum,
+             const std::string &elGamalPublicKeyInHex, const std::string &commitmentHashInHex,
+             const std::string &manifestHashInHex, std::unique_ptr<ContextConfiguration> config);
 
         /// <summary>
         ///  Makes a CiphertextElectionContext object from hex string representations.
@@ -198,6 +216,12 @@ namespace electionguard
         make(const uint64_t numberOfGuardians, const uint64_t quorum,
              const std::string &elGamalPublicKeyInHex, const std::string &commitmentHashInHex,
              const std::string &manifestHashInHex,
+             std::unordered_map<std::string, std::string> extendedData);
+
+        static std::unique_ptr<CiphertextElectionContext>
+        make(const uint64_t numberOfGuardians, const uint64_t quorum,
+             const std::string &elGamalPublicKeyInHex, const std::string &commitmentHashInHex,
+             const std::string &manifestHashInHex, std::unique_ptr<ContextConfiguration> config,
              std::unordered_map<std::string, std::string> extendedData);
 
         std::vector<uint8_t> toBson() const;

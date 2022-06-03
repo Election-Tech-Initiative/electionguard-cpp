@@ -224,6 +224,25 @@ namespace electionguard
     unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
       uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
       unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
+      unique_ptr<ContextConfiguration> config)
+    {
+        auto cryptoBaseHash = hash_elems(
+          {&const_cast<ElementModP &>(P()), &const_cast<ElementModQ &>(Q()),
+           &const_cast<ElementModP &>(G()), numberOfGuardians, quorum, manifestHash.get()});
+
+        auto cryptoExtendedBaseHash = hash_elems({cryptoBaseHash.get(), commitmentHash.get()});
+
+        // ensure the elgamal public key instance is set as a fixed base
+        elGamalPublicKey->setIsFixedBase(true);
+
+        return make_unique<CiphertextElectionContext>(
+          numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+          move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash), move(config));
+    }
+
+    unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
+      uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
+      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
       std::unordered_map<std::string, std::string> extendedData)
     {
         auto cryptoBaseHash = hash_elems(
@@ -238,6 +257,27 @@ namespace electionguard
         return make_unique<CiphertextElectionContext>(
           numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
           move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
+          move(extendedData));
+    }
+
+    unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
+      uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
+      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
+      unique_ptr<ContextConfiguration> config,
+      std::unordered_map<std::string, std::string> extendedData)
+    {
+        auto cryptoBaseHash = hash_elems(
+          {&const_cast<ElementModP &>(P()), &const_cast<ElementModQ &>(Q()),
+           &const_cast<ElementModP &>(G()), numberOfGuardians, quorum, manifestHash.get()});
+
+        auto cryptoExtendedBaseHash = hash_elems({cryptoBaseHash.get(), commitmentHash.get()});
+
+        // ensure the elgamal public key instance is set as a fixed base
+        elGamalPublicKey->setIsFixedBase(true);
+
+        return make_unique<CiphertextElectionContext>(
+          numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+          move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash), move(config),
           move(extendedData));
     }
 
@@ -270,6 +310,39 @@ namespace electionguard
 
         return make(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
                     move(manifestHash), move(extendedData));
+    }
+
+    unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
+      uint64_t numberOfGuardians, uint64_t quorum, const string &elGamalPublicKeyInHex,
+      const string &commitmentHashInHex, const string &manifestHashInHex,
+      unique_ptr<ContextConfiguration> config)
+    {
+        auto elGamalPublicKey = ElementModP::fromHex(elGamalPublicKeyInHex);
+        auto commitmentHash = ElementModQ::fromHex(commitmentHashInHex);
+        auto manifestHash = ElementModQ::fromHex(manifestHashInHex);
+
+        // ensure the elgamal public key instance is set as a fixed base
+        elGamalPublicKey->setIsFixedBase(true);
+
+        return make(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+                    move(manifestHash), move(config));
+    }
+
+    unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
+      uint64_t numberOfGuardians, uint64_t quorum, const string &elGamalPublicKeyInHex,
+      const string &commitmentHashInHex, const string &manifestHashInHex,
+      unique_ptr<ContextConfiguration> config,
+      std::unordered_map<std::string, std::string> extendedData)
+    {
+        auto elGamalPublicKey = ElementModP::fromHex(elGamalPublicKeyInHex);
+        auto commitmentHash = ElementModQ::fromHex(commitmentHashInHex);
+        auto manifestHash = ElementModQ::fromHex(manifestHashInHex);
+
+        // ensure the elgamal public key instance is set as a fixed base
+        elGamalPublicKey->setIsFixedBase(true);
+
+        return make(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
+                    move(manifestHash), move(config), move(extendedData));
     }
 
 #pragma endregion

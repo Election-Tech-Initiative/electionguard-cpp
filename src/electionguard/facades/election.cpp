@@ -5,6 +5,7 @@
 #include "electionguard/collections.h"
 #include "variant_cast.hpp"
 
+#include <algorithm>
 #include <cstring>
 #include <memory>
 #include <string>
@@ -201,10 +202,13 @@ eg_electionguard_status_t eg_ciphertext_election_context_make_with_configuration
         auto *publicKeyPtr = AS_TYPE(ElementModP, in_elgamal_public_key);
         auto *commitmentHashPtr = AS_TYPE(ElementModQ, in_commitment_hash);
         auto *manifestHashPtr = AS_TYPE(ElementModQ, in_manifest_hash);
+        auto *configPtr = AS_TYPE(ContextConfiguration, in_configuration);
+        auto config = make_unique<ContextConfiguration>(configPtr->getAllowOverVotes(),
+                                                        configPtr->getMaxNumberOfBallots());
 
-        auto context =
-          CiphertextElectionContext::make(in_number_of_guardians, in_quorum, publicKeyPtr->clone(),
-                                          commitmentHashPtr->clone(), manifestHashPtr->clone());
+        auto context = CiphertextElectionContext::make(
+          in_number_of_guardians, in_quorum, publicKeyPtr->clone(), commitmentHashPtr->clone(),
+          manifestHashPtr->clone(), move(config));
 
         *out_handle = AS_TYPE(eg_ciphertext_election_context_t, context.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -256,6 +260,9 @@ eg_electionguard_status_t eg_ciphertext_election_context_make_with_configuration
         auto *publicKeyPtr = AS_TYPE(ElementModP, in_elgamal_public_key);
         auto *commitmentHashPtr = AS_TYPE(ElementModQ, in_commitment_hash);
         auto *manifestHashPtr = AS_TYPE(ElementModQ, in_manifest_hash);
+        auto *configPtr = AS_TYPE(ContextConfiguration, in_configuration);
+        auto config = make_unique<ContextConfiguration>(configPtr->getAllowOverVotes(),
+                                                        configPtr->getMaxNumberOfBallots());
 
         unordered_map<string, string> extendedData = {};
         for (uint64_t i = 0; i < eg_linked_list_get_count(in_extended_data); i++) {
@@ -269,7 +276,7 @@ eg_electionguard_status_t eg_ciphertext_election_context_make_with_configuration
 
         auto context = CiphertextElectionContext::make(
           in_number_of_guardians, in_quorum, publicKeyPtr->clone(), commitmentHashPtr->clone(),
-          manifestHashPtr->clone(), move(extendedData));
+          manifestHashPtr->clone(), move(config), move(extendedData));
 
         *out_handle = AS_TYPE(eg_ciphertext_election_context_t, context.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
