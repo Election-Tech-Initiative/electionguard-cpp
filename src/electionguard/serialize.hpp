@@ -17,11 +17,11 @@
 #include <nlohmann/json.hpp>
 #include <unordered_map>
 
-using nlohmann::json;
 using electionguard::G;
 using electionguard::P;
 using electionguard::Q;
 using electionguard::R;
+using nlohmann::json;
 using std::make_unique;
 using std::reference_wrapper;
 using std::string;
@@ -910,7 +910,7 @@ namespace electionguard
         class EncryptionDevice
         {
           private:
-            static json EncryptionDevice::fromObject(const electionguard::EncryptionDevice &serializable)
+            static json fromObject(const electionguard::EncryptionDevice &serializable)
             {
 
                 json j = {
@@ -923,34 +923,31 @@ namespace electionguard
                 return j;
             }
 
-            static unique_ptr<electionguard::EncryptionDevice> EncryptionDevice::toObject(json j)
+            static unique_ptr<electionguard::EncryptionDevice> toObject(json j)
             {
                 auto deviceUuid = j["deviceUuid"].get<uint64_t>();
                 auto sessionUuid = j["sessionUuid"].get<uint64_t>();
                 auto launchCode = j["launchCode"].get<uint64_t>();
                 auto location = j["location"].get<string>();
 
-                return make_unique<electionguard::EncryptionDevice>(deviceUuid, sessionUuid, launchCode, location);
+                return make_unique<electionguard::EncryptionDevice>(deviceUuid, sessionUuid,
+                                                                    launchCode, location);
             }
 
           public:
-            static vector<uint8_t>
-            EncryptionDevice::toBson(const electionguard::EncryptionDevice &serializable)
+            static vector<uint8_t> toBson(const electionguard::EncryptionDevice &serializable)
             {
                 return json::to_bson(fromObject(serializable));
             }
-            static string
-            EncryptionDevice::toJson(const electionguard::EncryptionDevice &serializable)
+            static string toJson(const electionguard::EncryptionDevice &serializable)
             {
                 return fromObject(serializable).dump();
             }
-            static unique_ptr<electionguard::EncryptionDevice>
-            EncryptionDevice::fromBson(vector<uint8_t> data)
+            static unique_ptr<electionguard::EncryptionDevice> fromBson(vector<uint8_t> data)
             {
                 return toObject(json::from_bson(data));
             }
-            static unique_ptr<electionguard::EncryptionDevice>
-            EncryptionDevice::fromJson(string data)
+            static unique_ptr<electionguard::EncryptionDevice> fromJson(string data)
             {
                 return toObject(json::parse(data));
             }

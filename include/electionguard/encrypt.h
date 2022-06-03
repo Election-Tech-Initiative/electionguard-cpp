@@ -54,9 +54,27 @@ EG_API eg_electionguard_status_t eg_encryption_device_free(eg_encryption_device_
  * @param[out] out_hash The hash code for the encryption device
  *                      The caller is responsible for freeing the object
  */
-EG_API eg_electionguard_status_t eg_encryption_device_get_hash(eg_encryption_device_t *handle,
-                                                               eg_element_mod_q_t **out_hash);
+EG_API eg_electionguard_status_t eg_encryption_device_get_hash(eg_encryption_device_t *handle,eg_element_mod_q_t **out_hash);
 
+ /**
+ * @brief Get the encrpytion device when given JSON
+ * 
+ * @param[in] in_data The Json that will be converted into a device
+ * 
+ * @param[out] out_handle The encryption device
+ */                                                              
+EG_API eg_electionguard_status_t eg_encryption_device_from_json(char *in_data, eg_encryption_device_t **out_handle);
+
+
+/**
+ * @brief Get the JSON representation of this encrption device
+ * 
+ * 
+ * @param[out] out_data The json representation of the encryption device
+ * @param[out] out_size The size of this JSON representation
+ */  
+EG_API eg_electionguard_status_t eg_encryption_device_to_json(eg_encryption_device_t *handle,
+                                                              char **out_data, uint64_t *out_size);
 #endif
 
 #ifndef EncryptionMediator

@@ -3216,20 +3216,12 @@ namespace ElectionGuard
                 [MarshalAs(UnmanagedType.LPStr)] string data,
                 out EncryptionDeviceHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_encryption_device_from_bson",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status FromBson(
-                uint* data, ulong length, EncryptionDeviceHandle handle);
-
             [DllImport(DllName, EntryPoint = "eg_encryption_device_to_json",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToJson(
                 EncryptionDeviceHandle handle, out IntPtr data, out ulong size);
 
-            [DllImport(DllName, EntryPoint = "eg_encryption_device_to_bson",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status ToBson(
-                EncryptionDeviceHandle handle, out uint* data, out ulong size);
+
         }
 
         internal static unsafe class EncryptionMediator

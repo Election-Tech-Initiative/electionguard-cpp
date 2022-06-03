@@ -61,49 +61,17 @@ namespace ElectionGuard
             var status = NativeInterface.EncryptionDevice.FromJson(json, out Handle);
             status.ThrowIfError();
         }
-        /// <summary>
-        /// produces encription device when given bson
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="encoding"></param>
-        public unsafe EncryptionDevice(byte[] data, BinarySerializationEncoding encoding)
-        {
-            fixed (byte* pointer = data)
-            {
-                var status = encoding == BinarySerializationEncoding.BSON =
-                     NativeInterface.EncryptionDevice.FromBson(pointer, (ulong)data.Length, out Handle);
-                status.ThrowIfError();
-            }
-        }
         /// <Summary>
         /// Export the encryptiondevice representation as JSON
         /// </Summary>
         public unsafe string ToJson()
         {
-            var status = NativeInterface.EncryptionDevice.ToJson(Handle, out pointer, out size);
+            var status = NativeInterface.EncryptionDevice.ToJson(Handle, out IntPtr pointer, out ulong size);
             status.ThrowIfError();
             var json = Marshal.PtrToStringAnsi(pointer);
             return json;
         }
-        /// <Summary>
-        /// Export the encryption device representation as BSON
-        /// </Summary>
-        public unsafe byte[] ToBson()
-        {
 
-            var status = NativeInterface.EncryptionDevice.ToBson(Handle, out data, out size);
-
-            status.ThrowIfError();
-
-            if (size > int.MaxValue)
-            {
-                throw new ElectionGuardException($"EncryptionDevice Error ToBson: size is too big");
-            }
-
-            var byteArray = new byte[(int)size];
-            Marshal.Copy(data, byteArray, 0, (int)size);
-            return byteArray;
-        }
 
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
