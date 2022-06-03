@@ -20,34 +20,54 @@
         {
             encryptOptions.Validate();
 
-            var context = await GetContext(encryptOptions.Context);
-            var enumerateFiles = Directory.EnumerateFiles(encryptOptions.BallotsDir);
+            var encryptionMediator = await GetEncryptionMediator(encryptOptions);
+            var ballotFiles = GetBallotFiles(encryptOptions.BallotsDir);
 
-            var internalManifest = await GetInternalManifest(encryptOptions);
-            var device = GetDevice();
-
-            foreach (var ballotFile in enumerateFiles)
+            foreach (var ballotFile in ballotFiles)
             {
-                var ballot = await File.ReadAllTextAsync(ballotFile);
                 Console.WriteLine($"Parsing: {ballotFile}");
-                var plaintextBallot = new PlaintextBallot(ballot);
-                var ciphertextBallot = ElectionGuard.Encrypt.Ballot(plaintextBallot, internalManifest, context, device.GetHash());
-                await WriteEncryptedBallot(encryptOptions, ballotFile, ciphertextBallot);
+                var plaintextBallot = await GetPlaintextBallot(ballotFile);
+                var submittedBallot = EncryptAndSubmit(encryptionMediator, plaintextBallot);
+                await WriteSubmittedBallot(encryptOptions, ballotFile, submittedBallot);
             }
             Console.WriteLine("Parsing Complete");
         }
 
-        private static async Task WriteEncryptedBallot(EncryptOptions encryptOptions, string ballotFile,
-            CiphertextBallot ciphertextBallot)
+        private static SubmittedBallot EncryptAndSubmit(EncryptionMediator encryptionMediator, PlaintextBallot plaintextBallot)
         {
-            var ballotJson = ciphertextBallot.ToJson();
-            var outFile = Path.Join(encryptOptions.OutDir, Path.GetFileName(ballotFile));
-            await File.WriteAllTextAsync(outFile, ballotJson);
+            var ciphertextBallot = encryptionMediator.Encrypt(plaintextBallot);
+            // todo: spoil?
+            var submittedBallot = new SubmittedBallot(ciphertextBallot, BallotBoxState.Cast);
+            return submittedBallot;
         }
 
-        private static ElementModQ GetNonce()
+        private static async Task<EncryptionMediator> GetEncryptionMediator(EncryptOptions encryptOptions)
         {
-            return new ElementModQ("4BD3231DC17E9E84F5B0A5D2C4160C6A2299EDAE184C291E17709913B8F9CB40");
+            var context = await GetContext(encryptOptions.Context);
+            var internalManifest = await GetInternalManifest(encryptOptions);
+            var device = GetDevice();
+            var encryptionMediator = new EncryptionMediator(internalManifest, context, device);
+            return encryptionMediator;
+        }
+
+        private static IEnumerable<string> GetBallotFiles(string directory)
+        {
+            return Directory.EnumerateFiles(directory);
+        }
+
+        private static async Task<PlaintextBallot> GetPlaintextBallot(string ballotFile)
+        {
+            var ballot = await File.ReadAllTextAsync(ballotFile);
+            var plaintextBallot = new PlaintextBallot(ballot);
+            return plaintextBallot;
+        }
+
+        private static async Task WriteSubmittedBallot(EncryptOptions encryptOptions, string ballotFile,
+            SubmittedBallot submittedBallot)
+        {
+            var ballotJson = submittedBallot.ToJson();
+            var outFile = Path.Join(encryptOptions.OutDir, Path.GetFileName(ballotFile));
+            await File.WriteAllTextAsync(outFile, ballotJson);
         }
 
         private static EncryptionDevice GetDevice()
