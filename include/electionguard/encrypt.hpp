@@ -68,8 +68,7 @@ namespace electionguard
         class Impl;
         std::unique_ptr<Impl> pimpl;
 
-        static json fromObject(const electionguard::EncryptionDevice &serializable);
-        static unique_ptr<electionguard::EncryptionDevice> toObject(json j);
+
     };
 
     /// <summary>
