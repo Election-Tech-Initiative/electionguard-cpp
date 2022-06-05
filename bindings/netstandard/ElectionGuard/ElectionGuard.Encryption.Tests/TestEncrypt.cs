@@ -13,13 +13,12 @@ namespace ElectionGuard.Encrypt.Tests
 
             var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Brazil");
 
-            var deviceToJson = device.ToJson();
+            var json = device.ToJson();
 
             var deviceCreatedFromJson = new EncryptionDevice(deviceToJson);
 
-            Assert.That(deviceToJson.Contains("Brazil"));
-
-            Assert.That(deviceCreatedFromJson.ToJson().Contains("Brazil"));
+            Assert.True(deviceToJson.Contains("Brazil"));
+            Assert.True(deviceCreatedFromJson.ToJson().Contains("Brazil"));
 
         }
 

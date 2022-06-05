@@ -9,13 +9,11 @@
 #include "manifest.hpp"
 
 #include <memory>
-#include <nlohmann/json.hpp>
 
 using std::string;
 using std::unique_ptr;
 using std::vector;
 
-using nlohmann::json;
 
 namespace electionguard
 {
@@ -71,8 +69,6 @@ namespace electionguard
         class Impl;
         std::unique_ptr<Impl> pimpl;
 
-        static json fromObject(const electionguard::EncryptionDevice &serializable);
-        static unique_ptr<electionguard::EncryptionDevice> toObject(json j);
     };
 
     /// <summary>
