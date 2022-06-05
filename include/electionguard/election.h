@@ -13,6 +13,26 @@
 extern "C" {
 #endif
 
+#ifndef ContextConfiguration
+
+struct eg_context_configuration_s;
+typedef struct eg_context_configuration_s eg_context_configuration_t;
+
+EG_API eg_electionguard_status_t eg_ciphertext_election_context_config_get_allowed_overvotes(
+  eg_context_configuration_t *handle, bool *out_allowed_overvotes);
+
+EG_API eg_electionguard_status_t eg_ciphertext_election_context_config_get_max_ballots(
+  eg_context_configuration_t *handle, uint64_t *out_max_ballots);
+
+EG_API eg_electionguard_status_t
+eg_ciphertext_election_context_config_free(eg_context_configuration_t *handle);
+
+EG_API eg_electionguard_status_t
+eg_ciphertext_election_context_config_make(bool in_allow_overvotes, uint64_t in_number_of_guardians,
+                                           eg_context_configuration_t **out_handle);
+
+#endif
+
 #ifndef CiphertextElectionContext
 
 struct eg_ciphertext_election_context_s;
@@ -29,6 +49,15 @@ eg_ciphertext_election_context_free(eg_ciphertext_election_context_t *handle);
  */
 EG_API eg_electionguard_status_t eg_ciphertext_election_context_get_elgamal_public_key(
   eg_ciphertext_election_context_t *handle, eg_element_mod_p_t **out_elgamal_public_key_ref);
+
+/**
+ * The `joint public key (K)` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
+ * 
+ * @param[out] out_elgamal_public_key_ref An opaque pointer to the public key.  
+ *                                        The value is a reference and is not owned by the caller
+ */
+EG_API eg_electionguard_status_t eg_ciphertext_election_context_get_configuration(
+  eg_ciphertext_election_context_t *handle, eg_context_configuration_t **out_config);
 
 /**
  * The `commitment hash H(K 1,0 , K 2,0 ... , K n,0 )` of the public commitments
@@ -91,6 +120,11 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_make(
   eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
   eg_ciphertext_election_context_t **out_handle);
 
+EG_API eg_electionguard_status_t eg_ciphertext_election_context_make_with_configuration(
+  uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
+  eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
+  eg_context_configuration_t *in_configuration, eg_ciphertext_election_context_t **out_handle);
+
 /**
  * Makes a CiphertextElectionContext object.
  * 
@@ -106,6 +140,13 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_make_with_extend
   uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
   eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
   eg_linked_list_t *in_extended_data, eg_ciphertext_election_context_t **out_handle);
+
+EG_API eg_electionguard_status_t
+eg_ciphertext_election_context_make_with_configuration_and_extended_data(
+  uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
+  eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
+  eg_context_configuration_t *in_configuration, eg_linked_list_t *in_extended_data,
+  eg_ciphertext_election_context_t **out_handle);
 
 /**
  * Makes a CiphertextElectionContext object from the hex string representations.

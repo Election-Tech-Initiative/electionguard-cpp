@@ -20,6 +20,7 @@ static const uint8_t MAX_P_LEN_DOUBLE = 128;
 static const uint8_t MAX_Q_LEN_DOUBLE = 8;
 
 static const uint32_t DEFAULT_PRECOMPUTE_SIZE = 5000;
+static const uint64_t DEFAULT_MAX_BALLOTS = 1000000;
 
 static const uint32_t MAX_P_SIZE = MAX_P_LEN * sizeof(uint64_t);
 static const uint32_t MAX_Q_SIZE = MAX_Q_LEN * sizeof(uint64_t);

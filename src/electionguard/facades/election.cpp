@@ -5,6 +5,7 @@
 #include "electionguard/collections.h"
 #include "variant_cast.hpp"
 
+#include <algorithm>
 #include <cstring>
 #include <memory>
 #include <string>
@@ -16,6 +17,7 @@ extern "C" {
 }
 
 using electionguard::CiphertextElectionContext;
+using electionguard::ContextConfiguration;
 using electionguard::dynamicCopy;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
@@ -26,6 +28,61 @@ using std::string;
 using std::unique_ptr;
 using std::unordered_map;
 using std::vector;
+
+#pragma region CiphertextElectionContextConfiguration
+
+EG_API eg_electionguard_status_t eg_ciphertext_election_context_config_get_allowed_overvotes(
+  eg_context_configuration_t *handle, bool *out_allowed_overvotes)
+{
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto config = AS_TYPE(ContextConfiguration, handle);
+    *out_allowed_overvotes = config->getAllowOverVotes();
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+EG_API eg_electionguard_status_t eg_ciphertext_election_context_config_get_max_ballots(
+  eg_context_configuration_t *handle, uint64_t *out_max_ballots)
+{
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto config = AS_TYPE(ContextConfiguration, handle);
+    *out_max_ballots = config->getMaxNumberOfBallots();
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_ciphertext_election_context_config_free(eg_context_configuration_t *handle)
+{
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete AS_TYPE(ContextConfiguration, handle); // NOLINT(cppcoreguidelines-owning-memory)
+    handle = nullptr;
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_ciphertext_election_context_config_make(bool in_allow_overvotes, uint64_t in_number_of_guardians,
+                                           eg_context_configuration_t **out_handle)
+{
+    try {
+        auto context = ContextConfiguration::make(in_allow_overvotes, in_number_of_guardians);
+
+        *out_handle = AS_TYPE(eg_context_configuration_t, context.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_election_context_config_make", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+#pragma endregion
 
 #pragma region CiphertextElectionContext
 
@@ -46,6 +103,15 @@ eg_electionguard_status_t eg_ciphertext_election_context_get_elgamal_public_key(
 {
     const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getElGamalPublicKey();
     *out_elgamal_public_key_ref = AS_TYPE(eg_element_mod_p_t, const_cast<ElementModP *>(pointer));
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_ciphertext_election_context_get_configuration(eg_ciphertext_election_context_t *handle,
+                                                 eg_context_configuration_t **out_config)
+{
+    const auto pointer = AS_TYPE(CiphertextElectionContext, handle)->getConfiguration();
+    *out_config = AS_TYPE(eg_context_configuration_t, const_cast<ContextConfiguration *>(pointer));
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
@@ -127,6 +193,31 @@ eg_electionguard_status_t eg_ciphertext_election_context_make(
     }
 }
 
+eg_electionguard_status_t eg_ciphertext_election_context_make_with_configuration(
+  uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
+  eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
+  eg_context_configuration_t *in_configuration, eg_ciphertext_election_context_t **out_handle)
+{
+    try {
+        auto *publicKeyPtr = AS_TYPE(ElementModP, in_elgamal_public_key);
+        auto *commitmentHashPtr = AS_TYPE(ElementModQ, in_commitment_hash);
+        auto *manifestHashPtr = AS_TYPE(ElementModQ, in_manifest_hash);
+        auto *configPtr = AS_TYPE(ContextConfiguration, in_configuration);
+        auto config = make_unique<ContextConfiguration>(configPtr->getAllowOverVotes(),
+                                                        configPtr->getMaxNumberOfBallots());
+
+        auto context = CiphertextElectionContext::make(
+          in_number_of_guardians, in_quorum, publicKeyPtr->clone(), commitmentHashPtr->clone(),
+          manifestHashPtr->clone(), move(config));
+
+        *out_handle = AS_TYPE(eg_ciphertext_election_context_t, context.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_election_context_make", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 eg_electionguard_status_t eg_ciphertext_election_context_make_with_extended_data(
   uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
   eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
@@ -150,6 +241,42 @@ eg_electionguard_status_t eg_ciphertext_election_context_make_with_extended_data
         auto context = CiphertextElectionContext::make(
           in_number_of_guardians, in_quorum, publicKeyPtr->clone(), commitmentHashPtr->clone(),
           manifestHashPtr->clone(), move(extendedData));
+
+        *out_handle = AS_TYPE(eg_ciphertext_election_context_t, context.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_election_context_make_with_extended_data", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_ciphertext_election_context_make_with_configuration_and_extended_data(
+  uint64_t in_number_of_guardians, uint64_t in_quorum, eg_element_mod_p_t *in_elgamal_public_key,
+  eg_element_mod_q_t *in_commitment_hash, eg_element_mod_q_t *in_manifest_hash,
+  eg_context_configuration_t *in_configuration, eg_linked_list_t *in_extended_data,
+  eg_ciphertext_election_context_t **out_handle)
+{
+    try {
+        auto *publicKeyPtr = AS_TYPE(ElementModP, in_elgamal_public_key);
+        auto *commitmentHashPtr = AS_TYPE(ElementModQ, in_commitment_hash);
+        auto *manifestHashPtr = AS_TYPE(ElementModQ, in_manifest_hash);
+        auto *configPtr = AS_TYPE(ContextConfiguration, in_configuration);
+        auto config = make_unique<ContextConfiguration>(configPtr->getAllowOverVotes(),
+                                                        configPtr->getMaxNumberOfBallots());
+
+        unordered_map<string, string> extendedData = {};
+        for (uint64_t i = 0; i < eg_linked_list_get_count(in_extended_data); i++) {
+            char *edKey = NULL;
+            char *edValue = NULL;
+            if (eg_linked_list_get_element_at(in_extended_data, i, &edKey, &edValue)) {
+                return ELECTIONGUARD_STATUS_ERROR_BAD_ACCESS;
+            }
+            extendedData[string(edKey)] = string(edValue);
+        }
+
+        auto context = CiphertextElectionContext::make(
+          in_number_of_guardians, in_quorum, publicKeyPtr->clone(), commitmentHashPtr->clone(),
+          manifestHashPtr->clone(), move(config), move(extendedData));
 
         *out_handle = AS_TYPE(eg_ciphertext_election_context_t, context.release());
         return ELECTIONGUARD_STATUS_SUCCESS;

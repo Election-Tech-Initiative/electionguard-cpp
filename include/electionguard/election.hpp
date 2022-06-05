@@ -12,8 +12,41 @@
 #include <unordered_map>
 #include <vector>
 
+using std::make_unique;
+
 namespace electionguard
 {
+    /// <summary>
+    /// Structure for supporting the configuration settings inside of the Electioncontext
+    /// </summary>
+    struct EG_API ContextConfiguration {
+      public:
+        explicit ContextConfiguration(const bool allowOvervotes, const uint64_t maxBallots)
+            : allowOverVotes(allowOvervotes), maxNumberOfBallots(maxBallots){};
+
+        ContextConfiguration() : maxNumberOfBallots(DEFAULT_MAX_BALLOTS), allowOverVotes(true){};
+
+        /// <summary>
+        /// Gets the maximum number of ballots allowed
+        /// </summary>
+        uint64_t getMaxNumberOfBallots() const { return maxNumberOfBallots; };
+
+        /// <summary>
+        /// Gets the flag to say that overvotes are allowed
+        /// </summary>
+        bool getAllowOverVotes() const { return allowOverVotes; };
+
+        static std::unique_ptr<ContextConfiguration> make(const bool allowOvervotes,
+                                                          const uint64_t maxBallots)
+        {
+            return make_unique<ContextConfiguration>(allowOvervotes, maxBallots);
+        }
+
+      private:
+        uint64_t maxNumberOfBallots;
+        bool allowOverVotes;
+    };
+
     /// <summary>
     /// `CiphertextElectionContext` is the ElectionGuard representation of a specific election
     /// Note: The ElectionGuard Data Spec deviates from the NIST model in that
@@ -21,15 +54,19 @@ namespace electionguard
     /// Specifically, `crypto_base_hash`, `crypto_extended_base_hash` and `elgamal_public_key`
     /// are populated with election-specific information necessary for encrypting the election.
     /// Refer to the [Electionguard Specification](https://github.com/microsoft/electionguard) for more information.
-    ///
-    /// To make an instance of this class, don't construct it directly. Use
-    /// `make_ciphertext_election_context` instead.
     /// </summary>
     class EG_API CiphertextElectionContext
     {
       public:
         CiphertextElectionContext(const CiphertextElectionContext &other);
         CiphertextElectionContext(const CiphertextElectionContext &&other);
+        explicit CiphertextElectionContext(const uint64_t numberOfGuardians, const uint64_t quorum,
+                                           std::unique_ptr<ElementModP> elGamalPublicKey,
+                                           std::unique_ptr<ElementModQ> commitmentHash,
+                                           std::unique_ptr<ElementModQ> manifestHash,
+                                           std::unique_ptr<ElementModQ> cryptoBaseHash,
+                                           std::unique_ptr<ElementModQ> cryptoExtendedBaseHash,
+                                           std::unique_ptr<ContextConfiguration> config);
         explicit CiphertextElectionContext(const uint64_t numberOfGuardians, const uint64_t quorum,
                                            std::unique_ptr<ElementModP> elGamalPublicKey,
                                            std::unique_ptr<ElementModQ> commitmentHash,
@@ -42,11 +79,24 @@ namespace electionguard
           std::unique_ptr<ElementModQ> commitmentHash, std::unique_ptr<ElementModQ> manifestHash,
           std::unique_ptr<ElementModQ> cryptoBaseHash,
           std::unique_ptr<ElementModQ> cryptoExtendedBaseHash,
+          std::unique_ptr<ContextConfiguration> config,
+          std::unordered_map<std::string, std::string> extendedData);
+        explicit CiphertextElectionContext(
+          const uint64_t numberOfGuardians, const uint64_t quorum,
+          std::unique_ptr<ElementModP> elGamalPublicKey,
+          std::unique_ptr<ElementModQ> commitmentHash, std::unique_ptr<ElementModQ> manifestHash,
+          std::unique_ptr<ElementModQ> cryptoBaseHash,
+          std::unique_ptr<ElementModQ> cryptoExtendedBaseHash,
           std::unordered_map<std::string, std::string> extendedData);
         ~CiphertextElectionContext();
 
         CiphertextElectionContext &operator=(CiphertextElectionContext other);
         CiphertextElectionContext &operator=(CiphertextElectionContext &&other);
+
+        /// <summary>
+        /// The number of guardians necessary to generate the public key
+        /// </summary>
+        const ContextConfiguration *getConfiguration() const;
 
         /// <summary>
         /// The number of guardians necessary to generate the public key
@@ -112,12 +162,46 @@ namespace electionguard
         /// <param name="elGamalPublicKey"> the public key of the election </param>
         /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
         /// <param name="manifestHash"> the hash of the election metadata </param>
+        /// <param name="config"> the configuration for the election
+        /// </summary>
+        static std::unique_ptr<CiphertextElectionContext>
+        make(const uint64_t numberOfGuardians, const uint64_t quorum,
+             std::unique_ptr<ElementModP> elGamalPublicKey,
+             std::unique_ptr<ElementModQ> commitmentHash, std::unique_ptr<ElementModQ> manifestHash,
+             std::unique_ptr<ContextConfiguration> config);
+
+        /// <summary>
+        ///  Makes a CiphertextElectionContext object.
+        ///
+        /// <param name="number_of_guardians"> The number of guardians necessary to generate the public key </param>
+        /// <param name="quorum"> The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians` </param>
+        /// <param name="elGamalPublicKey"> the public key of the election </param>
+        /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
+        /// <param name="manifestHash"> the hash of the election metadata </param>
         /// <param name="extendedData"> an unordered map of key value strings revelant to the consuming application </param>
         /// </summary>
         static std::unique_ptr<CiphertextElectionContext>
         make(const uint64_t numberOfGuardians, const uint64_t quorum,
              std::unique_ptr<ElementModP> elGamalPublicKey,
              std::unique_ptr<ElementModQ> commitmentHash, std::unique_ptr<ElementModQ> manifestHash,
+             std::unordered_map<std::string, std::string> extendedData);
+
+        /// <summary>
+        ///  Makes a CiphertextElectionContext object.
+        ///
+        /// <param name="number_of_guardians"> The number of guardians necessary to generate the public key </param>
+        /// <param name="quorum"> The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians` </param>
+        /// <param name="elGamalPublicKey"> the public key of the election </param>
+        /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
+        /// <param name="manifestHash"> the hash of the election metadata </param>
+        /// <param name="config"> the configuration for the election
+        /// <param name="extendedData"> an unordered map of key value strings revelant to the consuming application </param>
+        /// </summary>
+        static std::unique_ptr<CiphertextElectionContext>
+        make(const uint64_t numberOfGuardians, const uint64_t quorum,
+             std::unique_ptr<ElementModP> elGamalPublicKey,
+             std::unique_ptr<ElementModQ> commitmentHash, std::unique_ptr<ElementModQ> manifestHash,
+             std::unique_ptr<ContextConfiguration> config,
              std::unordered_map<std::string, std::string> extendedData);
 
         /// <summary>
@@ -142,12 +226,44 @@ namespace electionguard
         /// <param name="elGamalPublicKeyInHex"> the public key of the election </param>
         /// <param name="commitmentHashInHex"> the hash of the commitments the guardians make to each other </param>
         /// <param name="manifestHashInHex"> the hash of the election metadata </param>
+        /// <param name="config"> the configuration for the election
+        /// </summary>
+        static std::unique_ptr<CiphertextElectionContext>
+        make(const uint64_t numberOfGuardians, const uint64_t quorum,
+             const std::string &elGamalPublicKeyInHex, const std::string &commitmentHashInHex,
+             const std::string &manifestHashInHex, std::unique_ptr<ContextConfiguration> config);
+
+        /// <summary>
+        ///  Makes a CiphertextElectionContext object from hex string representations.
+        ///
+        /// <param name="number_of_guardians"> The number of guardians necessary to generate the public key </param>
+        /// <param name="quorum"> The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians` </param>
+        /// <param name="elGamalPublicKeyInHex"> the public key of the election </param>
+        /// <param name="commitmentHashInHex"> the hash of the commitments the guardians make to each other </param>
+        /// <param name="manifestHashInHex"> the hash of the election metadata </param>
         /// <param name="extendedData"> an unordered map of key value strings revelant to the consuming application </param>
         /// </summary>
         static std::unique_ptr<CiphertextElectionContext>
         make(const uint64_t numberOfGuardians, const uint64_t quorum,
              const std::string &elGamalPublicKeyInHex, const std::string &commitmentHashInHex,
              const std::string &manifestHashInHex,
+             std::unordered_map<std::string, std::string> extendedData);
+
+        /// <summary>
+        ///  Makes a CiphertextElectionContext object from hex string representations.
+        ///
+        /// <param name="number_of_guardians"> The number of guardians necessary to generate the public key </param>
+        /// <param name="quorum"> The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians` </param>
+        /// <param name="elGamalPublicKeyInHex"> the public key of the election </param>
+        /// <param name="commitmentHashInHex"> the hash of the commitments the guardians make to each other </param>
+        /// <param name="manifestHashInHex"> the hash of the election metadata </param>
+        /// <param name="config"> the configuration for the election
+        /// <param name="extendedData"> an unordered map of key value strings revelant to the consuming application </param>
+        /// </summary>
+        static std::unique_ptr<CiphertextElectionContext>
+        make(const uint64_t numberOfGuardians, const uint64_t quorum,
+             const std::string &elGamalPublicKeyInHex, const std::string &commitmentHashInHex,
+             const std::string &manifestHashInHex, std::unique_ptr<ContextConfiguration> config,
              std::unordered_map<std::string, std::string> extendedData);
 
         std::vector<uint8_t> toBson() const;

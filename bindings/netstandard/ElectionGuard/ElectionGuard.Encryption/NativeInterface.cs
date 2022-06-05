@@ -2174,6 +2174,59 @@ namespace ElectionGuard
 
         #endregion
 
+        #region ContextConfiguration
+        internal static unsafe class ContextConfiguration
+        {
+            internal unsafe struct ContextConfigurationType { };
+
+            internal class ContextConfigurationHandle
+                : ElectionguardSafeHandle<ContextConfigurationType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = ContextConfiguration.Free(TypedPtr);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        throw new ElectionGuardException($"ContextConfiguration Error Free: {status}", status);
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_election_context_config_get_allowed_overvotes",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetAllowedOverVotes(
+                ContextConfigurationHandle handle,
+                ref bool allowed_overvotes);
+
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_election_context_config_get_max_ballots",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetMaxBallots(
+                ContextConfigurationHandle handle,
+                ref UInt64 max_ballots);
+
+
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_config_free",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Free(ContextConfigurationType* handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_config_make",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Make(
+                bool allow_overvotes,
+                UInt64 max_ballots,
+                out ContextConfigurationHandle handle);
+        }
+
+        #endregion
+
+
+
+
         #region CiphertextElectionContext
 
         internal static unsafe class CiphertextElectionContext
@@ -2199,6 +2252,13 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Free(CiphertextElectionType* handle);
+
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_election_context_get_configuration",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetConfiguration(
+                CiphertextElectionContextHandle handle,
+                out ContextConfiguration.ContextConfigurationHandle context_config);
 
             [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_election_context_get_elgamal_public_key",
@@ -2252,6 +2312,17 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle manifest_hash,
                 out CiphertextElectionContextHandle handle);
 
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_with_configuration",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Make(
+                ulong number_of_guardians,
+                ulong quorum,
+                ElementModP.ElementModPHandle elgamal_public_key,
+                ElementModQ.ElementModQHandle commitment_hash,
+                ElementModQ.ElementModQHandle manifest_hash,
+                ContextConfiguration.ContextConfigurationHandle configuration,
+                out CiphertextElectionContextHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_with_extended_data",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Make(
@@ -2262,6 +2333,19 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle manifest_hash,
                 LinkedList.LinkedListHandle extended_data,
                 out CiphertextElectionContextHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_with_configuration_and_extended_data",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Make(
+                ulong number_of_guardians,
+                ulong quorum,
+                ElementModP.ElementModPHandle elgamal_public_key,
+                ElementModQ.ElementModQHandle commitment_hash,
+                ElementModQ.ElementModQHandle manifest_hash,
+                ContextConfiguration.ContextConfigurationHandle configuration,
+                LinkedList.LinkedListHandle extended_data,
+                out CiphertextElectionContextHandle handle);
+
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_make_from_hex",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]

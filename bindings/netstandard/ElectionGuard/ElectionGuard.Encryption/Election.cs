@@ -7,7 +7,75 @@ namespace ElectionGuard
     using NativeElementModP = NativeInterface.ElementModP.ElementModPHandle;
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
     using NativeLinkedList = NativeInterface.LinkedList.LinkedListHandle;
+    using NativeContextConfig = NativeInterface.ContextConfiguration.ContextConfigurationHandle;
 
+
+    /// <summary>
+    /// Class to handle configuration settings for the ElectionContext
+    /// </summary>
+    public class ContextConfiguration : DisposableBase
+    {
+        internal unsafe NativeContextConfig Handle;
+        unsafe internal ContextConfiguration(NativeContextConfig handle)
+        {
+            Handle = handle;
+        }
+
+        /// <summary>
+        /// Determines if overvotes are allowed for the election.  This defaults to true
+        /// </summary>
+        public unsafe bool AllowedOverVotes
+        {
+            get
+            {
+                bool value = true;
+                var status = NativeInterface.ContextConfiguration.GetAllowedOverVotes(
+                    Handle, ref value);
+                status.ThrowIfError();
+                return value;
+            }
+        }
+        /// <summary>
+        /// Determines the maximum number of votes that an election can have, Defaults to 1000000
+        /// </summary>
+        public unsafe UInt64 MaxBallots
+        {
+            get
+            {
+                UInt64 value = 1;
+                var status = NativeInterface.ContextConfiguration.GetMaxBallots(
+                    Handle, ref value);
+                status.ThrowIfError();
+                return value;
+            }
+        }
+
+        /// <summary>
+        /// Parameterized constructor for the configuration class
+        /// </summary>
+        /// <param name="allowOverVotes">if overvotes are allowed</param>
+        /// <param name="maxVotes">maximum number of votes</param>
+        public unsafe ContextConfiguration(bool allowOverVotes, UInt64 maxVotes)
+        {
+            var status = NativeInterface.ContextConfiguration.Make(
+                allowOverVotes, maxVotes, out Handle);
+            status.ThrowIfError();
+        }
+
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+        {
+            base.DisposeUnmanaged();
+
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
+            Handle = null;
+        }
+
+
+    }
 
     /// <summary>
     /// `CiphertextElectionContext` is the ElectionGuard representation of a specific election
@@ -104,6 +172,21 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Get a linked list containing the extended data of the election.
+        /// </summary>
+        public unsafe ContextConfiguration Configuration
+        {
+            get
+            {
+                var status = NativeInterface.CiphertextElectionContext.GetConfiguration(
+                    Handle, out NativeContextConfig value);
+                status.ThrowIfError();
+                return new ContextConfiguration(value);
+            }
+        }
+
+
         internal unsafe NativeCiphertextElectionContext Handle;
 
         /// <summary>
@@ -137,6 +220,20 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
+        public unsafe CiphertextElectionContext(ulong numberOfGuardians,
+                ulong quorum,
+                ElementModP publicKey,
+                ElementModQ commitmentHash,
+                ElementModQ manifestHash,
+                ContextConfiguration config)
+        {
+            var status = NativeInterface.CiphertextElectionContext.Make(
+                numberOfGuardians, quorum, publicKey.Handle,
+                commitmentHash.Handle, manifestHash.Handle, config.Handle, out Handle);
+            status.ThrowIfError();
+        }
+
+
         /// <summary>
         ///  Makes a CiphertextElectionContext object.
         ///
@@ -159,6 +256,24 @@ namespace ElectionGuard
                 commitmentHash.Handle, manifestHash.Handle, extendedData.Handle, out Handle);
             status.ThrowIfError();
         }
+
+
+
+        public unsafe CiphertextElectionContext(ulong numberOfGuardians,
+                ulong quorum,
+                ElementModP publicKey,
+                ElementModQ commitmentHash,
+                ElementModQ manifestHash,
+                ContextConfiguration config,
+                LinkedList extendedData)
+        {
+            var status = NativeInterface.CiphertextElectionContext.Make(
+                numberOfGuardians, quorum, publicKey.Handle,
+                commitmentHash.Handle, manifestHash.Handle, config.Handle, extendedData.Handle, out Handle);
+            status.ThrowIfError();
+        }
+
+
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
