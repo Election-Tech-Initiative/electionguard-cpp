@@ -15,7 +15,7 @@ namespace ElectionGuard.Encrypt.Tests
 
             var json = device.ToJson();
 
-            var deviceCreatedFromJson = new EncryptionDevice(deviceToJson);
+            var deviceCreatedFromJson = new EncryptionDevice(json);
 
             Assert.True(json.Contains("Brazil"));
             Assert.True(deviceCreatedFromJson.ToJson().Contains("Brazil"));
