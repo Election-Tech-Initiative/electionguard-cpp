@@ -99,6 +99,7 @@
         "manifest.h": "c",
         "__bits": "cpp",
         "__memory": "c",
-        "filesystem": "c"
+        "filesystem": "c",
+        "numbers": "cpp"
     },
 }

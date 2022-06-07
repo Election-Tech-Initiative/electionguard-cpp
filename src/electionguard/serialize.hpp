@@ -5,6 +5,7 @@
 #include "electionguard/ballot.hpp"
 #include "electionguard/ballot_compact.hpp"
 #include "electionguard/election.hpp"
+#include "electionguard/encrypt.hpp"
 #include "electionguard/export.h"
 #include "electionguard/group.hpp"
 #include "electionguard/manifest.hpp"
@@ -20,14 +21,13 @@ using electionguard::G;
 using electionguard::P;
 using electionguard::Q;
 using electionguard::R;
+using nlohmann::json;
 using std::make_unique;
 using std::reference_wrapper;
 using std::string;
 using std::to_string;
 using std::unique_ptr;
 using std::vector;
-
-using nlohmann::json;
 
 namespace electionguard
 {
@@ -930,7 +930,51 @@ namespace electionguard
                 return toObject(json::from_msgpack(data));
             }
         };
+        class EncryptionDevice
+        {
+          private:
+            static json fromObject(const electionguard::EncryptionDevice &serializable)
+            {
 
+                json j = {
+                  {"deviceUuid", serializable.getDeviceUuid()},
+                  {"sessionUuid", serializable.getSessionUuid()},
+                  {"launchCode", serializable.getLaunchCode()},
+                  {"location", serializable.getLocation()},
+                };
+
+                return j;
+            }
+
+            static unique_ptr<electionguard::EncryptionDevice> toObject(json j)
+            {
+                auto deviceUuid = j["deviceUuid"].get<uint64_t>();
+                auto sessionUuid = j["sessionUuid"].get<uint64_t>();
+                auto launchCode = j["launchCode"].get<uint64_t>();
+                auto location = j["location"].get<string>();
+
+                return make_unique<electionguard::EncryptionDevice>(deviceUuid, sessionUuid,
+                                                                    launchCode, location);
+            }
+
+          public:
+            static vector<uint8_t> toBson(const electionguard::EncryptionDevice &serializable)
+            {
+                return json::to_bson(fromObject(serializable));
+            }
+            static string toJson(const electionguard::EncryptionDevice &serializable)
+            {
+                return fromObject(serializable).dump();
+            }
+            static unique_ptr<electionguard::EncryptionDevice> fromBson(vector<uint8_t> data)
+            {
+                return toObject(json::from_bson(data));
+            }
+            static unique_ptr<electionguard::EncryptionDevice> fromJson(string data)
+            {
+                return toObject(json::parse(data));
+            }
+        };
         class CompactPlaintextBallot
         {
           protected:

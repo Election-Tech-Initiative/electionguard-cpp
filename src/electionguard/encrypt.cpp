@@ -1,3 +1,4 @@
+
 #include "electionguard/encrypt.hpp"
 
 #include "async.hpp"
@@ -6,6 +7,7 @@
 #include "electionguard/hash.hpp"
 #include "log.hpp"
 #include "nonces.hpp"
+#include "serialize.hpp"
 #include "utils.hpp"
 #include "electionguard/precompute_buffers.hpp"
 #include <nlohmann/json.hpp>
@@ -26,6 +28,7 @@ using std::unique_ptr;
 using std::vector;
 
 using electionguard::getSystemTimestamp;
+using DeviceSerializer = electionguard::Serialize::EncryptionDevice;
 using nlohmann::json;
 
 namespace electionguard
@@ -52,6 +55,7 @@ namespace electionguard
                                        const uint64_t launchCode, const string &location)
         : pimpl(new Impl(deviceUuid, sessionUuid, launchCode, location))
     {
+
         Log::trace("EncryptionDevice: Created: UUID: " + to_string(deviceUuid) +
                    " at: " + location);
     }
@@ -70,6 +74,34 @@ namespace electionguard
     }
 
     uint64_t EncryptionDevice::getTimestamp() const { return getSystemTimestamp(); }
+
+    //allowing for serialization
+    vector<uint8_t> EncryptionDevice::toBson() const { return DeviceSerializer::toBson(*this); }
+
+    string EncryptionDevice::toJson() const { return DeviceSerializer::toJson(*this); }
+
+    unique_ptr<EncryptionDevice> EncryptionDevice::fromJson(string data)
+    {
+        return DeviceSerializer::fromJson(move(data));
+    }
+
+    unique_ptr<EncryptionDevice> EncryptionDevice::fromBson(vector<uint8_t> data)
+    {
+        return DeviceSerializer::fromBson(move(data));
+    }
+
+    uint64_t EncryptionDevice::getDeviceUuid() const {
+        return pimpl->deviceUuid;
+    }
+    uint64_t EncryptionDevice::getSessionUuid() const {
+        return pimpl->sessionUuid;
+    }
+    uint64_t EncryptionDevice::getLaunchCode() const {
+        return pimpl->launchCode;
+    }
+    std::string EncryptionDevice::getLocation() const {
+        return pimpl->location;
+    }
 
 #pragma endregion
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
@@ -50,6 +51,28 @@ namespace ElectionGuard
             var status = NativeInterface.EncryptionDevice.GetHash(Handle, out NativeElementModQ value);
             return new ElementModQ(value);
         }
+
+        /// <summary>
+        /// produces encription device when given json
+        /// </summary>
+        /// <param name="json"></param>
+        public unsafe EncryptionDevice(string json)
+        {
+            var status = NativeInterface.EncryptionDevice.FromJson(json, out Handle);
+            status.ThrowIfError();
+        }
+        /// <Summary>
+        /// Export the encryptiondevice representation as JSON
+        /// </Summary>
+        public unsafe string ToJson()
+        {
+            var status = NativeInterface.EncryptionDevice.ToJson(Handle, out IntPtr pointer, out ulong size);
+            status.ThrowIfError();
+            var json = Marshal.PtrToStringAnsi(pointer);
+            return json;
+        }
+
+
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
