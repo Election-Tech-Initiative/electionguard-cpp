@@ -88,11 +88,11 @@ endif
 build-msvc:
 	@echo 🖥️ BUILD MSVC
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/Win32 -G "Visual Studio 16 2019" -A Win32 \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/Win32 -G "Visual Studio 17 2022" -A Win32 \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 16 2019" -A x64 \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 17 2022" -A x64 \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DCAN_USE_VECTOR_INTRINSICS=ON \
@@ -231,7 +231,7 @@ sanitize: sanitize-asan sanitize-tsan
 sanitize-asan:
 	@echo 🧼 SANITIZE ADDRESS AND UNDEFINED
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 16 2019" -A x64 \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 17 2022" -A x64 \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DBUILD_SHARED_LIBS=ON \
 		-DEXPORT_INTERNALS=ON \
@@ -359,7 +359,7 @@ endif
 test-msvc:
 	@echo 🧪 TEST MSVC
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 16 2019" -A x64 \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 17 2022" -A x64 \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DEXPORT_INTERNALS=ON \
