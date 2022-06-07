@@ -319,12 +319,12 @@ endif
 
 bench-netstandard: build-netstandard
 	@echo 🧪 BENCHMARK
-	@echo net 5.0 x86
-	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x86/$(TARGET)/net5.0/ElectionGuard.Encryption.Bench
+	@echo net 6.0 x86
+	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x86/$(TARGET)/net6.0/ElectionGuard.Encryption.Bench
 	@echo net 4.8 x86
 	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x86/$(TARGET)/net48/ElectionGuard.Encryption.Bench
-	@echo net 5.0 x64
-	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net5.0/ElectionGuard.Encryption.Bench
+	@echo net 6.0 x64
+	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net6.0/ElectionGuard.Encryption.Bench
 	@echo net 4.8 x64
 	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net48/ElectionGuard.Encryption.Bench
 
