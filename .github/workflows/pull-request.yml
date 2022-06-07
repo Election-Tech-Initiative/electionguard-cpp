@@ -62,8 +62,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Change Directory
         run: cd ${{ github.workspace }}
-      - uses: actions/setup-dotnet@v2
-        if: runner.os == 'macOS'
+      - name: Install .NET 6
+        uses: actions/setup-dotnet@v2
         with:
           dotnet-version: "6.0.x"
       - name: Update Environment
