@@ -937,9 +937,9 @@ namespace electionguard
             {
 
                 json j = {
-                  {"deviceUuid", serializable.getDeviceUuid()},
-                  {"sessionUuid", serializable.getSessionUuid()},
-                  {"launchCode", serializable.getLaunchCode()},
+                  {"device_id", serializable.getDeviceUuid()},
+                  {"session_id", serializable.getSessionUuid()},
+                  {"launch_code", serializable.getLaunchCode()},
                   {"location", serializable.getLocation()},
                 };
 
@@ -948,9 +948,9 @@ namespace electionguard
 
             static unique_ptr<electionguard::EncryptionDevice> toObject(json j)
             {
-                auto deviceUuid = j["deviceUuid"].get<uint64_t>();
-                auto sessionUuid = j["sessionUuid"].get<uint64_t>();
-                auto launchCode = j["launchCode"].get<uint64_t>();
+                auto deviceUuid = j["device_id"].get<uint64_t>();
+                auto sessionUuid = j["session_id"].get<uint64_t>();
+                auto launchCode = j["launch_code"].get<uint64_t>();
                 auto location = j["location"].get<string>();
 
                 return make_unique<electionguard::EncryptionDevice>(deviceUuid, sessionUuid,
