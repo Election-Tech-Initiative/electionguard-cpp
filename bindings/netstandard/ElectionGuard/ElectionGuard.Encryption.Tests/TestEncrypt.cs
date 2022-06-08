@@ -21,6 +21,16 @@ namespace ElectionGuard.Encrypt.Tests
             Assert.True(deviceCreatedFromJson.ToJson().Contains("Brazil"));
 
         }
+        [Test]
+        public void Test_Device_Serialization_From_JSON_Succeeds()
+        {
+            string deviceJson = "{ \"device_id\": 91755434160, \"session_id\": 12345, \"launch_code\": 45678, \"location\": \"polling-place\" }";
+            var device = new EncryptionDevice(deviceJson);
+
+            var json = device.ToJson();
+
+            Assert.True(json.Contains("polling-place"));
+        }
 
         [Test]
         public void Test_Encrypt_Ballot_Simple_Succeeds()
