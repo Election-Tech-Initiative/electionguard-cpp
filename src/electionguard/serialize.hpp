@@ -212,24 +212,25 @@ namespace electionguard
     static unique_ptr<Party> partyFromJson(const json &j)
     {
         // TODO: other cases
+        string abbreviation;
+        string color;
+        string logo_uri;
+        if (!j["abbreviation"].is_null()) {
+            abbreviation = j["abbreviation"].get<string>();
+        }
+        if (!j["color"].is_null()) {
+            color = j["color"].get<string>();
+        }
+        if (!j["logo_uri"].is_null()) {
+            logo_uri = j["logo_uri"].get<string>();
+        }
+
         if (j.contains("name") && !j["name"].is_null()) {
-            string abbreviation;
-            string color;
-            string logo_uri;
-            if (!j["abbreviation"].is_null()) {
-                abbreviation = j["abbreviation"].get<string>();
-            }
-            if (!j["color"].is_null()) {
-                color = j["color"].get<string>();
-            }
-            if (!j["logo_uri"].is_null()) {
-                logo_uri = j["logo_uri"].get<string>();
-            }
             return make_unique<Party>(j["object_id"].get<string>(),
                                       internationalizedTextFromJson(j["name"]), abbreviation, color,
                                       logo_uri);
         }
-        return make_unique<Party>(j["object_id"].get<string>());
+        return make_unique<Party>(j["object_id"].get<string>(), abbreviation, color, logo_uri);
     }
 
     static json partiesToJson(const vector<reference_wrapper<Party>> &serializable)
