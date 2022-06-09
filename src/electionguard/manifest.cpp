@@ -700,28 +700,26 @@ namespace electionguard
         string color;
         string logoUri;
 
-        explicit Impl(const string &objectId)
+        void init(const string &objectId)
         {
             this->object_id = objectId;
             vector<unique_ptr<Language>> text;
             this->name = make_unique<InternationalizedText>(move(text));
         }
 
+        explicit Impl(const string &objectId) { init(objectId); }
+
         explicit Impl(const string &objectId, const string &abbreviation)
             : abbreviation(abbreviation)
         {
-            this->object_id = objectId;
-            vector<unique_ptr<Language>> text;
-            this->name = make_unique<InternationalizedText>(move(text));
+            init(objectId);
         }
 
         explicit Impl(const string &objectId, const string &abbreviation, const string &color,
                       const string &logoUri)
             : abbreviation(abbreviation), color(color), logoUri(logoUri)
         {
-            this->object_id = objectId;
-            vector<unique_ptr<Language>> text;
-            this->name = make_unique<InternationalizedText>(move(text));
+            init(objectId);
         }
 
         explicit Impl(const string &objectId, unique_ptr<InternationalizedText> name,

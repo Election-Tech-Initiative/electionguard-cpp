@@ -69,7 +69,7 @@ namespace electionguard
     static unique_ptr<InternationalizedText> internationalizedTextFromJson(const json &j)
     {
         vector<unique_ptr<Language>> text;
-        if (j.contains("text")) {
+        if (j.contains("text") && !j["text"].is_null()) {
             for (const auto &i : j["text"]) {
                 text.push_back(languageFromJson(i));
             }
@@ -217,13 +217,13 @@ namespace electionguard
         string abbreviation;
         string color;
         string logo_uri;
-        if (!j["abbreviation"].is_null()) {
+        if (j.contains("abbreviation") && !j["abbreviation"].is_null()) {
             abbreviation = j["abbreviation"].get<string>();
         }
-        if (!j["color"].is_null()) {
+        if (j.contains("color") && !j["color"].is_null()) {
             color = j["color"].get<string>();
         }
-        if (!j["logo_uri"].is_null()) {
+        if (j.contains("logo_uri") && !j["logo_uri"].is_null()) {
             logo_uri = j["logo_uri"].get<string>();
         }
         auto name = j.contains("name") && !j["name"].is_null()
@@ -282,7 +282,7 @@ namespace electionguard
         auto objectId = j["object_id"].get<string>();
         auto name = j.contains("name") && !j["name"].is_null()
                       ? internationalizedTextFromJson(j["name"])
-                      : nullptr;
+                      : internationalizedTextFromJson("{}");
         bool isWriteIn = j.contains("is_write_in") && !j["is_write_in"].is_null()
                            ? j["is_write_in"].get<bool>()
                            : false;
@@ -291,8 +291,7 @@ namespace electionguard
         auto imageUri =
           j.contains("image_uri") && !j["image_uri"].is_null() ? j["image_uri"].get<string>() : "";
 
-        return make_unique<Candidate>(objectId, name != nullptr ? move(name) : nullptr, partyId,
-                                      imageUri, isWriteIn);
+        return make_unique<Candidate>(objectId, move(name), partyId, imageUri, isWriteIn);
     }
 
     static json candidatesToJson(const vector<reference_wrapper<Candidate>> &serializable)
