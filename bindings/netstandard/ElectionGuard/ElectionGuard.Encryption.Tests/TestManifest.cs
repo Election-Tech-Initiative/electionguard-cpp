@@ -35,6 +35,16 @@ namespace ElectionGuard.Encrypt.Tests
         }
 
         [Test]
+        public void Test_Can_Party()
+        {
+            // Act
+            var party = new Party("new party");
+
+            // Assert
+            Assert.IsNotNull(party.Name);
+        }
+
+        [Test]
         public void Test_Can_Construct_Ballot_style()
         {
             var gpUnitIds = new[] { "gp-unit-1", "gp-unit-2" };

@@ -69,8 +69,10 @@ namespace electionguard
     static unique_ptr<InternationalizedText> internationalizedTextFromJson(const json &j)
     {
         vector<unique_ptr<Language>> text;
-        for (const auto &i : j["text"]) {
-            text.push_back(languageFromJson(i));
+        if (j.contains("text") && !j["text"].is_null()) {
+            for (const auto &i : j["text"]) {
+                text.push_back(languageFromJson(i));
+            }
         }
         return make_unique<InternationalizedText>(move(text));
     }
@@ -212,24 +214,24 @@ namespace electionguard
     static unique_ptr<Party> partyFromJson(const json &j)
     {
         // TODO: other cases
-        if (j.contains("name") && !j["name"].is_null()) {
-            string abbreviation;
-            string color;
-            string logo_uri;
-            if (!j["abbreviation"].is_null()) {
-                abbreviation = j["abbreviation"].get<string>();
-            }
-            if (!j["color"].is_null()) {
-                color = j["color"].get<string>();
-            }
-            if (!j["logo_uri"].is_null()) {
-                logo_uri = j["logo_uri"].get<string>();
-            }
-            return make_unique<Party>(j["object_id"].get<string>(),
-                                      internationalizedTextFromJson(j["name"]), abbreviation, color,
-                                      logo_uri);
+        string abbreviation;
+        string color;
+        string logo_uri;
+        if (j.contains("abbreviation") && !j["abbreviation"].is_null()) {
+            abbreviation = j["abbreviation"].get<string>();
         }
-        return make_unique<Party>(j["object_id"].get<string>());
+        if (j.contains("color") && !j["color"].is_null()) {
+            color = j["color"].get<string>();
+        }
+        if (j.contains("logo_uri") && !j["logo_uri"].is_null()) {
+            logo_uri = j["logo_uri"].get<string>();
+        }
+        auto name = j.contains("name") && !j["name"].is_null()
+                      ? internationalizedTextFromJson(j["name"])
+                      : internationalizedTextFromJson(json("{}"));
+
+        return make_unique<Party>(j["object_id"].get<string>(), move(name), abbreviation, color,
+                                  logo_uri);
     }
 
     static json partiesToJson(const vector<reference_wrapper<Party>> &serializable)
@@ -280,7 +282,7 @@ namespace electionguard
         auto objectId = j["object_id"].get<string>();
         auto name = j.contains("name") && !j["name"].is_null()
                       ? internationalizedTextFromJson(j["name"])
-                      : nullptr;
+                      : internationalizedTextFromJson("{}");
         bool isWriteIn = j.contains("is_write_in") && !j["is_write_in"].is_null()
                            ? j["is_write_in"].get<bool>()
                            : false;
@@ -289,8 +291,7 @@ namespace electionguard
         auto imageUri =
           j.contains("image_uri") && !j["image_uri"].is_null() ? j["image_uri"].get<string>() : "";
 
-        return make_unique<Candidate>(objectId, name != nullptr ? move(name) : nullptr, partyId,
-                                      imageUri, isWriteIn);
+        return make_unique<Candidate>(objectId, move(name), partyId, imageUri, isWriteIn);
     }
 
     static json candidatesToJson(const vector<reference_wrapper<Candidate>> &serializable)
