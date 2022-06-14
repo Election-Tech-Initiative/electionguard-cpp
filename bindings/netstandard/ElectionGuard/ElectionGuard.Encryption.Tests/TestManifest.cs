@@ -12,6 +12,19 @@ namespace ElectionGuard.Encrypt.Tests
     {
 
         [Test]
+        public void Test_Can_Create_Contest()
+        {
+            List<SelectionDescription> selections = new List<SelectionDescription>();
+
+            var contest = new ContestDescription("contest-id", "district-id", 1, VoteVariationType.n_of_m, 1,
+                                      "test election", selections.ToArray());
+
+            // Assert
+            Assert.AreEqual(contest.VotesAllowed, 1);
+        }
+
+
+        [Test]
         public void Test_Can_Serialize_Sample_manifest()
         {
             var subject = ManifestGenerator.GetManifestFromFile();

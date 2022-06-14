@@ -452,7 +452,8 @@ namespace electionguard
         auto elected = j["number_elected"].get<uint64_t>();
         auto allowed = j.contains("votes_allowed") && !j["votes_allowed"].is_null()
                          ? j["votes_allowed"].get<uint64_t>()
-                         : 0;
+                       : variation == VoteVariationType::n_of_m ? 1
+                                                                : 0;
         auto name = j["name"].get<string>();
         auto title = j.contains("ballot_title") && !j["ballot_title"].is_null()
                        ? internationalizedTextFromJson(j["ballot_title"])

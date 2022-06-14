@@ -1027,7 +1027,7 @@ namespace electionguard
             this->sequenceOrder = sequenceOrder;
             this->voteVariation = voteVariation;
             this->numberElected = numberElected;
-            this->votesAllowed = 0UL;
+            this->votesAllowed = voteVariation == VoteVariationType::n_of_m ? 1UL : 0UL;
             this->primaryPartyIds = {};
         }
 
@@ -1042,7 +1042,7 @@ namespace electionguard
             this->sequenceOrder = sequenceOrder;
             this->voteVariation = voteVariation;
             this->numberElected = numberElected;
-            this->votesAllowed = 0UL;
+            this->votesAllowed = voteVariation == VoteVariationType::n_of_m ? 1UL : 0UL;
         }
 
         Impl(const string &objectId, const string &electoralDistrictId,
