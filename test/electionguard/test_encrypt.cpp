@@ -60,7 +60,7 @@ TEST_CASE("Encrypt simple selection using precomputed values succeeds")
     auto hashContext = metadata->crypto_hash();
     auto plaintext = BallotGenerator::selectionFrom(*metadata);
 
-    // cause a two triples and a quad to be populated 
+    // cause a two triples and a quad to be populated
     PrecomputeBufferContext::init(1);
     PrecomputeBufferContext::populate(*keypair->getPublicKey());
     PrecomputeBufferContext::stop_populate();
@@ -132,7 +132,7 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
     auto mediator = make_unique<EncryptionMediator>(*internal, *context, *device);
-  
+
     // Act
     auto plaintext = BallotGenerator::getFakeBallot(*internal);
     // Log::debug(plaintext->toJson());
@@ -201,7 +201,7 @@ TEST_CASE("Encrypt PlaintextBallot overvote")
     CHECK(heg != nullptr);
     CHECK(heg->getData().size() == (size_t)(BYTES_512 + sizeof(uint16_t)));
 
-     unique_ptr<ElementModP> new_pad = make_unique<ElementModP>(*heg->getPad());
+    unique_ptr<ElementModP> new_pad = make_unique<ElementModP>(*heg->getPad());
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(new_pad), heg->getData(), heg->getMac());
 
@@ -210,8 +210,8 @@ TEST_CASE("Encrypt PlaintextBallot overvote")
     string new_plaintext_string((char *)&new_plaintext.front(), new_plaintext.size());
 
     CHECK(new_plaintext_string ==
-      string("{\"error\":\"overvote\",\"error_data\":[\"benjamin-franklin-selection\""
-          ",\"john-adams-selection\"]}"));
+          string("{\"error\":\"overvote\",\"error_data\":[\"benjamin-franklin-selection\""
+                 ",\"john-adams-selection\"]}"));
 }
 
 TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds")
@@ -260,28 +260,29 @@ TEST_CASE("Encrypt full PlaintextBallot with WriteIn and Overvote with Encryptio
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
     auto mediator = make_unique<EncryptionMediator>(*internal, *context, *device);
-    
+
     // Act
-    string plaintextBallot_json = string("{\"object_id\": \"03a29d15-667c-4ac8-afd7-549f19b8e4eb\","
-        "\"style_id\": \"jefferson-county-ballot-style\", \"contests\": [ {\"object_id\":"
-        "\"justice-supreme-court\", \"sequence_order\": 0, \"ballot_selections\": [{"
-        "\"object_id\": \"john-adams-selection\", \"sequence_order\": 0, \"vote\": 1,"
-        "\"is_placeholder_selection\": false, \"extended_data\": null}, {\"object_id\""
-        ": \"benjamin-franklin-selection\", \"sequence_order\": 1, \"vote\": 1,"
-        "\"is_placeholder_selection\": false, \"extended_data\": null}, {\"object_id\":"
-        " \"write-in-selection\", \"sequence_order\": 3, \"vote\": 1, \"is_placeholder_selection\""
-        ": false, \"write_in\": \"Susan B. Anthony\"}], \"extended_data\": null}]}");
-    // TODO - Once the relevant plaintext ballot file is in the environment then 
+    string plaintextBallot_json = string(
+      "{\"object_id\": \"03a29d15-667c-4ac8-afd7-549f19b8e4eb\","
+      "\"style_id\": \"jefferson-county-ballot-style\", \"contests\": [ {\"object_id\":"
+      "\"justice-supreme-court\", \"sequence_order\": 0, \"ballot_selections\": [{"
+      "\"object_id\": \"john-adams-selection\", \"sequence_order\": 0, \"vote\": 1,"
+      "\"is_placeholder_selection\": false, \"extended_data\": null}, {\"object_id\""
+      ": \"benjamin-franklin-selection\", \"sequence_order\": 1, \"vote\": 1,"
+      "\"is_placeholder_selection\": false, \"extended_data\": null}, {\"object_id\":"
+      " \"write-in-selection\", \"sequence_order\": 3, \"vote\": 1, \"is_placeholder_selection\""
+      ": false, \"write_in\": \"Susan B. Anthony\"}], \"extended_data\": null}]}");
+    // TODO - Once the relevant plaintext ballot file is in the environment then
     // uncomment the below and stop using the hard coded string.
     //auto plaintextBallot =
     //  BallotGenerator::getSimpleBallotFromFile(TEST_BALLOT_WITH_WRITEIN_SELECTED);
     auto plaintextBallot = PlaintextBallot::fromJson(plaintextBallot_json);
     auto ciphertext = mediator->encrypt(*plaintextBallot);
-    
+
     // Assert
     CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
-    
+
     // check to make sure we have a hashed elgamal ciphertext
     unique_ptr<HashedElGamalCiphertext> heg = nullptr;
     auto contests = ciphertext->getContests();
@@ -307,9 +308,9 @@ TEST_CASE("Encrypt full PlaintextBallot with WriteIn and Overvote with Encryptio
     Log::debug(new_plaintext_string);
 
     CHECK(new_plaintext_string ==
-      string("{\"error\":\"overvote\",\"error_data\":[\"john-adams-selection\","
-             "\"benjamin-franklin-selection\",\"write-in-selection\"],\"write_ins\""
-             ":{\"write-in-selection\":\"Susan B. Anthony\"}}"));
+          string("{\"error\":\"overvote\",\"error_data\":[\"john-adams-selection\","
+                 "\"benjamin-franklin-selection\",\"write-in-selection\"],\"write_ins\""
+                 ":{\"write-in-selection\":\"Susan B. Anthony\"}}"));
 }
 
 TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeeds")
@@ -437,4 +438,38 @@ TEST_CASE("Encrypt simple ballot from file succeeds with precomputed values")
     CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
     PrecomputeBufferContext::empty_queues();
+}
+
+TEST_CASE("Create EncryptionMediator with same manifest hash")
+{
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
+    auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto context = make_unique<CiphertextElectionContext>(
+      1UL, 1UL, keypair->getPublicKey()->clone(), Q().clone(),
+      internal.get()->getManifestHash()->clone(), Q().clone(), Q().clone());
+    auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
+
+    auto mediator = make_unique<EncryptionMediator>(*internal, *context, *device);
+    CHECK(mediator != nullptr);
+}
+
+TEST_CASE("Create EncryptionMediator with different manifest hash")
+{
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
+    auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto context =
+      make_unique<CiphertextElectionContext>(1UL, 1UL, keypair->getPublicKey()->clone(),
+                                             Q().clone(), Q().clone(), Q().clone(), Q().clone());
+    auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
+
+    try {
+        auto mediator = make_unique<EncryptionMediator>(*internal, *context, *device);
+        CHECK(mediator == nullptr);
+    } catch (const std::exception &e) {
+        CHECK(internal->getManifestHash()->toHex() != context->getManifestHash()->toHex());
+    }
 }

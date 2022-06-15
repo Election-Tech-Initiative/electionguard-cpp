@@ -110,6 +110,11 @@ namespace ElectionGuard
             CiphertextElectionContext context,
             EncryptionDevice device)
         {
+            if (manifest.ManifestHash.ToHex() != context.ManifestHash.ToHex())
+            {
+                Status.ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT.ThrowIfError();
+            }
+
             var status = NativeInterface.EncryptionMediator.New(
                 manifest.Handle, context.Handle, device.Handle, out Handle);
             status.ThrowIfError();
