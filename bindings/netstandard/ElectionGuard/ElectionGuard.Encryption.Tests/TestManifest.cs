@@ -148,7 +148,10 @@ namespace ElectionGuard.Encrypt.Tests
                 new InternationalizedText(new[] { language }),
                 new ContactInformation("na"));
 
-            Assert.That(result.IsValid());
+            var json = result.ToJson();
+
+            Assert.IsTrue(result.IsValid());
+            Assert.IsFalse(json.Contains("\"name\":{\"text\":null"));   // check to make sure the party name serialized correctly
         }
 
     }

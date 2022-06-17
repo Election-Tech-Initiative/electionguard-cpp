@@ -59,7 +59,7 @@ namespace electionguard
 
     static json internationalizedTextToJson(const InternationalizedText &serializable)
     {
-        json serialized;
+        json serialized = json::array();
         for (const auto &element : serializable.getText()) {
             serialized.push_back(languageToJson(element.get()));
         }
