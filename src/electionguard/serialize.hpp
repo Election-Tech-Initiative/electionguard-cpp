@@ -450,10 +450,12 @@ namespace electionguard
         auto sequenceOrder = j["sequence_order"].get<uint64_t>();
         auto variation = getVoteVariationType(j["vote_variation"].get<string>());
         auto elected = j["number_elected"].get<uint64_t>();
-        auto allowed = j.contains("votes_allowed") && !j["votes_allowed"].is_null()
-                         ? j["votes_allowed"].get<uint64_t>()
-                       : variation == VoteVariationType::n_of_m ? 1
-                                                                : 0;
+        auto allowed =
+          j.contains("votes_allowed") && !j["votes_allowed"].is_null()
+            ? j["votes_allowed"].get<uint64_t>()
+          : variation == VoteVariationType::n_of_m || variation == VoteVariationType::one_of_m
+            ? elected
+            : 0;
         auto name = j["name"].get<string>();
         auto title = j.contains("ballot_title") && !j["ballot_title"].is_null()
                        ? internationalizedTextFromJson(j["ballot_title"])
