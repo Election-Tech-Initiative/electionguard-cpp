@@ -18,9 +18,12 @@ namespace ElectionGuard.Encrypt.Tests
 
             var contest = new ContestDescription("contest-id", "district-id", 1, VoteVariationType.n_of_m, 1,
                                       "test election", selections.ToArray());
+            var contestThreeVotes = new ContestDescription("contest-id", "district-id", 1, VoteVariationType.n_of_m, 3,
+                                      "test election", selections.ToArray());
 
             // Assert
             Assert.AreEqual(contest.VotesAllowed, 1);
+            Assert.AreEqual(contestThreeVotes.VotesAllowed, 3);
         }
 
 
