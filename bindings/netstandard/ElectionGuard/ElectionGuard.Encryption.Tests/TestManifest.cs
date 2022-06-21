@@ -12,7 +12,7 @@ namespace ElectionGuard.Encrypt.Tests
     {
 
         [Test]
-        public void Test_Can_Create_Contest()
+        public void Test_Votes_Allowed_On_Create_Contest()
         {
             List<SelectionDescription> selections = new List<SelectionDescription>();
 
