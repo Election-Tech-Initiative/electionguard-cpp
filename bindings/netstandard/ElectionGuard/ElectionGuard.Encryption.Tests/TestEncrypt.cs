@@ -127,7 +127,8 @@ namespace ElectionGuard.Encryption.Tests
                 1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
             var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
             var mediator = new EncryptionMediator(internalManifest, context, device);
-            var ballot = BallotGenerator.GetFakeBallotWithContest(internalManifest, "pismo-beach-school-board-contest", 3);
+            const string styleId = "congress-district-7-arlington-pismo-beach";
+            var ballot = BallotGenerator.GetFakeBallotWithContest(internalManifest, "pismo-beach-school-board-contest", 3, styleId);
 
             // Act
             var ciphertext = mediator.Encrypt(ballot);

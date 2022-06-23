@@ -24,9 +24,8 @@ namespace ElectionGuard.Encryption.Utils
             return new PlaintextBallotContest(contest.ObjectId, selections.ToArray());
         }
 
-        public static PlaintextBallot GetFakeBallotWithContest(InternalManifest manifest, string contestId, int numberOfSelections)
+        public static PlaintextBallot GetFakeBallotWithContest(InternalManifest manifest, string contestId, int numberOfSelections, string styleId)
         {
-            const string styleId = "congress-district-7-arlington-pismo-beach";
             return GetFakeBallotInternal(manifest, styleId, (currentContestId, selectionId) =>
             {
                 if (currentContestId == contestId)
