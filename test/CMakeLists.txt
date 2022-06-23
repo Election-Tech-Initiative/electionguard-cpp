@@ -19,7 +19,7 @@ include(../cmake/CPM.cmake)
 CPMAddPackage(
     NAME doctest
     GITHUB_REPOSITORY doctest/doctest
-    GIT_TAG v2.4.8
+    GIT_TAG v2.4.9
 )
 
 CPMAddPackage(
