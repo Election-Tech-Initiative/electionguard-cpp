@@ -4,11 +4,16 @@
 #include "ballot.hpp"
 #include "ballot_compact.hpp"
 #include "election.hpp"
+#include "export.h"
 #include "group.hpp"
 #include "manifest.hpp"
-#include "export.h"
 
 #include <memory>
+
+using std::string;
+using std::unique_ptr;
+using std::vector;
+
 
 namespace electionguard
 {
@@ -46,9 +51,24 @@ namespace electionguard
         /// </summary>
         uint64_t getTimestamp() const;
 
+        uint64_t getDeviceUuid() const;
+        uint64_t getSessionUuid() const;
+        uint64_t getLaunchCode() const;
+        std::string getLocation() const;
+
+        /// <summary>
+        /// Allow for serialization
+        /// </summary>
+        std::vector<uint8_t> toBson() const;
+        std::string toJson() const;
+
+        static std::unique_ptr<EncryptionDevice> fromBson(std::vector<uint8_t> data);
+        static std::unique_ptr<EncryptionDevice> fromJson(std::string data);
+
       private:
         class Impl;
         std::unique_ptr<Impl> pimpl;
+
     };
 
     /// <summary>
@@ -146,8 +166,7 @@ namespace electionguard
     /// <returns>A `CiphertextBallotContest`</returns>
     /// </summary>
     EG_API std::unique_ptr<CiphertextBallotContest>
-    encryptContest(const PlaintextBallotContest &contest,
-                   const InternalManifest &internalManifest,
+    encryptContest(const PlaintextBallotContest &contest, const InternalManifest &internalManifest,
                    const ContestDescriptionWithPlaceholders &description,
                    const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
                    const ElementModQ &nonceSeed, bool shouldVerifyProofs = true);

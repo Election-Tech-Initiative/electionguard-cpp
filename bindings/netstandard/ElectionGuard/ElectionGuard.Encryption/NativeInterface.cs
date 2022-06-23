@@ -3283,13 +3283,29 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_encryption_device_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+                
             internal static extern Status Free(EncryptionDeviceType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_encryption_device_get_hash",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+
             internal static extern Status GetHash(
                 EncryptionDeviceHandle handle,
                 out ElementModQ.ElementModQHandle device_hash);
+
+            //hooking up jsonular calls
+            [DllImport(DllName, EntryPoint = "eg_encryption_device_from_json",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status FromJson(
+                [MarshalAs(UnmanagedType.LPStr)] string data,
+                out EncryptionDeviceHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_encryption_device_to_json",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status ToJson(
+                EncryptionDeviceHandle handle, out IntPtr data, out ulong size);
+
+
         }
 
         internal static unsafe class EncryptionMediator

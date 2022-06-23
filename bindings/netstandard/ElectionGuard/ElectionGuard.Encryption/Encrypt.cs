@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
@@ -51,6 +52,28 @@ namespace ElectionGuard
             return new ElementModQ(value);
         }
 
+        /// <summary>
+        /// produces encription device when given json
+        /// </summary>
+        /// <param name="json"></param>
+        public unsafe EncryptionDevice(string json)
+        {
+            var status = NativeInterface.EncryptionDevice.FromJson(json, out Handle);
+            status.ThrowIfError();
+        }
+        /// <Summary>
+        /// Export the encryptiondevice representation as JSON
+        /// </Summary>
+        public unsafe string ToJson()
+        {
+            var status = NativeInterface.EncryptionDevice.ToJson(Handle, out IntPtr pointer, out ulong size);
+            status.ThrowIfError();
+            var json = Marshal.PtrToStringAnsi(pointer);
+            return json;
+        }
+
+
+
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
@@ -87,6 +110,11 @@ namespace ElectionGuard
             CiphertextElectionContext context,
             EncryptionDevice device)
         {
+            if (manifest.ManifestHash.ToHex() != context.ManifestHash.ToHex())
+            {
+                Status.ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT.ThrowIfError();
+            }
+
             var status = NativeInterface.EncryptionMediator.New(
                 manifest.Handle, context.Handle, device.Handle, out Handle);
             status.ThrowIfError();

@@ -8,6 +8,31 @@ namespace ElectionGuard.Encrypt.Tests
     public class TestEncrypt
     {
         [Test]
+        public void Test_Device_Serialization_Succeeds()
+        {
+
+            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Brazil");
+
+            var json = device.ToJson();
+
+            var deviceCreatedFromJson = new EncryptionDevice(json);
+
+            Assert.True(json.Contains("Brazil"));
+            Assert.True(deviceCreatedFromJson.ToJson().Contains("Brazil"));
+
+        }
+        [Test]
+        public void Test_Device_Serialization_From_JSON_Succeeds()
+        {
+            string deviceJson = "{ \"device_id\": 91755434160, \"session_id\": 12345, \"launch_code\": 45678, \"location\": \"polling-place\" }";
+            var device = new EncryptionDevice(deviceJson);
+
+            var json = device.ToJson();
+
+            Assert.True(json.Contains("polling-place"));
+        }
+
+        [Test]
         public void Test_Encrypt_Ballot_Simple_Succeeds()
         {
             // Configure the election context
@@ -128,6 +153,49 @@ namespace ElectionGuard.Encrypt.Tests
             Assert.That(constants.Contains(Constants.R.ToHex()));
             Assert.That(constants.Contains(Constants.G.ToHex()));
         }
+
+        [Test]
+        public void Test_EncryptMediator_Hashes_Match()
+        {
+            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
+            var manifest = ManifestGenerator.GetManifestFromFile();
+            var internalManifest = new InternalManifest(manifest);
+            var context = new CiphertextElectionContext(
+                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);   // make a context with the correct manifesthash
+            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
+            try
+            {
+                var mediator = new EncryptionMediator(internalManifest, context, device);
+                Assert.IsNotNull(mediator);     // should not be null if it gets created
+            }
+            catch (Exception ex)
+            {
+                // if there is an exception then the manifest hash would not be equal
+                Assert.AreNotEqual(context.ManifestHash.ToHex(), internalManifest.ManifestHash.ToHex());
+            }
+        }
+
+        [Test]
+        public void Test_EncryptMediator_Hashes_Dont_Match()
+        {
+            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
+            var manifest = ManifestGenerator.GetManifestFromFile();
+            var internalManifest = new InternalManifest(manifest);
+            var context = new CiphertextElectionContext(
+                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, Constants.ONE_MOD_Q);     // make a context with a different manifesthash
+            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
+            try
+            {
+                var mediator = new EncryptionMediator(internalManifest, context, device);
+                Assert.IsNull(mediator);    // should not be created, so null at best
+            }
+            catch (Exception ex)
+            {
+                // if there is an exception then the manifest hash would not be equal
+                Assert.AreNotEqual(context.ManifestHash.ToHex(), internalManifest.ManifestHash.ToHex());
+            }
+        }
+
 
     }
 }

@@ -1,6 +1,7 @@
 #include "electionguard/encrypt.hpp"
 
 #include "../log.hpp"
+#include "convert.hpp"
 #include "variant_cast.hpp"
 
 #include <cerrno>
@@ -17,6 +18,7 @@ using electionguard::CiphertextBallotSelection;
 using electionguard::CiphertextElectionContext;
 using electionguard::CompactCiphertextBallot;
 using electionguard::ContestDescriptionWithPlaceholders;
+using electionguard::dynamicCopy;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
 using electionguard::encryptBallot;
@@ -78,6 +80,34 @@ eg_electionguard_status_t eg_encryption_device_get_hash(eg_encryption_device_t *
     }
 }
 
+eg_electionguard_status_t eg_encryption_device_from_json(char *in_data,
+                                                         eg_encryption_device_t **out_handle)
+{
+    try {
+        auto data = string(in_data);
+        auto deserialized = EncryptionDevice::fromJson(data);
+        *out_handle = AS_TYPE(eg_encryption_device_t, deserialized.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_encryption_device_from_json", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+eg_electionguard_status_t eg_encryption_device_to_json(eg_encryption_device_t *handle,
+                                                       char **out_data, uint64_t *out_size)
+{
+    try {
+        auto *domain_type = AS_TYPE(EncryptionDevice, handle);
+        auto data_string = domain_type->toJson();
+        size_t size = 0;
+        *out_data = dynamicCopy(data_string, &size);
+        *out_size = (uint64_t)size;
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_encryption_device_to_json", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
 #pragma endregion
 
 #pragma region EncryptionMediator
@@ -260,8 +290,7 @@ eg_electionguard_status_t eg_encrypt_contest(
 
         auto ciphertext =
           encryptContest(*plaintext, *internalManifest, *description, *public_key,
-                         *crypto_extended_base_hash,
-                         *nonce_seed_, in_should_verify_proofs);
+                         *crypto_extended_base_hash, *nonce_seed_, in_should_verify_proofs);
 
         *out_handle = AS_TYPE(eg_ciphertext_ballot_contest_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;

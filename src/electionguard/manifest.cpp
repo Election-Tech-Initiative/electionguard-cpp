@@ -700,19 +700,26 @@ namespace electionguard
         string color;
         string logoUri;
 
-        explicit Impl(const string &objectId) { this->object_id = objectId; }
+        void init(const string &objectId)
+        {
+            this->object_id = objectId;
+            vector<unique_ptr<Language>> text;
+            this->name = make_unique<InternationalizedText>(move(text));
+        }
+
+        explicit Impl(const string &objectId) { init(objectId); }
 
         explicit Impl(const string &objectId, const string &abbreviation)
             : abbreviation(abbreviation)
         {
-            this->object_id = objectId;
+            init(objectId);
         }
 
         explicit Impl(const string &objectId, const string &abbreviation, const string &color,
                       const string &logoUri)
             : abbreviation(abbreviation), color(color), logoUri(logoUri)
         {
-            this->object_id = objectId;
+            init(objectId);
         }
 
         explicit Impl(const string &objectId, unique_ptr<InternationalizedText> name,
@@ -761,6 +768,12 @@ namespace electionguard
     Party::Party(const string &objectId, unique_ptr<InternationalizedText> name,
                  const string &abbreviation, const string &color, const string &logoUri)
         : pimpl(new Impl(objectId, move(name), abbreviation, color, logoUri))
+    {
+    }
+
+    Party::Party(const string &objectId, const string &abbreviation, const string &color,
+                 const string &logoUri)
+        : pimpl(new Impl(objectId, abbreviation, color, logoUri))
     {
     }
 
@@ -1014,7 +1027,10 @@ namespace electionguard
             this->sequenceOrder = sequenceOrder;
             this->voteVariation = voteVariation;
             this->numberElected = numberElected;
-            this->votesAllowed = 0UL;
+            this->votesAllowed = voteVariation == VoteVariationType::n_of_m ||
+                                     voteVariation == VoteVariationType::one_of_m
+                                   ? numberElected
+                                   : 0UL;
             this->primaryPartyIds = {};
         }
 
@@ -1029,7 +1045,10 @@ namespace electionguard
             this->sequenceOrder = sequenceOrder;
             this->voteVariation = voteVariation;
             this->numberElected = numberElected;
-            this->votesAllowed = 0UL;
+            this->votesAllowed = voteVariation == VoteVariationType::n_of_m ||
+                                     voteVariation == VoteVariationType::one_of_m
+                                   ? numberElected
+                                   : 0UL;
         }
 
         Impl(const string &objectId, const string &electoralDistrictId,
@@ -1508,7 +1527,7 @@ namespace electionguard
             if (name == nullptr) {
                 auto hash = hash_elems(
                   {electionScopeId, getElectionTypeString(type), timePointToIsoString(startDate),
-                   timePointToIsoString(endDate), nullptr, geopoliticalUnitRefs, partyRefs,
+                   timePointToIsoString(endDate), nullptr, nullptr, geopoliticalUnitRefs, partyRefs,
                    contestRefs, ballotStyleRefs});
                 Log::trace("Manifest:: NO NAME!", hash->toHex());
                 return hash;
@@ -1813,8 +1832,8 @@ namespace electionguard
              vector<unique_ptr<ContestDescriptionWithPlaceholders>> contests,
              vector<unique_ptr<BallotStyle>> ballotStyles, unique_ptr<ElementModQ> manifestHash)
             : geopoliticalUnits(move(geopoliticalUnits)), candidates(move(candidates)),
-              contests(move(contests)),
-              ballotStyles(move(ballotStyles)), manifestHash(move(manifestHash))
+              contests(move(contests)), ballotStyles(move(ballotStyles)),
+              manifestHash(move(manifestHash))
         {
         }
     };
@@ -1829,8 +1848,7 @@ namespace electionguard
       vector<unique_ptr<ContestDescriptionWithPlaceholders>> contests,
       vector<unique_ptr<BallotStyle>> ballotStyles, const ElementModQ &manifestHash)
         : pimpl(new Impl(move(geopoliticalUnits), move(candidates), move(contests),
-                         move(ballotStyles),
-                         make_unique<ElementModQ>(manifestHash)))
+                         move(ballotStyles), make_unique<ElementModQ>(manifestHash)))
     {
     }
 

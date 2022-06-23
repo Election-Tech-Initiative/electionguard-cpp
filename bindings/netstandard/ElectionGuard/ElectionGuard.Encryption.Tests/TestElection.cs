@@ -20,6 +20,36 @@ namespace ElectionGuard.Encrypt.Tests
         }
 
         [Test]
+        public void Test_Can_Create_Party()
+        {
+            var candidateName = new Language("father time", "en");
+            var candidate = new Candidate(
+                "2022-holidays",
+                new InternationalizedText(new[] { candidateName }),
+                "new-years-id",
+                null,
+                false);
+
+
+            var partyName = new Language("new years", "en");
+            var party = new ElectionGuard.Party(
+                "new-years-id",
+                new InternationalizedText(new[] { partyName }),
+                "ny",
+                null,
+                null);
+
+            // Assert
+            Assert.IsNotNull(candidate);
+            Assert.IsNotNull(party);
+        }
+
+
+
+
+
+
+        [Test]
         public void Test_Can_Deserialize_Ciphertext_Election_Context()
         {
             // Arrange

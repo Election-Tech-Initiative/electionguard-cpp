@@ -65,3 +65,16 @@ TEST_CASE("Can serialize InternalManifest")
     // Assert
     CHECK(internal->getManifestHash()->toHex() == fromJson->getManifestHash()->toHex());
 }
+
+TEST_CASE("Can construct Contest from Parameters")
+{
+    vector<std::unique_ptr<electionguard::SelectionDescription>> selections;
+
+    // Arrange
+    auto data =
+      make_unique<ContestDescription>("contest-id", "district-id", 1, VoteVariationType::n_of_m, 1,
+                                      "test election", move(selections));
+
+    // Assert
+    CHECK_EQ(data->getVotesAllowed(), 1);
+}

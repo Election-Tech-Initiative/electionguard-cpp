@@ -151,3 +151,5 @@ bindings/netframework/ElectionGuard.NetFramework/packages/
 sample-data.zip
 
 sample-data-container.zip
+
+bindings/netstandard/ElectionGuard/*.user

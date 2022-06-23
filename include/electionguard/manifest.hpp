@@ -438,6 +438,8 @@ namespace electionguard
         explicit Party(const std::string &objectId, std::unique_ptr<InternationalizedText> name,
                        const std::string &abbreviation, const std::string &color,
                        const std::string &logoUri);
+        explicit Party(const std::string &objectId, const std::string &abbreviation,
+                       const std::string &color, const std::string &logoUri);
         ~Party();
 
         Party &operator=(Party other);
@@ -1058,8 +1060,7 @@ namespace electionguard
         static std::vector<std::unique_ptr<GeopoliticalUnit>>
         copyGeopoliticalUnits(const Manifest &description);
 
-        static std::vector<std::unique_ptr<Candidate>>
-        copyCandidates(const Manifest &description);
+        static std::vector<std::unique_ptr<Candidate>> copyCandidates(const Manifest &description);
 
         static std::vector<std::unique_ptr<BallotStyle>>
         copyBallotStyles(const Manifest &description);

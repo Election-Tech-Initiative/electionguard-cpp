@@ -12,6 +12,19 @@ namespace ElectionGuard.Encrypt.Tests
     {
 
         [Test]
+        public void Test_Votes_Allowed_On_Create_Contest()
+        {
+            List<SelectionDescription> selections = new List<SelectionDescription>();
+
+            var contestThreeVotes = new ContestDescription("contest-id", "district-id", 1, VoteVariationType.n_of_m, 3,
+                                      "test election", selections.ToArray());
+
+            // Assert
+            Assert.AreEqual(3, contestThreeVotes.VotesAllowed);
+        }
+
+
+        [Test]
         public void Test_Can_Serialize_Sample_manifest()
         {
             var subject = ManifestGenerator.GetManifestFromFile();
@@ -32,6 +45,16 @@ namespace ElectionGuard.Encrypt.Tests
             // Assert
             var actual = subject.GetTextAt(0);
             Assert.That(actual.Value == "some words");
+        }
+
+        [Test]
+        public void Test_Can_Party()
+        {
+            // Act
+            var party = new Party("new party");
+
+            // Assert
+            Assert.IsNotNull(party.Name);
         }
 
         [Test]
@@ -125,7 +148,10 @@ namespace ElectionGuard.Encrypt.Tests
                 new InternationalizedText(new[] { language }),
                 new ContactInformation("na"));
 
-            Assert.That(result.IsValid());
+            var json = result.ToJson();
+
+            Assert.IsTrue(result.IsValid());
+            Assert.IsFalse(json.Contains("\"name\":{\"text\":null"));   // check to make sure the party name serialized correctly
         }
 
     }
