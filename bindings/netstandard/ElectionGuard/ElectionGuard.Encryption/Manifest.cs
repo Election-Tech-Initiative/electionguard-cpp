@@ -824,7 +824,7 @@ namespace ElectionGuard
             string abbreviation, string color, string logoUri)
         {
             var status = NativeInterface.Party.New(
-                objectId, name.Handle, abbreviation, color, logoUri, out Handle);
+                objectId, name.Handle, abbreviation, color ?? string.Empty, logoUri ?? string.Empty, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"Party Error Status: {status}");
@@ -1009,7 +1009,7 @@ namespace ElectionGuard
             string partyId, string imageUri, bool isWriteIn)
         {
             var status = NativeInterface.Candidate.New(
-                objectId, name.Handle, partyId, imageUri, isWriteIn, out Handle);
+                objectId, name.Handle, partyId, imageUri ?? string.Empty, isWriteIn, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"Candidate Error Status: {status}");
