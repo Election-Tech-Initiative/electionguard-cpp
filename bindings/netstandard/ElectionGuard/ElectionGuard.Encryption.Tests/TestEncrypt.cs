@@ -2,7 +2,7 @@
 using ElectionGuard.Encryption.Utils;
 using NUnit.Framework;
 
-namespace ElectionGuard.Encrypt.Tests
+namespace ElectionGuard.Encryption.Tests
 {
     [TestFixture]
     public class TestEncrypt
@@ -88,7 +88,7 @@ namespace ElectionGuard.Encrypt.Tests
             var mediator = new EncryptionMediator(internalManifest, context, device);
 
             // Act
-            var ballot = BallotGenerator.GetFakeBallot(internalManifest, 1);
+            var ballot = BallotGenerator.GetFakeBallot(internalManifest);
             var ciphertext = mediator.Encrypt(ballot);
 
             // Assert
@@ -114,6 +114,39 @@ namespace ElectionGuard.Encrypt.Tests
             var ciphertext = mediator.Encrypt(ballot);
 
             Assert.That(ciphertext.IsValidEncryption(context.ManifestHash, keypair.PublicKey, context.CryptoExtendedBaseHash));
+        }
+
+        [Test]
+        public void Test_EncryptAndDecryptOfBallot_WithMultipleVotesAllowed()
+        {
+            // Arrange
+            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
+            var manifest = ManifestGenerator.GetManifestFromFile();
+            var internalManifest = new InternalManifest(manifest);
+            var context = new CiphertextElectionContext(
+                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
+            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
+            var mediator = new EncryptionMediator(internalManifest, context, device);
+            var ballot = BallotGenerator.GetFakeBallotWithContest(internalManifest, "pismo-beach-school-board-contest", 3);
+
+            // Act
+            var ciphertext = mediator.Encrypt(ballot);
+
+            // Assert
+            Assert.AreEqual(5, ciphertext.ContestsSize);
+            var pismoBeach = FindContestOrDefault(ciphertext, i => i.ObjectId == "pismo-beach-school-board-contest");
+            Assert.IsNotNull(pismoBeach);
+            Assert.AreEqual(1L, DecryptSelection(pismoBeach, keypair, 0));
+            Assert.AreEqual(1L, DecryptSelection(pismoBeach, keypair, 1));
+            Assert.AreEqual(1L, DecryptSelection(pismoBeach, keypair, 2));
+            Assert.AreEqual(0L, DecryptSelection(pismoBeach, keypair, 3));
+            Assert.AreEqual(0L, DecryptSelection(pismoBeach, keypair, 4));
+        }
+
+        private static ulong? DecryptSelection(CiphertextBallotContest pismoBeach, ElGamalKeyPair keypair, int index)
+        {
+            var selection = pismoBeach.GetSelectionAt((ulong)index);
+            return selection.Ciphertext.Decrypt(keypair.SecretKey);
         }
 
         [Test]
@@ -168,7 +201,7 @@ namespace ElectionGuard.Encrypt.Tests
                 var mediator = new EncryptionMediator(internalManifest, context, device);
                 Assert.IsNotNull(mediator);     // should not be null if it gets created
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // if there is an exception then the manifest hash would not be equal
                 Assert.AreNotEqual(context.ManifestHash.ToHex(), internalManifest.ManifestHash.ToHex());
@@ -189,7 +222,7 @@ namespace ElectionGuard.Encrypt.Tests
                 var mediator = new EncryptionMediator(internalManifest, context, device);
                 Assert.IsNull(mediator);    // should not be created, so null at best
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // if there is an exception then the manifest hash would not be equal
                 Assert.AreNotEqual(context.ManifestHash.ToHex(), internalManifest.ManifestHash.ToHex());
@@ -197,5 +230,19 @@ namespace ElectionGuard.Encrypt.Tests
         }
 
 
+        private static CiphertextBallotContest FindContestOrDefault(CiphertextBallot ballot, Func<CiphertextBallotContest, bool> func)
+        {
+            var contestSize = (int)ballot.ContestsSize;
+            for (int i = 0; i < contestSize; i++)
+            {
+                var contest = ballot.GetContestAt((ulong)i);
+                if (func(contest))
+                {
+                    return contest;
+                }
+            }
+
+            return null;
+        }
     }
 }
