@@ -9,7 +9,7 @@ ELECTIONGUARD_BUILD_DIR=$(realpath .)/build
 ELECTIONGUARD_BUILD_DIR_WIN=$(subst \c\,C:\,$(subst /,\,$(ELECTIONGUARD_BUILD_DIR)))
 ELECTIONGUARD_BUILD_APPS_DIR=$(ELECTIONGUARD_BUILD_DIR)/apps
 ELECTIONGUARD_BUILD_BINDING_DIR=$(ELECTIONGUARD_BUILD_DIR)/bindings
-ELECTIONGUARD_BUILD_LIBS_DIR=$(ELECTIONGUARD_BUILD_DIR)/libs
+ELECTIONGUARD_BUILD_LIBS_DIR=$(subst \,/,$(ELECTIONGUARD_BUILD_DIR)/libs
 CPM_SOURCE_CACHE=$(realpath .)/.cache/CPM
 
 # Detect operating system
@@ -332,7 +332,7 @@ bench-netstandard: build-netstandard
 test:
 	@echo 🧪 TEST
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(subst \,/,$(ELECTIONGUARD_BUILD_LIBS_DIR))/x86_64/$(TARGET) -G "MSYS Makefiles" \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DEXPORT_INTERNALS=ON \
@@ -359,7 +359,7 @@ endif
 test-msvc:
 	@echo 🧪 TEST MSVC
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(subst \,/,$(ELECTIONGUARD_BUILD_LIBS_DIR))/msvc/x64 -G "Visual Studio 17 2022" -A x64 \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 17 2022" -A x64 \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DEXPORT_INTERNALS=ON \
@@ -383,7 +383,7 @@ endif
 coverage:
 	@echo ✅ CHECK COVERAGE
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(subst \,/,$(ELECTIONGUARD_BUILD_LIBS_DIR))/x86_64/$(TARGET) -G "MSYS Makefiles" \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DEXPORT_INTERNALS=ON \
