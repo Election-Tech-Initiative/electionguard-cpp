@@ -332,7 +332,7 @@ bench-netstandard: build-netstandard
 test:
 	@echo 🧪 TEST
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) -G "MSYS Makefiles" \
+	cmake -S . -B $(subst /,\,$(ELECTIONGUARD_BUILD_LIBS_DIR))\x86_64\$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DEXPORT_INTERNALS=ON \
@@ -359,7 +359,7 @@ endif
 test-msvc:
 	@echo 🧪 TEST MSVC
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 17 2022" -A x64 \
+	cmake -S . -B $(subst /,\,$(ELECTIONGUARD_BUILD_LIBS_DIR))\msvc\x64 -G "Visual Studio 17 2022" -A x64 \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DEXPORT_INTERNALS=ON \
