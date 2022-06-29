@@ -473,3 +473,27 @@ TEST_CASE("Create EncryptionMediator with different manifest hash")
         CHECK(internal->getManifestHash()->toHex() != context->getManifestHash()->toHex());
     }
 }
+
+TEST_CASE("Verify placeholder flag")
+{
+    // Arrange
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
+    auto manifest = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
+    auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
+
+    auto ballot = BallotGenerator::getFakeBallot(*internal);
+
+    // Act
+    auto ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash());
+
+    // Assert
+    // TODO: compare other values
+    CHECK(
+      ciphertext->getContests().front().get().getSelections().front().get().getIsPlaceholder() ==
+      false);
+    CHECK(ciphertext->getContests().front().get().getSelections().back().get().getIsPlaceholder() ==
+          true);
+}

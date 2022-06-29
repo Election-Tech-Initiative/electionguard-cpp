@@ -502,7 +502,7 @@ namespace electionguard
             auto placeholderSelection = selectionFrom(placeholder, true, selectPlaceholder);
             encryptedSelections.push_back(encryptSelection(
               *placeholderSelection, placeholder, *elgamalPublicKey_ptr,
-              *cryptoExtendedBaseHash_ptr, *sharedNonce.get(), false, shouldVerifyProofs));
+              *cryptoExtendedBaseHash_ptr, *sharedNonce.get(), true, shouldVerifyProofs));
         }
 
         // Derive the extendedDataNonce from the selection nonce and a constant
