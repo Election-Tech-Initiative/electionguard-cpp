@@ -27,7 +27,7 @@ namespace ElectionGuard.Encrypt.Tests
                 "2022-holidays",
                 new InternationalizedText(new[] { candidateName }),
                 "new-years-id",
-                null,
+                string.Empty,
                 false);
 
 
