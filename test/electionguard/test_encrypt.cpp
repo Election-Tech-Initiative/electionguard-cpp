@@ -141,6 +141,7 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
     // Assert
     CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
+    CHECK(ciphertext->getContests().front().get().getHashedElGamalCiphertext().get() != nullptr);
 }
 
 TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
@@ -490,7 +491,6 @@ TEST_CASE("Verify placeholder flag")
     auto ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash());
 
     // Assert
-    // TODO: compare other values
     CHECK(
       ciphertext->getContests().front().get().getSelections().front().get().getIsPlaceholder() ==
       false);

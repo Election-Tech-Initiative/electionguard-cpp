@@ -10,13 +10,13 @@ namespace ElectionGuard.Encryption.Tests
         [Test]
         public void Test_DisjunctiveChaumPedersen()
         {
-            var nonce = Constants.ONE_MOD_Q;
+            var nonce = new ElementModQ(Constants.ONE_MOD_Q.Data);
             var keyPair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
             const ulong vote = 0UL;
             var ciphertext = Elgamal.Encrypt(vote, nonce, keyPair.PublicKey);
 
             var proof = new DisjunctiveChaumPedersenProof(
-                ciphertext, nonce, keyPair.PublicKey, Constants.ONE_MOD_Q, vote);
+                ciphertext, nonce, keyPair.PublicKey, new ElementModQ(Constants.ONE_MOD_Q.Data), vote);
 
             Assert.That(proof.IsValid(ciphertext, keyPair.PublicKey, Constants.ONE_MOD_Q));
         }

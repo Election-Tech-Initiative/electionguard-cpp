@@ -510,8 +510,7 @@ namespace electionguard
           make_unique<Nonces>(*sharedNonce->clone(), "constant-extended-data");
         auto extendedDataNonce = noncesForExtendedData->get(0);
 
-        vector<uint8_t> extendedData_plaintext(
-          (uint8_t *)&extendedData.front(), (uint8_t *)&extendedData.front() + extendedData.size());
+        vector<uint8_t> extendedData_plaintext(extendedData.begin(), extendedData.end());
 
         // Perform HashedElGamalCiphertext calculation
         unique_ptr<HashedElGamalCiphertext> hashedElGamal =
