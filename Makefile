@@ -65,7 +65,6 @@ endif
 	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.35.0/CPM.cmake
 	wget -O sample-data-container.zip https://github.com/microsoft/electionguard/releases/download/v0.95.0/sample-data.zip
 	unzip -o sample-data-container.zip
-	unzip -o sample-data.zip
 
 
 build:

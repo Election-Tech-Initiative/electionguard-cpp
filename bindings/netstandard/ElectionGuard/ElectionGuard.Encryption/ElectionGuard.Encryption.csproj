@@ -78,12 +78,37 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>
+    <Content Name="iOS" Include="$(ElectionGuardLibs)\ios\$(Configuration)\lib\*.a" Pack="true" PackagePath="runtimes\xamarinios\native">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
+    <Content Name="Android x86" Include="$(ElectionGuardLibs)\android\$(Configuration)\x86\src\*.so" Pack="true" PackagePath="runtimes\monoandroid\x86\native">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
+    <Content Name="Android x86_64" Include="$(ElectionGuardLibs)\android\$(Configuration)\x86_64\src\*.so" Pack="true" PackagePath="runtimes\monoandroid\x86_64\native">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
+    <Content Name="Android arm64-v8a" Include="$(ElectionGuardLibs)\android\$(Configuration)\arm64-v8a\src\*.so" Pack="true" PackagePath="runtimes\monoandroid\arm64-v8a\native">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
+    <Content Name="Android armeabi-v7a" Include="$(ElectionGuardLibs)\android\$(Configuration)\armeabi-v7a\src\*.so" Pack="true" PackagePath="runtimes\monoandroid\armeabi-v7a\native">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
     <None Include="Electionguard.Encryption.targets">
       <PackagePath>build\</PackagePath>
       <Pack>true</Pack>
     </None>
   </ItemGroup>
-
+  <ItemGroup>
+    <Content Include="runtimes\**" PackagePath="runtimes">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
   <ItemGroup Label="Additional Package Files">
     <None Name="ReadMe" Include="..\README.md" Pack="true" PackagePath="\" />
     <None Name="Icon" Include="..\icon.png" Pack="true" PackagePath="\" />

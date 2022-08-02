@@ -63,6 +63,30 @@ jobs:
         with:
           name: linux-x64
           path: build/libs/x86_64/Release/src/*.so
+      - name: Make Mobile Builds
+        env:
+          NDK_PATH: $$ANDROID_NDK_LATEST_HOME
+        run: make build-android
+      - name: Upload Android x86 Library
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-x86
+          path: build/libs/android/Release/x86/src/*.so
+      - name: Upload Android x64 Library
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-x64
+          path: build/libs/android/Release/x86_64/src/*.so
+      - name: Upload Android Arm8 Library
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-arm8
+          path: build/libs/android/Release/arm64-v8a/src/*.so
+      - name: Upload Android Arm7 Library
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-arm7
+          path: build/libs/android/Release/armeabi-v7a/src/*.so
 
   macos_build:
     name: MacOS Build
@@ -83,7 +107,14 @@ jobs:
         with:
           name: osx-x64
           path: build/libs/x86_64/Release/src/*.dylib
-
+      - name: Make Mobile Builds
+        run: make build-ios
+      - name: Upload IOS Library
+        uses: actions/upload-artifact@v2
+        with:
+          name: ios-x64
+          path: build/libs/ios/Release/lib/*.a
+          
   package:
     name: Upload Package
     needs: [linux_build, windows_build, macos_build]
@@ -111,6 +142,31 @@ jobs:
         with:
           name: osx-x64
           path: build/libs/x86_64/Release/src
+      - name: Get IOS Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ios-x64
+          path: build/libs/ios/Release/lib
+      - name: Get Android x86 Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: android-x86
+          path: build/libs/android/Release/x86/src
+      - name: Get Android x64 Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: android-x64
+          path: build/libs/android/Release/x86_64/src
+      - name: Get Android Arm8 Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: android-arm8
+          path: build/libs/android/Release/arm64-v8a/src
+      - name: Get Android Arm7 Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: android-arm7
+          path: build/libs/android/Release/armeabi-v7a/src
       - name: Get Shortened Sha
         id: sha
         run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
@@ -136,6 +192,7 @@ jobs:
             ./build/libs/x86_64/Release/src/*.dylib
             ./build/libs/x86_64/Release/src/*.so
             ./build/libs/msvc/x64/src/Release/*.dll*
+            ./build/libs/ios/Release/lib/*.a
       - name: Push to Nuget.org
         working-directory: bindings/netstandard/ElectionGuard/ElectionGuard.Encryption
         run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
