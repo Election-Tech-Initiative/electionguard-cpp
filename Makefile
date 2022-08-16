@@ -59,12 +59,17 @@ ifeq ($(OPERATING_SYSTEM),Linux)
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo 🏁 WINDOWS INSTALL
-	choco install wget
-	choco install unzip
+	choco upgrade wget -y
+	choco upgrade unzip -y
+	choco upgrade cmake -y
 endif
-	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.35.0/CPM.cmake
-	wget -O sample-data-container.zip https://github.com/microsoft/electionguard/releases/download/v0.95.0/sample-data.zip
-	unzip -o sample-data-container.zip
+	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.35.5/CPM.cmake
+	make fetch-sample-data
+
+fetch-sample-data:
+	@echo ⬇️ FETCH Sample Data
+	wget -O sample-data-1-0.zip https://github.com/microsoft/electionguard/releases/download/v1.0/sample-data.zip
+	unzip -o sample-data-1-0.zip
 
 
 build:
