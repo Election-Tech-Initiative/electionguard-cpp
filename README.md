@@ -64,7 +64,15 @@ To build for iOS you need XCode installed
 
 ### Linux
 
-The automated install of dependencies is currently only supported on debian-based systems. See the makefile for more information.
+The automated install of dependencies is currently only supported on debian-based systems, Arch Linux and some Redhat-based systems. Although it is supposed to work on most of the supported Linux distributions, however the following distributions have been successfully tested:
+- Archlinux
+- Debian 11
+- Ubuntu 22.04
+- Ubuntu 20.04
+- Centos 8
+- Oracle Linux 8.6
+- Oracle Linux 9
+
 
 ### 🖥️ Windows (using MSVC)
 
