@@ -54,7 +54,9 @@ namespace ElectionGuard
                 var status = NativeInterface.ExtendedData.GetValue(
                     Handle, out IntPtr value);
                 status.ThrowIfError();
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -134,7 +136,9 @@ namespace ElectionGuard
                 var status = NativeInterface.PlaintextBallotSelection.GetObjectId(
                     Handle, out IntPtr value);
                 status.ThrowIfError();
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -273,7 +277,9 @@ namespace ElectionGuard
                 var status = NativeInterface.CiphertextBallotSelection.GetObjectId(
                     Handle, out IntPtr value);
                 status.ThrowIfError();
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -458,7 +464,9 @@ namespace ElectionGuard
                 var status = NativeInterface.PlaintextBallotContest.GetObjectId(
                     Handle, out IntPtr value);
                 status.ThrowIfError();
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -575,7 +583,9 @@ namespace ElectionGuard
                 var status = NativeInterface.CiphertextBallotContest.GetObjectId(
                     Handle, out IntPtr value);
                 status.ThrowIfError();
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -780,7 +790,9 @@ namespace ElectionGuard
                 var status = NativeInterface.PlaintextBallot.GetObjectId(
                     Handle, out IntPtr value);
                 status.ThrowIfError();
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -796,7 +808,9 @@ namespace ElectionGuard
                 var status = NativeInterface.PlaintextBallot.GetStyleId(
                     Handle, out IntPtr value);
                 status.ThrowIfError();
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -895,7 +909,8 @@ namespace ElectionGuard
             var status = NativeInterface.PlaintextBallot.ToJson(
                 Handle, out IntPtr pointer, out ulong size);
             status.ThrowIfError();
-            var json = Marshal.PtrToStringAnsi(pointer);
+            var json = Marshal.PtrToStringAnsi(pointer, (int)size);
+            NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
 
@@ -1043,7 +1058,9 @@ namespace ElectionGuard
                 var status = NativeInterface.CiphertextBallot.GetObjectId(
                     Handle, out IntPtr value);
                 status.ThrowIfError();
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -1059,7 +1076,9 @@ namespace ElectionGuard
                 var status = NativeInterface.CiphertextBallot.GetStyleId(
                     Handle, out IntPtr value);
                 status.ThrowIfError();
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -1223,7 +1242,8 @@ namespace ElectionGuard
                 : NativeInterface.CiphertextBallot.ToJson(
                 Handle, out pointer, out size);
             status.ThrowIfError();
-            var json = Marshal.PtrToStringAnsi(pointer);
+            var json = Marshal.PtrToStringAnsi(pointer, (int)size);
+            NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
 
@@ -1316,7 +1336,9 @@ namespace ElectionGuard
                 var status = NativeInterface.CompactCiphertextBallot.GetObjectId(
                     Handle, out IntPtr value);
                 status.ThrowIfError();
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -1408,7 +1430,9 @@ namespace ElectionGuard
                 var status = NativeInterface.SubmittedBallot.GetObjectId(
                     Handle, out IntPtr value);
                 status.ThrowIfError();
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -1424,7 +1448,9 @@ namespace ElectionGuard
                 var status = NativeInterface.SubmittedBallot.GetStyleId(
                     Handle, out IntPtr value);
                 status.ThrowIfError();
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -1583,7 +1609,8 @@ namespace ElectionGuard
             var status = NativeInterface.SubmittedBallot.ToJson(
                 Handle, out IntPtr pointer, out ulong size);
             status.ThrowIfError();
-            var json = Marshal.PtrToStringAnsi(pointer);
+            var json = Marshal.PtrToStringAnsi(pointer, (int)size);
+            NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
 

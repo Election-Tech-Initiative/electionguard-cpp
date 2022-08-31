@@ -65,6 +65,7 @@ namespace ElectionGuard
                 throw new ElectionGuardException($"ToHex Error Status: {status}");
             }
             var value = Marshal.PtrToStringAnsi(pointer);
+            NativeInterface.Memory.FreeIntPtr(pointer);
             return value;
         }
 
@@ -177,6 +178,7 @@ namespace ElectionGuard
                 throw new ElectionGuardException($"ToHex Error Status: {status}");
             }
             var value = Marshal.PtrToStringAnsi(pointer);
+            NativeInterface.Memory.FreeIntPtr(pointer);
             return value;
         }
 
@@ -413,7 +415,8 @@ namespace ElectionGuard
             var status = NativeInterface.Constants.ToJson(
                  out IntPtr pointer, out ulong size);
             status.ThrowIfError();
-            var json = Marshal.PtrToStringAnsi(pointer);
+            var json = Marshal.PtrToStringAnsi(pointer, (int)size);
+            NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
 

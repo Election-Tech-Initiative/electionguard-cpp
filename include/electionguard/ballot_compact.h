@@ -84,6 +84,14 @@ EG_API eg_electionguard_status_t eg_compact_ciphertext_ballot_msgpack_free(uint8
 
 #endif
 
+#ifndef Memory Functions
+
+EG_API eg_electionguard_status_t eg_free_int_ptr(char *in_data);
+
+EG_API eg_electionguard_status_t eg_delete_int_ptr(uint8_t *in_data);
+
+#endif
+
 #ifndef Compress Functions
 
 // TODO: implement
