@@ -10,6 +10,7 @@ cmake/CPM.cmake
 cmake/ios.toolchain.cmake
 
 data/0.95.0/
+data/1.0/
 
 ### Xcode and Swift ###
 

@@ -12,7 +12,7 @@ using namespace electionguard;
 using namespace std;
 
 #ifndef TEST_SPEC_VERSION
-#    define TEST_SPEC_VERSION "0.95.0"
+#    define TEST_SPEC_VERSION "1.0"
 #endif
 
 #ifndef TEST_USE_SAMPLE
