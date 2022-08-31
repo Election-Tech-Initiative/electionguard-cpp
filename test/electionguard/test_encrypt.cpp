@@ -14,18 +14,6 @@ using namespace electionguard;
 using namespace electionguard::tools::generators;
 using namespace std;
 
-#ifndef TEST_BALLOT_WITH_WRITEIN_SELECTED
-#    define TEST_BALLOT_WITH_WRITEIN_SELECTED                                                      \
-        "0.95.0/sample/full/election_private_data/plaintext_ballots/"                              \
-        "plaintext_ballot_03a29d15-667c-4ac8-afd7-549f19b8e4eb.json"
-#endif
-
-#ifndef TEST_BALLOT_WITH_WRITEIN_NOT_SELECTED
-#    define TEST_BALLOT_WITH_WRITEIN_NOT_SELECTED                                                  \
-        "0.95.0/sample/full/election_private_data/plaintext_ballots/"                              \
-        "plaintext_ballot_ballot-06e7aa04-73fc-11ec-8051-acde48001122.json"
-#endif
-
 TEST_CASE("Encrypt simple selection succeeds")
 {
     // Arrange
@@ -273,10 +261,6 @@ TEST_CASE("Encrypt full PlaintextBallot with WriteIn and Overvote with Encryptio
       "\"is_placeholder_selection\": false, \"extended_data\": null}, {\"object_id\":"
       " \"write-in-selection\", \"sequence_order\": 3, \"vote\": 1, \"is_placeholder_selection\""
       ": false, \"write_in\": \"Susan B. Anthony\"}], \"extended_data\": null}]}");
-    // TODO - Once the relevant plaintext ballot file is in the environment then
-    // uncomment the below and stop using the hard coded string.
-    //auto plaintextBallot =
-    //  BallotGenerator::getSimpleBallotFromFile(TEST_BALLOT_WITH_WRITEIN_SELECTED);
     auto plaintextBallot = PlaintextBallot::fromJson(plaintextBallot_json);
     auto ciphertext = mediator->encrypt(*plaintextBallot);
 
