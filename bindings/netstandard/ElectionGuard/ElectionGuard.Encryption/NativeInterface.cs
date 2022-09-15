@@ -3283,7 +3283,7 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_encryption_device_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-                
+
             internal static extern Status Free(EncryptionDeviceType* handle);
 
             [DllImport(DllName, EntryPoint = "eg_encryption_device_get_hash",
@@ -3460,6 +3460,20 @@ namespace ElectionGuard
             internal static extern Status Status(out int count, out int queue_size);
         }
 
+        #endregion
+
+
+        #region Memory
+        internal static unsafe class Memory
+        {
+            [DllImport(DllName, EntryPoint = "eg_free_int_ptr",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status FreeIntPtr(IntPtr data);
+
+            [DllImport(DllName, EntryPoint = "eg_delete_int_ptr",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status DeleteIntPtr(IntPtr data);
+        }
         #endregion
 
     }

@@ -155,6 +155,28 @@ eg_electionguard_status_t eg_compact_ciphertext_ballot_msgpack_free(uint8_t *in_
 
 #pragma endregion
 
+#pragma region Memory
+eg_electionguard_status_t eg_free_int_ptr(char *in_data)
+{
+    if (in_data == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    free(in_data); // NOLINT(cppcoreguidelines-owning-memory)
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_delete_int_ptr(uint8_t *in_data)
+{
+    if (in_data == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete[] in_data; // NOLINT(cppcoreguidelines-owning-memory)
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+#pragma endregion
+
 #pragma region Compress Functions
 
 // TODO: implement

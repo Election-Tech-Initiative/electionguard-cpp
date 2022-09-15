@@ -1,37 +1,34 @@
 cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 
 # --- Import tools ----
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
 # ---- Dependencies ----
-
 include(../cmake/CPM.cmake)
 
 CPMAddPackage(
-        NAME date
-        GITHUB_REPOSITORY HowardHinnant/date
-        VERSION 3.0.1
+    NAME date
+    GITHUB_REPOSITORY HowardHinnant/date
+    VERSION 3.0.1
 )
 
 CPMAddPackage(
     NAME nlohmann_json
-    VERSION 3.9.1
-    URL https://github.com/nlohmann/json/releases/download/v3.9.1/include.zip
-    URL_HASH SHA256=6bea5877b1541d353bd77bdfbdb2696333ae5ed8f9e8cc22df657192218cad91
+    VERSION 3.11.2
+    URL https://github.com/nlohmann/json/releases/download/v3.11.2/include.zip
+    URL_HASH SHA256=e5c7a9f49a16814be27e4ed0ee900ecd0092bfb7dbfca65b5a421b774dccaaed
 )
 
 CPMAddPackage(
-  NAME spdlog
-  GITHUB_REPOSITORY gabime/spdlog
-  VERSION 1.9.2
-  OPTIONS "SPDLOG_INSTALL ON"
+    NAME spdlog
+    GITHUB_REPOSITORY gabime/spdlog
+    VERSION 1.9.2
+    OPTIONS "SPDLOG_INSTALL ON"
 )
 
 find_package(Threads REQUIRED)
 
 # ---- Library Sources ----
-
 set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/ballot_code.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/ballot_compact.cpp
@@ -130,7 +127,6 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/include/electionguard/manifest.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/precompute_buffers.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/status.h
-    
 )
 
 add_library(${META_PROJECT_TARGET} ${PROJECT_SOURCE_FILES})
@@ -138,29 +134,30 @@ add_library(${META_PROJECT_TARGET}::${META_PROJECT_TARGET} ALIAS ${META_PROJECT_
 
 # ---- Compile ----
 
-# Set the target compile features rather than setting CMAKE_CXX_STANDARD 
+# Set the target compile features rather than setting CMAKE_CXX_STANDARD
 # so we don't pollute other targets that may compile differently
 target_compile_features(${META_PROJECT_TARGET} PRIVATE cxx_std_17)
 target_compile_options(${META_PROJECT_TARGET} PUBLIC "$<$<BOOL:${MSVC}>:/permissive->")
 
 # define dll export markers
-if (BUILD_SHARED_LIBS)
-    message("++ Building Shared Libs")  
+if(BUILD_SHARED_LIBS)
+    message("++ Building Shared Libs")
     add_compile_definitions(ELECTIONGUARD_BUILD_SHARED)
 endif()
 
-if (MINGW)
+if(MINGW)
     message("++ Building with MINGW")
+
     # Remove lib prefix
     set_target_properties(${META_PROJECT_TARGET} PROPERTIES PREFIX "")
 endif()
 
-if (MSVC)
+if(MSVC)
     message("++ Building with MSVC")
     target_compile_options(${META_PROJECT_TARGET} PUBLIC /wd4067)
 endif()
 
-if (IOS AND CMAKE_IOS_INSTALL_COMBINED)
+if(IOS AND CMAKE_IOS_INSTALL_COMBINED)
     # Tell XCode how to merge the fat binary
     # see: https://github.com/leetal/ios-cmake/issues/12#issuecomment-421425541
     set_target_properties(${META_PROJECT_TARGET} PROPERTIES
@@ -169,24 +166,24 @@ if (IOS AND CMAKE_IOS_INSTALL_COMBINED)
     )
 endif()
 
-# Set the public include directory depending on 
+# Set the public include directory depending on
 # if the target is being exported or installed
 target_include_directories(${META_PROJECT_TARGET}
     SYSTEM PUBLIC
-        $<INSTALL_INTERFACE:include/${META_PROJECT_EXPORT}/${PROJECT_VERSION}>
-        # Headers used from /build
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include/${META_PROJECT_EXPORT}/${PROJECT_VERSION}>
+
+    # Headers used from /build
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     PRIVATE
-        ${PROJECT_SOURCE_DIR}/src/${META_PROJECT_TARGET}
-        ${PROJECT_SOURCE_DIR}/src/karamel
+    ${PROJECT_SOURCE_DIR}/src/${META_PROJECT_TARGET}
+    ${PROJECT_SOURCE_DIR}/src/karamel
 )
 
 # ---- Dependencies ----
-
 add_library(nlohmann_json INTERFACE IMPORTED)
 target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
 
-if (MINGW)
+if(MINGW)
     target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date nlohmann_json spdlog::spdlog_header_only Threads::Threads)
 
     # Statically link in libstdc++
@@ -198,10 +195,10 @@ endif()
 
 # ---- Install ----
 
-# Install the electionguard library in the default location, 
+# Install the electionguard library in the default location,
 # and associate electionguard with the ElectionGuard export
 install(
-    TARGETS ${META_PROJECT_TARGET} 
+    TARGETS ${META_PROJECT_TARGET}
     EXPORT ${META_PROJECT_EXPORT}
 )
 
@@ -215,14 +212,14 @@ install(
 # export the spdlog config
 export(EXPORT spdlog FILE "${project_config_out}")
 
-# Generate the build-tree ElectionGuardConfig.cmake for use 
+# Generate the build-tree ElectionGuardConfig.cmake for use
 # in other cmake projects without needing to install
 export(
     EXPORT ${META_PROJECT_EXPORT}
     FILE "${PROJECT_BINARY_DIR}/${META_PROJECT_EXPORT}Config.cmake"
 )
 
-# Generate the install-tree ElectionGuardConfig.cmake for use 
+# Generate the install-tree ElectionGuardConfig.cmake for use
 # in other cmake projects after this library has been installed
 install(
     EXPORT ${META_PROJECT_EXPORT}
@@ -231,27 +228,27 @@ install(
 )
 
 # ---- Test ----
-
 if(OPTION_ENABLE_TESTS)
     message("++ Building for tests")
 
     # Expose the internal headers to tests
     target_include_directories(${META_PROJECT_TARGET}
         SYSTEM PUBLIC
-            $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
     )
 
     # When running tests, set some specific compiler flags
     if(MSVC)
-        #TODO: renenable warnings as errors when the correct ones are defined
-       #target_compile_options(${META_PROJECT_TARGET} PUBLIC /W4 /WX)C5059
-       target_compile_options(${META_PROJECT_TARGET} PUBLIC /Zi) # Generates complete debugging information.
+        # TODO: renenable warnings as errors when the correct ones are defined
+        # target_compile_options(${META_PROJECT_TARGET} PUBLIC /W4 /WX)C5059
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC /Zi) # Generates complete debugging information.
     endif()
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         message("++ Configuring compile options for Clang|GNU")
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wall)
-       # TODO: target_compile_options(${META_PROJECT_TARGET} PUBLIC -Werror)
+
+        # TODO: target_compile_options(${META_PROJECT_TARGET} PUBLIC -Werror)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wextra)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -pedantic)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -pedantic-errors)
@@ -260,11 +257,11 @@ if(OPTION_ENABLE_TESTS)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-variable)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-redundant-decls)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unknown-pragmas)
-        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-useless-cast) 
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-useless-cast)
     endif()
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    message("++ Configuring compile options for Clang")
+        message("++ Configuring compile options for Clang")
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-static-in-inline)
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         message("++ Configuring compile options for GNU")
@@ -273,15 +270,14 @@ if(OPTION_ENABLE_TESTS)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-but-set-parameter)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-but-set-variable)
     endif()
-
 endif()
 
-if (CODE_COVERAGE)
+if(CODE_COVERAGE)
     message("++ Building with coverage")
     target_code_coverage(${META_PROJECT_TARGET} AUTO)
 endif()
 
-if (USE_FORMATTING)
+if(USE_FORMATTING)
     message("++ Building with formatting")
     clang_format(format ${PROJECT_SOURCE_FILES})
 endif()

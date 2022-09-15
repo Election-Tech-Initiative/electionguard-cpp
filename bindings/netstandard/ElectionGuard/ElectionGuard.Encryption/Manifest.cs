@@ -40,7 +40,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"AnnotatedString Error Annotation: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -57,7 +59,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"AnnotatedString Error Value: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -133,7 +137,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"Language Error Value: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -150,7 +156,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"Language Error LanguageAbbreviation: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -394,7 +402,9 @@ namespace ElectionGuard
             {
                 throw new ElectionGuardException($"ContactInformation Error GetAddressLineAt: {status}");
             }
-            return Marshal.PtrToStringAnsi(value);
+            var data = Marshal.PtrToStringAnsi(value);
+            NativeInterface.Memory.FreeIntPtr(value);
+            return data;
         }
 
         /// <Summary>
@@ -472,7 +482,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"GeopoliticalUnit Error ObjectId: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -489,7 +501,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"GeopoliticalUnit Error Name: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -586,7 +600,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"BallotStyle Error ObjectId: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -660,7 +676,9 @@ namespace ElectionGuard
             {
                 throw new ElectionGuardException($"BallotStyle Error GetGeopoliticalUnitIdAt: {status}");
             }
-            return Marshal.PtrToStringAnsi(value);
+            var data = Marshal.PtrToStringAnsi(value);
+            NativeInterface.Memory.FreeIntPtr(value);
+            return data;
         }
 
         /// <Summary>
@@ -674,7 +692,9 @@ namespace ElectionGuard
             {
                 throw new ElectionGuardException($"BallotStyle Error GetPartyIdAt: {status}");
             }
-            return Marshal.PtrToStringAnsi(value);
+            var data = Marshal.PtrToStringAnsi(value);
+            NativeInterface.Memory.FreeIntPtr(value);
+            return data;
         }
 
         /// <Summary>
@@ -718,7 +738,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"Party Error ObjectId: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -735,7 +757,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"Party Error Abbreviation: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -769,7 +793,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"Party Error Color: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -786,7 +812,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"Party Error LogoUri: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -886,7 +914,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"Candidate Error ObjectId: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -903,7 +933,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"Candidate Error CandidateId: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -920,7 +952,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"Candidate Error Name: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -937,7 +971,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"Candidate Error PartyId: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -954,7 +990,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"Candidate Error ImageUri: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -1075,7 +1113,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"SelectionDescription Error ObjectId: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -1092,7 +1132,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"SelectionDescription Error CandidateId: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -1190,7 +1232,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"ContestDescription Error ObjectId: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -1208,7 +1252,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"ContestDescription Error ElectoralDistrictId: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -1276,7 +1322,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"ContestDescription Error Name: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -1541,7 +1589,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error ObjectId: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -1559,7 +1609,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error ElectoralDistrictId: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -1627,7 +1679,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error Name: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -1966,7 +2020,9 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"Manifest Error ObjectId: {status}");
                 }
-                return Marshal.PtrToStringAnsi(value);
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
             }
         }
 
@@ -2398,7 +2454,8 @@ namespace ElectionGuard
             {
                 throw new ElectionGuardException($"ToJson Error Status: {status}");
             }
-            var json = Marshal.PtrToStringAnsi(pointer);
+            var json = Marshal.PtrToStringAnsi(pointer, (int)size);
+            NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
 
@@ -2624,7 +2681,8 @@ namespace ElectionGuard
             {
                 throw new ElectionGuardException($"ToJson Error Status: {status}");
             }
-            var json = Marshal.PtrToStringAnsi(pointer);
+            var json = Marshal.PtrToStringAnsi(pointer, (int)size);
+            NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
 
