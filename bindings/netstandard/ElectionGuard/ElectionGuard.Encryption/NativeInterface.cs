@@ -2793,7 +2793,7 @@ namespace ElectionGuard
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
                 {
-                    if (IsClosed) return true;
+                    if (IsFreed) return true;
 
                     var status = PlaintextBallot.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
@@ -2924,7 +2924,7 @@ namespace ElectionGuard
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
                 {
-                    if (IsClosed) return true;
+                    if (IsFreed) return true;
 
                     var status = CiphertextBallot.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
@@ -3118,7 +3118,7 @@ namespace ElectionGuard
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
                 {
-                    if (IsClosed) return true;
+                    if (IsFreed) return true;
 
                     var status = SubmittedBallot.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)

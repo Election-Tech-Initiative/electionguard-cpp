@@ -50,6 +50,8 @@ namespace ElectionGuard
 
         public IntPtr Ptr => handle;
 
+        protected bool IsFreed = false;
+
         protected abstract bool Free();
 
         protected override bool ReleaseHandle()
@@ -59,6 +61,7 @@ namespace ElectionGuard
                 var freed = Free();
                 if (freed)
                 {
+                    IsFreed = true;
                     Close();
                 }
                 return freed;
