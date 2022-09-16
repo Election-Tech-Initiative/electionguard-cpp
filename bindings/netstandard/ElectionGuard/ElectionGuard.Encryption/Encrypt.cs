@@ -68,7 +68,7 @@ namespace ElectionGuard
         {
             var status = NativeInterface.EncryptionDevice.ToJson(Handle, out IntPtr pointer, out ulong size);
             status.ThrowIfError();
-            var json = Marshal.PtrToStringAnsi(pointer, (int)size);
+            var json = Marshal.PtrToStringAnsi(pointer);
             NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }

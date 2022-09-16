@@ -2454,7 +2454,7 @@ namespace ElectionGuard
             {
                 throw new ElectionGuardException($"ToJson Error Status: {status}");
             }
-            var json = Marshal.PtrToStringAnsi(pointer, (int)size);
+            var json = Marshal.PtrToStringAnsi(pointer);
             NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
@@ -2681,7 +2681,7 @@ namespace ElectionGuard
             {
                 throw new ElectionGuardException($"ToJson Error Status: {status}");
             }
-            var json = Marshal.PtrToStringAnsi(pointer, (int)size);
+            var json = Marshal.PtrToStringAnsi(pointer);
             NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
