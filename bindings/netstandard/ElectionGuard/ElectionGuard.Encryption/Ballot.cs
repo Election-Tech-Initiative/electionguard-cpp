@@ -909,7 +909,7 @@ namespace ElectionGuard
             var status = NativeInterface.PlaintextBallot.ToJson(
                 Handle, out IntPtr pointer, out ulong size);
             status.ThrowIfError();
-            var json = Marshal.PtrToStringAnsi(pointer, (int)size);
+            var json = Marshal.PtrToStringAnsi(pointer);
             NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
@@ -1242,7 +1242,7 @@ namespace ElectionGuard
                 : NativeInterface.CiphertextBallot.ToJson(
                 Handle, out pointer, out size);
             status.ThrowIfError();
-            var json = Marshal.PtrToStringAnsi(pointer, (int)size);
+            var json = Marshal.PtrToStringAnsi(pointer);
             NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
@@ -1609,7 +1609,7 @@ namespace ElectionGuard
             var status = NativeInterface.SubmittedBallot.ToJson(
                 Handle, out IntPtr pointer, out ulong size);
             status.ThrowIfError();
-            var json = Marshal.PtrToStringAnsi(pointer, (int)size);
+            var json = Marshal.PtrToStringAnsi(pointer);
             NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
