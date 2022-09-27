@@ -125,23 +125,6 @@ namespace ElectionGuard
     /// </summary>
     public partial class PlaintextBallotSelection : DisposableBase
     {
-        /// <Summary>
-        /// Get the objectId of the selection, which is the unique id for
-        /// the selection in a specific contest described in the election manifest.
-        /// </Summary>
-        public unsafe string ObjectId
-        {
-            get
-            {
-                var status = NativeInterface.PlaintextBallotSelection.GetObjectId(
-                    Handle, out IntPtr value);
-                status.ThrowIfError();
-                var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
-                return data;
-            }
-        }
-
         /// <summary>
         /// an optional field of arbitrary data, such as the value of a write-in candidate
         /// </summary>

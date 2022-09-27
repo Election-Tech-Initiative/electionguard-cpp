@@ -37,11 +37,19 @@ var properties = File.ReadLines(propertiesPath);
             
             #line default
             #line hidden
-            this.Write("// DO NOT MODIFY THIS FILE\r\n// This file is generated via ElectionGuard.InteropGe" +
-                    "nerator at /src/interop-generator\r\n\r\nnamespace ElectionGuard\r\n{\r\n    public part" +
-                    "ial class PlaintextBallotSelection\r\n    {\r\n");
+            this.Write(@"// DO NOT MODIFY THIS FILE
+// This file is generated via ElectionGuard.InteropGenerator at /src/interop-generator
+
+using System;
+using System.Runtime.InteropServices;
+
+namespace ElectionGuard
+{
+    public partial class PlaintextBallotSelection
+    {
+");
             
-            #line 17 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
+            #line 20 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
  foreach (var property in properties) { 
         var pieces = property.Split(',');
         var name = pieces[0];
@@ -53,36 +61,65 @@ var properties = File.ReadLines(propertiesPath);
             #line hidden
             this.Write("        /// <Summary>\r\n        /// ");
             
-            #line 24 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
+            #line 27 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(description));
             
             #line default
             #line hidden
             this.Write("\r\n        /// </Summary>\r\n        public unsafe ");
             
-            #line 26 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
+            #line 29 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(type));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 26 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
+            #line 29 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(name));
             
             #line default
             #line hidden
-            this.Write("\r\n        {\r\n            get\r\n            {\r\n                return NativeInterfa" +
-                    "ce.PlaintextBallotSelection.Get");
+            this.Write("\r\n        {\r\n            get\r\n            {\r\n");
             
-            #line 30 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(name));
+            #line 33 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
+ if (type == "string") { 
             
             #line default
             #line hidden
-            this.Write("(Handle);\r\n            }\r\n        }\r\n\r\n");
+            this.Write("                var status = NativeInterface.PlaintextBallotSelection.Get");
             
             #line 34 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(name));
+            
+            #line default
+            #line hidden
+            this.Write("(\r\n                    Handle, out IntPtr value);\r\n                status.ThrowIf" +
+                    "Error();\r\n                var data = Marshal.PtrToStringAnsi(value);\r\n          " +
+                    "      NativeInterface.Memory.FreeIntPtr(value);\r\n                return data;\r\n");
+            
+            #line 40 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
+ } else { 
+            
+            #line default
+            #line hidden
+            this.Write("                return NativeInterface.PlaintextBallotSelection.Get");
+            
+            #line 41 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(name));
+            
+            #line default
+            #line hidden
+            this.Write("(Handle);\r\n");
+            
+            #line 42 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("            }\r\n        }\r\n\r\n");
+            
+            #line 46 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
 }
             
             #line default
