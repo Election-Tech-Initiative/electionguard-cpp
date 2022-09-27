@@ -140,7 +140,7 @@ bindings/netstandard/ElectionGuard/packages/
 .idea/
 .cache/
 cmake-build-debug/
-*.csproj.user
+*.user
 *.sln.DotSettings.user
 
 appsettings.json

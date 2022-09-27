@@ -1,0 +1,2 @@
+﻿IsPlaceholder,bool,Determines if this is a placeholder selection
+Vote,ulong,Get the plaintext vote

@@ -1,0 +1,36 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#
+var propertiesPath = Path.Join(Directory.GetCurrentDirectory(), "/Properties.txt");
+var properties = File.ReadLines(propertiesPath);
+#>
+// DO NOT MODIFY THIS FILE
+// This file is generated via ElectionGuard.InteropGenerator at /src/interop-generator
+
+namespace ElectionGuard
+{
+    public partial class PlaintextBallotSelection
+    {
+<# foreach (var property in properties) { 
+        var pieces = property.Split(',');
+        var name = pieces[0];
+        var type = pieces[1];
+        var description = pieces[2];
+        #>
+        /// <Summary>
+        /// <#= description #>
+        /// </Summary>
+        public unsafe <#= type #> <#= name #>
+        {
+            get
+            {
+                return NativeInterface.PlaintextBallotSelection.Get<#= name #>(Handle);
+            }
+        }
+
+<#}#>
+    }
+}

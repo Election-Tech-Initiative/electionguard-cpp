@@ -123,7 +123,7 @@ namespace ElectionGuard
     /// of a write-in candidate value.  In the current implementation these values are
     /// discarded when encrypting.
     /// </summary>
-    public class PlaintextBallotSelection : DisposableBase
+    public partial class PlaintextBallotSelection : DisposableBase
     {
         /// <Summary>
         /// Get the objectId of the selection, which is the unique id for
@@ -139,28 +139,6 @@ namespace ElectionGuard
                 var data = Marshal.PtrToStringAnsi(value);
                 NativeInterface.Memory.FreeIntPtr(value);
                 return data;
-            }
-        }
-
-        /// <Summary>
-        /// Get the plaintext vote
-        /// </Summary>
-        public unsafe ulong Vote
-        {
-            get
-            {
-                return NativeInterface.PlaintextBallotSelection.GetVote(Handle);
-            }
-        }
-
-        /// <summary>
-        /// Determines if this is a placeholder selection
-        /// </summary>
-        public unsafe bool IsPlaceholder
-        {
-            get
-            {
-                return NativeInterface.PlaintextBallotSelection.GetIsPlaceholder(Handle);
             }
         }
 
