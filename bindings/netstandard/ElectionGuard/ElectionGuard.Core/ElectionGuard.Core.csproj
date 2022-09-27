@@ -1,0 +1,76 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net48</TargetFrameworks>
+		<Platforms>x64;x86</Platforms>
+
+		<!-- Project -->
+		<RootNamespace>ElectionGuard</RootNamespace>
+		<AssemblyName>ElectionGuard.Core</AssemblyName>
+		<Version>0.1.18</Version>
+		<AssemblyVersion>0.1.18.0</AssemblyVersion>
+		<AssemblyFileVersion>0.1.18.0</AssemblyFileVersion>
+	</PropertyGroup>
+
+	<PropertyGroup>
+
+		<!-- Package -->
+		<PackageId>ElectionGuard.Core</PackageId>
+		<Title>ElectionGuard Core</Title>
+		<Description>Open source implementation of ElectionGuard's core components.</Description>
+		<Authors>Microsoft</Authors>
+		<PackageVersion>0.1.18</PackageVersion>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/microsoft/electionguard-cpp</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/microsoft/electionguard-cpp</RepositoryUrl>
+		<PackageTags>Microsoft;Electionguard;Windows;MacOS;Linux</PackageTags>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageIcon>icon.png</PackageIcon>
+		<RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<!-- <PackageReleaseNotes>Changelog</PackageReleaseNotes> -->
+	</PropertyGroup>
+
+	<PropertyGroup Label="Configuration">
+		<Import_RootNamespace>ElectionGuard</Import_RootNamespace>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<PropertyGroup Label="Library Paths">
+		<ElectionGuardLibs>..\..\..\..\build\libs</ElectionGuardLibs>
+	</PropertyGroup>
+
+	<ItemGroup Label="C++ Built Libraries">
+		<Content Name="Windows MSVC x86" Include="$(ElectionGuardLibs)\msvc\Win32\src\$(Configuration)\*.dll*" Pack="true">
+			<CopyToOutputDirectory Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
+			<PackageCopyToOutput Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">true</PackageCopyToOutput>
+			<PackagePath>runtimes\win-x86\native</PackagePath>
+		</Content>
+		<Content Name="Windows MSVC x86 symbols" Include="$(ElectionGuardLibs)\msvc\Win32\src\$(Configuration)\*.pdb*" Pack="true">
+			<CopyToOutputDirectory Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
+			<PackageCopyToOutput Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">true</PackageCopyToOutput>
+		</Content>
+		<Content Name="Windows MSVC x64" Include="$(ElectionGuardLibs)\msvc\x64\src\$(Configuration)\*.dll*" Pack="true">
+			<CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
+			<PackageCopyToOutput Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">true</PackageCopyToOutput>
+			<PackagePath>runtimes\win-x64\native</PackagePath>
+		</Content>
+		<Content Name="Windows MSVC x64 symbols" Include="$(ElectionGuardLibs)\msvc\x64\src\$(Configuration)\*.pdb*" Pack="true">
+			<CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
+			<PackageCopyToOutput Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">true</PackageCopyToOutput>
+		</Content>
+		<Content Name="MacOS" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.dylib" Pack="true" PackagePath="runtimes\osx-x64\native">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<PackageCopyToOutput>true</PackageCopyToOutput>
+		</Content>
+		<Content Name="Linux" Include="$(ElectionGuardLibs)\x86_64\$(Configuration)\src\*.so" Pack="true" PackagePath="runtimes\linux-x64\native">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<PackageCopyToOutput>true</PackageCopyToOutput>
+		</Content>
+		<None Include="Electionguard.Encryption.targets">
+			<PackagePath>build\</PackagePath>
+			<Pack>true</Pack>
+		</None>
+	</ItemGroup>
+
+</Project>
