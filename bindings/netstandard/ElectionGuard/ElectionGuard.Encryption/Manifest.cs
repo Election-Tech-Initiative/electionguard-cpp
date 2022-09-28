@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -177,7 +178,7 @@ namespace ElectionGuard
         /// <param name="language">string with language info</param>
         public unsafe Language(string value, string language)
         {
-            var data = ReplaceAccents(value);
+            var data = EncodeNonAsciiCharacters(value);
             var status = NativeInterface.Language.New(data, language, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
@@ -190,15 +191,23 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="value">string to convert</param>
         /// <returns>string with replaced characters</returns>
-        private string ReplaceAccents(string value)
+        public static string EncodeNonAsciiCharacters(string value)
         {
-            return value.Replace("ú", "u")
-                        .Replace("é", "e")
-                        .Replace("ë", "e")
-                        .Replace("ó", "o")
-                        .Replace("ô", "o")
-                        .Replace("ö", "o")
-                        .Replace("î", "i");
+            StringBuilder sb = new StringBuilder();
+            foreach (char c in value)
+            {
+                if (c > 127)
+                {
+                    // This character is too big for ASCII
+                    string encodedValue = "\\u" + ((int)c).ToString("x4");
+                    sb.Append(encodedValue);
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString();
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -2186,7 +2195,8 @@ namespace ElectionGuard
         /// <param name="json">string of json data describing the manifest</param>
         public unsafe Manifest(string json)
         {
-            var status = NativeInterface.Manifest.FromJson(json, out Handle);
+            var data = Language.EncodeNonAsciiCharacters(json);
+            var status = NativeInterface.Manifest.FromJson(data, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"Manifest Error Status: {status}");
