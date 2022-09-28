@@ -4,8 +4,31 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#
+static string ToSnakeCase(string text)
+{
+    if(text == null) {
+        throw new ArgumentNullException(nameof(text));
+    }
+    if(text.Length < 2) {
+        return text;
+    }
+    var sb = new StringBuilder();
+    sb.Append(char.ToLowerInvariant(text[0]));
+    for(int i = 1; i < text.Length; ++i) {
+        char c = text[i];
+        if(char.IsUpper(c)) {
+            sb.Append('_');
+            sb.Append(char.ToLowerInvariant(c));
+        } else {
+            sb.Append(c);
+        }
+    }
+    return sb.ToString();
+}
+
 var propertiesPath = Path.Join(Directory.GetCurrentDirectory(), "/Properties.txt");
 var properties = File.ReadLines(propertiesPath);
+var className = "PlaintextBallotSelection";
 #>
 // DO NOT MODIFY THIS FILE
 // This file is generated via ElectionGuard.InteropGenerator at /src/interop-generator
@@ -15,14 +38,25 @@ using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
-    public partial class PlaintextBallotSelection
+    public partial class <#= className #>
     {
 <# foreach (var property in properties) { 
         var pieces = property.Split(',');
         var name = pieces[0];
         var type = pieces[1];
         var description = pieces[2];
+        var entryPoint = ToSnakeCase($"Eg{className}Get{name}");
         #>
+        [DllImport(NativeInterface.DllName,
+            EntryPoint = "<#= entryPoint #>",
+            CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        internal static extern <#= type == "string" ? "Status" : type #> Get<#= name #>(
+            NativeInterface.<#= className #>.<#= className #>Handle handle
+<# if (type == "string") { #>
+            , out IntPtr object_id
+<# } #>
+        );
+
         /// <Summary>
         /// <#= description #>
         /// </Summary>
@@ -31,14 +65,14 @@ namespace ElectionGuard
             get
             {
 <# if (type == "string") { #>
-                var status = NativeInterface.PlaintextBallotSelection.Get<#= name #>(
+                var status = Get<#= name #>(
                     Handle, out IntPtr value);
                 status.ThrowIfError();
                 var data = Marshal.PtrToStringAnsi(value);
                 NativeInterface.Memory.FreeIntPtr(value);
                 return data;
 <# } else { #>
-                return NativeInterface.PlaintextBallotSelection.Get<#= name #>(Handle);
+                return Get<#= name #>(Handle);
 <# } #>
             }
         }

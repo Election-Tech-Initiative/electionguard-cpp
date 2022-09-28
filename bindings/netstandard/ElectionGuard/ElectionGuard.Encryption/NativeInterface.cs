@@ -346,7 +346,7 @@ namespace ElectionGuard
 
     internal static unsafe class NativeInterface
     {
-        const string DllName = "electionguard";
+        internal const string DllName = "electionguard";
 
         internal unsafe struct CharPtr { };
 
@@ -2482,22 +2482,6 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Free(PlaintextBallotSelectionType* handle);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_get_object_id",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetObjectId(
-                PlaintextBallotSelectionHandle handle, out IntPtr object_id);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_get_vote",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetVote(
-                PlaintextBallotSelectionHandle handle);
-
-            [DllImport(DllName,
-                EntryPoint = "eg_plaintext_ballot_selection_get_is_placeholder",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern bool GetIsPlaceholder(
-                PlaintextBallotSelectionHandle handle);
 
             [DllImport(DllName,
                 EntryPoint = "eg_plaintext_ballot_selection_get_extended_data",

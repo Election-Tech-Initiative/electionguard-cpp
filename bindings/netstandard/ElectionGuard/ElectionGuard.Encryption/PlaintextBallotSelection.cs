@@ -8,14 +8,22 @@ namespace ElectionGuard
 {
     public partial class PlaintextBallotSelection
     {
+        [DllImport(NativeInterface.DllName,
+            EntryPoint = "eg_plaintext_ballot_selection_get_object_id",
+            CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        internal static extern Status GetObjectId(
+            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
+            , out IntPtr object_id
+        );
+
         /// <Summary>
-        /// Get the objectId of the selection which is the unique id for\nthe selection in a specific contest described in the election manifest.
+        /// Get the objectId of the selection which is the unique id for the selection in a specific contest described in the election manifest.
         /// </Summary>
         public unsafe string ObjectId
         {
             get
             {
-                var status = NativeInterface.PlaintextBallotSelection.GetObjectId(
+                var status = GetObjectId(
                     Handle, out IntPtr value);
                 status.ThrowIfError();
                 var data = Marshal.PtrToStringAnsi(value);
@@ -24,6 +32,13 @@ namespace ElectionGuard
             }
         }
 
+        [DllImport(NativeInterface.DllName,
+            EntryPoint = "eg_plaintext_ballot_selection_get_is_placeholder",
+            CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        internal static extern bool GetIsPlaceholder(
+            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
+        );
+
         /// <Summary>
         /// Determines if this is a placeholder selection
         /// </Summary>
@@ -31,9 +46,16 @@ namespace ElectionGuard
         {
             get
             {
-                return NativeInterface.PlaintextBallotSelection.GetIsPlaceholder(Handle);
+                return GetIsPlaceholder(Handle);
             }
         }
+
+        [DllImport(NativeInterface.DllName,
+            EntryPoint = "eg_plaintext_ballot_selection_get_vote",
+            CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        internal static extern ulong GetVote(
+            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
+        );
 
         /// <Summary>
         /// Get the plaintext vote
@@ -42,7 +64,7 @@ namespace ElectionGuard
         {
             get
             {
-                return NativeInterface.PlaintextBallotSelection.GetVote(Handle);
+                return GetVote(Handle);
             }
         }
 
