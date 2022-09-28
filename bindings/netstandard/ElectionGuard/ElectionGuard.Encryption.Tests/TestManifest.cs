@@ -154,5 +154,37 @@ namespace ElectionGuard.Encrypt.Tests
             Assert.IsFalse(json.Contains("\"name\":{\"text\":null"));   // check to make sure the party name serialized correctly
         }
 
+        [Test]
+        public void Test_Unicode_CandidateNames()
+        {
+            var candidateName = new Language("Raúl", "en");
+            var candidate = new Candidate(
+                "candidate-1",
+                new InternationalizedText(new[] { candidateName }),
+                string.Empty,
+                string.Empty,
+                false);
+
+            List<Candidate> candidates = new List<Candidate>
+            {
+                candidate
+            };
+
+            var result = new Manifest(
+                "test-manifest",
+                ElectionType.general,
+                DateTime.Now,
+                DateTime.Now,
+                new GeopoliticalUnit[] { },
+                new Party[] { },
+                candidates.ToArray(),
+                new ContestDescription[] { },
+                new BallotStyle[] { },
+                new InternationalizedText(new Language[] { }),
+                new ContactInformation("na"));
+
+            var json = result.ToJson();
+            Assert.IsTrue(json.Contains("\"value\":\"Raul\""));
+        }
     }
 }

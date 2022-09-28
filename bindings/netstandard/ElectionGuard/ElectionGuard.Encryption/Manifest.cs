@@ -177,11 +177,28 @@ namespace ElectionGuard
         /// <param name="language">string with language info</param>
         public unsafe Language(string value, string language)
         {
-            var status = NativeInterface.Language.New(value, language, out Handle);
+            var data = ReplaceAccents(value);
+            var status = NativeInterface.Language.New(data, language, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"Language Error Status: {status}");
             }
+        }
+
+        /// <summary>
+        /// Temp function for handling accented latin characters for v1.0
+        /// </summary>
+        /// <param name="value">string to convert</param>
+        /// <returns>string with replaced characters</returns>
+        private string ReplaceAccents(string value)
+        {
+            return value.Replace("ú", "u")
+                        .Replace("é", "e")
+                        .Replace("ë", "e")
+                        .Replace("ó", "o")
+                        .Replace("ô", "o")
+                        .Replace("ö", "o")
+                        .Replace("î", "i");
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
