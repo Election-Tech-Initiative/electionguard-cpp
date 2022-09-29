@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using ElectionGuard.InteropGenerator.Models;
+using System.Text.Json;
 
 namespace ElectionGuard.InteropGenerator
 {

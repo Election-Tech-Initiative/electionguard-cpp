@@ -1,4 +1,6 @@
-﻿namespace ElectionGuard.InteropGenerator;
+﻿using ElectionGuard.InteropGenerator.Models;
+
+namespace ElectionGuard.InteropGenerator;
 
 internal class InteropClassGenerator
 {

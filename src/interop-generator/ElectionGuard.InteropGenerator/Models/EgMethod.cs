@@ -1,4 +1,4 @@
-﻿namespace ElectionGuard.InteropGenerator;
+﻿namespace ElectionGuard.InteropGenerator.Models;
 
 public class EgMethod
 {
