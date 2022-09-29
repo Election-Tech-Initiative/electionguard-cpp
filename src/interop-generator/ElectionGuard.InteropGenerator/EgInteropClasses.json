@@ -17,6 +17,19 @@
         "Type": "ulong",
         "Description": "Get the plaintext vote"
       }
+    ],
+    "Methods": [
+      {
+        "Name": "IsValid",
+        "ReturnType": "bool",
+        "Description": "Given a PlaintextBallotSelection validates that the object matches an expected object and that the plaintext value can resolve to a valid representation",
+        "Params": [
+          {
+            "Type": "string",
+            "Name": "expectedObjectId"
+          }
+        ]
+      }
     ]
   },
   {
@@ -32,6 +45,8 @@
         "Type": "ulong",
         "Description": "Get the Size of the selections collection"
       }
-    ] 
+    ],
+    "Methods": [
+    ]
   }
 ]

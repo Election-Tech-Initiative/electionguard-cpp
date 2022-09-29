@@ -8,9 +8,13 @@ namespace ElectionGuard
 {
     public partial class PlaintextBallotSelection
     {
-        [DllImport(NativeInterface.DllName,
+        #region Properties
+        [DllImport(
+            NativeInterface.DllName,
             EntryPoint = "eg_plaintext_ballot_selection_get_object_id",
-            CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            CallingConvention = CallingConvention.Cdecl, 
+            SetLastError = true
+        )]
         internal static extern Status GetObjectId(
             NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
             , out IntPtr object_id
@@ -32,9 +36,12 @@ namespace ElectionGuard
             }
         }
 
-        [DllImport(NativeInterface.DllName,
+        [DllImport(
+            NativeInterface.DllName,
             EntryPoint = "eg_plaintext_ballot_selection_get_is_placeholder",
-            CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            CallingConvention = CallingConvention.Cdecl, 
+            SetLastError = true
+        )]
         internal static extern bool GetIsPlaceholder(
             NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
         );
@@ -50,9 +57,12 @@ namespace ElectionGuard
             }
         }
 
-        [DllImport(NativeInterface.DllName,
+        [DllImport(
+            NativeInterface.DllName,
             EntryPoint = "eg_plaintext_ballot_selection_get_vote",
-            CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            CallingConvention = CallingConvention.Cdecl, 
+            SetLastError = true
+        )]
         internal static extern ulong GetVote(
             NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
         );
@@ -68,5 +78,18 @@ namespace ElectionGuard
             }
         }
 
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Given a PlaintextBallotSelection validates that the object matches an expected object and that the plaintext value can resolve to a valid representation
+        /// </summary>
+        public unsafe bool IsValid(
+            string expectedObjectId
+        ) {
+            return NativeInterface.PlaintextBallotSelection.IsValid(
+                Handle, expectedObjectId);
+        }
+        #endregion
     }
 }

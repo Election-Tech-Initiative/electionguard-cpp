@@ -176,16 +176,6 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
-        /// <summary>
-        /// Given a PlaintextBallotSelection validates that the object matches an expected object
-        /// and that the plaintext value can resolve to a valid representation
-        /// </summary>
-        public unsafe bool IsValid(string expectedObjectId)
-        {
-            return NativeInterface.PlaintextBallotSelection.IsValid(
-                Handle, expectedObjectId);
-        }
-
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

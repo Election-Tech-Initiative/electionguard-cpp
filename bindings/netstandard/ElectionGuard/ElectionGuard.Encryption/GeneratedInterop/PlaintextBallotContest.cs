@@ -8,9 +8,13 @@ namespace ElectionGuard
 {
     public partial class PlaintextBallotContest
     {
-        [DllImport(NativeInterface.DllName,
+        #region Properties
+        [DllImport(
+            NativeInterface.DllName,
             EntryPoint = "eg_plaintext_ballot_contest_get_object_id",
-            CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            CallingConvention = CallingConvention.Cdecl, 
+            SetLastError = true
+        )]
         internal static extern Status GetObjectId(
             NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle handle
             , out IntPtr object_id
@@ -32,9 +36,12 @@ namespace ElectionGuard
             }
         }
 
-        [DllImport(NativeInterface.DllName,
+        [DllImport(
+            NativeInterface.DllName,
             EntryPoint = "eg_plaintext_ballot_contest_get_selections_size",
-            CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            CallingConvention = CallingConvention.Cdecl, 
+            SetLastError = true
+        )]
         internal static extern ulong GetSelectionsSize(
             NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle handle
         );
@@ -50,5 +57,9 @@ namespace ElectionGuard
             }
         }
 
+        #endregion
+
+        #region Methods
+        #endregion
     }
 }

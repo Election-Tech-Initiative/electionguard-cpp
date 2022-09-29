@@ -39,15 +39,19 @@ namespace ElectionGuard
 {
     public partial class <#= className #>
     {
+        #region Properties
 <# foreach (var egProperty in EgClass.Properties) { 
         var name = egProperty.Name;
         var type = egProperty.Type;
         var description = egProperty.Description;
         var entryPoint = ToSnakeCase($"Eg{className}Get{name}");
         #>
-        [DllImport(NativeInterface.DllName,
+        [DllImport(
+            NativeInterface.DllName,
             EntryPoint = "<#= entryPoint #>",
-            CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            CallingConvention = CallingConvention.Cdecl, 
+            SetLastError = true
+        )]
         internal static extern <#= type == "string" ? "Status" : type #> Get<#= name #>(
             NativeInterface.<#= className #>.<#= className #>Handle handle
 <# if (type == "string") { #>
@@ -76,5 +80,20 @@ namespace ElectionGuard
         }
 
 <#} // foreach EgProperty#>
+        #endregion
+
+        #region Methods
+<# foreach (var method in EgClass.Methods) { #>
+        /// <summary>
+        /// <#= method.Description #>
+        /// </summary>
+        public unsafe <#= method.ReturnType #> <#= method.Name #>(
+            <#= string.Join(", ", method.Params.Select(p => $"{p.Type} {p.Name}")) #>
+        ) {
+            return NativeInterface.<#= className #>.<#= method.Name #>(
+                Handle, expectedObjectId);
+        }
+<# } // foreach method #>
+        #endregion
     }
 }
