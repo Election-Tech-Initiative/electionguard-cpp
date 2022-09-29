@@ -26,6 +26,11 @@
         "Name": "ObjectId",
         "Type": "string",
         "Description": "Get the objectId of the contest, which is the unique id for the contest in a specific ballot style described in the election manifest."
+      },
+      {
+        "Name": "SelectionsSize",
+        "Type": "ulong",
+        "Description": "Get the Size of the selections collection"
       }
     ] 
   }

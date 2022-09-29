@@ -32,5 +32,23 @@ namespace ElectionGuard
             }
         }
 
+        [DllImport(NativeInterface.DllName,
+            EntryPoint = "eg_plaintext_ballot_contest_get_selections_size",
+            CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        internal static extern ulong GetSelectionsSize(
+            NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle handle
+        );
+
+        /// <Summary>
+        /// Get the Size of the selections collection
+        /// </Summary>
+        public unsafe ulong SelectionsSize
+        {
+            get
+            {
+                return GetSelectionsSize(Handle);
+            }
+        }
+
     }
 }

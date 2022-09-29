@@ -414,19 +414,6 @@ namespace ElectionGuard
     /// </summary>
     public partial class PlaintextBallotContest : DisposableBase
     {
-        /// <Summary>
-        /// Get the Size of the selections collection
-        /// </Summary>
-        public unsafe ulong SelectionsSize
-        {
-            get
-            {
-                var size = NativeInterface.PlaintextBallotContest.GetSelectionsSize(
-                    Handle);
-                return size;
-            }
-        }
-
         internal unsafe NativePlaintextBallotContest Handle;
 
         unsafe internal PlaintextBallotContest(
