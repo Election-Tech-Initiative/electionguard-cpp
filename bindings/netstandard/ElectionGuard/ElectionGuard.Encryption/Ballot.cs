@@ -412,25 +412,8 @@ namespace ElectionGuard
     /// Typically partial contests may be passed into Electionguard for memory constrained systems,
     /// while complete contests are passed into ElectionGuard when running encryption on an existing dataset.
     /// </summary>
-    public class PlaintextBallotContest : DisposableBase
+    public partial class PlaintextBallotContest : DisposableBase
     {
-        /// <Summary>
-        /// Get the objectId of the contest, which is the unique id for
-        /// the contest in a specific ballot style described in the election manifest.
-        /// </Summary>
-        public unsafe string ObjectId
-        {
-            get
-            {
-                var status = NativeInterface.PlaintextBallotContest.GetObjectId(
-                    Handle, out IntPtr value);
-                status.ThrowIfError();
-                var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
-                return data;
-            }
-        }
-
         /// <Summary>
         /// Get the Size of the selections collection
         /// </Summary>

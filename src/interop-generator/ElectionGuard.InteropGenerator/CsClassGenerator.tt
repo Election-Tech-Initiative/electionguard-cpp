@@ -27,11 +27,7 @@ static string ToSnakeCase(string text)
     return sb.ToString();
 }
 
-var propertiesPath = Path.Join(Directory.GetCurrentDirectory(), "/Properties.json");
-using FileStream openStream = File.OpenRead(propertiesPath);
-var egClasses = JsonSerializer.Deserialize<EgClass[]>(openStream);
-foreach (var egClass in egClasses) {
-    var className = egClass.ClassName;
+var className = EgClass.ClassName;
 #>
 // DO NOT MODIFY THIS FILE
 // This file is generated via ElectionGuard.InteropGenerator at /src/interop-generator
@@ -43,7 +39,7 @@ namespace ElectionGuard
 {
     public partial class <#= className #>
     {
-<# foreach (var egProperty in egClass.Properties) { 
+<# foreach (var egProperty in EgClass.Properties) { 
         var name = egProperty.Name;
         var type = egProperty.Type;
         var description = egProperty.Description;
@@ -82,4 +78,3 @@ namespace ElectionGuard
 <#} // foreach EgProperty#>
     }
 }
-<#} // foreach EgClass#>

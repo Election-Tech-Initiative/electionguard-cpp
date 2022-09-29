@@ -20,7 +20,7 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>CsClassGenerator.cs</LastGenOutput>
     </None>
-    <None Update="Properties.json">
+    <None Update="EgInteropClasses.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -30,10 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="ClassGenerator.cs">
+    <Compile Update="InteropClassGenerator.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>ClassGenerator.tt</DependentUpon>
     </Compile>
     <Compile Update="CppClassGenerator.cs">
       <DesignTime>True</DesignTime>

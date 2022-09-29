@@ -1,0 +1,32 @@
+﻿[
+  {
+    "ClassName": "PlaintextBallotSelection",
+    "Properties": [
+      {
+        "Name": "ObjectId",
+        "Type": "string",
+        "Description": "Get the objectId of the selection which is the unique id for the selection in a specific contest described in the election manifest."
+      },
+      {
+        "Name": "IsPlaceholder",
+        "Type": "bool",
+        "Description": "Determines if this is a placeholder selection"
+      },
+      {
+        "Name": "Vote",
+        "Type": "ulong",
+        "Description": "Get the plaintext vote"
+      }
+    ]
+  },
+  {
+    "ClassName": "PlaintextBallotContest",
+    "Properties": [
+      {
+        "Name": "ObjectId",
+        "Type": "string",
+        "Description": "Get the objectId of the contest, which is the unique id for the contest in a specific ballot style described in the election manifest."
+      }
+    ] 
+  }
+]
