@@ -3,6 +3,7 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text.Json" #>
 <#
 static string ToSnakeCase(string text)
 {
@@ -26,9 +27,11 @@ static string ToSnakeCase(string text)
     return sb.ToString();
 }
 
-var propertiesPath = Path.Join(Directory.GetCurrentDirectory(), "/Properties.txt");
-var properties = File.ReadLines(propertiesPath);
-var className = "PlaintextBallotSelection";
+var propertiesPath = Path.Join(Directory.GetCurrentDirectory(), "/Properties.json");
+using FileStream openStream = File.OpenRead(propertiesPath);
+var egClasses = JsonSerializer.Deserialize<EgClass[]>(openStream);
+foreach (var egClass in egClasses) {
+    var className = egClass.ClassName;
 #>
 // DO NOT MODIFY THIS FILE
 // This file is generated via ElectionGuard.InteropGenerator at /src/interop-generator
@@ -40,11 +43,10 @@ namespace ElectionGuard
 {
     public partial class <#= className #>
     {
-<# foreach (var property in properties) { 
-        var pieces = property.Split(',');
-        var name = pieces[0];
-        var type = pieces[1];
-        var description = pieces[2];
+<# foreach (var egProperty in egClass.Properties) { 
+        var name = egProperty.Name;
+        var type = egProperty.Type;
+        var description = egProperty.Description;
         var entryPoint = ToSnakeCase($"Eg{className}Get{name}");
         #>
         [DllImport(NativeInterface.DllName,
@@ -77,6 +79,7 @@ namespace ElectionGuard
             }
         }
 
-<#}#>
+<#} // foreach EgProperty#>
     }
 }
+<#} // foreach EgClass#>

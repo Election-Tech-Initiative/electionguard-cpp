@@ -20,7 +20,7 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>CsClassGenerator.cs</LastGenOutput>
     </None>
-    <None Update="Properties.txt">
+    <None Update="Properties.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
