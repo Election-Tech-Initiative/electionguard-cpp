@@ -19,12 +19,9 @@ namespace ElectionGuard
     {
         #region Properties
 <# foreach (var egProperty in EgClass.Properties) { 
-        var name = egProperty.Name;
-        var type = egProperty.Type;
-        var description = egProperty.Description;
         var entryPoint = egProperty.GetEntryPoint(className);
         var isInternalType = egProperty.NativeHandleType != null;
-        var isComplexType = type == "string" || isInternalType;
+        var isComplexType = egProperty.Type == "string" || isInternalType;
         #>
         [DllImport(
             NativeInterface.DllName,
@@ -32,35 +29,35 @@ namespace ElectionGuard
             CallingConvention = CallingConvention.Cdecl, 
             SetLastError = true
         )]
-        private static extern <#= isComplexType ? "Status" : type #> Get<#= name #>(
+        private static extern <#= isComplexType ? "Status" : egProperty.Type #> Get<#= egProperty.Name #>(
             NativeInterface.<#= className #>.<#= className #>Handle handle
 <# if (isInternalType) { #>
             , out <#= egProperty.NativeHandleType #> objectId
-<# } else if (type == "string") { #>
+<# } else if (egProperty.Type == "string") { #>
             , out IntPtr objectId
 <# } #>
         );
 
         /// <Summary>
-        /// <#= description #>
+        /// <#= egProperty.Description #>
         /// </Summary>
-        public unsafe <#= type #> <#= name #>
+        public unsafe <#= egProperty.Type #> <#= egProperty.Name #>
         {
             get
             {
 <# if (isInternalType) { #>
-                var status = Get<#= name #>(
+                var status = Get<#= egProperty.Name #>(
                     Handle, out <#= egProperty.NativeHandleType #> value);
                 status.ThrowIfError();
-                return new <#= type #>(value);
-<# } else if (type == "string") { #>
-                var status = Get<#= name #>(Handle, out IntPtr value);
+                return new <#= egProperty.Type #>(value);
+<# } else if (egProperty.Type == "string") { #>
+                var status = Get<#= egProperty.Name #>(Handle, out IntPtr value);
                 status.ThrowIfError();
                 var data = Marshal.PtrToStringAnsi(value);
                 NativeInterface.Memory.FreeIntPtr(value);
                 return data;
 <# } else { #>
-                return Get<#= name #>(Handle);
+                return Get<#= egProperty.Name #>(Handle);
 <# } #>
             }
         }
