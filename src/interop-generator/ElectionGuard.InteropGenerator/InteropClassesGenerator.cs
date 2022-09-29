@@ -27,7 +27,7 @@ namespace ElectionGuard.InteropGenerator
             foreach (var egClass in egClasses)
             {
                 var (className, generatedCode) = _classGenerator.Generate(outputType, egClass);
-                var fileName = className + ".cs";
+                var fileName = className + ".generated.cs";
                 var filePath = Path.Combine(OutputDir, fileName);
                 await File.WriteAllTextAsync(filePath, generatedCode);
             }
