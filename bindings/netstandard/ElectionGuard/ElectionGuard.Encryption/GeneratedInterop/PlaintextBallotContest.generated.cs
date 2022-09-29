@@ -17,7 +17,7 @@ namespace ElectionGuard
         )]
         internal static extern Status GetObjectId(
             NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle handle
-            , out IntPtr object_id
+            , out IntPtr objectId
         );
 
         /// <Summary>
@@ -27,8 +27,7 @@ namespace ElectionGuard
         {
             get
             {
-                var status = GetObjectId(
-                    Handle, out IntPtr value);
+                var status = GetObjectId(Handle, out IntPtr value);
                 status.ThrowIfError();
                 var data = Marshal.PtrToStringAnsi(value);
                 NativeInterface.Memory.FreeIntPtr(value);

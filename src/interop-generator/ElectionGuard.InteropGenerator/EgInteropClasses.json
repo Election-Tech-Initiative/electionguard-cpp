@@ -16,6 +16,12 @@
         "Name": "Vote",
         "Type": "ulong",
         "Description": "Get the plaintext vote"
+      },
+      {
+        "Name": "ExtendedData",
+        "Type": "ExtendedData",
+        "NativeHandleType": "NativeInterface.ExtendedData.ExtendedDataHandle",
+        "Description": "An optional field of arbitrary data, such as the value of a write-in candidate"
       }
     ],
     "Methods": [

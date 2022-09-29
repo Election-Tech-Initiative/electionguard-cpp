@@ -2483,12 +2483,6 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Free(PlaintextBallotSelectionType* handle);
 
-            [DllImport(DllName,
-                EntryPoint = "eg_plaintext_ballot_selection_get_extended_data",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetExtendedData(
-                PlaintextBallotSelectionHandle handle, out ExtendedData.ExtendedDataHandle extended_data);
-
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_is_valid",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern bool IsValid(

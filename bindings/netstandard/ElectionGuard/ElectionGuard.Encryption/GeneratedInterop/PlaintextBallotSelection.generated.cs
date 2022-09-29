@@ -17,7 +17,7 @@ namespace ElectionGuard
         )]
         internal static extern Status GetObjectId(
             NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
-            , out IntPtr object_id
+            , out IntPtr objectId
         );
 
         /// <Summary>
@@ -27,8 +27,7 @@ namespace ElectionGuard
         {
             get
             {
-                var status = GetObjectId(
-                    Handle, out IntPtr value);
+                var status = GetObjectId(Handle, out IntPtr value);
                 status.ThrowIfError();
                 var data = Marshal.PtrToStringAnsi(value);
                 NativeInterface.Memory.FreeIntPtr(value);
@@ -75,6 +74,31 @@ namespace ElectionGuard
             get
             {
                 return GetVote(Handle);
+            }
+        }
+
+        [DllImport(
+            NativeInterface.DllName,
+            EntryPoint = "eg_plaintext_ballot_selection_get_extended_data",
+            CallingConvention = CallingConvention.Cdecl, 
+            SetLastError = true
+        )]
+        internal static extern Status GetExtendedData(
+            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
+            , out NativeInterface.ExtendedData.ExtendedDataHandle objectId
+        );
+
+        /// <Summary>
+        /// An optional field of arbitrary data, such as the value of a write-in candidate
+        /// </Summary>
+        public unsafe ExtendedData ExtendedData
+        {
+            get
+            {
+                var status = GetExtendedData(
+                    Handle, out NativeInterface.ExtendedData.ExtendedDataHandle value);
+                status.ThrowIfError();
+                return new ExtendedData(value);
             }
         }
 

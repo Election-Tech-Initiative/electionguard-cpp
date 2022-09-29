@@ -125,20 +125,6 @@ namespace ElectionGuard
     /// </summary>
     public partial class PlaintextBallotSelection : DisposableBase
     {
-        /// <summary>
-        /// an optional field of arbitrary data, such as the value of a write-in candidate
-        /// </summary>
-        public unsafe ExtendedData ExtendedData
-        {
-            get
-            {
-                var status = NativeInterface.PlaintextBallotSelection.GetExtendedData(
-                    Handle, out NativeExtendedData value);
-                status.ThrowIfError();
-                return new ExtendedData(value);
-            }
-        }
-
         internal unsafe NativePlaintextBallotSelection Handle;
 
         unsafe internal PlaintextBallotSelection(NativePlaintextBallotSelection handle)

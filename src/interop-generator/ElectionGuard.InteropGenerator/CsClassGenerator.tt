@@ -45,6 +45,8 @@ namespace ElectionGuard
         var type = egProperty.Type;
         var description = egProperty.Description;
         var entryPoint = ToSnakeCase($"Eg{className}Get{name}");
+        var isInternalType = egProperty.NativeHandleType != null;
+        var isComplexType = type == "string" || isInternalType;
         #>
         [DllImport(
             NativeInterface.DllName,
@@ -52,10 +54,12 @@ namespace ElectionGuard
             CallingConvention = CallingConvention.Cdecl, 
             SetLastError = true
         )]
-        internal static extern <#= type == "string" ? "Status" : type #> Get<#= name #>(
+        internal static extern <#= isComplexType ? "Status" : type #> Get<#= name #>(
             NativeInterface.<#= className #>.<#= className #>Handle handle
-<# if (type == "string") { #>
-            , out IntPtr object_id
+<# if (isInternalType) { #>
+            , out <#= egProperty.NativeHandleType #> objectId
+<# } else if (type == "string") { #>
+            , out IntPtr objectId
 <# } #>
         );
 
@@ -66,9 +70,13 @@ namespace ElectionGuard
         {
             get
             {
-<# if (type == "string") { #>
+<# if (isInternalType) { #>
                 var status = Get<#= name #>(
-                    Handle, out IntPtr value);
+                    Handle, out <#= egProperty.NativeHandleType #> value);
+                status.ThrowIfError();
+                return new <#= type #>(value);
+<# } else if (type == "string") { #>
+                var status = Get<#= name #>(Handle, out IntPtr value);
                 status.ThrowIfError();
                 var data = Marshal.PtrToStringAnsi(value);
                 NativeInterface.Memory.FreeIntPtr(value);
