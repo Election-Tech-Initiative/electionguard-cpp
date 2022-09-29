@@ -32,7 +32,7 @@ namespace ElectionGuard
             CallingConvention = CallingConvention.Cdecl, 
             SetLastError = true
         )]
-        internal static extern <#= isComplexType ? "Status" : type #> Get<#= name #>(
+        private static extern <#= isComplexType ? "Status" : type #> Get<#= name #>(
             NativeInterface.<#= className #>.<#= className #>Handle handle
 <# if (isInternalType) { #>
             , out <#= egProperty.NativeHandleType #> objectId

@@ -69,7 +69,7 @@ var className = EgClass.ClassName;
             #line default
             #line hidden
             this.Write("\",\r\n            CallingConvention = CallingConvention.Cdecl, \r\n            SetLas" +
-                    "tError = true\r\n        )]\r\n        internal static extern ");
+                    "tError = true\r\n        )]\r\n        private static extern ");
             
             #line 35 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CsClassGenerator.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(isComplexType ? "Status" : type));

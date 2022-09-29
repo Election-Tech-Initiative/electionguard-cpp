@@ -15,7 +15,7 @@ namespace ElectionGuard
             CallingConvention = CallingConvention.Cdecl, 
             SetLastError = true
         )]
-        internal static extern Status GetObjectId(
+        private static extern Status GetObjectId(
             NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle handle
             , out IntPtr objectId
         );
@@ -41,7 +41,7 @@ namespace ElectionGuard
             CallingConvention = CallingConvention.Cdecl, 
             SetLastError = true
         )]
-        internal static extern ulong GetSelectionsSize(
+        private static extern ulong GetSelectionsSize(
             NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle handle
         );
 
