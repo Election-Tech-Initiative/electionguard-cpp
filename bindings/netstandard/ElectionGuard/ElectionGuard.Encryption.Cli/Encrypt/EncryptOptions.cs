@@ -14,6 +14,12 @@ internal class EncryptOptions
     [Option('b', "ballots", Required = true, HelpText = "File folder containing ballots to encrypt.")]
     public string? BallotsDir { get; set; }
 
+    [Option('d', "device", Required = true, HelpText = "Json file containing device information like launch code and location.")]
+    public string? Device { get; set; }
+
+    [Option('s', "spoiled_ids", Required = false, Separator = ',', HelpText = "Json file containing device information like launch code and location.")]
+    public IEnumerable<string> SpoiledDeviceIds { get; set; }
+
     [Option('o', "out", Required = true, HelpText = "File folder in which to place encrypted ballots.")]
     public string? OutDir { get; set; }
 
