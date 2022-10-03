@@ -16,6 +16,7 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <unordered_map>
+#include <regex>
 
 using electionguard::G;
 using electionguard::P;
@@ -25,6 +26,8 @@ using nlohmann::json;
 using std::make_unique;
 using std::reference_wrapper;
 using std::string;
+using std::regex;
+using std::regex_replace;
 using std::to_string;
 using std::unique_ptr;
 using std::vector;
@@ -581,7 +584,8 @@ namespace electionguard
 
             static string toJson(const electionguard::Manifest &serializable)
             {
-                return fromObject(serializable).dump();
+                auto manifestStr = fromObject(serializable).dump();
+                return regex_replace(manifestStr, regex("\\\\\\\\u"), "\\u");
             }
 
             static unique_ptr<electionguard::Manifest> fromBson(vector<uint8_t> data)
