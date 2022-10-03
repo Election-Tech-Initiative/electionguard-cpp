@@ -585,6 +585,9 @@ namespace electionguard
             static string toJson(const electionguard::Manifest &serializable)
             {
                 auto manifestStr = fromObject(serializable).dump();
+                // special characters like ú are converted to ascii escapes in C# but then 
+                //      https://github.com/nlohmann/json has a bug where it duplicates slashes,
+                //      so this code removes the duplicates to work around the bug
                 return regex_replace(manifestStr, regex("\\\\\\\\u"), "\\u");
             }
 
