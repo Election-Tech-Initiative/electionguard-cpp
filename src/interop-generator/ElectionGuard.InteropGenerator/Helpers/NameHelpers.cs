@@ -2,9 +2,9 @@
 
 namespace ElectionGuard.InteropGenerator.Helpers
 {
-    internal class NameHelpers
+    internal static class NameHelpers
     {
-        public static string ToSnakeCase(string text)
+        public static string ToSnakeCase(this string text)
         {
             if (text == null)
             {

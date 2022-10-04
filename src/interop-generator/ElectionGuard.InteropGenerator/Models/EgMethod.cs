@@ -5,7 +5,7 @@ namespace ElectionGuard.InteropGenerator.Models;
 public class EgMethod
 {
     public string Name { get; set; }
-    public string ReturnType { get; set; }
+    public string ReturnTypeCs { get; set; }
     public string Description { get; set; }
     public EgParam[] Params { get; set; }
 
@@ -18,14 +18,14 @@ public class EgMethod
 public class EgParam
 {
     public string Name { get; set; }
-    public string Type { get; set; }
+    public string TypeCs { get; set; }
 
     public string MarshallAs()
     {
-        if (Type == "string")
+        if (TypeCs == "string")
         {
             return "UnmanagedType.LPStr";
         }
-        throw new NotImplementedException("Unsupported marshall type " + Type);
+        throw new NotImplementedException("Unsupported marshall type " + TypeCs);
     }
 }

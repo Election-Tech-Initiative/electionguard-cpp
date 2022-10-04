@@ -65,7 +65,7 @@ var className = EgClass.ClassName;
             this.Write("\r\n        /// </Summary>\r\n        public unsafe ");
             
             #line 27 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.Type));
+            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.TypeCs));
             
             #line default
             #line hidden
@@ -100,14 +100,14 @@ var className = EgClass.ClassName;
             this.Write(" value);\r\n                status.ThrowIfError();\r\n                return new ");
             
             #line 35 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.Type));
+            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.TypeCs));
             
             #line default
             #line hidden
             this.Write("(value);\r\n");
             
             #line 36 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
- } else if (egProperty.Type == "string") { 
+ } else if (egProperty.TypeCs == "string") { 
             
             #line default
             #line hidden
@@ -165,7 +165,7 @@ var className = EgClass.ClassName;
             this.Write("\r\n        /// </summary>\r\n        public unsafe ");
             
             #line 56 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnType));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnTypeCs));
             
             #line default
             #line hidden
@@ -179,7 +179,7 @@ var className = EgClass.ClassName;
             this.Write("(\r\n            ");
             
             #line 57 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(", ", method.Params.Select(p => $"{p.Type} {p.Name}"))));
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(", ", method.Params.Select(p => $"{p.TypeCs} {p.Name}"))));
             
             #line default
             #line hidden
@@ -204,7 +204,7 @@ var className = EgClass.ClassName;
  foreach (var egProperty in EgClass.Properties) {
         var entryPoint = egProperty.GetEntryPoint(className);
         var isInternalType = egProperty.NativeHandleType != null;
-        var isComplexType = egProperty.Type == "string" || isInternalType;
+        var isComplexType = egProperty.TypeCs == "string" || isInternalType;
 
             
             #line default
@@ -221,7 +221,7 @@ var className = EgClass.ClassName;
                     "  SetLastError = true\r\n            )]\r\n            internal static extern ");
             
             #line 78 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(isComplexType ? "Status" : egProperty.Type));
+            this.Write(this.ToStringHelper.ToStringWithCulture(isComplexType ? "Status" : egProperty.TypeCs));
             
             #line default
             #line hidden
@@ -263,7 +263,7 @@ var className = EgClass.ClassName;
             this.Write(" objectId\r\n");
             
             #line 82 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
- } else if (egProperty.Type == "string") { 
+ } else if (egProperty.TypeCs == "string") { 
             
             #line default
             #line hidden
@@ -300,7 +300,7 @@ var className = EgClass.ClassName;
                     "rue)]\r\n            internal static extern ");
             
             #line 93 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnType));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnTypeCs));
             
             #line default
             #line hidden
@@ -328,7 +328,7 @@ var className = EgClass.ClassName;
             this.Write("Handle handle,\r\n                ");
             
             #line 95 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(", ", method.Params.Select(p => $"[MarshalAs({p.MarshallAs()})] {p.Type} {p.Name}"))));
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(", ", method.Params.Select(p => $"[MarshalAs({p.MarshallAs()})] {p.TypeCs} {p.Name}"))));
             
             #line default
             #line hidden

@@ -13,6 +13,7 @@
 
 extern "C" {
 #include "electionguard/ballot.h"
+#include "electionguard/plaintext_ballot_contest.generated.h"
 }
 
 using electionguard::BallotBoxState;

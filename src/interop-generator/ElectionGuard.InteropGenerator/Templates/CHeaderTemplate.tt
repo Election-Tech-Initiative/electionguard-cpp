@@ -3,16 +3,44 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="ElectionGuard.InteropGenerator.Helpers" #>
+<#
+	var classNameSnakeCase = EgClass.ClassName.ToSnakeCase();
+	var classHandle = $"eg_{classNameSnakeCase}_t";
+#>
+/// @file <#= classNameSnakeCase.ToLower() #>.generated.h
+#pragma once
 
 #include "chaum_pedersen.h"
 #include "elgamal.h"
 #include "export.h"
 #include "group.h"
 #include "status.h"
+#include "ballot.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+<# foreach (var egProperty in EgClass.Properties) { 
+	var entryPoint = egProperty.GetEntryPoint(EgClass.ClassName);
+	var returnType = egProperty.GetCReturnType();
+#>
+/**
+ * <#= egProperty.Description #>
+ */
+EG_API <#= returnType #> <#= entryPoint #>(
+	<#= classHandle #> *handle<#
+if (egProperty.TypeCs == "string") {
+#>,
+	char **out_object_id
+	);
+<# } else { #>
+
+	);
+<# } #>
+
+<# } // foreach property #>
 
 #ifdef __cplusplus
 }

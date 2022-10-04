@@ -104,6 +104,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_code.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_compact.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_compact.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/plaintext_ballot_contest.generated.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.h

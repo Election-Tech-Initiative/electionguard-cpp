@@ -24,7 +24,7 @@ namespace ElectionGuard
         /// <Summary>
         /// <#= egProperty.Description #>
         /// </Summary>
-        public unsafe <#= egProperty.Type #> <#= egProperty.Name #>
+        public unsafe <#= egProperty.TypeCs #> <#= egProperty.Name #>
         {
             get
             {
@@ -32,8 +32,8 @@ namespace ElectionGuard
                 var status = External.Get<#= egProperty.Name #>(
                     Handle, out <#= egProperty.NativeHandleType #> value);
                 status.ThrowIfError();
-                return new <#= egProperty.Type #>(value);
-<# } else if (egProperty.Type == "string") { #>
+                return new <#= egProperty.TypeCs #>(value);
+<# } else if (egProperty.TypeCs == "string") { #>
                 var status = External.Get<#= egProperty.Name #>(Handle, out IntPtr value);
                 status.ThrowIfError();
                 var data = Marshal.PtrToStringAnsi(value);
@@ -53,8 +53,8 @@ namespace ElectionGuard
         /// <summary>
         /// <#= method.Description #>
         /// </summary>
-        public unsafe <#= method.ReturnType #> <#= method.Name #>(
-            <#= string.Join(", ", method.Params.Select(p => $"{p.Type} {p.Name}")) #>
+        public unsafe <#= method.ReturnTypeCs #> <#= method.Name #>(
+            <#= string.Join(", ", method.Params.Select(p => $"{p.TypeCs} {p.Name}")) #>
         ) {
             return External.<#= method.Name #>(
                 Handle, expectedObjectId);
@@ -67,7 +67,7 @@ namespace ElectionGuard
 <# foreach (var egProperty in EgClass.Properties) {
         var entryPoint = egProperty.GetEntryPoint(className);
         var isInternalType = egProperty.NativeHandleType != null;
-        var isComplexType = egProperty.Type == "string" || isInternalType;
+        var isComplexType = egProperty.TypeCs == "string" || isInternalType;
 #>
             [DllImport(
                 NativeInterface.DllName,
@@ -75,11 +75,11 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
-            internal static extern <#= isComplexType ? "Status" : egProperty.Type #> Get<#= egProperty.Name #>(
+            internal static extern <#= isComplexType ? "Status" : egProperty.TypeCs #> Get<#= egProperty.Name #>(
                 NativeInterface.<#= className #>.<#= className #>Handle handle
 <# if (isInternalType) { #>
                 , out <#= egProperty.NativeHandleType #> objectId
-<# } else if (egProperty.Type == "string") { #>
+<# } else if (egProperty.TypeCs == "string") { #>
                 , out IntPtr objectId
 <# } // end is internal type #>
             );
@@ -90,9 +90,9 @@ namespace ElectionGuard
 #>
             [DllImport(NativeInterface.DllName, EntryPoint = "<#= entryPoint #>",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern <#= method.ReturnType #> <#= method.Name #>(
+            internal static extern <#= method.ReturnTypeCs #> <#= method.Name #>(
                 NativeInterface.<#= className #>.<#= className #>Handle handle,
-                <#= string.Join(", ", method.Params.Select(p => $"[MarshalAs({p.MarshallAs()})] {p.Type} {p.Name}")) #>
+                <#= string.Join(", ", method.Params.Select(p => $"[MarshalAs({p.MarshallAs()})] {p.TypeCs} {p.Name}")) #>
                 );
 <# } #>
         }
