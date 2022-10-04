@@ -19,25 +19,8 @@ namespace ElectionGuard
     {
         #region Properties
 <# foreach (var egProperty in EgClass.Properties) { 
-        var entryPoint = egProperty.GetEntryPoint(className);
         var isInternalType = egProperty.NativeHandleType != null;
-        var isComplexType = egProperty.Type == "string" || isInternalType;
         #>
-        [DllImport(
-            NativeInterface.DllName,
-            EntryPoint = "<#= entryPoint #>",
-            CallingConvention = CallingConvention.Cdecl, 
-            SetLastError = true
-        )]
-        private static extern <#= isComplexType ? "Status" : egProperty.Type #> Get<#= egProperty.Name #>(
-            NativeInterface.<#= className #>.<#= className #>Handle handle
-<# if (isInternalType) { #>
-            , out <#= egProperty.NativeHandleType #> objectId
-<# } else if (egProperty.Type == "string") { #>
-            , out IntPtr objectId
-<# } #>
-        );
-
         /// <Summary>
         /// <#= egProperty.Description #>
         /// </Summary>
@@ -77,6 +60,34 @@ namespace ElectionGuard
                 Handle, expectedObjectId);
         }
 <# } // foreach method #>
+        #endregion
+
+        #region Extern
+<# foreach (var egProperty in EgClass.Properties) {
+        var entryPoint = egProperty.GetEntryPoint(className);
+        var isInternalType = egProperty.NativeHandleType != null;
+        var isComplexType = egProperty.Type == "string" || isInternalType;
+#>
+        [DllImport(
+            NativeInterface.DllName,
+            EntryPoint = "<#= entryPoint #>",
+            CallingConvention = CallingConvention.Cdecl, 
+            SetLastError = true
+        )]
+        private static extern <#= isComplexType ? "Status" : egProperty.Type #> Get<#= egProperty.Name #>(
+            NativeInterface.<#= className #>.<#= className #>Handle handle
+<# if (isInternalType) { #>
+            , out <#= egProperty.NativeHandleType #> objectId
+<# } else if (egProperty.Type == "string") { #>
+            , out IntPtr objectId
+<# } // end is internal type #>
+        );
+<# } // end foreach property #>
+
+<# foreach (var method in EgClass.Methods) { #>
+        // todo: extern method
+<# } #>
+
         #endregion
     }
 }

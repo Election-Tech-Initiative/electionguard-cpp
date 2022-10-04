@@ -9,17 +9,6 @@ namespace ElectionGuard
     public partial class PlaintextBallotSelection
     {
         #region Properties
-        [DllImport(
-            NativeInterface.DllName,
-            EntryPoint = "eg_plaintext_ballot_selection_get_object_id",
-            CallingConvention = CallingConvention.Cdecl, 
-            SetLastError = true
-        )]
-        private static extern Status GetObjectId(
-            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
-            , out IntPtr objectId
-        );
-
         /// <Summary>
         /// Get the objectId of the selection which is the unique id for the selection in a specific contest described in the election manifest.
         /// </Summary>
@@ -35,16 +24,6 @@ namespace ElectionGuard
             }
         }
 
-        [DllImport(
-            NativeInterface.DllName,
-            EntryPoint = "eg_plaintext_ballot_selection_get_is_placeholder",
-            CallingConvention = CallingConvention.Cdecl, 
-            SetLastError = true
-        )]
-        private static extern bool GetIsPlaceholder(
-            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
-        );
-
         /// <Summary>
         /// Determines if this is a placeholder selection
         /// </Summary>
@@ -56,16 +35,6 @@ namespace ElectionGuard
             }
         }
 
-        [DllImport(
-            NativeInterface.DllName,
-            EntryPoint = "eg_plaintext_ballot_selection_get_vote",
-            CallingConvention = CallingConvention.Cdecl, 
-            SetLastError = true
-        )]
-        private static extern ulong GetVote(
-            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
-        );
-
         /// <Summary>
         /// Get the plaintext vote
         /// </Summary>
@@ -76,17 +45,6 @@ namespace ElectionGuard
                 return GetVote(Handle);
             }
         }
-
-        [DllImport(
-            NativeInterface.DllName,
-            EntryPoint = "eg_plaintext_ballot_selection_get_extended_data",
-            CallingConvention = CallingConvention.Cdecl, 
-            SetLastError = true
-        )]
-        private static extern Status GetExtendedData(
-            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
-            , out NativeInterface.ExtendedData.ExtendedDataHandle objectId
-        );
 
         /// <Summary>
         /// An optional field of arbitrary data, such as the value of a write-in candidate
@@ -114,6 +72,50 @@ namespace ElectionGuard
             return NativeInterface.PlaintextBallotSelection.IsValid(
                 Handle, expectedObjectId);
         }
+        #endregion
+
+        #region Extern
+        [DllImport(
+            NativeInterface.DllName,
+            EntryPoint = "eg_plaintext_ballot_selection_get_object_id",
+            CallingConvention = CallingConvention.Cdecl, 
+            SetLastError = true
+        )]
+        private static extern Status GetObjectId(
+            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
+            , out IntPtr objectId
+        );
+        [DllImport(
+            NativeInterface.DllName,
+            EntryPoint = "eg_plaintext_ballot_selection_get_is_placeholder",
+            CallingConvention = CallingConvention.Cdecl, 
+            SetLastError = true
+        )]
+        private static extern bool GetIsPlaceholder(
+            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
+        );
+        [DllImport(
+            NativeInterface.DllName,
+            EntryPoint = "eg_plaintext_ballot_selection_get_vote",
+            CallingConvention = CallingConvention.Cdecl, 
+            SetLastError = true
+        )]
+        private static extern ulong GetVote(
+            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
+        );
+        [DllImport(
+            NativeInterface.DllName,
+            EntryPoint = "eg_plaintext_ballot_selection_get_extended_data",
+            CallingConvention = CallingConvention.Cdecl, 
+            SetLastError = true
+        )]
+        private static extern Status GetExtendedData(
+            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
+            , out NativeInterface.ExtendedData.ExtendedDataHandle objectId
+        );
+
+        // todo: extern method
+
         #endregion
     }
 }
