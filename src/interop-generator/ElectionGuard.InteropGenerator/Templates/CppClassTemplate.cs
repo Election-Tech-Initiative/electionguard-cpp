@@ -7,7 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace ElectionGuard.InteropGenerator
+namespace ElectionGuard.InteropGenerator.Templates
 {
     using System.Linq;
     using System.Text;
@@ -19,9 +19,9 @@ namespace ElectionGuard.InteropGenerator
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CppClassGenerator.tt"
+    #line 1 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CppClassTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "17.0.0.0")]
-    public partial class CppClassGenerator : CppClassGeneratorBase
+    public partial class CppClassTemplate : CppClassTemplateBase
     {
 #line hidden
         /// <summary>
@@ -30,7 +30,7 @@ namespace ElectionGuard.InteropGenerator
         public virtual string TransformText()
         {
             
-            #line 7 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CppClassGenerator.tt"
+            #line 7 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CppClassTemplate.tt"
 
 var propertiesPath = Path.Join(Directory.GetCurrentDirectory(), "/Properties.txt");
 var properties = File.ReadLines(propertiesPath);
@@ -41,21 +41,21 @@ var properties = File.ReadLines(propertiesPath);
             this.Write("\r\nstruct PlaintextBallotSelection::Impl : public ElectionObjectBase {\r\n\tPlaintext" +
                     "BallotSelection::~PlaintextBallotSelection() = default;\r\n");
             
-            #line 14 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CppClassGenerator.tt"
+            #line 14 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CppClassTemplate.tt"
  foreach (var property in properties) { 
             
             #line default
             #line hidden
             this.Write("\tuint64_t ");
             
-            #line 15 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CppClassGenerator.tt"
+            #line 15 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CppClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property));
             
             #line default
             #line hidden
             this.Write(" = 0;\r\n");
             
-            #line 16 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\CppClassGenerator.tt"
+            #line 16 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CppClassTemplate.tt"
 }
 	
             
@@ -73,7 +73,7 @@ var properties = File.ReadLines(propertiesPath);
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "17.0.0.0")]
-    public class CppClassGeneratorBase
+    public class CppClassTemplateBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

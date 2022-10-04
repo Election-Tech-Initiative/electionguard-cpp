@@ -12,13 +12,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="CppClassGenerator.tt">
+    <None Update="Templates\CHeaderTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>CppClassGenerator.cs</LastGenOutput>
+      <LastGenOutput>CHeaderTemplate.cs</LastGenOutput>
     </None>
-    <None Update="CsClassGenerator.tt">
+    <None Update="Templates\CppClassTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>CsClassGenerator.cs</LastGenOutput>
+      <LastGenOutput>CppClassTemplate.cs</LastGenOutput>
+    </None>
+    <None Update="Templates\CsClassTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>CsClassTemplate.cs</LastGenOutput>
     </None>
     <None Update="EgInteropClasses.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -30,19 +34,24 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="InteropClassGenerator.cs">
+    <Compile Update="Templates\CHeaderTemplate.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CHeaderTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Update="FileGenerators\CsFileGenerator.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
-    <Compile Update="CppClassGenerator.cs">
+    <Compile Update="Templates\CppClassTemplate.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>CppClassGenerator.tt</DependentUpon>
+      <DependentUpon>CppClassTemplate.tt</DependentUpon>
     </Compile>
-    <Compile Update="CsClassGenerator.cs">
+    <Compile Update="Templates\CsClassTemplate.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>CsClassGenerator.tt</DependentUpon>
+      <DependentUpon>CsClassTemplate.tt</DependentUpon>
     </Compile>
   </ItemGroup>
 

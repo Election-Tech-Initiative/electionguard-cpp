@@ -1,2 +1,2 @@
-﻿var egInteropClassesGenerator = new InteropClassesGenerator();
-await egInteropClassesGenerator.Generate();
+﻿var egInteropClassesGenerator = new InteropGenerator();
+await egInteropClassesGenerator.GenerateAll();

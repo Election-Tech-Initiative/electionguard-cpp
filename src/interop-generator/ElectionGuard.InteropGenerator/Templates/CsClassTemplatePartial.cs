@@ -1,10 +1,10 @@
 ﻿using ElectionGuard.InteropGenerator.Models;
 
-namespace ElectionGuard.InteropGenerator
+namespace ElectionGuard.InteropGenerator.Templates
 {
-    public partial class CsClassGenerator
+    public partial class CsClassTemplate
     {
-        public CsClassGenerator(EgClass egClass)
+        public CsClassTemplate(EgClass egClass)
         {
             EgClass = egClass;
         }

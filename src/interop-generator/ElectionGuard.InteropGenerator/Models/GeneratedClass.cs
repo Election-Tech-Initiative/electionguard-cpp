@@ -1,3 +1,9 @@
 ﻿namespace ElectionGuard.InteropGenerator.Models;
 
-internal record GeneratedClass(string ClassName, string GeneratedCode);
+public record GeneratedClass(string FilePath, string GeneratedCode)
+{
+    public async Task Write()
+    {
+        await File.WriteAllTextAsync(FilePath, GeneratedCode);
+    }
+}
