@@ -16,7 +16,7 @@ namespace ElectionGuard
         {
             get
             {
-                var status = GetObjectId(Handle, out IntPtr value);
+                var status = External.GetObjectId(Handle, out IntPtr value);
                 status.ThrowIfError();
                 var data = Marshal.PtrToStringAnsi(value);
                 NativeInterface.Memory.FreeIntPtr(value);
@@ -31,7 +31,7 @@ namespace ElectionGuard
         {
             get
             {
-                return GetSelectionsSize(Handle);
+                return External.GetSelectionsSize(Handle);
             }
         }
 
@@ -41,27 +41,29 @@ namespace ElectionGuard
         #endregion
 
         #region Extern
-        [DllImport(
-            NativeInterface.DllName,
-            EntryPoint = "eg_plaintext_ballot_contest_get_object_id",
-            CallingConvention = CallingConvention.Cdecl, 
-            SetLastError = true
-        )]
-        private static extern Status GetObjectId(
-            NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle handle
-            , out IntPtr objectId
-        );
-        [DllImport(
-            NativeInterface.DllName,
-            EntryPoint = "eg_plaintext_ballot_contest_get_selections_size",
-            CallingConvention = CallingConvention.Cdecl, 
-            SetLastError = true
-        )]
-        private static extern ulong GetSelectionsSize(
-            NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle handle
-        );
+        private unsafe static class External {
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_plaintext_ballot_contest_get_object_id",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true
+            )]
+            internal static extern Status GetObjectId(
+                NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle handle
+                , out IntPtr objectId
+            );
 
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_plaintext_ballot_contest_get_selections_size",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true
+            )]
+            internal static extern ulong GetSelectionsSize(
+                NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle handle
+            );
 
+        }
         #endregion
     }
 }

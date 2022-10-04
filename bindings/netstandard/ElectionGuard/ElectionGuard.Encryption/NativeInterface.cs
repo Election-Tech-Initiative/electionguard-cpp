@@ -2482,12 +2482,6 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Free(PlaintextBallotSelectionType* handle);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_is_valid",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern bool IsValid(
-                PlaintextBallotSelectionHandle handle,
-                [MarshalAs(UnmanagedType.LPStr)] string expectedObjectId);
         }
 
         internal static unsafe class CiphertextBallotSelection

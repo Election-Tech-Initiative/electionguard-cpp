@@ -16,7 +16,7 @@ namespace ElectionGuard
         {
             get
             {
-                var status = GetObjectId(Handle, out IntPtr value);
+                var status = External.GetObjectId(Handle, out IntPtr value);
                 status.ThrowIfError();
                 var data = Marshal.PtrToStringAnsi(value);
                 NativeInterface.Memory.FreeIntPtr(value);
@@ -31,7 +31,7 @@ namespace ElectionGuard
         {
             get
             {
-                return GetIsPlaceholder(Handle);
+                return External.GetIsPlaceholder(Handle);
             }
         }
 
@@ -42,7 +42,7 @@ namespace ElectionGuard
         {
             get
             {
-                return GetVote(Handle);
+                return External.GetVote(Handle);
             }
         }
 
@@ -53,7 +53,7 @@ namespace ElectionGuard
         {
             get
             {
-                var status = GetExtendedData(
+                var status = External.GetExtendedData(
                     Handle, out NativeInterface.ExtendedData.ExtendedDataHandle value);
                 status.ThrowIfError();
                 return new ExtendedData(value);
@@ -69,53 +69,62 @@ namespace ElectionGuard
         public unsafe bool IsValid(
             string expectedObjectId
         ) {
-            return NativeInterface.PlaintextBallotSelection.IsValid(
+            return External.IsValid(
                 Handle, expectedObjectId);
         }
         #endregion
 
         #region Extern
-        [DllImport(
-            NativeInterface.DllName,
-            EntryPoint = "eg_plaintext_ballot_selection_get_object_id",
-            CallingConvention = CallingConvention.Cdecl, 
-            SetLastError = true
-        )]
-        private static extern Status GetObjectId(
-            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
-            , out IntPtr objectId
-        );
-        [DllImport(
-            NativeInterface.DllName,
-            EntryPoint = "eg_plaintext_ballot_selection_get_is_placeholder",
-            CallingConvention = CallingConvention.Cdecl, 
-            SetLastError = true
-        )]
-        private static extern bool GetIsPlaceholder(
-            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
-        );
-        [DllImport(
-            NativeInterface.DllName,
-            EntryPoint = "eg_plaintext_ballot_selection_get_vote",
-            CallingConvention = CallingConvention.Cdecl, 
-            SetLastError = true
-        )]
-        private static extern ulong GetVote(
-            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
-        );
-        [DllImport(
-            NativeInterface.DllName,
-            EntryPoint = "eg_plaintext_ballot_selection_get_extended_data",
-            CallingConvention = CallingConvention.Cdecl, 
-            SetLastError = true
-        )]
-        private static extern Status GetExtendedData(
-            NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
-            , out NativeInterface.ExtendedData.ExtendedDataHandle objectId
-        );
+        private unsafe static class External {
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_plaintext_ballot_selection_get_object_id",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true
+            )]
+            internal static extern Status GetObjectId(
+                NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
+                , out IntPtr objectId
+            );
 
-        // todo: extern method
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_plaintext_ballot_selection_get_is_placeholder",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true
+            )]
+            internal static extern bool GetIsPlaceholder(
+                NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
+            );
 
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_plaintext_ballot_selection_get_vote",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true
+            )]
+            internal static extern ulong GetVote(
+                NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
+            );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_plaintext_ballot_selection_get_extended_data",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true
+            )]
+            internal static extern Status GetExtendedData(
+                NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle
+                , out NativeInterface.ExtendedData.ExtendedDataHandle objectId
+            );
+
+            [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_selection_is_valid",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern bool IsValid(
+                NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle handle,
+                [MarshalAs(UnmanagedType.LPStr)] string expectedObjectId
+                );
+        }
         #endregion
     }
 }

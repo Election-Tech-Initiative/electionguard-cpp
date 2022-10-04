@@ -1,4 +1,6 @@
-﻿namespace ElectionGuard.InteropGenerator.Models;
+﻿using ElectionGuard.InteropGenerator.Helpers;
+
+namespace ElectionGuard.InteropGenerator.Models;
 
 public class EgMethod
 {
@@ -6,10 +8,24 @@ public class EgMethod
     public string ReturnType { get; set; }
     public string Description { get; set; }
     public EgParam[] Params { get; set; }
+
+    public string GetEntryPoint(string className)
+    {
+        return NameHelpers.ToSnakeCase($"Eg{className}{Name}");
+    }
 }
 
 public class EgParam
 {
     public string Name { get; set; }
     public string Type { get; set; }
+
+    public string MarshallAs()
+    {
+        if (Type == "string")
+        {
+            return "UnmanagedType.LPStr";
+        }
+        throw new NotImplementedException("Unsupported marshall type " + Type);
+    }
 }
