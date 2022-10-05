@@ -2786,11 +2786,6 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Free(PlaintextBallotType* handle);
 
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_object_id",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetObjectId(
-                PlaintextBallotHandle handle, out IntPtr object_id);
-
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_style_id",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetStyleId(

@@ -55,5 +55,17 @@
     ],
     "Methods": [
     ]
+  },
+  {
+    "ClassName": "PlaintextBallot",
+    "Properties": [
+      {
+        "Name": "ObjectId",
+        "TypeCs": "string",
+        "Description": "A unique Ballot ID that is relevant to the external system and must be unique within the dataset of the election."
+      }
+    ],
+    "Methods": [
+    ]
   }
 ]

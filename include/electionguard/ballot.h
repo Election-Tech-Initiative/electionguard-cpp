@@ -467,13 +467,6 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_new(
 EG_API eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle);
 
 /**
- * A unique Ballot ID that is relevant to the external system and must be unique
- * within the dataset of the election.
- */
-EG_API eg_electionguard_status_t eg_plaintext_ballot_get_object_id(eg_plaintext_ballot_t *handle,
-                                                                   char **out_object_id);
-
-/**
  * The Object Id of the ballot style in the election manifest.  This value is used
  * to determine which contests to expect on the ballot, to fill in missing values,
  * and to validate that the ballot is well-formed

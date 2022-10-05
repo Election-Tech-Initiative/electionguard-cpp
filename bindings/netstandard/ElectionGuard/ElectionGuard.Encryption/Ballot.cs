@@ -684,25 +684,8 @@ namespace ElectionGuard
     /// A complete representation of a ballot must include both affirmative and negative selections of
     /// every contest, AND the placeholder selections necessary to satisfy the NIZKPs for each contest and selection.
     /// </summary>
-    public class PlaintextBallot : DisposableBase
+    public partial class PlaintextBallot : DisposableBase
     {
-        /// <Summary>
-        /// A unique Ballot ID that is relevant to the external system and must be unique
-        /// within the dataset of the election.
-        /// </Summary>
-        public unsafe string ObjectId
-        {
-            get
-            {
-                var status = NativeInterface.PlaintextBallot.GetObjectId(
-                    Handle, out IntPtr value);
-                status.ThrowIfError();
-                var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
-                return data;
-            }
-        }
-
         /// <Summary>
         /// The Object Id of the ballot style in the election manifest.  This value is used
         /// to determine which contests to expect on the ballot, to fill in missing values,
