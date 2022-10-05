@@ -94,39 +94,6 @@ EG_API eg_electionguard_status_t
 eg_plaintext_ballot_selection_free(eg_plaintext_ballot_selection_t *handle);
 
 /**
-* @brief Get the ObjectId
-* @param[in] handle A poiner to the `eg_plaintext_ballot_selection_t` opaque instance
-* @param[out] out_object_id A pointer to the output object id.  
-                            The caller is responsible for freeing the string.
-* @return eg_electionguard_status_t indicating success or failure
-* @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
-* @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
-*/
-EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_get_object_id(
-  eg_plaintext_ballot_selection_t *handle, char **out_object_id);
-
-/**
- * Get the plaintext vote
- */
-EG_API uint64_t eg_plaintext_ballot_selection_get_vote(eg_plaintext_ballot_selection_t *handle);
-
-/**
- * Determines if this is a placeholder selection
- */
-EG_API bool
-eg_plaintext_ballot_selection_get_is_placeholder(eg_plaintext_ballot_selection_t *handle);
-
-/**
- * an optional field of arbitrary data, such as the value of a write-in candidate
- * 
- * @param[in] handle A poiner to the `eg_plaintext_ballot_selection_t` opaque instance
- * @param[out] out_extended_data_ref A pointer to the extended data.  
-                                     The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_get_extended_data(
-  eg_plaintext_ballot_selection_t *handle, eg_extended_data_t **out_extended_data_ref);
-
-/**
  * Given a PlaintextBallotSelection validates that the object matches an expected object
  * and that the plaintext value can resolve to a valid representation
  */
