@@ -57,7 +57,21 @@ if (egProperty.IsReferenceType()) {
 <# } #>
 
 <# } // foreach property #>
+<# foreach (var egMethod in EgClass.Methods) { 
+	var entryPoint = egMethod.GetEntryPoint(EgClass.ClassName); #>
+/**
+ * <#= egMethod.Description #>
+ */
+EG_API <#= egMethod.ReturnTypeC #> <#= entryPoint #>(
+	eg_plaintext_ballot_selection_t *handle<#
+foreach (var parameter in egMethod.Params) {
+	this.Write($",{Environment.NewLine}\t{parameter.TypeC}in_{parameter.Name.ToSnakeCase()}");
+}
+#>
 
+	);
+
+<# } // foreach method #>
 #ifdef __cplusplus
 }
 #endif

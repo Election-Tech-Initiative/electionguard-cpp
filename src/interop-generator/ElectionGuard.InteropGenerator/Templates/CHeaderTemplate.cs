@@ -180,7 +180,53 @@ if (egProperty.IsReferenceType()) {
             
             #line default
             #line hidden
-            this.Write("\r\n#ifdef __cplusplus\r\n}\r\n#endif\r\n");
+            
+            #line 60 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+ foreach (var egMethod in EgClass.Methods) { 
+	var entryPoint = egMethod.GetEntryPoint(EgClass.ClassName); 
+            
+            #line default
+            #line hidden
+            this.Write("/**\r\n * ");
+            
+            #line 63 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(egMethod.Description));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n */\r\nEG_API ");
+            
+            #line 65 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(egMethod.ReturnTypeC));
+            
+            #line default
+            #line hidden
+            this.Write(" ");
+            
+            #line 65 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entryPoint));
+            
+            #line default
+            #line hidden
+            this.Write("(\r\n\teg_plaintext_ballot_selection_t *handle");
+            
+            #line 66 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+
+foreach (var parameter in egMethod.Params) {
+	this.Write($",{Environment.NewLine}\t{parameter.TypeC}in_{parameter.Name.ToSnakeCase()}");
+}
+
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\t);\r\n\r\n");
+            
+            #line 74 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+ } // foreach method 
+            
+            #line default
+            #line hidden
+            this.Write("#ifdef __cplusplus\r\n}\r\n#endif\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }

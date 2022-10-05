@@ -56,6 +56,13 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_get_extended_data
 	eg_extended_data_t **out_extended_data
 	);
 
+/**
+ * Given a PlaintextBallotSelection validates that the object matches an expected object and that the plaintext value can resolve to a valid representation
+ */
+EG_API bool eg_plaintext_ballot_selection_is_valid(
+	eg_plaintext_ballot_selection_t *handle,
+	char *in_expected_object_id
+	);
 
 #ifdef __cplusplus
 }

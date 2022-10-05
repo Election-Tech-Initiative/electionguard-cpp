@@ -34,7 +34,6 @@ EG_API uint64_t eg_plaintext_ballot_contest_get_selections_size(
 	eg_plaintext_ballot_contest_t *handle
 	);
 
-
 #ifdef __cplusplus
 }
 #endif
