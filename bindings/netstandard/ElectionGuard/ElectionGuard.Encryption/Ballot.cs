@@ -686,24 +686,6 @@ namespace ElectionGuard
     /// </summary>
     public partial class PlaintextBallot : DisposableBase
     {
-        /// <Summary>
-        /// The Object Id of the ballot style in the election manifest.  This value is used
-        /// to determine which contests to expect on the ballot, to fill in missing values,
-        /// and to validate that the ballot is well-formed
-        /// </Summary>
-        public unsafe string StyleId
-        {
-            get
-            {
-                var status = NativeInterface.PlaintextBallot.GetStyleId(
-                    Handle, out IntPtr value);
-                status.ThrowIfError();
-                var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
-                return data;
-            }
-        }
-
         /// <summary>
         /// The size of the Contests collection
         /// </summary>

@@ -24,6 +24,21 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The Object Id of the ballot style in the election manifest.  This value is used to determine which contests to expect on the ballot, to fill in missing values, and to validate that the ballot is well-formed.
+        /// </Summary>
+        public unsafe string StyleId
+        {
+            get
+            {
+                var status = External.GetStyleId(Handle, out IntPtr value);
+                status.ThrowIfError();
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -38,6 +53,17 @@ namespace ElectionGuard
                 SetLastError = true
             )]
             internal static extern Status GetObjectId(
+                NativeInterface.PlaintextBallot.PlaintextBallotHandle handle
+                , out IntPtr objectId
+            );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_plaintext_ballot_get_style_id",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true
+            )]
+            internal static extern Status GetStyleId(
                 NativeInterface.PlaintextBallot.PlaintextBallotHandle handle
                 , out IntPtr objectId
             );

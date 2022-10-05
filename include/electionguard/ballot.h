@@ -467,14 +467,6 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_new(
 EG_API eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle);
 
 /**
- * The Object Id of the ballot style in the election manifest.  This value is used
- * to determine which contests to expect on the ballot, to fill in missing values,
- * and to validate that the ballot is well-formed
- */
-EG_API eg_electionguard_status_t eg_plaintext_ballot_get_style_id(eg_plaintext_ballot_t *handle,
-                                                                  char **out_style_id);
-
-/**
  * Get the size of the contest collection
  */
 EG_API uint64_t eg_plaintext_ballot_get_contests_size(eg_plaintext_ballot_t *handle);
