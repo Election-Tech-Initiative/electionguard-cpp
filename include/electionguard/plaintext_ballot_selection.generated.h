@@ -23,7 +23,7 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_get_object_id(
 /**
  * Determines if this is a placeholder selection
  */
-EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_get_is_placeholder(
+EG_API bool eg_plaintext_ballot_selection_get_is_placeholder(
 	eg_plaintext_ballot_selection_t *handle
 	);
 
@@ -38,7 +38,8 @@ EG_API uint64_t eg_plaintext_ballot_selection_get_vote(
  * An optional field of arbitrary data, such as the value of a write-in candidate
  */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_get_extended_data(
-	eg_plaintext_ballot_selection_t *handle
+	eg_plaintext_ballot_selection_t *handle,
+	eg_extended_data_t **out_extended_data
 	);
 
 

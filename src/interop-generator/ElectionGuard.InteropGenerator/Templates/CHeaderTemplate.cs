@@ -89,12 +89,26 @@ namespace ElectionGuard.InteropGenerator.Templates
             
             #line 33 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
 
-if (egProperty.TypeCs == "string") {
+if (egProperty.IsReferenceType()) {
 
             
             #line default
             #line hidden
-            this.Write(",\r\n\tchar **out_object_id\r\n\t);\r\n");
+            this.Write(",\r\n\t");
+            
+            #line 36 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.GetOutVarType()));
+            
+            #line default
+            #line hidden
+            this.Write("out_");
+            
+            #line 36 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.Name.ToSnakeCase()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\t);\r\n");
             
             #line 38 "C:\dev\ElectionGuard\electionguard-cpp\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
  } else { 

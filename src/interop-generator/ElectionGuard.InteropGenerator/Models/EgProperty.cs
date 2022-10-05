@@ -2,28 +2,44 @@
 
 namespace ElectionGuard.InteropGenerator.Models;
 
-public class EgProperty
+public record EgProperty(
+    string Name, 
+    string TypeCs, 
+    string? TypeC, 
+    string? NativeHandleType, 
+    string Description
+    )
 {
-    public string Name { get; set; }
-    public string TypeCs { get; set; }
-    public string? NativeHandleType { get; set; }
-    public string Description { get; set; }
+    private static readonly Dictionary<string, string> ReturnTypes = new()
+    {
+        { "string", "eg_electionguard_status_t" },
+        { "bool", "bool" },
+        { "ulong", "uint64_t" },
+    };
+
+    private static readonly string[] ValueTypes = {
+        "bool", "ulong"
+    };
 
     public string GetEntryPoint(string className)
     {
-        return NameHelpers.ToSnakeCase($"Eg{className}Get{Name}");
+        return $"Eg{className}Get{Name}".ToSnakeCase();
+    }
+
+    public bool IsReferenceType()
+    {
+        return !ValueTypes.Contains(TypeCs);
     }
 
     public string GetCReturnType()
     {
-        switch (TypeCs)
-        {
-            case "string":
-                return "eg_electionguard_status_t";
-            case "ulong":
-                return "uint64_t";
-            default:
-                return "eg_electionguard_status_t";
-        }
+        ReturnTypes.TryGetValue(TypeCs, out var value);
+        return value ?? "eg_electionguard_status_t";
+    }
+
+    public string GetOutVarType()
+    {
+        if (TypeCs == "string") return "char **";
+        return TypeC + " **";
     }
 }

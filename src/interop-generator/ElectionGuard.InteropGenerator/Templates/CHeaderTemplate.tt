@@ -31,9 +31,9 @@ extern "C" {
  */
 EG_API <#= returnType #> <#= entryPoint #>(
 	<#= classHandle #> *handle<#
-if (egProperty.TypeCs == "string") {
+if (egProperty.IsReferenceType()) {
 #>,
-	char **out_object_id
+	<#= egProperty.GetOutVarType() #>out_<#= egProperty.Name.ToSnakeCase() #>
 	);
 <# } else { #>
 

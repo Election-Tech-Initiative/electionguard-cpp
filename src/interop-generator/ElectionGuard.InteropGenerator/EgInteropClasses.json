@@ -20,6 +20,7 @@
       {
         "Name": "ExtendedData",
         "TypeCs": "ExtendedData",
+        "TypeC": "eg_extended_data_t",
         "NativeHandleType": "NativeInterface.ExtendedData.ExtendedDataHandle",
         "Description": "An optional field of arbitrary data, such as the value of a write-in candidate"
       }
