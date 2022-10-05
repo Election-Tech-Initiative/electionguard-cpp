@@ -22,6 +22,8 @@
 extern "C" {
 #endif
 
+#ifndef <#= EgClass.ClassName #>
+
 <# foreach (var egProperty in EgClass.Properties) { 
 	var entryPoint = egProperty.GetEntryPoint(EgClass.ClassName);
 	var returnType = egProperty.GetCReturnType();
@@ -72,6 +74,8 @@ foreach (var parameter in egMethod.Params) {
 	);
 
 <# } // foreach method #>
+#endif // ifndef <#= EgClass.ClassName #>
+
 #ifdef __cplusplus
 }
 #endif

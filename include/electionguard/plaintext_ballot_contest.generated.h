@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+#ifndef PlaintextBallotContest
+
 /**
  * @brief Get the objectId of the contest, which is the unique id for the contest in a specific ballot style described in the election manifest.
  * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
@@ -33,6 +35,8 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_get_object_id(
 EG_API uint64_t eg_plaintext_ballot_contest_get_selections_size(
 	eg_plaintext_ballot_contest_t *handle
 	);
+
+#endif // ifndef PlaintextBallotContest
 
 #ifdef __cplusplus
 }
