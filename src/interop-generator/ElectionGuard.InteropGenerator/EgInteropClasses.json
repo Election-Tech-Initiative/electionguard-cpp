@@ -68,6 +68,11 @@
         "Name": "StyleId",
         "TypeCs": "string",
         "Description": "The Object Id of the ballot style in the election manifest.  This value is used to determine which contests to expect on the ballot, to fill in missing values, and to validate that the ballot is well-formed."
+      },
+      {
+        "Name": "ContestsSize",
+        "TypeCs": "ulong",
+        "Description": "The size of the Contests collection."
       }
     ],
     "Methods": [

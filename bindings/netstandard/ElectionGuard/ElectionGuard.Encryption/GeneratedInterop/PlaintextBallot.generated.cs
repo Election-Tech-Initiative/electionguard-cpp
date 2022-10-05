@@ -39,6 +39,17 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The size of the Contests collection.
+        /// </Summary>
+        public unsafe ulong ContestsSize
+        {
+            get
+            {
+                return External.GetContestsSize(Handle);
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -66,6 +77,16 @@ namespace ElectionGuard
             internal static extern Status GetStyleId(
                 NativeInterface.PlaintextBallot.PlaintextBallotHandle handle
                 , out IntPtr objectId
+            );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_plaintext_ballot_get_contests_size",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true
+            )]
+            internal static extern ulong GetContestsSize(
+                NativeInterface.PlaintextBallot.PlaintextBallotHandle handle
             );
 
         }

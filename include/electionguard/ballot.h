@@ -467,11 +467,6 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_new(
 EG_API eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle);
 
 /**
- * Get the size of the contest collection
- */
-EG_API uint64_t eg_plaintext_ballot_get_contests_size(eg_plaintext_ballot_t *handle);
-
-/**
  * Get a contest at a specific index.
  * 
  * @param[in] in_index The index of the contest

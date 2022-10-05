@@ -40,6 +40,15 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_get_style_id(
 	char **out_style_id
 	);
 
+/**
+ * @brief The size of the Contests collection.
+ * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
+ * @return The value of the property
+ */
+EG_API uint64_t eg_plaintext_ballot_get_contests_size(
+	eg_plaintext_ballot_t *handle
+	);
+
 #endif // ifndef PlaintextBallot
 
 #ifdef __cplusplus
