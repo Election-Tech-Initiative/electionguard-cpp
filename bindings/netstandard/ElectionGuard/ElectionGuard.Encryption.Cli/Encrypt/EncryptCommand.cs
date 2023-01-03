@@ -1,4 +1,7 @@
-﻿namespace ElectionGuard.Encryption.Cli.Encrypt
+﻿using System.Collections;
+using System.Globalization;
+
+namespace ElectionGuard.Encryption.Cli.Encrypt
 {
     internal class EncryptCommand
     {
@@ -30,17 +33,21 @@
             {
                 Console.WriteLine($"Parsing: {ballotFile}");
                 var plaintextBallot = await GetPlaintextBallot(ballotFile);
-                var submittedBallot = EncryptAndSubmit(encryptionMediator, plaintextBallot);
+                var spoiledDeviceIds = encryptOptions.SpoiledDeviceIds.ToList();
+                var submittedBallot = EncryptAndSubmit(encryptionMediator, plaintextBallot, spoiledDeviceIds, ballotFile);
                 await WriteSubmittedBallot(encryptOptions, ballotFile, submittedBallot);
             }
             Console.WriteLine("Parsing Complete");
         }
 
-        private static SubmittedBallot EncryptAndSubmit(EncryptionMediator encryptionMediator, PlaintextBallot plaintextBallot)
+        private static SubmittedBallot EncryptAndSubmit(EncryptionMediator encryptionMediator,
+            PlaintextBallot plaintextBallot, IList<string> spoiledDeviceIds, string ballotFile)
         {
             var ciphertextBallot = encryptionMediator.Encrypt(plaintextBallot);
-            // todo: spoil?
-            var submittedBallot = new SubmittedBallot(ciphertextBallot, BallotBoxState.Cast);
+            var shouldSpoil = spoiledDeviceIds.Contains(ciphertextBallot.ObjectId, StringComparer.OrdinalIgnoreCase) ||
+                              spoiledDeviceIds.Contains(Path.GetFileNameWithoutExtension(ballotFile), StringComparer.OrdinalIgnoreCase);
+            var state = shouldSpoil ? BallotBoxState.Spoiled : BallotBoxState.Cast;
+            var submittedBallot = new SubmittedBallot(ciphertextBallot, state);
             return submittedBallot;
         }
 
