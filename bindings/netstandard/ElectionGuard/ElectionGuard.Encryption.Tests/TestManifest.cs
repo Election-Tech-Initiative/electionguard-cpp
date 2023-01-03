@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -185,6 +185,7 @@ namespace ElectionGuard.Encrypt.Tests
 
             var json = result.ToJson();
             Assert.IsTrue(json.Contains("\"value\":\"Ra\\\\u00fal\""));
+            Assert.IsTrue(json.Contains("\"value\":\"Ra\\u00fal\""));
         }
     }
 }
