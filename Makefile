@@ -42,7 +42,7 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 	brew install cppcheck
 	brew install include-what-you-use
 	brew install llvm
-	ln -s "$(brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
+	test -f /usr/local/bin/clang-tidy || sudo ln -s "$(shell brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
 	@echo 🐧 LINUX INSTALL
