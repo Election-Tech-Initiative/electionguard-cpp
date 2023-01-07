@@ -46,16 +46,7 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
 	@echo 🐧 LINUX INSTALL
-	sudo apt install -y build-essential
-	sudo apt install -y iwyu
-	sudo apt install -y llvm
-	sudo apt install -y clang-9
-	sudo apt install -y cmake
-	sudo apt install -y lcov
-	sudo apt install -y cppcheck
-	sudo apt install -y clang-format
-	sudo apt install -y clang-tidy
-	sudo apt install -y valgrind
+	@sudo /bin/bash make-environment-linux.sh
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo 🏁 WINDOWS INSTALL
